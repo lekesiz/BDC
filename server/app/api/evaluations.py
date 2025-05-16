@@ -58,7 +58,9 @@ def get_evaluations():
                 creator_id = current_user.id
         elif current_user.role == 'student':
             # Students can only see evaluations assigned to them
-            beneficiary_id = current_user.beneficiary_profile.id if hasattr(current_user, 'beneficiary_profile') else None
+            from app.models import Beneficiary
+            beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+            beneficiary_id = beneficiary.id if beneficiary else None
             if not beneficiary_id:
                 return jsonify({
                     'error': 'beneficiary_required',
@@ -137,7 +139,9 @@ def get_evaluation(id):
                         'message': 'You do not have permission to access this evaluation'
                     }), 403
         elif current_user.role == 'student':
-            beneficiary_id = current_user.beneficiary_profile.id if hasattr(current_user, 'beneficiary_profile') else None
+            from app.models import Beneficiary
+            beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+            beneficiary_id = beneficiary.id if beneficiary else None
             if not beneficiary_id or evaluation.beneficiary_id != beneficiary_id:
                 return jsonify({
                     'error': 'forbidden',
@@ -385,7 +389,9 @@ def get_questions(evaluation_id):
                         'message': 'You do not have permission to access questions for this evaluation'
                     }), 403
         elif current_user.role == 'student':
-            beneficiary_id = current_user.beneficiary_profile.id if hasattr(current_user, 'beneficiary_profile') else None
+            from app.models import Beneficiary
+            beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+            beneficiary_id = beneficiary.id if beneficiary else None
             if not beneficiary_id or evaluation.beneficiary_id != beneficiary_id:
                 return jsonify({
                     'error': 'forbidden',
@@ -684,7 +690,9 @@ def get_sessions():
                 }), 400
         elif current_user.role == 'student':
             # Students can only see their own sessions
-            beneficiary_id = current_user.beneficiary_profile.id if hasattr(current_user, 'beneficiary_profile') else None
+            from app.models import Beneficiary
+            beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+            beneficiary_id = beneficiary.id if beneficiary else None
             if not beneficiary_id:
                 return jsonify({
                     'error': 'beneficiary_required',
