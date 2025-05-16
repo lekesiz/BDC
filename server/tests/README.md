@@ -6,12 +6,31 @@ This directory contains the comprehensive test suite for the BDC (Beneficiary De
 
 ```
 tests/
-├── conftest.py          # Pytest fixtures and configuration
-├── test_auth.py         # Authentication endpoint tests
-├── test_beneficiaries.py # Beneficiary management tests
-├── test_programs.py     # Program management tests
-├── test_assessments.py  # Assessment/test engine tests
-└── README.md           # This file
+├── conftest.py              # Pytest fixtures and configuration
+├── factories.py             # Test factories for creating test data
+├── fixtures/                # Test fixtures
+│   └── integration_fixtures.py
+├── test_guide.md            # Testing guidelines
+├── test_ai*.py             # AI service tests
+├── test_analytics*.py      # Analytics tests
+├── test_api*.py            # API tests
+├── test_appointments*.py   # Appointment tests
+├── test_auth*.py           # Authentication tests
+├── test_availability*.py   # Availability tests
+├── test_beneficiaries*.py  # Beneficiary tests
+├── test_cache.py           # Cache tests
+├── test_documents*.py      # Document tests
+├── test_e2e_workflows.py   # End-to-end tests
+├── test_email_service.py   # Email service tests
+├── test_evaluations*.py    # Evaluation tests
+├── test_integration.py     # Integration tests
+├── test_notifications*.py  # Notification tests
+├── test_performance*.py    # Performance tests
+├── test_programs.py        # Program tests
+├── test_reports*.py        # Report tests
+├── test_security*.py       # Security tests
+├── test_users*.py          # User tests
+└── README.md               # This file
 ```
 
 ## Running Tests
@@ -58,6 +77,8 @@ pytest tests/test_auth.py::TestAuth::test_login_success
 # Run tests by marker
 pytest -m unit
 pytest -m integration
+pytest -m performance
+pytest -m security
 pytest -m "not slow"
 ```
 
@@ -79,37 +100,36 @@ Common fixtures defined in `conftest.py`:
 
 ## Test Categories
 
-### Authentication Tests (`test_auth.py`)
-- User registration
-- Login/logout
-- Token refresh
-- Password reset
-- Email verification
-- Access control
+### Unit Tests
+- Service tests (`test_*_service.py`)
+- Utility tests (`test_cache.py`, `test_logger.py`, etc.)
+- Model tests
 
-### Beneficiary Tests (`test_beneficiaries.py`)
-- CRUD operations
-- Trainer assignment
-- Progress tracking
-- Export/import functionality
-- Document management
-- Role-based access control
+### Integration Tests
+- API tests (`test_*_api.py`)
+- Full workflow tests (`test_integration.py`)
+- End-to-end tests (`test_e2e_workflows.py`)
 
-### Program Tests (`test_programs.py`)
-- Program creation and management
-- Beneficiary enrollment
-- Schedule management
-- Progress tracking
-- Statistics and analytics
-- Cloning programs
+### Performance Tests
+- Load tests (`test_performance.py`)
+- Backend performance (`test_performance_backend.py`)
 
-### Assessment Tests (`test_assessments.py`)
-- Test creation and management
-- Question management
-- Test sessions
-- Answer submission
-- Results and analytics
-- Bulk operations
+### Security Tests
+- Authentication tests (`test_security_auth.py`)
+- Input validation (`test_security_input_validation.py`)
+- XSS/CSRF protection (`test_security_xss_csrf.py`)
+- Encryption tests (`test_security_encryption.py`)
+
+### Feature Tests
+- Authentication (`test_auth*.py`)
+- Beneficiaries (`test_beneficiaries*.py`)
+- Programs (`test_programs.py`)
+- Assessments (`test_assessments.py`)
+- Appointments (`test_appointments*.py`)
+- Documents (`test_documents*.py`)
+- Notifications (`test_notifications*.py`)
+- Reports (`test_reports*.py`)
+- Users (`test_users*.py`)
 
 ## Writing New Tests
 

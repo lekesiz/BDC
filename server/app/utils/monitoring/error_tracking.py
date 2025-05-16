@@ -17,11 +17,9 @@ from flask_sqlalchemy import SQLAlchemy
 import redis
 from sqlalchemy import func
 
-from backend.app.models.monitoring import ErrorLog, ErrorMetrics
-from backend.app.utils.security import sanitize_sensitive_data
-
-
-logger = logging.getLogger(__name__)
+from app.models.monitoring import ErrorLog, ErrorMetrics
+from app.utils.security import sanitize_sensitive_data
+from app.utils.logging import logger
 
 
 class ErrorTracker:
@@ -557,4 +555,4 @@ def init_error_tracking(app: Flask, db: SQLAlchemy, redis_client: redis.Redis):
         count = error_tracker.cleanup_old_errors()
         print(f"Cleaned up {count} old error records")
     
-    return error_tracker
+    return error_tracker 

@@ -3,7 +3,7 @@ import os
 import tempfile
 from datetime import datetime, timedelta
 from app import create_app
-from models import db, User, Tenant, Beneficiary, Program, Test, TestQuestion
+from app.models import db, User, Tenant, Beneficiary, Program, Test, TestQuestion
 from flask_jwt_extended import create_access_token
 
 @pytest.fixture(scope='session')

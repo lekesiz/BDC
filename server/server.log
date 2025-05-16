@@ -592,3 +592,1488 @@ Server initialized for eventlet.
 [2025-05-16 08:01:29,383] INFO in __init__: Total users in database: 13
  * Debugger is active!
  * Debugger PIN: 376-864-709
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/users/me HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/users/me HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/notifications/unread-count HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/notifications/unread-count HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/notifications HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/analytics/dashboard?range=7days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/notifications HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/analytics/dashboard?range=7days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/notifications/unread-count HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/notifications HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/notifications/unread-count HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/notifications HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/analytics/dashboard?range=7days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/reports/recent HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/reports/recent HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/appointments?start_date=2025-05-16&end_date=2025-05-23&status=scheduled HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/analytics/dashboard?range=7days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/reports/recent HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/appointments?start_date=2025-05-16&end_date=2025-05-23&status=scheduled HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "OPTIONS /api/tests/sessions?per_page=5&sort=created_at&order=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/appointments?start_date=2025-05-16&end_date=2025-05-23&status=scheduled HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/tests/sessions?per_page=5&sort=created_at&order=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:51] "GET /api/tests/sessions?per_page=5&sort=created_at&order=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:59] "OPTIONS /api/analytics/dashboard?range=30days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:59] "GET /api/analytics/dashboard?range=30days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:59] "GET /api/reports/recent HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:59] "GET /api/appointments?start_date=2025-05-16&end_date=2025-05-23&status=scheduled HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:59] "GET /api/tests/sessions?per_page=5&sort=created_at&order=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:59] "OPTIONS /api/analytics/dashboard?range=90days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:59] "GET /api/analytics/dashboard?range=90days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:59] "GET /api/reports/recent HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:59] "GET /api/appointments?start_date=2025-05-16&end_date=2025-05-23&status=scheduled HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:10:59] "GET /api/tests/sessions?per_page=5&sort=created_at&order=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:00] "GET /api/analytics/dashboard?range=7days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:00] "GET /api/reports/recent HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:00] "GET /api/appointments?start_date=2025-05-16&end_date=2025-05-23&status=scheduled HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:00] "GET /api/tests/sessions?per_page=5&sort=created_at&order=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:07] "OPTIONS /api/evaluations HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:07] "OPTIONS /api/evaluations HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:08] "GET /api/evaluations HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:08] "GET /api/evaluations HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:11] "OPTIONS /api/users?page=1&limit=10&sort_by=created_at&sort_direction=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:11] "OPTIONS /api/users?page=1&limit=10&sort_by=created_at&sort_direction=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:11] "GET /api/users?page=1&limit=10&sort_by=created_at&sort_direction=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:11] "GET /api/users?page=1&limit=10&sort_by=created_at&sort_direction=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:14] "OPTIONS /api/tenants HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:14] "OPTIONS /api/tenants HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:14] "GET /api/tenants HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:14] "GET /api/tenants HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:15] "OPTIONS /api/beneficiaries?page=1&per_page=10&sort_by=created_at&sort_dir=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:15] "OPTIONS /api/beneficiaries?page=1&per_page=10&sort_by=created_at&sort_dir=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:15] "GET /api/beneficiaries?page=1&per_page=10&sort_by=created_at&sort_dir=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:15] "GET /api/beneficiaries?page=1&per_page=10&sort_by=created_at&sort_dir=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:24] "OPTIONS /api/reports/1 HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:24] "OPTIONS /api/reports/1 HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:24] "[33mGET /api/reports/1 HTTP/1.1[0m" 404 -
+127.0.0.1 - - [16/May/2025 09:11:24] "[33mGET /api/reports/1 HTTP/1.1[0m" 404 -
+127.0.0.1 - - [16/May/2025 09:11:33] "OPTIONS /api/reports/4 HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:33] "OPTIONS /api/reports/4 HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:33] "[33mGET /api/reports/4 HTTP/1.1[0m" 404 -
+127.0.0.1 - - [16/May/2025 09:11:33] "[33mGET /api/reports/4 HTTP/1.1[0m" 404 -
+127.0.0.1 - - [16/May/2025 09:11:40] "OPTIONS /api/documents HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:40] "OPTIONS /api/documents HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:40] "GET /api/documents HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:40] "GET /api/documents HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:42] "GET /api/beneficiaries?page=1&per_page=10&sort_by=created_at&sort_dir=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:43] "GET /api/beneficiaries?page=1&per_page=10&sort_by=created_at&sort_dir=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:43] "GET /api/tenants HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:43] "GET /api/tenants HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:43] "GET /api/users?page=1&limit=10&sort_by=created_at&sort_direction=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:43] "GET /api/users?page=1&limit=10&sort_by=created_at&sort_direction=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:45] "GET /api/evaluations HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:45] "GET /api/evaluations HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:45] "GET /api/analytics/dashboard?range=7days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:45] "GET /api/reports/recent HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:45] "GET /api/appointments?start_date=2025-05-16&end_date=2025-05-23&status=scheduled HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:45] "GET /api/analytics/dashboard?range=7days HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:45] "GET /api/tests/sessions?per_page=5&sort=created_at&order=desc HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:45] "GET /api/reports/recent HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:45] "GET /api/appointments?start_date=2025-05-16&end_date=2025-05-23&status=scheduled HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 09:11:45] "GET /api/tests/sessions?per_page=5&sort=created_at&order=desc HTTP/1.1" 200 -
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/ai_verification.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 09:14:42,073] INFO in __init__: Total users in database: 13
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/ai/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 09:14:52,342] INFO in __init__: Total users in database: 13
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/optimization/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 09:14:59,592] INFO in __init__: Total users in database: 13
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/database/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 09:15:06,798] INFO in __init__: Total users in database: 13
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/monitoring/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 09:15:13,022] INFO in __init__: Total users in database: 13
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/models/monitoring.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/ai/content_recommendations.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/ai/human_review_workflow.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/ai/note_analysis.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/ai/recommendations.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/ai/report_synthesis.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/ai/test_analysis.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/optimization/api_optimizer.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/optimization/cache_strategy.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/optimization/cache_strategy.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/optimization/db_indexing.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/optimization/db_indexing.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/optimization/query_optimizer.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/optimization/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/optimization/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/database/backup.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/database/indexing_strategy.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/database/migrations.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/database/optimization.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/database/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/database/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/monitoring/alarm_system.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/monitoring/app_monitoring.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/monitoring/error_tracking.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/monitoring/error_tracking.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/monitoring/performance_metrics.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/utils/monitoring/performance_metrics.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_performance_backend.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_performance_backend.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/tests/factories.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_security_auth.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_security_encryption.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_security_input_validation.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_security_xss_csrf.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/dashboard.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_beneficiaries_api.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_security_input_validation.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/conftest.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/conftest.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+  File "/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py", line 14, in <module>
+    from app.api.beneficiaries.dashboard import BeneficiaryDashboardResource, BeneficiaryProgressResource
+  File "/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/dashboard.py", line 2, in <module>
+    from flask_restful import Resource
+ModuleNotFoundError: No module named 'flask_restful'
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from 'app.api.beneficiaries' (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+  File "/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py", line 9, in <module>
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from partially initialized module 'app.api.beneficiaries' (most likely due to a circular import) (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+127.0.0.1 - - [16/May/2025 10:41:26] "[35m[1mOPTIONS /api/auth/login HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 907, in app
+    raise err from None
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+  File "/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py", line 9, in <module>
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from partially initialized module 'app.api.beneficiaries' (most likely due to a circular import) (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+
+127.0.0.1 - - [16/May/2025 10:41:30] "[35m[1mOPTIONS /api/auth/login HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 907, in app
+    raise err from None
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/werkzeug/debug/__init__.py", line 330, in debug_application
+    app_iter = self.app(environ, start_response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 907, in app
+    raise err from None
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 224, in locate_app
+    raise NoAppException(
+flask.cli.NoAppException: While importing 'wsgi', an ImportError was raised:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 196, in register_blueprints
+    from app.api.beneficiaries import beneficiaries_bp
+  File "/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py", line 9, in <module>
+    from app.api.beneficiaries import beneficiaries_bp
+ImportError: cannot import name 'beneficiaries_bp' from partially initialized module 'app.api.beneficiaries' (most likely due to a circular import) (/Users/mikail/Desktop/BDC/server/app/api/beneficiaries/__init__.py)
+

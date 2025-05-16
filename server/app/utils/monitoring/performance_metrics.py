@@ -574,4 +574,4 @@ def init_performance_monitoring(app: Flask, redis_client: redis.Redis):
         metrics = collector.collect_system_metrics()
         print(json.dumps(metrics, indent=2))
     
-    return collector
+    return collector 
