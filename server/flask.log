@@ -1,0 +1,110 @@
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.8.134:5001
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+User not found: admin@bdc.com
+Failed login attempt for admin@bdc.com
+127.0.0.1 - - [14/May/2025 22:29:08] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.IntegrityError: NOT NULL constraint failed: tenants.slug
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 898, in run_command
+    app = info.load_app()
+          ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 313, in load_app
+    app = locate_app(import_name, None, raise_if_not_found=False)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/cli.py", line 219, in locate_app
+    __import__(module_name)
+  File "/Users/mikail/Desktop/BDC/server/wsgi.py", line 6, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 78, in create_app
+    db.session.commit()
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/scoping.py", line 598, in commit
+    return self._proxied.commit()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4312, in flush
+    self._flush(objects)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4408, in _flush
+    flush_context.execute()
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: tenants.slug
+[SQL: INSERT INTO tenants (name, slug, email, phone, address, "plan", max_users, max_beneficiaries, is_active, activation_date, expiration_date, settings, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('Default', None, None, None, None, 'basic', 10, 50, 1, None, None, '{}', '2025-05-14 20:30:51.729889', '2025-05-14 20:30:51.729892')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+ * Debugger is active!
+ * Debugger PIN: 911-738-190
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/__init__.py', reloading
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+[2025-05-14 22:31:07,814] INFO in __init__: Admin user exists, verified password: True
+ * Debugger is active!
+ * Debugger PIN: 376-864-709

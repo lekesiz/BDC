@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.server
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - ./backend/uploads:/app/uploads
+    env_file:
+      - .env
+    environment:
+      - FLASK_APP=wsgi.py
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/bdc
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    networks:
+      - bdc-network
+
+  client:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.client
+    ports:
+      - "5173:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+    depends_on:
+      - server
+    networks:
+      - bdc-network
+
+  db:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=bdc
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - bdc-network
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - bdc-network
+
+networks:
+  bdc-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  uploads:

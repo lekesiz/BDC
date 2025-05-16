@@ -1,0 +1,54 @@
+# Flask and extensions
+Flask==3.0.0
+flask-sqlalchemy==3.1.1
+flask-migrate==4.0.5
+flask-jwt-extended==4.6.0
+flask-marshmallow==1.1.0
+flask-cors==4.0.0
+flask-caching==2.1.0
+flask-limiter==3.5.0
+flask-mail==0.9.1
+marshmallow-sqlalchemy==1.0.0
+python-dotenv==1.0.0
+gunicorn==21.2.0
+
+# Database
+SQLAlchemy==2.0.25
+alembic==1.13.1
+psycopg2-binary==2.9.9
+
+# Caching
+redis==5.0.1
+
+# Utilities
+Werkzeug==3.0.1
+structlog==24.1.0
+email-validator==2.1.0
+python-dateutil==2.8.2
+PyJWT==2.8.0
+pycryptodome==3.19.0
+reportlab==4.0.9
+Pillow==10.1.0
+
+# AI and ML
+openai==1.3.7
+langchain==0.0.352
+numpy==1.26.3
+pandas==2.1.4
+
+# Google Calendar Integration
+google-auth==2.23.0
+google-auth-oauthlib==1.1.0
+google-auth-httplib2==0.1.1
+google-api-python-client==2.108.0
+
+# Real-time Communications
+flask-socketio==5.3.6
+eventlet==0.33.3
+redis==5.0.1  # Already included above, just noting it's used for socketio as well
+
+# Testing
+pytest==7.4.3
+pytest-flask==1.3.0
+factory-boy==3.3.0
+coverage==7.3.2

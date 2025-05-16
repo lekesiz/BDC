@@ -1,0 +1,31 @@
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+[2025-05-14 22:40:03,501] INFO in __init__: Admin user exists, verified password: True
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+[2025-05-14 22:40:04,208] INFO in __init__: Admin user exists, verified password: True
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+127.0.0.1 - - [14/May/2025 22:40:40] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+User not found: tenant@bdc.com
+Failed login attempt for tenant@bdc.com
+127.0.0.1 - - [14/May/2025 22:40:40] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+127.0.0.1 - - [14/May/2025 22:40:51] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+User not found: trainer@bdc.com
+Failed login attempt for trainer@bdc.com
+127.0.0.1 - - [14/May/2025 22:40:51] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+127.0.0.1 - - [14/May/2025 22:41:01] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+User not found: student@bdc.com
+Failed login attempt for student@bdc.com
+127.0.0.1 - - [14/May/2025 22:41:01] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+127.0.0.1 - - [14/May/2025 22:41:16] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2025 22:41:16] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2025 22:41:16] "OPTIONS /api/users/me HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2025 22:41:16] "GET /api/users/me HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2025 22:41:16] "[33mOPTIONS /notifications/unread-count HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/May/2025 22:41:16] "[33mOPTIONS /notifications/unread-count HTTP/1.1[0m" 404 -

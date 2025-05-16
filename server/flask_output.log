@@ -1,0 +1,707 @@
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 03:56:55,380] INFO in __init__: Total users in database: 9
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 9
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- test.admin@bdc.com (super_admin)
+- test.beneficiary2@example.com (student)
+- test.beneficiary@example.com (student)
+- advanced.test@example.com (student)
+- advanced.test.0246bc56@example.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.8.134:5001
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 03:56:56,389] INFO in __init__: Total users in database: 8
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/test_beneficiaries_complete.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 8
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 03:58:33,949] INFO in __init__: Total users in database: 8
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/test_beneficiaries_complete.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 8
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 03:59:46,085] INFO in __init__: Total users in database: 8
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+Failed login attempt for admin@bdc.com
+127.0.0.1 - - [16/May/2025 03:59:48] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+ * Detected change in '/Users/mikail/Desktop/BDC/server/create_test_data.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 8
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:01:04,295] INFO in __init__: Total users in database: 8
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/create_test_data.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 8
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:01:11,545] INFO in __init__: Total users in database: 8
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+Failed login attempt for admin@bdc.com
+127.0.0.1 - - [16/May/2025 04:01:19] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+127.0.0.1 - - [16/May/2025 04:01:36] "GET /api/auth/debug HTTP/1.1" 200 -
+Failed to parse JSON: 400 Bad Request: Failed to decode JSON object: Invalid \escape: line 1 column 46 (char 45)
+127.0.0.1 - - [16/May/2025 04:01:56] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 400 -
+127.0.0.1 - - [16/May/2025 04:02:21] "POST /api/auth/login HTTP/1.1" 200 -
+Failed login attempt for admin@bdc.com
+127.0.0.1 - - [16/May/2025 04:02:57] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+ * Detected change in '/Users/mikail/Desktop/BDC/server/test_beneficiaries_complete.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 8
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:03:07,306] INFO in __init__: Total users in database: 8
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+Failed login attempt for admin@bdc.com
+127.0.0.1 - - [16/May/2025 04:03:13] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+ * Detected change in '/Users/mikail/Desktop/BDC/server/test_beneficiaries_complete.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 8
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:03:22,675] INFO in __init__: Total users in database: 8
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+127.0.0.1 - - [16/May/2025 04:03:24] "POST /api/auth/login HTTP/1.1" 200 -
+[2025-05-16 04:03:24,644] ERROR in beneficiaries: Get beneficiaries error: object of type 'AppenderQuery' has no len()
+Traceback (most recent call last):
+  File "/Users/mikail/Desktop/BDC/server/app/api/beneficiaries.py", line 73, in get_beneficiaries
+    result = schema.dump(beneficiaries)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/marshmallow/schema.py", line 621, in dump
+    result = self._serialize(processed_obj, many=many)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/marshmallow/schema.py", line 586, in _serialize
+    return [self._serialize(d, many=False) for d in obj]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/marshmallow/schema.py", line 586, in <listcomp>
+    return [self._serialize(d, many=False) for d in obj]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/marshmallow/schema.py", line 589, in _serialize
+    value = field_obj.serialize(attr_name, obj, accessor=self.get_attribute)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/marshmallow/fields.py", line 340, in serialize
+    value = self.get_value(obj, attr, accessor=accessor)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/marshmallow/fields.py", line 270, in get_value
+    return accessor_func(obj, check_key, default)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/marshmallow/schema.py", line 554, in get_attribute
+    return get_value(obj, attr, default)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/marshmallow/utils.py", line 283, in get_value
+    return _get_value_for_key(obj, key, default)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/marshmallow/utils.py", line 296, in _get_value_for_key
+    return getattr(obj, key, default)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/models/beneficiary.py", line 50, in evaluation_count
+    return len(self.evaluations) if hasattr(self, 'evaluations') else 0
+           ^^^^^^^^^^^^^^^^^^^^^
+TypeError: object of type 'AppenderQuery' has no len()
+127.0.0.1 - - [16/May/2025 04:03:24] "[35m[1mGET /api/beneficiaries HTTP/1.1[0m" 500 -
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/models/beneficiary.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 8
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:03:47,164] INFO in __init__: Total users in database: 8
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+127.0.0.1 - - [16/May/2025 04:04:37] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:04:37] "GET /api/beneficiaries HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:05:21] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:05:21] "[35m[1mPOST /api/auth/register HTTP/1.1[0m" 201 -
+send: 'ehlo mac.lan\r\n'
+reply: b'250-smtp.gmail.com at your service, [82.66.101.58]\r\n'
+reply: b'250-SIZE 35882577\r\n'
+reply: b'250-8BITMIME\r\n'
+reply: b'250-STARTTLS\r\n'
+reply: b'250-ENHANCEDSTATUSCODES\r\n'
+reply: b'250-PIPELINING\r\n'
+reply: b'250-CHUNKING\r\n'
+reply: b'250 SMTPUTF8\r\n'
+reply: retcode (250); Msg: b'smtp.gmail.com at your service, [82.66.101.58]\nSIZE 35882577\n8BITMIME\nSTARTTLS\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8'
+send: 'STARTTLS\r\n'
+reply: b'220 2.0.0 Ready to start TLS\r\n'
+reply: retcode (220); Msg: b'2.0.0 Ready to start TLS'
+send: 'ehlo mac.lan\r\n'
+reply: b'250-smtp.gmail.com at your service, [82.66.101.58]\r\n'
+reply: b'250-SIZE 35882577\r\n'
+reply: b'250-8BITMIME\r\n'
+reply: b'250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH\r\n'
+reply: b'250-ENHANCEDSTATUSCODES\r\n'
+reply: b'250-PIPELINING\r\n'
+reply: b'250-CHUNKING\r\n'
+reply: b'250 SMTPUTF8\r\n'
+reply: retcode (250); Msg: b'smtp.gmail.com at your service, [82.66.101.58]\nSIZE 35882577\n8BITMIME\nAUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8'
+send: 'AUTH PLAIN AHlvdXItZW1haWxAZ21haWwuY29tAHlvdXItYXBwLXBhc3N3b3Jk\r\n'
+reply: b'535-5.7.8 Username and Password not accepted. For more information, go to\r\n'
+reply: b'535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca8874bsm1236242f8f.67 - gsmtp\r\n'
+reply: retcode (535); Msg: b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca8874bsm1236242f8f.67 - gsmtp'
+send: 'AUTH LOGIN eW91ci1lbWFpbEBnbWFpbC5jb20=\r\n'
+reply: b'334 UGFzc3dvcmQ6\r\n'
+reply: retcode (334); Msg: b'UGFzc3dvcmQ6'
+send: 'eW91ci1hcHAtcGFzc3dvcmQ=\r\n'
+reply: b'535-5.7.8 Username and Password not accepted. For more information, go to\r\n'
+reply: b'535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca8874bsm1236242f8f.67 - gsmtp\r\n'
+reply: retcode (535); Msg: b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca8874bsm1236242f8f.67 - gsmtp'
+Exception in thread Thread-11 (send_async_email):
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/mikail/Desktop/BDC/server/app/services/email_service.py", line 16, in send_async_email
+    mail.send(msg)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 491, in send
+    with self.connect() as connection:
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 144, in __enter__
+    self.host = self.configure_host()
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 165, in configure_host
+    host.login(self.mail.username, self.mail.password)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 750, in login
+    raise last_exception
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 739, in login
+    (code, resp) = self.auth(
+                   ^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 662, in auth
+    raise SMTPAuthenticationError(code, resp)
+smtplib.SMTPAuthenticationError: (535, b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca8874bsm1236242f8f.67 - gsmtp')
+ * Detected change in '/Users/mikail/Desktop/BDC/server/test_beneficiaries_comprehensive.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 8
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:05:31,950] INFO in __init__: Total users in database: 9
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+127.0.0.1 - - [16/May/2025 04:05:33] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:05:33] "[35m[1mPOST /api/auth/register HTTP/1.1[0m" 201 -
+127.0.0.1 - - [16/May/2025 04:05:33] "[31m[1mPOST /api/beneficiaries HTTP/1.1[0m" 400 -
+send: 'ehlo mac.lan\r\n'
+reply: b'250-smtp.gmail.com at your service, [82.66.101.58]\r\n'
+reply: b'250-SIZE 35882577\r\n'
+reply: b'250-8BITMIME\r\n'
+reply: b'250-STARTTLS\r\n'
+reply: b'250-ENHANCEDSTATUSCODES\r\n'
+reply: b'250-PIPELINING\r\n'
+reply: b'250-CHUNKING\r\n'
+reply: b'250 SMTPUTF8\r\n'
+reply: retcode (250); Msg: b'smtp.gmail.com at your service, [82.66.101.58]\nSIZE 35882577\n8BITMIME\nSTARTTLS\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8'
+send: 'STARTTLS\r\n'
+reply: b'220 2.0.0 Ready to start TLS\r\n'
+reply: retcode (220); Msg: b'2.0.0 Ready to start TLS'
+send: 'ehlo mac.lan\r\n'
+reply: b'250-smtp.gmail.com at your service, [82.66.101.58]\r\n'
+reply: b'250-SIZE 35882577\r\n'
+reply: b'250-8BITMIME\r\n'
+reply: b'250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH\r\n'
+reply: b'250-ENHANCEDSTATUSCODES\r\n'
+reply: b'250-PIPELINING\r\n'
+reply: b'250-CHUNKING\r\n'
+reply: b'250 SMTPUTF8\r\n'
+reply: retcode (250); Msg: b'smtp.gmail.com at your service, [82.66.101.58]\nSIZE 35882577\n8BITMIME\nAUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8'
+send: 'AUTH PLAIN AHlvdXItZW1haWxAZ21haWwuY29tAHlvdXItYXBwLXBhc3N3b3Jk\r\n'
+reply: b'535-5.7.8 Username and Password not accepted. For more information, go to\r\n'
+reply: b'535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-442fd51583dsm15359765e9.22 - gsmtp\r\n'
+reply: retcode (535); Msg: b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-442fd51583dsm15359765e9.22 - gsmtp'
+send: 'AUTH LOGIN eW91ci1lbWFpbEBnbWFpbC5jb20=\r\n'
+reply: b'334 UGFzc3dvcmQ6\r\n'
+reply: retcode (334); Msg: b'UGFzc3dvcmQ6'
+send: 'eW91ci1hcHAtcGFzc3dvcmQ=\r\n'
+reply: b'535-5.7.8 Username and Password not accepted. For more information, go to\r\n'
+reply: b'535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-442fd51583dsm15359765e9.22 - gsmtp\r\n'
+reply: retcode (535); Msg: b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-442fd51583dsm15359765e9.22 - gsmtp'
+Exception in thread Thread-7 (send_async_email):
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/mikail/Desktop/BDC/server/app/services/email_service.py", line 16, in send_async_email
+    mail.send(msg)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 491, in send
+    with self.connect() as connection:
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 144, in __enter__
+    self.host = self.configure_host()
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 165, in configure_host
+    host.login(self.mail.username, self.mail.password)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 750, in login
+    raise last_exception
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 739, in login
+    (code, resp) = self.auth(
+                   ^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 662, in auth
+    raise SMTPAuthenticationError(code, resp)
+smtplib.SMTPAuthenticationError: (535, b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-442fd51583dsm15359765e9.22 - gsmtp')
+ * Detected change in '/Users/mikail/Desktop/BDC/server/test_beneficiaries_comprehensive.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 9
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:05:46,373] INFO in __init__: Total users in database: 10
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+127.0.0.1 - - [16/May/2025 04:05:49] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:05:49] "[35m[1mPOST /api/auth/register HTTP/1.1[0m" 201 -
+Cannot access Redis client, clearing entire cache instead of pattern: beneficiaries:*
+Error invalidating cache for pattern beneficiaries:*: Error 8 connecting to redis:6379. nodename nor servname provided, or not known.
+127.0.0.1 - - [16/May/2025 04:05:49] "[35m[1mPOST /api/beneficiaries HTTP/1.1[0m" 201 -
+send: 'ehlo mac.lan\r\n'
+reply: b'250-smtp.gmail.com at your service, [82.66.101.58]\r\n'
+reply: b'250-SIZE 35882577\r\n'
+reply: b'250-8BITMIME\r\n'
+reply: b'250-STARTTLS\r\n'
+reply: b'250-ENHANCEDSTATUSCODES\r\n'
+reply: b'250-PIPELINING\r\n'
+reply: b'250-CHUNKING\r\n'
+reply: b'250 SMTPUTF8\r\n'
+reply: retcode (250); Msg: b'smtp.gmail.com at your service, [82.66.101.58]\nSIZE 35882577\n8BITMIME\nSTARTTLS\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8'
+send: 'STARTTLS\r\n'
+reply: b'220 2.0.0 Ready to start TLS\r\n'
+reply: retcode (220); Msg: b'2.0.0 Ready to start TLS'
+send: 'ehlo mac.lan\r\n'
+reply: b'250-smtp.gmail.com at your service, [82.66.101.58]\r\n'
+reply: b'250-SIZE 35882577\r\n'
+reply: b'250-8BITMIME\r\n'
+reply: b'250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH\r\n'
+reply: b'250-ENHANCEDSTATUSCODES\r\n'
+reply: b'250-PIPELINING\r\n'
+reply: b'250-CHUNKING\r\n'
+reply: b'250 SMTPUTF8\r\n'
+reply: retcode (250); Msg: b'smtp.gmail.com at your service, [82.66.101.58]\nSIZE 35882577\n8BITMIME\nAUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8'
+send: 'AUTH PLAIN AHlvdXItZW1haWxAZ21haWwuY29tAHlvdXItYXBwLXBhc3N3b3Jk\r\n'
+reply: b'535-5.7.8 Username and Password not accepted. For more information, go to\r\n'
+reply: b'535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca62c8asm1258603f8f.60 - gsmtp\r\n'
+reply: retcode (535); Msg: b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca62c8asm1258603f8f.60 - gsmtp'
+send: 'AUTH LOGIN eW91ci1lbWFpbEBnbWFpbC5jb20=\r\n'
+reply: b'334 UGFzc3dvcmQ6\r\n'
+reply: retcode (334); Msg: b'UGFzc3dvcmQ6'
+send: 'eW91ci1hcHAtcGFzc3dvcmQ=\r\n'
+reply: b'535-5.7.8 Username and Password not accepted. For more information, go to\r\n'
+reply: b'535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca62c8asm1258603f8f.60 - gsmtp\r\n'
+reply: retcode (535); Msg: b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca62c8asm1258603f8f.60 - gsmtp'
+Exception in thread Thread-7 (send_async_email):
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/mikail/Desktop/BDC/server/app/services/email_service.py", line 16, in send_async_email
+    mail.send(msg)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 491, in send
+    with self.connect() as connection:
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 144, in __enter__
+    self.host = self.configure_host()
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 165, in configure_host
+    host.login(self.mail.username, self.mail.password)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 750, in login
+    raise last_exception
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 739, in login
+    (code, resp) = self.auth(
+                   ^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 662, in auth
+    raise SMTPAuthenticationError(code, resp)
+smtplib.SMTPAuthenticationError: (535, b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca62c8asm1258603f8f.60 - gsmtp')
+ * Detected change in '/Users/mikail/Desktop/BDC/server/test_beneficiaries_comprehensive.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 10
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:05:58,799] INFO in __init__: Total users in database: 11
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+127.0.0.1 - - [16/May/2025 04:06:00] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:06:01] "[35m[1mPOST /api/auth/register HTTP/1.1[0m" 201 -
+Cannot access Redis client, clearing entire cache instead of pattern: beneficiaries:*
+Error invalidating cache for pattern beneficiaries:*: Error 8 connecting to redis:6379. nodename nor servname provided, or not known.
+127.0.0.1 - - [16/May/2025 04:06:01] "[35m[1mPOST /api/beneficiaries HTTP/1.1[0m" 201 -
+127.0.0.1 - - [16/May/2025 04:06:01] "GET /api/beneficiaries/5 HTTP/1.1" 200 -
+send: 'ehlo mac.lan\r\n'
+127.0.0.1 - - [16/May/2025 04:06:01] "GET /api/beneficiaries/5/evaluations HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:06:01] "GET /api/beneficiaries/5/sessions HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:06:01] "GET /api/beneficiaries/5/progress HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:06:01] "GET /api/beneficiaries/5/skills HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:06:01] "GET /api/beneficiaries/5/documents HTTP/1.1" 200 -
+reply: b'250-smtp.gmail.com at your service, [82.66.101.58]\r\n'
+reply: b'250-SIZE 35882577\r\n'
+reply: b'250-8BITMIME\r\n'
+reply: b'250-STARTTLS\r\n'
+reply: b'250-ENHANCEDSTATUSCODES\r\n'
+reply: b'250-PIPELINING\r\n'
+reply: b'250-CHUNKING\r\n'
+reply: b'250 SMTPUTF8\r\n'
+reply: retcode (250); Msg: b'smtp.gmail.com at your service, [82.66.101.58]\nSIZE 35882577\n8BITMIME\nSTARTTLS\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8'
+send: 'STARTTLS\r\n'
+127.0.0.1 - - [16/May/2025 04:06:01] "GET /api/beneficiaries/5/trainers HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:06:01] "GET /api/beneficiaries/5/comparison HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:06:01] "[31m[1mPOST /api/beneficiaries/5/assign-trainer HTTP/1.1[0m" 400 -
+127.0.0.1 - - [16/May/2025 04:06:01] "GET /api/beneficiaries/5/report HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:06:01] "[31m[1mPOST /api/beneficiaries/5/profile-picture HTTP/1.1[0m" 400 -
+127.0.0.1 - - [16/May/2025 04:06:01] "[31m[1mPUT /api/beneficiaries/5 HTTP/1.1[0m" 405 -
+reply: b'220 2.0.0 Ready to start TLS\r\n'
+reply: retcode (220); Msg: b'2.0.0 Ready to start TLS'
+127.0.0.1 - - [16/May/2025 04:06:01] "GET /api/beneficiaries?page=1&per_page=10 HTTP/1.1" 200 -
+127.0.0.1 - - [16/May/2025 04:06:01] "[33mGET /api/beneficiaries/99999 HTTP/1.1[0m" 404 -
+127.0.0.1 - - [16/May/2025 04:06:01] "[31m[1mPOST /api/beneficiaries HTTP/1.1[0m" 400 -
+send: 'ehlo mac.lan\r\n'
+reply: b'250-smtp.gmail.com at your service, [82.66.101.58]\r\n'
+reply: b'250-SIZE 35882577\r\n'
+reply: b'250-8BITMIME\r\n'
+reply: b'250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH\r\n'
+reply: b'250-ENHANCEDSTATUSCODES\r\n'
+reply: b'250-PIPELINING\r\n'
+reply: b'250-CHUNKING\r\n'
+reply: b'250 SMTPUTF8\r\n'
+reply: retcode (250); Msg: b'smtp.gmail.com at your service, [82.66.101.58]\nSIZE 35882577\n8BITMIME\nAUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8'
+send: 'AUTH PLAIN AHlvdXItZW1haWxAZ21haWwuY29tAHlvdXItYXBwLXBhc3N3b3Jk\r\n'
+reply: b'535-5.7.8 Username and Password not accepted. For more information, go to\r\n'
+reply: b'535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca8cb2dsm1206263f8f.84 - gsmtp\r\n'
+reply: retcode (535); Msg: b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca8cb2dsm1206263f8f.84 - gsmtp'
+send: 'AUTH LOGIN eW91ci1lbWFpbEBnbWFpbC5jb20=\r\n'
+reply: b'334 UGFzc3dvcmQ6\r\n'
+reply: retcode (334); Msg: b'UGFzc3dvcmQ6'
+send: 'eW91ci1hcHAtcGFzc3dvcmQ=\r\n'
+reply: b'535-5.7.8 Username and Password not accepted. For more information, go to\r\n'
+reply: b'535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca8cb2dsm1206263f8f.84 - gsmtp\r\n'
+reply: retcode (535); Msg: b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca8cb2dsm1206263f8f.84 - gsmtp'
+Exception in thread Thread-7 (send_async_email):
+Traceback (most recent call last):
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/mikail/Desktop/BDC/server/app/services/email_service.py", line 16, in send_async_email
+    mail.send(msg)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 491, in send
+    with self.connect() as connection:
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 144, in __enter__
+    self.host = self.configure_host()
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_mail.py", line 165, in configure_host
+    host.login(self.mail.username, self.mail.password)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 750, in login
+    raise last_exception
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 739, in login
+    (code, resp) = self.auth(
+                   ^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/smtplib.py", line 662, in auth
+    raise SMTPAuthenticationError(code, resp)
+smtplib.SMTPAuthenticationError: (535, b'5.7.8 Username and Password not accepted. For more information, go to\n5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a35ca8cb2dsm1206263f8f.84 - gsmtp')
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/beneficiary_service.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 11
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- test.beneficiary.1747361149.275478@example.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:06:30,453] INFO in __init__: Total users in database: 12
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 12
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- test.beneficiary.1747361149.275478@example.com (student)
+- test.beneficiary.1747361160.987778@example.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:06:35,840] INFO in __init__: Total users in database: 12
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 12
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- test.beneficiary.1747361149.275478@example.com (student)
+- test.beneficiary.1747361160.987778@example.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-16 04:06:44,301] INFO in __init__: Total users in database: 12
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 12
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikai@lekesiz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- test.beneficiary.1747361149.275478@example.com (student)
+- test.beneficiary.1747361160.987778@example.com (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask_limiter/extension.py:336: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/Desktop/BDC/server/run_app.py", line 16, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 216, in register_blueprints
+    app.register_blueprint(beneficiaries_bp, url_prefix='/api/beneficiaries')
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/sansio/scaffold.py", line 44, in wrapper_func
+    return f(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/sansio/app.py", line 597, in register_blueprint
+    blueprint.register(self, options)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/sansio/blueprints.py", line 335, in register
+    deferred(state)
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/sansio/blueprints.py", line 431, in <lambda>
+    lambda s: s.add_url_rule(
+              ^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/sansio/blueprints.py", line 110, in add_url_rule
+    self.app.add_url_rule(
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/sansio/scaffold.py", line 44, in wrapper_func
+    return f(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mikail/.pyenv/versions/3.11.8/lib/python3.11/site-packages/flask/sansio/app.py", line 659, in add_url_rule
+    raise AssertionError(
+AssertionError: View function mapping is overwriting an existing endpoint function: beneficiaries.update_beneficiary

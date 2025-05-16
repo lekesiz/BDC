@@ -1,0 +1,23 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY client/package.json client/package-lock.json ./
+RUN npm ci
+
+# Copy application code
+COPY client/ .
+
+# Build application
+ENV NODE_ENV=production
+RUN npm run build
+
+# Install serve to serve the static files
+RUN npm install -g serve
+
+# Expose port
+EXPOSE 3000
+
+# Serve the application
+CMD ["serve", "-s", "dist", "-l", "3000"]

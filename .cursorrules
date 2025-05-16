@@ -1,0 +1,149 @@
+# .cursorrules for BDC (Beneficiary Development Center)
+# Version: 1.1
+#
+# This file provides guidelines and commands for the Cursor AI
+# to assist with development of the BDC project.
+#
+# The primary instruction for the AI after making any code modification
+# (either by user or AI-generated) is to suggest or offer to run
+# relevant tests and dependency checks.
+
+# General project information
+project_name: "BDC (Beneficiary Development Center)"
+description: "A comprehensive web application for managing, tracking, and evaluating the development processes of beneficiaries (students), featuring a test engine, assessments, reporting, and personalized AI learning recommendations."
+
+# Key Technologies (for AI context)
+technologies:
+  backend:
+    language: "Python 3.8+"
+    framework: "Flask"
+    orm: "SQLAlchemy"
+    database_dev: "SQLite"
+    database_prod: "PostgreSQL"
+    caching: "Redis"
+    ai_libs: ["OpenAI", "LangChain"]
+    testing: ["pytest", "coverage", "factory-boy"]
+    realtime: ["flask-socketio", "eventlet"]
+  frontend:
+    framework: "React 18.2+"
+    build_tool: "Vite"
+    css_framework: "Tailwind CSS"
+    ui_components: ["Radix UI"]
+    state_management: ["React Query", "Context API"]
+    http_client: "Axios"
+    testing: ["Vitest", "MSW"]
+    routing: "react-router-dom"
+  devops:
+    containerization: "Docker"
+    ci_cd: "GitHub Actions"
+
+# Define custom commands that the AI can be instructed to run or suggest.
+# The AI should be encouraged to use these after code modifications.
+commands:
+  - name: "Run Backend Tests"
+    description: "Executes all Python unit and integration tests for the server with coverage report."
+    command: "cd server && python run_tests.py"
+    tags: ["test", "backend", "python", "coverage"]
+    # AI should suggest this if files in `server/` are changed, especially in app/ directory.
+
+  - name: "Run Specific Backend Tests"
+    description: "Runs specific test files or patterns for focused testing."
+    command: "cd server && python -m pytest tests/[TEST_FILE_OR_PATTERN] -v"
+    tags: ["test", "backend", "python", "specific"]
+    # AI should recommend this for targeted testing of specific features.
+
+  - name: "Check Backend Dependencies"
+    description: "Verifies installed Python package dependencies for the server for inconsistencies."
+    command: "cd server && pip check"
+    tags: ["dependencies", "backend", "python", "validation"]
+    # AI should suggest this if `server/requirements.txt` is changed or backend code is modified.
+
+  - name: "Run Frontend Tests"
+    description: "Executes all JavaScript/TypeScript tests for the client application."
+    command: "cd client && npm test"
+    tags: ["test", "frontend", "javascript", "react"]
+    # AI should suggest this if files in `client/src/` are changed.
+
+  - name: "Run Frontend Tests with Coverage"
+    description: "Runs frontend tests with coverage reporting."
+    command: "cd client && npm run test:coverage"
+    tags: ["test", "frontend", "javascript", "coverage"]
+    # AI should suggest this for comprehensive frontend test coverage.
+
+  - name: "Check Frontend Dependencies"
+    description: "Audits frontend npm package dependencies for vulnerabilities and inconsistencies."
+    command: "cd client && npm audit"
+    tags: ["dependencies", "frontend", "javascript", "validation"]
+    # AI should suggest this if `client/package.json` or `client/package-lock.json` is changed.
+
+  - name: "Run All Tests"
+    description: "Executes both backend and frontend tests."
+    command: "echo 'Running backend tests...' && (cd server && python run_tests.py) && echo 'Backend tests complete.' && echo 'Running frontend tests...' && (cd client && npm test) && echo 'Frontend tests complete.'"
+    tags: ["test", "full_suite"]
+    # Suggested for comprehensive testing after major changes.
+
+  - name: "Start Development Environment"
+    description: "Starts the development environment with both backend and frontend."
+    command: "docker-compose -f docker-compose.dev.yml up"
+    tags: ["dev", "environment", "docker"]
+    # Useful for starting the full development environment.
+
+  - name: "Start Backend Server"
+    description: "Starts only the backend server for local development."
+    command: "cd server && python run_app.py"
+    tags: ["dev", "backend", "server"]
+    # Useful for testing only backend changes.
+
+  - name: "Start Frontend Client"
+    description: "Starts only the frontend client for local development."
+    command: "cd client && npm run dev"
+    tags: ["dev", "frontend", "client"]
+    # Useful for testing only frontend changes.
+
+# Linting
+linters:
+  - name: "Backend Linter (Flake8)"
+    command: "cd server && python -m flake8"
+    description: "Runs Flake8 linter on the backend Python code."
+    tags: ["lint", "backend", "python"]
+
+  - name: "Frontend Linter (ESLint)"
+    command: "cd client && npm run lint"
+    description: "Runs ESLint on the frontend JavaScript/React code."
+    tags: ["lint", "frontend", "javascript"]
+
+# Formatting
+formatters:
+  - name: "Backend Formatter (Black)"
+    command: "cd server && python -m black ."
+    description: "Formats backend Python code using Black."
+    tags: ["format", "backend", "python"]
+
+  - name: "Frontend Formatter (Prettier)"
+    command: "cd client && npx prettier --write 'src/**/*.{js,jsx,json,css}'"
+    description: "Formats frontend code using Prettier."
+    tags: ["format", "frontend", "javascript"]
+
+# Database Operations
+database_operations:
+  - name: "Initialize Database"
+    command: "cd server && python init_db.py"
+    description: "Initializes or resets the database with basic structure."
+    tags: ["database", "init", "backend"]
+
+  - name: "Run Migrations"
+    command: "cd server && flask db upgrade"
+    description: "Applies any pending database migrations."
+    tags: ["database", "migration", "backend"]
+
+  - name: "Create Migration"
+    command: "cd server && flask db migrate -m \"[migration description]\""
+    description: "Creates a new database migration based on model changes."
+    tags: ["database", "migration", "backend"]
+
+# AI Behavior Guidance:
+# After any significant code generation or modification in this project:
+# 1. For backend changes, suggest running "Run Backend Tests" and "Check Backend Dependencies"
+# 2. For frontend changes, suggest running "Run Frontend Tests" and "Check Frontend Dependencies"
+# 3. For database model changes, suggest running "Create Migration" followed by "Run Migrations"
+# 4. For major architectural changes, suggest running "Run All Tests"
