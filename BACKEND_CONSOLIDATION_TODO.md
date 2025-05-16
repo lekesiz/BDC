@@ -154,10 +154,10 @@ find backend -type f -name "*.py" | sort > backend_files.txt
     - [x] `backend/app/services/ai/report_synthesis.py` -> `server/app/services/ai/report_synthesis.py`
     - [x] `backend/app/services/ai/test_analysis.py` -> `server/app/services/ai/test_analysis.py`
   - [ ] Optimizasyon Servisleri
-    - [ ] `backend/app/services/optimization/api_optimizer.py` -> `server/app/services/optimization/api_optimizer.py`
-    - [ ] `backend/app/services/optimization/cache_strategy.py` -> `server/app/services/optimization/cache_strategy.py`
-    - [ ] `backend/app/services/optimization/db_indexing.py` -> `server/app/services/optimization/db_indexing.py`
-    - [ ] `backend/app/services/optimization/query_optimizer.py` -> `server/app/services/optimization/query_optimizer.py`
+    - [x] `backend/app/services/optimization/api_optimizer.py` -> `server/app/services/optimization/api_optimizer.py`
+    - [x] `backend/app/services/optimization/cache_strategy.py` -> `server/app/services/optimization/cache_strategy.py`
+    - [x] `backend/app/services/optimization/db_indexing.py` -> `server/app/services/optimization/db_indexing.py`
+    - [x] `backend/app/services/optimization/query_optimizer.py` -> `server/app/services/optimization/query_optimizer.py`
   - [ ] Veritabanı Yardımcı Modülleri
     - [ ] `backend/database/backup.py` -> `server/app/utils/database/backup.py`
     - [ ] `backend/database/indexing_strategy.py` -> `server/app/utils/database/indexing_strategy.py` 
