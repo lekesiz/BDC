@@ -166,7 +166,7 @@ find backend -type f -name "*.py" | sort > backend_files.txt
   - [ ] İzleme/Monitör Modülleri
     - [x] `backend/app/models/monitoring.py` -> `server/app/models/monitoring.py`
     - [x] `backend/monitoring/alarm_system.py` -> `server/app/utils/monitoring/alarm_system.py`
-    - [ ] `backend/monitoring/app_monitoring.py` -> `server/app/utils/monitoring/app_monitoring.py`
+    - [x] `backend/monitoring/app_monitoring.py` -> `server/app/utils/monitoring/app_monitoring.py`
     - [ ] `backend/monitoring/error_tracking.py` -> `server/app/utils/monitoring/error_tracking.py`
     - [ ] `backend/monitoring/performance_metrics.py` -> `server/app/utils/monitoring/performance_metrics.py`
   - [ ] Test Modülleri
