@@ -159,10 +159,10 @@ find backend -type f -name "*.py" | sort > backend_files.txt
     - [x] `backend/app/services/optimization/db_indexing.py` -> `server/app/services/optimization/db_indexing.py`
     - [x] `backend/app/services/optimization/query_optimizer.py` -> `server/app/services/optimization/query_optimizer.py`
   - [ ] Veritabanı Yardımcı Modülleri
-    - [ ] `backend/database/backup.py` -> `server/app/utils/database/backup.py`
-    - [ ] `backend/database/indexing_strategy.py` -> `server/app/utils/database/indexing_strategy.py` 
-    - [ ] `backend/database/migrations.py` -> `server/app/utils/database/migrations.py`
-    - [ ] `backend/database/optimization.py` -> `server/app/utils/database/optimization.py`
+    - [x] `backend/database/backup.py` -> `server/app/utils/database/backup.py`
+    - [x] `backend/database/indexing_strategy.py` -> `server/app/utils/database/indexing_strategy.py`
+    - [x] `backend/database/migrations.py` -> `server/app/utils/database/migrations.py`
+    - [x] `backend/database/optimization.py` -> `server/app/utils/database/optimization.py`
   - [ ] İzleme/Monitör Modülleri
     - [x] `backend/app/models/monitoring.py` -> `server/app/models/monitoring.py`
     - [ ] `backend/monitoring/alarm_system.py` -> `server/app/utils/monitoring/alarm_system.py`
