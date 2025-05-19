@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import BeneficiariesPage from '../BeneficiariesPage'
+import BeneficiariesPage from '../../../pages/beneficiaries/BeneficiariesPage'
 import { render } from '../../../test/test-utils'
 import * as beneficiaryService from '../../../services/beneficiary.service'
 

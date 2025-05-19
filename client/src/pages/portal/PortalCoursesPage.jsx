@@ -40,10 +40,20 @@ const PortalCoursesPage = () => {
       try {
         setIsLoading(true);
         const response = await api.get('/api/portal/courses');
-        setCourses(response.data);
-        setFilteredCourses(response.data);
+        
+        // Handle different response structures
+        const coursesData = Array.isArray(response.data) 
+          ? response.data 
+          : response.data.courses || response.data.enrollments || [];
+          
+        console.log('Fetched courses data:', coursesData);
+        
+        setCourses(coursesData);
+        setFilteredCourses(coursesData);
       } catch (error) {
         console.error('Error fetching course data:', error);
+        setCourses([]);
+        setFilteredCourses([]);
         toast({
           title: 'Error',
           description: 'Failed to load course data',
@@ -55,10 +65,15 @@ const PortalCoursesPage = () => {
     };
     
     fetchCourses();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
   
   // Apply filters and search
   useEffect(() => {
+    if (!Array.isArray(courses)) {
+      setFilteredCourses([]);
+      return;
+    }
+    
     let results = [...courses];
     
     // Apply status filter
@@ -70,13 +85,16 @@ const PortalCoursesPage = () => {
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       results = results.filter(
-        course => 
-          course.title.toLowerCase().includes(searchLower) ||
-          course.description.toLowerCase().includes(searchLower) ||
-          course.modules.some(module => 
-            module.title.toLowerCase().includes(searchLower) ||
+        course => {
+          const titleMatch = course.title?.toLowerCase().includes(searchLower) || false;
+          const descMatch = course.description?.toLowerCase().includes(searchLower) || false;
+          const moduleMatch = course.modules?.some(module => 
+            module.title?.toLowerCase().includes(searchLower) ||
             (module.description && module.description.toLowerCase().includes(searchLower))
-          )
+          ) || false;
+          
+          return titleMatch || descMatch || moduleMatch;
+        }
       );
     }
     
@@ -208,7 +226,7 @@ const PortalCoursesPage = () => {
       </div>
       
       {/* Course grid */}
-      {filteredCourses.length === 0 ? (
+      {!Array.isArray(filteredCourses) || filteredCourses.length === 0 ? (
         <div className="text-center py-12">
           <BookOpen className="h-12 w-12 text-gray-300 mx-auto mb-3" />
           <h3 className="text-lg font-medium">No courses found</h3>

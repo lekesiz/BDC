@@ -4,9 +4,10 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { AnimatedButton, AnimatedForm, AnimatedInput, AnimatedCheckbox } from '@/components/animations';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { motion } from 'framer-motion';
+import { fadeInUp } from '@/lib/animations';
 
 /**
  * Login page component
@@ -46,6 +47,26 @@ const LoginPage = () => {
     return Object.keys(newErrors).length === 0;
   };
   
+  // Get redirect path based on user role
+  const getRedirectPath = (user, from) => {
+    // If there's a specific 'from' location, use it (unless it's the login page)
+    if (from && from !== '/login' && from !== '/') {
+      return from;
+    }
+    
+    // Otherwise, redirect based on role
+    switch (user.role) {
+      case 'student':
+        return '/portal';
+      case 'super_admin':
+      case 'tenant_admin':
+      case 'trainer':
+        return '/';
+      default:
+        return '/';
+    }
+  };
+  
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,15 +78,21 @@ const LoginPage = () => {
     try {
       setIsLoading(true);
       
-      const user = await login(email, password, remember);
+      const result = await login(email, password, remember);
       
-      addToast({
-        type: 'success',
-        title: 'Login successful',
-        message: `Welcome back, ${user.first_name}!`,
-      });
-      
-      navigate(from, { replace: true });
+      if (result.success) {
+        addToast({
+          type: 'success',
+          title: 'Login successful',
+          message: `Welcome back, ${result.user.first_name}!`,
+        });
+        
+        // Use role-based redirect
+        const redirectPath = getRedirectPath(result.user, from);
+        navigate(redirectPath, { replace: true });
+      } else {
+        throw new Error(result.error);
+      }
     } catch (err) {
       console.error('Login error:', err);
       
@@ -81,12 +108,27 @@ const LoginPage = () => {
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
+      <motion.div 
+        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div 
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+        >
           <div className="inline-block">
-            <div className="w-12 h-12 mx-auto bg-primary rounded-md flex items-center justify-center">
+            <motion.div 
+              className="w-12 h-12 mx-auto bg-primary rounded-md flex items-center justify-center"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            >
               <span className="text-white font-bold text-2xl">B</span>
-            </div>
+            </motion.div>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
           <p className="mt-2 text-sm text-gray-600">
@@ -95,9 +137,15 @@ const LoginPage = () => {
               create a new account
             </Link>
           </p>
-        </div>
+        </motion.div>
         
-        <Card>
+        <motion.div
+          variants={fadeInUp}
+          initial="initial"
+          animate="animate"
+          transition={{ delay: 0.3 }}
+        >
+          <Card>
           <CardHeader>
             <CardTitle className="text-xl">Welcome back</CardTitle>
             <CardDescription>
@@ -105,9 +153,9 @@ const LoginPage = () => {
             </CardDescription>
           </CardHeader>
           
-          <form onSubmit={handleSubmit}>
+          <AnimatedForm onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
-              <Input
+              <AnimatedInput
                 id="email"
                 type="email"
                 label="Email address"
@@ -121,7 +169,7 @@ const LoginPage = () => {
                 required
               />
               
-              <Input
+              <AnimatedInput
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 label="Password"
@@ -149,19 +197,13 @@ const LoginPage = () => {
               />
               
               <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                    checked={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                    Remember me
-                  </label>
-                </div>
+                <AnimatedCheckbox
+                  id="remember-me"
+                  name="remember-me"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  label="Remember me"
+                />
                 
                 <div className="text-sm">
                   <Link to="/forgot-password" className="font-medium text-primary hover:text-primary-dark">
@@ -172,27 +214,33 @@ const LoginPage = () => {
             </CardContent>
             
             <CardFooter>
-              <Button
+              <AnimatedButton
                 type="submit"
                 className="w-full"
                 isLoading={isLoading}
                 disabled={isLoading}
               >
                 Sign in
-              </Button>
+              </AnimatedButton>
             </CardFooter>
-          </form>
+          </AnimatedForm>
         </Card>
         
-        <div className="mt-6 text-center">
+        <motion.div 
+          className="mt-6 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
           <p className="text-sm text-gray-600">
             Don't have an account?{' '}
             <Link to="/register" className="font-medium text-primary hover:text-primary-dark">
               Sign up
             </Link>
           </p>
-        </div>
-      </div>
+        </motion.div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };

@@ -65,6 +65,13 @@ export const API_ENDPOINTS = {
     SCHEDULED: '/api/reports/scheduled',
     DOWNLOAD: id => `/api/reports/${id}/download`,
   },
+  DOCUMENTS: {
+    BASE: '/api/documents',
+    FOLDERS: '/api/documents/folders',
+    FOLDER: id => `/api/documents/folders/${id}`,
+    UPLOAD: '/api/documents/upload',
+    DOWNLOAD: id => `/api/documents/${id}/download`,
+  },
   NOTIFICATIONS: {
     BASE: '/api/notifications',
     UNREAD_COUNT: '/api/notifications/unread-count',

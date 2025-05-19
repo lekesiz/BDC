@@ -1,10 +1,12 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from './components/ui/toast';
 import { useAuth } from './hooks/useAuth';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import RoleBasedRedirect from './components/common/RoleBasedRedirect';
 import TestLogin from './TestLogin';
 import TestAuth from './TestAuth';
 import { SocketProvider } from './contexts/SocketContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 // Layouts
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -55,6 +57,7 @@ import ZapierIntegrationPage from './pages/integrations/ZapierIntegrationPage';
 
 // Evaluation Pages
 import EvaluationsPage from './pages/evaluation/EvaluationsPage';
+import MyEvaluationsPage from './pages/evaluation/MyEvaluationsPage';
 import TestCreationPage from './pages/evaluation/TestCreationPage';
 import TestSessionPage from './pages/evaluation/TestSessionPage';
 import TestResultsPage from './pages/evaluation/TestResultsPage';
@@ -75,6 +78,7 @@ import EmailRemindersPage from './pages/calendar/EmailRemindersPage';
 
 // Document Pages
 import DocumentsPage from './pages/document/DocumentsPage';
+import MyDocumentsPage from './pages/document/MyDocumentsPage';
 import DocumentDetailPage from './pages/document/DocumentDetailPage';
 import DocumentSharePage from './pages/document/DocumentSharePage';
 import DocumentUploadPage from './pages/document/DocumentUploadPage';
@@ -93,10 +97,12 @@ import NotificationCenterV2 from './pages/notifications/NotificationCenterV2';
 import NotificationPreferencesPageV2 from './pages/settings/NotificationPreferencesPageV2';
 import NotificationProviderV2 from './providers/NotificationProviderV2';
 import ThemeProvider from './providers/ThemeProvider';
+import GlobalErrorHandler from './components/common/GlobalErrorHandler';
 
 // Dashboard
 import DashboardPage from './pages/dashboard/DashboardPage';
 import DashboardPageV3 from './pages/dashboard/DashboardPageV3';
+import DashboardPageEnhanced from './pages/dashboard/DashboardPageEnhanced';
 
 // Test Pages
 import WebSocketTestPage from './pages/test/WebSocketTestPage';
@@ -192,6 +198,7 @@ function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
+        <GlobalErrorHandler />
         <NotificationProviderV2>
           <SocketProvider>
             <Routes>
@@ -214,7 +221,8 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<DashboardPageV3 />} />
+          <Route index element={<RoleBasedRedirect />} />
+          <Route path="dashboard" element={<Navigate to="/" replace />} />
 
           {/* User routes */}
           <Route path="profile" element={<ProfilePage />} />
@@ -287,6 +295,26 @@ function App() {
             />
             {/* Add other beneficiary routes as they are developed */}
           </Route>
+
+          {/* My Evaluations route for students */}
+          <Route 
+            path="my-evaluations" 
+            element={
+              <ProtectedRoute requiredRole={['student']}>
+                <MyEvaluationsPage />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* My Documents route for students */}
+          <Route 
+            path="my-documents" 
+            element={
+              <ProtectedRoute requiredRole={['student']}>
+                <MyDocumentsPage />
+              </ProtectedRoute>
+            } 
+          />
 
           {/* Trainer Assessment Management routes */}
           <Route path="assessment">
@@ -409,7 +437,7 @@ function App() {
             <Route
               index
               element={
-                <ProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer']}>
+                <ProtectedRoute>
                   <EvaluationsPage />
                 </ProtectedRoute>
               }

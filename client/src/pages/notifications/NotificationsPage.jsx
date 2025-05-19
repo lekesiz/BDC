@@ -78,7 +78,7 @@ const NotificationsPage = () => {
     };
     
     fetchNotifications();
-  }, [toast, activeFilter, currentPage]);
+  }, [activeFilter, currentPage]); // Remove toast dependency to prevent infinite loop
 
   // Get icon for notification type
   const getNotificationIcon = (notification) => {

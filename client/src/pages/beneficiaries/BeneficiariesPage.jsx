@@ -289,7 +289,7 @@ const BeneficiariesPage = () => {
                   </td>
                 </tr>
               ) : (
-                beneficiaries.map((beneficiary) => (
+                (beneficiaries || []).map((beneficiary) => (
                   <tr 
                     key={beneficiary.id} 
                     className="hover:bg-gray-50 cursor-pointer"

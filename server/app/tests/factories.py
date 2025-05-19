@@ -10,7 +10,7 @@ from factory.alchemy import SQLAlchemyModelFactory
 from app import db
 from app.models import (
     User, Beneficiary, Evaluation, Appointment, 
-    Program, Document, Category
+    Program, Document
 )
 
 fake = Faker()
@@ -126,13 +126,4 @@ class DocumentFactory(BaseFactory):
     tenant_id = 1
 
 
-class CategoryFactory(BaseFactory):
-    """Factory for Category model"""
-    
-    class Meta:
-        model = Category
-
-    name = factory.LazyFunction(lambda: fake.word().capitalize())
-    description = factory.LazyFunction(lambda: fake.paragraph())
-    created_at = factory.LazyFunction(lambda: datetime.datetime.now())
-    tenant_id = 1 
+# Removed CategoryFactory as Category model no longer exists 

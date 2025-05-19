@@ -79,9 +79,8 @@ api.interceptors.response.use(
 );
 
 // Enable mock API for development
-// Temporarily disabled to test real API
-// if (import.meta.env.DEV) {
-//   setupMockApi(api);
-// }
+if (import.meta.env.DEV) {
+  setupMockApi(api);
+}
 
 export default api;

@@ -1,0 +1,44 @@
+{% extends "email/base.html" %}
+
+{% block title %}New Evaluation Assigned{% endblock %}
+
+{% block content %}
+<h2>New Evaluation Assigned</h2>
+
+<p>Hello {{ student_name }},</p>
+
+<p>A new evaluation has been assigned to you by {{ trainer_name }}.</p>
+
+<div style="background-color: #f0f0f0; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Evaluation Details</h3>
+    <ul style="list-style: none; padding: 0;">
+        <li><strong>Title:</strong> {{ evaluation_title }}</li>
+        <li><strong>Type:</strong> {{ evaluation_type }}</li>
+        <li><strong>Due Date:</strong> {{ due_date }}</li>
+        <li><strong>Duration:</strong> {{ duration }}</li>
+        <li><strong>Points:</strong> {{ total_points }}</li>
+    </ul>
+</div>
+
+<h3>Instructions:</h3>
+<p>{{ instructions }}</p>
+
+<p>To start the evaluation, log in to your portal and navigate to the Assessments section.</p>
+
+<a href="{{ evaluation_url }}" class="button">Start Evaluation</a>
+
+<h3>Tips for Success:</h3>
+<ul>
+    <li>Read all instructions carefully before starting</li>
+    <li>Manage your time wisely</li>
+    <li>Save your progress regularly</li>
+    <li>Submit before the deadline</li>
+</ul>
+
+<p>If you have any questions about this evaluation, please contact your trainer.</p>
+
+<p>Good luck!</p>
+
+<p>Best regards,<br>
+The BDC Team</p>
+{% endblock %}

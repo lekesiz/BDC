@@ -8,7 +8,7 @@ class LoginSchema(Schema):
     """Schema for login requests."""
     email = fields.Email(required=True)
     password = fields.String(required=True, load_only=True)
-    remember_me = fields.Boolean(load_default=False)
+    remember = fields.Boolean(load_default=False)
 
 
 class RegisterSchema(Schema):

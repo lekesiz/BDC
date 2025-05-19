@@ -37,9 +37,15 @@ const PortalResourcesPage = () => {
       try {
         setIsLoading(true);
         const response = await api.get('/api/portal/resources');
-        setResources(response.data.resources);
-        setFilteredResources(response.data.resources);
-        setCategories(response.data.categories);
+        const resourceData = response.data;
+        
+        // Handle different response structures
+        const resourcesList = resourceData.resources || resourceData.documents || resourceData.data || [];
+        const categoriesList = resourceData.categories || [];
+        
+        setResources(resourcesList);
+        setFilteredResources(resourcesList);
+        setCategories(categoriesList);
       } catch (error) {
         console.error('Error fetching resources:', error);
         toast({
@@ -53,10 +59,15 @@ const PortalResourcesPage = () => {
     };
     
     fetchResources();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
   
   // Filter resources based on category and search term
   useEffect(() => {
+    if (!Array.isArray(resources)) {
+      setFilteredResources([]);
+      return;
+    }
+    
     let result = resources;
     
     // Filter by category
@@ -68,8 +79,8 @@ const PortalResourcesPage = () => {
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       result = result.filter(resource => 
-        resource.name.toLowerCase().includes(search) || 
-        resource.description.toLowerCase().includes(search)
+        (resource.name && resource.name.toLowerCase().includes(search)) || 
+        (resource.description && resource.description.toLowerCase().includes(search))
       );
     }
     

@@ -55,7 +55,7 @@ const ProgramAnalyticsPage = () => {
         
         // If an ID is provided, fetch that specific program
         if (id) {
-          const program = programsResponse.data.find(p => p.id.toString() === id);
+          const program = programsResponse.data?.find(p => p.id.toString() === id);
           if (program) {
             setSelectedProgram(program);
           } else {
@@ -372,7 +372,7 @@ const ProgramAnalyticsPage = () => {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {sessionTypeData.map((entry, index) => (
+                      {(sessionTypeData || []).map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -515,7 +515,7 @@ const ProgramAnalyticsPage = () => {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {trainers && trainers.length > 0 ? (
-                  trainers.map((trainer, index) => (
+                  (trainers || []).map((trainer, index) => (
                     <tr key={trainer.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -574,7 +574,7 @@ const ProgramAnalyticsPage = () => {
             <h2 className="text-lg font-medium mb-4">Key Insights</h2>
             <div className="bg-gray-50 p-4 rounded-lg">
               <ul className="space-y-2">
-                {programMetrics.insights.map((insight, index) => (
+                {(programMetrics?.insights || []).map((insight, index) => (
                   <li key={index} className="flex items-start">
                     <span className="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs mr-2 mt-0.5">{index + 1}</span>
                     <span>{insight}</span>
@@ -632,7 +632,7 @@ const ProgramAnalyticsPage = () => {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredPrograms.length > 0 ? (
-                  filteredPrograms.map((program) => (
+                  (filteredPrograms || []).map((program) => (
                     <tr key={program.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">

@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import api from '@/lib/api';
-import { Card } from '@/components/ui/card';
+import { AnimatedCard, AnimatedButton, AnimatedPage, AnimatedList, AnimatedListItem } from '@/components/animations';
+import { OptimizedAnimation, BatchAnimation } from '@/components/animations/OptimizedAnimation';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem } from '@/lib/animations';
 import {
   BookOpen,
   Calendar,
@@ -68,6 +71,31 @@ const PortalDashboardV3 = () => {
         
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        // Set default data structures to prevent errors
+        setDashboardData({
+          user: {
+            name: user?.first_name || 'Student',
+            email: user?.email || '',
+            profile_picture: user?.profile_picture || ''
+          },
+          beneficiary: {},
+          stats: {
+            enrolled_programs: 0,
+            completed_programs: 0,
+            average_progress: 0,
+            total_attendance_rate: 0
+          },
+          upcoming_sessions: [],
+          recent_tests: []
+        });
+        setCoursesData([]);
+        setProgressData({
+          overall_progress: 0,
+          current_level: 'Beginner',
+          skills_distribution: [],
+          monthly_progress: []
+        });
+        setAchievementsData([]);
         setError(error.response?.data?.message || 'Failed to load dashboard');
       } finally {
         setIsLoading(false);
@@ -110,9 +138,14 @@ const PortalDashboardV3 = () => {
   const performanceData = progressData?.monthly_progress || [];
 
   return (
-    <div className="space-y-6 p-6">
+    <AnimatedPage className="space-y-6 p-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-primary to-primary-dark rounded-lg p-6 text-white">
+      <motion.div 
+        className="bg-gradient-to-r from-primary to-primary-dark rounded-lg p-6 text-white"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold mb-2">Welcome back, {userData.name}!</h1>
@@ -123,10 +156,15 @@ const PortalDashboardV3 = () => {
             <p className="text-2xl font-bold">{progressData?.current_level || 'Beginner'}</p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+      >
         <StatsCard
           title="Enrolled Programs"
           value={stats.enrolled_programs}
@@ -155,20 +193,20 @@ const PortalDashboardV3 = () => {
           color="bg-orange-500"
           subtitle="Badges earned"
         />
-      </div>
+      </motion.div>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Progress Overview */}
         <div className="lg:col-span-2 space-y-6">
           {/* Active Programs */}
-          <Card className="p-6">
+          <AnimatedCard className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Active Programs</h2>
               <Link to="/portal/courses">
-                <Button variant="ghost" size="sm">
+                <AnimatedButton variant="ghost" size="sm">
                   View All <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
+                </AnimatedButton>
               </Link>
             </div>
             
@@ -188,10 +226,10 @@ const PortalDashboardV3 = () => {
                 <p className="text-gray-500 text-center py-8">No active programs</p>
               )}
             </div>
-          </Card>
+          </AnimatedCard>
 
           {/* Recent Assessments */}
-          <Card className="p-6">
+          <AnimatedCard className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Recent Assessments</h2>
               <Link to="/portal/assessments">
@@ -217,10 +255,10 @@ const PortalDashboardV3 = () => {
                 <p className="text-gray-500 text-center py-8">No recent assessments</p>
               )}
             </div>
-          </Card>
+          </AnimatedCard>
 
           {/* Performance Analytics */}
-          <Card className="p-6">
+          <AnimatedCard className="p-6">
             <h2 className="text-xl font-semibold mb-4">Performance Trend</h2>
             {performanceData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
@@ -238,13 +276,13 @@ const PortalDashboardV3 = () => {
             ) : (
               <p className="text-gray-500 text-center py-8">No performance data available</p>
             )}
-          </Card>
+          </AnimatedCard>
         </div>
 
         {/* Right Column - Schedule & Skills */}
         <div className="space-y-6">
           {/* Upcoming Schedule */}
-          <Card className="p-6">
+          <AnimatedCard className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Upcoming Schedule</h2>
               <Link to="/portal/calendar">
@@ -270,32 +308,33 @@ const PortalDashboardV3 = () => {
                 <p className="text-gray-500 text-center py-8">No upcoming sessions</p>
               )}
             </div>
-          </Card>
+          </AnimatedCard>
 
           {/* Skills Progress */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Skills Development</h2>
-            {skillsData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <RadarChart data={skillsData}>
-                  <PolarGrid strokeDasharray="3 3" />
-                  <PolarAngleAxis dataKey="skill" />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                  <Radar name="Progress" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-                </RadarChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-gray-500 text-center py-8">No skills data available</p>
-            )}
+          <OptimizedAnimation threshold={0.3}>
+            <AnimatedCard className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Skills Development</h2>
+              {skillsData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={250}>
+                  <RadarChart data={skillsData}>
+                    <PolarGrid strokeDasharray="3 3" />
+                    <PolarAngleAxis dataKey="skill" />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                    <Radar name="Progress" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                  </RadarChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-gray-500 text-center py-8">No skills data available</p>
+              )}
             <Link to="/portal/skills" className="block mt-4">
               <Button variant="outline" className="w-full">
                 View Detailed Progress
               </Button>
             </Link>
-          </Card>
+          </AnimatedCard>
 
           {/* Achievements */}
-          <Card className="p-6">
+          <AnimatedCard className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Recent Achievements</h2>
               <Link to="/portal/achievements">
@@ -320,10 +359,10 @@ const PortalDashboardV3 = () => {
                 <p className="text-gray-500 text-center py-8">No achievements yet</p>
               )}
             </div>
-          </Card>
+          </AnimatedCard>
 
           {/* Quick Actions */}
-          <Card className="p-6">
+          <AnimatedCard className="p-6">
             <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 gap-3">
               <QuickActionButton
@@ -347,19 +386,20 @@ const PortalDashboardV3 = () => {
                 to="/portal/profile"
               />
             </div>
-          </Card>
+          </AnimatedCard>
         </div>
       </div>
-    </div>
+    </AnimatedPage>
   );
 };
 
 // Helper Components
 const StatsCard = ({ title, value, icon, color, subtitle }) => (
-  <Card className="p-6">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm text-gray-600">{title}</p>
+  <motion.div variants={staggerItem}>
+    <AnimatedCard className="p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-gray-600">{title}</p>
         <p className="text-2xl font-bold mt-1">{value}</p>
         {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
       </div>
@@ -367,7 +407,8 @@ const StatsCard = ({ title, value, icon, color, subtitle }) => (
         <div className={`${color} text-white`}>{icon}</div>
       </div>
     </div>
-  </Card>
+    </AnimatedCard>
+  </motion.div>
 );
 
 const ProgramProgressCard = ({ title, progress, nextSession, moduleProgress, instructor }) => (
@@ -441,10 +482,10 @@ const AchievementBadge = ({ icon, title, description, earnedDate }) => (
 
 const QuickActionButton = ({ icon, label, to }) => (
   <Link to={to}>
-    <Button variant="outline" className="w-full h-20 flex flex-col items-center justify-center space-y-2 hover:bg-primary-50 transition-colors">
+    <AnimatedButton variant="outline" className="w-full h-20 flex flex-col items-center justify-center space-y-2 hover:bg-primary-50 transition-colors">
       {icon}
       <span className="text-xs">{label}</span>
-    </Button>
+    </AnimatedButton>
   </Link>
 );
 

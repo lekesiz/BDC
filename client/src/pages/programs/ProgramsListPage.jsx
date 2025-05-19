@@ -59,7 +59,7 @@ const ProgramsListPage = () => {
     };
     
     fetchPrograms();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
   
   // Filter programs based on search and filters
   useEffect(() => {
@@ -167,7 +167,7 @@ const ProgramsListPage = () => {
         
         {(user.role === 'super_admin' || user.role === 'tenant_admin') && (
           <Button
-            onClick={() => navigate('/programs/create')}
+            onClick={() => navigate('/programs/new')}
             className="flex items-center"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -286,7 +286,7 @@ const ProgramsListPage = () => {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPrograms.map((program) => (
+          {(filteredPrograms || []).map((program) => (
             <Card key={program.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">

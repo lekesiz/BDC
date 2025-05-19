@@ -58,7 +58,7 @@ const PortalNotificationsPage = () => {
     };
     
     fetchNotifications();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
   
   // Filter notifications based on filter value and search term
   const getFilteredNotifications = () => {

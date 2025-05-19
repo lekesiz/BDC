@@ -1,0 +1,44 @@
+{% extends "email/base.html" %}
+
+{% block title %}Appointment Reminder{% endblock %}
+
+{% block content %}
+<h2>Appointment Reminder</h2>
+
+<p>Hello {{ beneficiary_name }},</p>
+
+<p>This is a reminder about your upcoming appointment:</p>
+
+<div style="background-color: #f0f0f0; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Appointment Details</h3>
+    <ul style="list-style: none; padding: 0;">
+        <li><strong>With:</strong> {{ trainer_name }}</li>
+        <li><strong>Date:</strong> {{ appointment_date }}</li>
+        <li><strong>Time:</strong> {{ appointment_time }}</li>
+        <li><strong>Duration:</strong> {{ duration }}</li>
+        <li><strong>Type:</strong> {{ appointment_type }}</li>
+        {% if location %}
+        <li><strong>Location:</strong> {{ location }}</li>
+        {% endif %}
+        {% if meeting_link %}
+        <li><strong>Virtual Meeting Link:</strong> <a href="{{ meeting_link }}">Join Meeting</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+{% if notes %}
+<h3>Additional Notes:</h3>
+<p>{{ notes }}</p>
+{% endif %}
+
+<h3>Actions:</h3>
+<p>
+    <a href="{{ confirm_url }}" class="button" style="background-color: #10b981;">Confirm Attendance</a>
+    <a href="{{ reschedule_url }}" class="button" style="background-color: #f59e0b;">Request Reschedule</a>
+</p>
+
+<p>If you need to cancel or reschedule, please do so at least 24 hours in advance.</p>
+
+<p>Best regards,<li>
+The BDC Team</p>
+{% endblock %}

@@ -62,7 +62,7 @@ const PortalSkillsPage = () => {
     };
     
     fetchSkillsData();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
   
   // Filter skills based on search term and filter
   const getFilteredSkills = () => {

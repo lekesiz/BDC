@@ -1,7 +1,7 @@
 import pytest
 import json
 from flask_jwt_extended import decode_token
-from models import User
+from app.models import User
 
 class TestAuth:
     """Test authentication endpoints."""

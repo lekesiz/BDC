@@ -11,6 +11,113 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Check if user has required role
+  const hasRole = useCallback((requiredRole) => {
+    if (!user) return false;
+    
+    if (Array.isArray(requiredRole)) {
+      return requiredRole.includes(user.role);
+    }
+    
+    return user.role === requiredRole;
+  }, [user]);
+
+  // Check if user has permission
+  const hasPermission = useCallback((permission) => {
+    if (!user) return false;
+    
+    // Super admin has all permissions
+    if (user.role === 'super_admin') return true;
+    
+    // Check specific permissions based on role
+    return user.permissions?.includes(permission) || false;
+  }, [user]);
+
+  // Refresh token
+  const refreshToken = useCallback(async () => {
+    try {
+      const refreshToken = localStorage.getItem('refresh_token');
+      
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
+      }
+      
+      const response = await api.post('/api/auth/refresh', {
+        refresh_token: refreshToken
+      });
+      
+      const { access_token, user: userData } = response.data;
+      
+      // Update tokens
+      localStorage.setItem('access_token', access_token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      
+      // Update user state
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      return access_token;
+    } catch (error) {
+      console.error('Refresh token error:', error);
+      throw error;
+    }
+  }, []);
+
+  // Logout function
+  const logout = useCallback(() => {
+    // Clear tokens
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    
+    // Clear auth header
+    delete api.defaults.headers.common['Authorization'];
+    
+    // Clear state
+    setUser(null);
+    setIsAuthenticated(false);
+    setError(null);
+  }, []);
+
+  // Login function
+  const login = async (email, password, remember = false) => {
+    try {
+      setError(null);
+      setIsLoading(true);
+      
+      const response = await api.post('/api/auth/login', {
+        email,
+        password,
+        remember
+      });
+      
+      const { access_token, refresh_token, user: userData } = response.data;
+      
+      // Store tokens
+      localStorage.setItem('access_token', access_token);
+      if (refresh_token) {
+        localStorage.setItem('refresh_token', refresh_token);
+      }
+      
+      // Set default auth header
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      
+      // Update state
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      return { success: true, user: userData };
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error.response?.data?.message || 'Failed to login');
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Failed to login' 
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Initialize authentication state
   useEffect(() => {
     const initAuth = async () => {
@@ -44,138 +151,72 @@ export const AuthProvider = ({ children }) => {
     };
     
     initAuth();
-  }, []);
+  }, [refreshToken, logout]);
 
-  // Login function
-  const login = async (email, password, remember = false) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const response = await api.post('/api/auth/login', { email, password, remember_me: remember });
-      
-      const { access_token, refresh_token } = response.data;
-      
-      // Store tokens
-      localStorage.setItem('access_token', access_token);
-      if (remember) {
-        localStorage.setItem('refresh_token', refresh_token);
+  // Request interceptor to add token
+  useEffect(() => {
+    const requestInterceptor = api.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
       }
-      
-      // Set default auth header
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
-      // Fetch user data
-      const userResponse = await api.get('/api/users/me');
-      setUser(userResponse.data);
-      setIsAuthenticated(true);
-      
-      return userResponse.data;
-    } catch (error) {
-      console.error('Login error:', error);
-      setError(error.response?.data?.message || 'An unexpected error occurred');
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    );
 
-  // Register function
-  const register = async (userData) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const response = await api.post('/api/auth/register', userData);
-      
-      const { access_token, refresh_token } = response.data;
-      
-      // Store tokens
-      localStorage.setItem('access_token', access_token);
-      localStorage.setItem('refresh_token', refresh_token);
-      
-      // Set default auth header
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
-      // Fetch user data
-      const userResponse = await api.get('/api/users/me');
-      setUser(userResponse.data);
-      setIsAuthenticated(true);
-      
-      return userResponse.data;
-    } catch (error) {
-      console.error('Registration error:', error);
-      setError(error.response?.data?.message || 'An unexpected error occurred');
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    // Response interceptor to handle token refresh
+    const responseInterceptor = api.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
 
-  // Logout function
-  const logout = useCallback(async () => {
-    try {
-      // Call logout API if authenticated
-      if (isAuthenticated) {
-        await api.post('/api/auth/logout');
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          try {
+            // Try to refresh token
+            const newToken = await refreshToken();
+            
+            // Retry original request with new token
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            return api(originalRequest);
+          } catch (refreshError) {
+            // Refresh failed, logout
+            logout();
+            return Promise.reject(refreshError);
+          }
+        }
+
+        return Promise.reject(error);
       }
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      // Clear auth state regardless of API call success
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      delete api.defaults.headers.common['Authorization'];
-      setUser(null);
-      setIsAuthenticated(false);
-    }
-  }, [isAuthenticated]);
+    );
 
-  // Refresh token function
-  const refreshToken = async () => {
-    try {
-      const refresh_token = localStorage.getItem('refresh_token');
-      
-      if (!refresh_token) {
-        throw new Error('No refresh token available');
-      }
-      
-      const response = await api.post('/api/auth/refresh', { refresh_token });
-      
-      const { access_token } = response.data;
-      
-      // Store new access token
-      localStorage.setItem('access_token', access_token);
-      
-      // Set default auth header
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
-      return access_token;
-    } catch (error) {
-      console.error('Token refresh error:', error);
-      logout();
-      throw error;
-    }
-  };
+    // Cleanup
+    return () => {
+      api.interceptors.request.eject(requestInterceptor);
+      api.interceptors.response.eject(responseInterceptor);
+    };
+  }, [refreshToken, logout]);
 
-  // Check if user has a specific role
-  const hasRole = (role) => {
-    if (!user) return false;
-    return user.role === role || (Array.isArray(role) && role.includes(user.role));
-  };
-
-  // Context value
   const value = {
     user,
     isAuthenticated,
     isLoading,
     error,
     login,
-    register,
     logout,
     refreshToken,
-    hasRole
+    hasRole,
+    hasPermission
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

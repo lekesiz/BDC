@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { BrowserRouter } from 'react-router-dom';
+import { describe, it, expect } from 'vitest';
 import LoginPage from '../../pages/auth/LoginPage';
 
 expect.extend(toHaveNoViolations);

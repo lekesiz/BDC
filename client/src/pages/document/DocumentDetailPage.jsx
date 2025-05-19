@@ -92,7 +92,7 @@ const DocumentDetailPage = () => {
     };
     
     fetchDocumentDetails();
-  }, [id, toast]);
+  }, [id]); // Remove toast dependency to prevent infinite loop
 
   // Toggle document star
   const toggleStar = async () => {

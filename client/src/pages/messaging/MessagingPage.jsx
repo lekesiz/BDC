@@ -68,7 +68,7 @@ const MessagingPage = () => {
     };
     
     fetchConversations();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
 
   // Filter conversations based on search term
   useEffect(() => {
@@ -121,7 +121,7 @@ const MessagingPage = () => {
     };
     
     fetchMessages();
-  }, [selectedConversation, toast]);
+  }, [selectedConversation]); // Remove toast dependency to prevent infinite loop
 
   // Scroll to bottom of messages
   useEffect(() => {

@@ -23,6 +23,18 @@ class UserPreference(db.Model):
     sms_notifications = Column(Boolean, default=False)
     push_notifications = Column(Boolean, default=True)
     
+    # Privacy preferences
+    profile_visibility = Column(String(20), default='all')  # 'all', 'users', 'none'
+    show_online_status = Column(Boolean, default=True)
+    share_activity = Column(Boolean, default=True)
+    allow_data_collection = Column(Boolean, default=True)
+    
+    # Additional UI preferences
+    sidebar_collapsed = Column(Boolean, default=False)
+    density = Column(String(20), default='normal')  # 'compact', 'normal', 'comfortable'
+    accent_color = Column(String(20), default='blue')
+    font_size = Column(String(20), default='medium')
+    
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

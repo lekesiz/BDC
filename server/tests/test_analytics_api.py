@@ -9,12 +9,15 @@ from app.extensions import db
 
 
 @pytest.fixture
-def setup_analytics_data(session, app):
+def setup_analytics_data(db_session, test_app):
     """Setup test data for analytics API tests."""
+    import uuid
+    unique_id = str(uuid.uuid4())[:8]
+    
     # Create test users
     admin_user = User(
-        username='admin_analytics',
-        email='admin_analytics@test.com',
+        username=f'admin_analytics_{unique_id}',
+        email=f'admin_analytics_{unique_id}@test.com',
         first_name='Admin',
         last_name='Analytics',
         is_active=True,
@@ -24,8 +27,8 @@ def setup_analytics_data(session, app):
     admin_user.password = 'Admin123!'
     
     trainer_user = User(
-        username='trainer_analytics',
-        email='trainer_analytics@test.com',
+        username=f'trainer_analytics_{unique_id}',
+        email=f'trainer_analytics_{unique_id}@test.com',
         first_name='Trainer',
         last_name='Analytics',
         is_active=True,
@@ -35,8 +38,8 @@ def setup_analytics_data(session, app):
     trainer_user.password = 'Trainer123!'
     
     student_user = User(
-        username='student_analytics',
-        email='student_analytics@test.com',
+        username=f'student_analytics_{unique_id}',
+        email=f'student_analytics_{unique_id}@test.com',
         first_name='Student',
         last_name='Analytics',
         is_active=True,
@@ -45,13 +48,13 @@ def setup_analytics_data(session, app):
     )
     student_user.password = 'Student123!'
     
-    session.add_all([admin_user, trainer_user, student_user])
-    session.commit()
+    db_session.add_all([admin_user, trainer_user, student_user])
+    db_session.commit()
     
     # Create beneficiary users
     ben_user1 = User(
-        username='ben_one',
-        email='ben1@test.com',
+        username=f'ben_one_{unique_id}',
+        email=f'ben1_{unique_id}@test.com',
         first_name='Ben',
         last_name='One',
         is_active=True,
@@ -61,8 +64,8 @@ def setup_analytics_data(session, app):
     ben_user1.password = 'Password123!'
     
     ben_user2 = User(
-        username='ben_two',
-        email='ben2@test.com',
+        username=f'ben_two_{unique_id}',
+        email=f'ben2_{unique_id}@test.com',
         first_name='Ben',
         last_name='Two',
         is_active=True,
@@ -71,8 +74,8 @@ def setup_analytics_data(session, app):
     )
     ben_user2.password = 'Password123!'
     
-    session.add_all([ben_user1, ben_user2])
-    session.commit()
+    db_session.add_all([ben_user1, ben_user2])
+    db_session.commit()
     
     # Create beneficiaries
     beneficiary1 = Beneficiary(
@@ -92,8 +95,8 @@ def setup_analytics_data(session, app):
         created_at=datetime.now() - timedelta(days=5)  # Recent
     )
     
-    session.add_all([beneficiary1, beneficiary2])
-    session.commit()
+    db_session.add_all([beneficiary1, beneficiary2])
+    db_session.commit()
     
     # Create a test set first
     from app.models.test import TestSet
@@ -104,8 +107,8 @@ def setup_analytics_data(session, app):
         tenant_id=1,
         creator_id=admin_user.id
     )
-    session.add(test_set)
-    session.commit()
+    db_session.add(test_set)
+    db_session.commit()
     
     # Create evaluations
     evaluation1 = Evaluation(
@@ -126,8 +129,8 @@ def setup_analytics_data(session, app):
         status='in_progress'
     )
     
-    session.add_all([evaluation1, evaluation2])
-    session.commit()
+    db_session.add_all([evaluation1, evaluation2])
+    db_session.commit()
     
     # Create test sessions
     test_session1 = TestSession(
@@ -143,8 +146,8 @@ def setup_analytics_data(session, app):
         status='in_progress'
     )
     
-    session.add_all([test_session1, test_session2])
-    session.commit()
+    db_session.add_all([test_session1, test_session2])
+    db_session.commit()
     
     # Create appointments
     appointment1 = Appointment(
@@ -165,8 +168,8 @@ def setup_analytics_data(session, app):
         status='scheduled'
     )
     
-    session.add_all([appointment1, appointment2])
-    session.commit()
+    db_session.add_all([appointment1, appointment2])
+    db_session.commit()
     
     return {
         'admin_user': admin_user,
@@ -186,7 +189,7 @@ def setup_analytics_data(session, app):
 class TestAnalyticsAPI:
     """Test cases for analytics API endpoints."""
     
-    def test_get_dashboard_analytics_admin(self, client, setup_analytics_data, app):
+    def test_get_dashboard_analytics_admin(self, client, setup_analytics_data, test_app):
         """Test getting dashboard analytics as admin."""
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_analytics_data['admin_id'])
@@ -206,7 +209,7 @@ class TestAnalyticsAPI:
         assert 'admin_count' in stats
         assert 'recent_activity' in stats
     
-    def test_get_dashboard_analytics_trainer(self, client, setup_analytics_data, app):
+    def test_get_dashboard_analytics_trainer(self, client, setup_analytics_data, test_app):
         """Test getting dashboard analytics as trainer."""
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_analytics_data['trainer_id'])
@@ -223,7 +226,7 @@ class TestAnalyticsAPI:
         assert 'total_sessions' in stats
         assert 'upcoming_sessions' in stats
     
-    def test_get_dashboard_analytics_student(self, client, setup_analytics_data, app):
+    def test_get_dashboard_analytics_student(self, client, setup_analytics_data, test_app):
         """Test getting dashboard analytics as student."""
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_analytics_data['student_id'])
@@ -236,7 +239,7 @@ class TestAnalyticsAPI:
         assert 'statistics' in data
         # Students may have limited stats
     
-    def test_get_time_series_data(self, client, setup_analytics_data, app):
+    def test_get_time_series_data(self, client, setup_analytics_data, test_app):
         """Test getting time series data."""
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_analytics_data['admin_id'])
@@ -247,7 +250,7 @@ class TestAnalyticsAPI:
         # This endpoint might not exist
         assert response.status_code in [200, 404]
     
-    def test_get_activity_overview(self, client, setup_analytics_data, app):
+    def test_get_activity_overview(self, client, setup_analytics_data, test_app):
         """Test getting activity overview."""
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_analytics_data['admin_id'])
@@ -258,7 +261,7 @@ class TestAnalyticsAPI:
         # This endpoint might not exist
         assert response.status_code in [200, 404]
     
-    def test_get_user_stats(self, client, setup_analytics_data, app):
+    def test_get_user_stats(self, client, setup_analytics_data, test_app):
         """Test getting user statistics."""
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_analytics_data['admin_id'])
@@ -269,7 +272,7 @@ class TestAnalyticsAPI:
         # This endpoint might not exist
         assert response.status_code in [200, 404]
     
-    def test_get_evaluation_stats(self, client, setup_analytics_data, app):
+    def test_get_evaluation_stats(self, client, setup_analytics_data, test_app):
         """Test getting evaluation statistics."""
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_analytics_data['admin_id'])
@@ -280,7 +283,7 @@ class TestAnalyticsAPI:
         # This endpoint might not exist
         assert response.status_code in [200, 404]
     
-    def test_get_appointment_stats(self, client, setup_analytics_data, app):
+    def test_get_appointment_stats(self, client, setup_analytics_data, test_app):
         """Test getting appointment statistics."""
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_analytics_data['admin_id'])
@@ -291,13 +294,13 @@ class TestAnalyticsAPI:
         # This endpoint might not exist
         assert response.status_code in [200, 404]
     
-    def test_unauthorized_access(self, client, app):
+    def test_unauthorized_access(self, client, test_app):
         """Test accessing analytics without authentication."""
         response = client.get('/api/analytics/dashboard')
         
         assert response.status_code == 401
     
-    def test_get_role_specific_stats(self, client, setup_analytics_data, app):
+    def test_get_role_specific_stats(self, client, setup_analytics_data, test_app):
         """Test getting role-specific stats."""
         from flask_jwt_extended import create_access_token
         

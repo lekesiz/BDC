@@ -117,3 +117,7 @@ def get_logger(name):
         Logger: Logger instance
     """
     return structlog.get_logger(name)
+
+
+# Default logger instance
+logger = get_logger(__name__)

@@ -4,7 +4,7 @@ from io import BytesIO
 from concurrent.futures import ThreadPoolExecutor
 from app import create_app, db
 from app.models import User, Beneficiary, Evaluation, Appointment
-from app.tests.factories import UserFactory, BeneficiaryFactory, EvaluationFactory
+from tests.factories import UserFactory, BeneficiaryFactory, EvaluationFactory
 
 class TestPerformance:
     """Performance tests for critical API endpoints"""

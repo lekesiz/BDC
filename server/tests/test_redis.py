@@ -1,29 +1,50 @@
 #!/usr/bin/env python3
 """Test Redis connection."""
 
+import pytest
 import redis
-import sys
 
-try:
-    # Try to connect to Redis
-    r = redis.Redis(host='localhost', port=6379, db=0)
+
+@pytest.fixture
+def redis_client():
+    """Create Redis client."""
+    return redis.Redis(host='localhost', port=6379, db=0)
+
+
+def test_redis_connection(redis_client):
+    """Test Redis connection is working."""
+    redis_client.ping()
+    # If ping() doesn't raise an exception, connection is working
+
+
+def test_redis_basic_operations(redis_client):
+    """Test basic Redis operations."""
+    # Set a key
+    redis_client.set('test_key', 'test_value')
     
-    # Test connection
-    r.ping()
-    print("✓ Redis is running and accessible")
-    
-    # Test basic operations
-    r.set('test_key', 'test_value')
-    value = r.get('test_key')
-    print(f"✓ Basic operations working: {value.decode('utf-8')}")
+    # Get the value
+    value = redis_client.get('test_key')
+    assert value.decode('utf-8') == 'test_value'
     
     # Cleanup
-    r.delete('test_key')
+    redis_client.delete('test_key')
     
-except redis.ConnectionError:
-    print("✗ Redis is not running")
-    print("Start Redis with: brew services start redis")
-    sys.exit(1)
-except Exception as e:
-    print(f"✗ Error: {e}")
-    sys.exit(1)
+    # Verify deletion
+    assert redis_client.get('test_key') is None
+
+
+def test_redis_key_expiration(redis_client):
+    """Test Redis key expiration."""
+    # Set a key with 1 second expiration
+    redis_client.setex('temp_key', 1, 'temp_value')
+    
+    # Verify key exists
+    assert redis_client.exists('temp_key') == 1
+    
+    # Wait for expiration (using time.sleep in test is not ideal, 
+    # but acceptable for testing expiration)
+    import time
+    time.sleep(2)
+    
+    # Verify key expired
+    assert redis_client.exists('temp_key') == 0

@@ -77,7 +77,7 @@ const DocumentUploadPage = () => {
     };
     
     fetchDocumentDetails();
-  }, [id, navigate, toast]);
+  }, [id, navigate]); // Remove toast dependency to prevent infinite loop
 
   // Fetch available folders
   useEffect(() => {
@@ -96,7 +96,7 @@ const DocumentUploadPage = () => {
     };
     
     fetchFolders();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
 
   // Handle file selection
   const handleFileChange = (e) => {

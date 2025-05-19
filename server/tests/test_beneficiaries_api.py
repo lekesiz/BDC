@@ -109,21 +109,4 @@ def test_beneficiary_update(client, token, beneficiary_id):
     else:
         print(f"Error: {response.data.decode()}")
 
-with app.app_context():
-    client = app.test_client()
-    
-    # Get token
-    token = get_auth_token(client)
-    if not token:
-        print("Failed to get auth token")
-        exit(1)
-    
-    print(f"Got token: {token[:50]}...")
-    
-    # Run tests
-    test_beneficiaries_list(client, token)
-    beneficiary_id = test_beneficiary_create(client, token)
-    
-    if beneficiary_id:
-        test_beneficiary_get(client, token, beneficiary_id)
-        test_beneficiary_update(client, token, beneficiary_id)
+# Code converted to pytest compatible tests instead of top-level execution

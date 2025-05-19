@@ -28,7 +28,7 @@ if login_response.status_code == 200:
     print(f"   Token: {token[:20]}...")
 else:
     print(f"   ✗ Login failed: {login_response.text}")
-    exit(1)
+    return
 
 headers = {
     "Authorization": f"Bearer {token}",

@@ -176,7 +176,15 @@ const useToast = () => {
     throw new Error("useToast must be used within a ToastProvider");
   }
   
-  return context;
+  // Provide a toast method for simplified API
+  const toast = (options) => {
+    return context.addToast(options);
+  };
+  
+  return {
+    ...context,
+    toast
+  };
 };
 
 export { 

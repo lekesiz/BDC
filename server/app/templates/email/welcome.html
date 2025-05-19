@@ -1,0 +1,33 @@
+{% extends "email/base.html" %}
+
+{% block title %}Welcome to BDC{% endblock %}
+
+{% block content %}
+<h2>Welcome to BDC, {{ user_name }}!</h2>
+
+<p>Thank you for joining the Beneficiary Development Center. We're excited to have you as part of our community.</p>
+
+<p>Your account has been successfully created with the following details:</p>
+<ul>
+    <li><strong>Email:</strong> {{ user_email }}</li>
+    <li><strong>Role:</strong> {{ user_role }}</li>
+    <li><strong>Organization:</strong> {{ organization_name }}</li>
+</ul>
+
+<p>To get started, please log in to your account:</p>
+
+<a href="{{ login_url }}" class="button">Log In to Your Account</a>
+
+<h3>What's Next?</h3>
+<ol>
+    <li>Complete your profile</li>
+    <li>Set up your availability (for trainers)</li>
+    <li>Explore available programs</li>
+    <li>Connect with other members</li>
+</ol>
+
+<p>If you have any questions or need assistance, our support team is here to help.</p>
+
+<p>Best regards,<br>
+The BDC Team</p>
+{% endblock %}

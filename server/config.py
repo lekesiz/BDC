@@ -12,7 +12,7 @@ class Config:
 
     # SQLAlchemy
     # Use absolute path for SQLite to ensure consistency
-    DB_PATH = os.path.join(BASE_DIR, 'app.db')
+    DB_PATH = os.path.join(BASE_DIR, 'instance', 'app.db')
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', f"sqlite:///{DB_PATH}")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False  # Set to True to see SQL queries
@@ -74,7 +74,10 @@ class DevelopmentConfig(Config):
     DEBUG = True
     TESTING = False
     SESSION_COOKIE_SECURE = False
-    CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
+    CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5174', 'http://127.0.0.1:5174']
+    # Disable rate limiting for development
+    RATELIMIT_ENABLED = False
+    RATELIMIT_DEFAULT = "10000 per minute"
 
 
 class TestingConfig(Config):

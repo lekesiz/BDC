@@ -20,6 +20,20 @@ class UserSchema(UserBaseSchema):
     is_active = fields.Boolean()
     last_login = fields.DateTime(dump_only=True)
     tenants = fields.List(fields.Nested('TenantSchema', only=('id', 'name')), dump_only=True)
+    phone = fields.String()
+    organization = fields.String()
+    bio = fields.String()
+    address = fields.String()
+    city = fields.String()
+    state = fields.String()
+    zip_code = fields.String()
+    country = fields.String()
+    # Preferences
+    email_notifications = fields.Boolean()
+    push_notifications = fields.Boolean()
+    sms_notifications = fields.Boolean()
+    language = fields.String()
+    theme = fields.String()
 
 
 class UserCreateSchema(UserBaseSchema):
@@ -80,6 +94,19 @@ class UserProfileSchema(Schema):
     # Profile specific fields could be added here
     avatar = fields.String()
     phone = fields.String()
+    organization = fields.String()
+    bio = fields.String()
+    address = fields.String()
+    city = fields.String()
+    state = fields.String()
+    zip_code = fields.String()
+    country = fields.String()
+    # Preferences
+    email_notifications = fields.Boolean()
+    push_notifications = fields.Boolean()
+    sms_notifications = fields.Boolean()
+    language = fields.String()
+    theme = fields.String()
     language = fields.String()
     theme = fields.String()
     timezone = fields.String()

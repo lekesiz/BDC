@@ -1,7 +1,7 @@
 import pytest
 import json
 from datetime import datetime, timedelta
-from models import Program, ProgramBeneficiary
+from app.models import Program  # ProgramBeneficiary no longer exists
 
 class TestPrograms:
     """Test program endpoints."""

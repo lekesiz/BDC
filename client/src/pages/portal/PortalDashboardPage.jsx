@@ -69,7 +69,7 @@ const PortalDashboardPage = () => {
     };
     
     fetchDashboardData();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
   
   // Load saved layout from localStorage
   const getSavedLayout = () => {

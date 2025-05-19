@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import RegisterPage from '../RegisterPage'
+import RegisterPage from '../../../pages/auth/RegisterPage'
 import { render } from '../../../test/test-utils'
 import * as authService from '../../../services/auth.service'
 

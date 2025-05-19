@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import RealTimeNotifications from '../notifications/RealTimeNotifications';
+import ThemeToggle from '../common/ThemeToggle';
 import { 
   Menu, 
   Bell, 
@@ -35,7 +36,7 @@ const Header = ({ onToggleSidebar }) => {
   };
   
   return (
-    <header className="bg-white border-b border-gray-200 z-10">
+    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-10 transition-colors">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left section */}
@@ -55,6 +56,9 @@ const Header = ({ onToggleSidebar }) => {
           
           {/* Right section */}
           <div className="flex items-center space-x-4">
+            {/* Theme toggle */}
+            <ThemeToggle />
+            
             {/* Real-time notifications */}
             <RealTimeNotifications />
             

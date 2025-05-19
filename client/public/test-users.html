@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users UI Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 20px;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #1f2937;
+        }
+        .test-button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background-color: #2563eb;
+        }
+        .test-button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .success {
+            color: #10b981;
+            font-weight: bold;
+        }
+        .error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        .info {
+            color: #6b7280;
+        }
+        .warning {
+            color: #f59e0b;
+        }
+        .results {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9fafb;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .loading {
+            color: #3b82f6;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .role-super_admin { background-color: #dc2626; color: white; }
+        .role-tenant_admin { background-color: #7c3aed; color: white; }
+        .role-trainer { background-color: #2563eb; color: white; }
+        .role-student { background-color: #10b981; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Users Management UI Test</h1>
+        
+        <div class="test-section">
+            <h2>Test User List</h2>
+            <button class="test-button" onclick="testListUsers()">Test List All Users</button>
+            <button class="test-button" onclick="testFilterByRole()">Test Filter by Role</button>
+            <button class="test-button" onclick="testSearchUsers()">Test Search</button>
+            <button class="test-button" onclick="testSorting()">Test Sorting</button>
+            <div id="list-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test User CRUD Operations</h2>
+            <button class="test-button" onclick="testCreateUser()">Test Create User</button>
+            <button class="test-button" onclick="testUpdateUser()">Test Update User</button>
+            <button class="test-button" onclick="testDeleteUser()">Test Delete User</button>
+            <button class="test-button" onclick="testUserValidation()">Test Validation</button>
+            <div id="crud-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test User Details & Profile</h2>
+            <button class="test-button" onclick="testUserDetail()">Test User Detail</button>
+            <button class="test-button" onclick="testUserProfile()">Test User Profile</button>
+            <button class="test-button" onclick="testPasswordChange()">Test Password Change</button>
+            <button class="test-button" onclick="testUserActivities()">Test User Activities</button>
+            <div id="detail-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Role Management</h2>
+            <select id="role-select">
+                <option value="super_admin">Super Admin</option>
+                <option value="tenant_admin">Tenant Admin</option>
+                <option value="trainer">Trainer</option>
+                <option value="student">Student</option>
+            </select>
+            <button class="test-button" onclick="testRoleChange()">Test Role Change</button>
+            <button class="test-button" onclick="testRolePermissions()">Test Role Permissions</button>
+            <div id="role-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Tenant Association</h2>
+            <button class="test-button" onclick="testTenantUsers()">Test Tenant Users</button>
+            <button class="test-button" onclick="testCrossTenantAccess()">Test Cross-Tenant Access</button>
+            <div id="tenant-results" class="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5001/api';
+        let authToken = null;
+        let currentUser = null;
+
+        // Test credentials for different roles
+        const roleCredentials = {
+            super_admin: { email: 'admin@bdc.com', password: 'Admin123!' },
+            tenant_admin: { email: 'tenant@bdc.com', password: 'Tenant123!' },
+            trainer: { email: 'trainer@bdc.com', password: 'Trainer123!' },
+            student: { email: 'student@bdc.com', password: 'Student123!' }
+        };
+
+        async function loginAs(role) {
+            const creds = roleCredentials[role];
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(creds)
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    authToken = data.access_token;
+                    currentUser = data.user;
+                    return { success: true, message: `Logged in as ${role}` };
+                } else {
+                    return { success: false, message: data.message || 'Login failed' };
+                }
+            } catch (error) {
+                return { success: false, message: error.message };
+            }
+        }
+
+        async function makeRequest(url, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            const mergedOptions = {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...(options.headers || {})
+                }
+            };
+            
+            return fetch(`${API_URL}${url}`, mergedOptions);
+        }
+
+        async function testListUsers() {
+            const resultsDiv = document.getElementById('list-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing user list...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                const response = await makeRequest('/users');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    let html = '<span class="success">✓ Users retrieved successfully</span>\n';
+                    html += `Total users: ${data.pagination?.total_items || data.length}\n\n`;
+                    
+                    if (data.items || data.length > 0) {
+                        const users = data.items || data;
+                        html += '<table>';
+                        html += '<tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Tenant</th><th>Status</th></tr>';
+                        users.slice(0, 5).forEach(user => {
+                            html += `<tr>
+                                <td>${user.id}</td>
+                                <td>${user.first_name} ${user.last_name}</td>
+                                <td>${user.email}</td>
+                                <td><span class="role-badge role-${user.role}">${user.role}</span></td>
+                                <td>${user.tenant_name || 'N/A'}</td>
+                                <td>${user.is_active ? 'Active' : 'Inactive'}</td>
+                            </tr>`;
+                        });
+                        html += '</table>';
+                    }
+                    
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = `<span class="error">✗ Error: ${data.message || response.statusText}</span>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testFilterByRole() {
+            const resultsDiv = document.getElementById('list-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing role filters...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                const roles = ['super_admin', 'tenant_admin', 'trainer', 'student'];
+                let html = '<span class="success">Testing role filters...</span>\n\n';
+                
+                for (const role of roles) {
+                    const response = await makeRequest(`/users?role=${role}`);
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        const count = data.pagination?.total_items || data.length;
+                        html += `${role}: ${count} users\n`;
+                    } else {
+                        html += `${role}: <span class="error">Error</span>\n`;
+                    }
+                }
+                
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testSearchUsers() {
+            const resultsDiv = document.getElementById('list-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing user search...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                const searchTerms = ['admin', 'trainer', 'test', '@bdc.com'];
+                let html = '<span class="success">Testing search...</span>\n\n';
+                
+                for (const term of searchTerms) {
+                    const response = await makeRequest(`/users?search=${encodeURIComponent(term)}`);
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        const count = data.pagination?.total_items || data.length;
+                        html += `Search "${term}": ${count} results\n`;
+                    } else {
+                        html += `Search "${term}": <span class="error">Error</span>\n`;
+                    }
+                }
+                
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testSorting() {
+            const resultsDiv = document.getElementById('list-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing sorting...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                const sortOptions = [
+                    { field: 'created_at', order: 'desc', label: 'Newest first' },
+                    { field: 'created_at', order: 'asc', label: 'Oldest first' },
+                    { field: 'email', order: 'asc', label: 'Email A-Z' },
+                    { field: 'first_name', order: 'asc', label: 'Name A-Z' }
+                ];
+                
+                let html = '<span class="success">Testing sorting...</span>\n\n';
+                
+                for (const option of sortOptions) {
+                    const response = await makeRequest(`/users?sort_by=${option.field}&sort_order=${option.order}`);
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        const users = data.items || data;
+                        const firstUser = users[0];
+                        html += `${option.label}: First user is ${firstUser?.email || 'N/A'}\n`;
+                    } else {
+                        html += `${option.label}: <span class="error">Error</span>\n`;
+                    }
+                }
+                
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testCreateUser() {
+            const resultsDiv = document.getElementById('crud-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing create user...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                const newUser = {
+                    email: `test.user.${Date.now()}@example.com`,
+                    password: 'TestPassword123!',
+                    first_name: 'Test',
+                    last_name: 'User',
+                    role: 'student',
+                    is_active: true
+                };
+                
+                const response = await makeRequest('/users', {
+                    method: 'POST',
+                    body: JSON.stringify(newUser)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultsDiv.innerHTML = `<span class="success">✓ User created successfully</span>\n` +
+                        `ID: ${data.id}\n` +
+                        `Email: ${data.email}\n` +
+                        `Role: ${data.role}`;
+                } else {
+                    resultsDiv.innerHTML = `<span class="error">✗ Error: ${data.message || response.statusText}</span>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testUpdateUser() {
+            const resultsDiv = document.getElementById('crud-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing update user...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                // Get a user to update
+                const listResponse = await makeRequest('/users?role=student&per_page=1');
+                const listData = await listResponse.json();
+                
+                if (listData.items && listData.items.length > 0) {
+                    const user = listData.items[0];
+                    
+                    const updateData = {
+                        first_name: 'Updated',
+                        last_name: user.last_name + ' Modified',
+                        phone: '+1234567890'
+                    };
+                    
+                    const response = await makeRequest(`/users/${user.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(updateData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        resultsDiv.innerHTML = `<span class="success">✓ User updated successfully</span>\n` +
+                            `ID: ${data.id}\n` +
+                            `Name: ${data.first_name} ${data.last_name}\n` +
+                            `Phone: ${data.phone || 'Not set'}`;
+                    } else {
+                        resultsDiv.innerHTML = `<span class="error">✗ Error: ${data.message || response.statusText}</span>`;
+                    }
+                } else {
+                    resultsDiv.innerHTML = '<span class="error">✗ No users found to update</span>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testDeleteUser() {
+            const resultsDiv = document.getElementById('crud-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing delete user...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                // Create a user to delete
+                const createResponse = await makeRequest('/users', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        email: `delete.test.${Date.now()}@example.com`,
+                        password: 'TestPassword123!',
+                        first_name: 'Delete',
+                        last_name: 'Test',
+                        role: 'student',
+                        is_active: true
+                    })
+                });
+                
+                if (createResponse.ok) {
+                    const createdUser = await createResponse.json();
+                    
+                    // Now delete it
+                    const deleteResponse = await makeRequest(`/users/${createdUser.id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (deleteResponse.ok) {
+                        resultsDiv.innerHTML = `<span class="success">✓ User deleted successfully</span>\n` +
+                            `Deleted user ID: ${createdUser.id}`;
+                    } else {
+                        const deleteData = await deleteResponse.json();
+                        resultsDiv.innerHTML = `<span class="error">✗ Delete error: ${deleteData.message || deleteResponse.statusText}</span>`;
+                    }
+                } else {
+                    resultsDiv.innerHTML = '<span class="error">✗ Failed to create test user for deletion</span>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testUserValidation() {
+            const resultsDiv = document.getElementById('crud-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing validation...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                // Test various invalid data
+                const invalidUsers = [
+                    { email: 'invalid-email', password: 'Test123!', first_name: 'Test', error: 'Invalid email' },
+                    { email: 'test@test.com', password: 'weak', first_name: 'Test', error: 'Weak password' },
+                    { email: 'test@test.com', password: 'Test123!', error: 'Missing first_name' },
+                    { email: 'admin@bdc.com', password: 'Test123!', first_name: 'Test', error: 'Duplicate email' }
+                ];
+                
+                let html = '<span class="success">Testing validation...</span>\n\n';
+                
+                for (const invalidUser of invalidUsers) {
+                    const response = await makeRequest('/users', {
+                        method: 'POST',
+                        body: JSON.stringify(invalidUser)
+                    });
+                    
+                    if (!response.ok) {
+                        html += `<span class="success">✓</span> ${invalidUser.error}: Correctly rejected\n`;
+                    } else {
+                        html += `<span class="error">✗</span> ${invalidUser.error}: Should have failed\n`;
+                    }
+                }
+                
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testUserDetail() {
+            const resultsDiv = document.getElementById('detail-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing user detail...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                // Get current user's details
+                const response = await makeRequest(`/users/${currentUser.id}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultsDiv.innerHTML = `<span class="success">✓ User detail loaded</span>\n` +
+                        `ID: ${data.id}\n` +
+                        `Name: ${data.first_name} ${data.last_name}\n` +
+                        `Email: ${data.email}\n` +
+                        `Role: ${data.role}\n` +
+                        `Tenant: ${data.tenant_name || 'N/A'}\n` +
+                        `Created: ${new Date(data.created_at).toLocaleDateString()}\n` +
+                        `Last login: ${data.last_login ? new Date(data.last_login).toLocaleString() : 'Never'}`;
+                } else {
+                    resultsDiv.innerHTML = `<span class="error">✗ Error: ${data.message || response.statusText}</span>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testUserProfile() {
+            const resultsDiv = document.getElementById('detail-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing user profile...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                // Get profile
+                const response = await makeRequest('/users/me/profile');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultsDiv.innerHTML = `<span class="success">✓ User profile loaded</span>\n` +
+                        `Bio: ${data.bio || 'Not set'}\n` +
+                        `Phone: ${data.phone || 'Not set'}\n` +
+                        `Language: ${data.language || 'en'}\n` +
+                        `Timezone: ${data.timezone || 'UTC'}`;
+                } else if (response.status === 404) {
+                    // Try to create profile
+                    const createResponse = await makeRequest('/users/me/profile', {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            bio: 'Test bio',
+                            phone: '+1234567890',
+                            language: 'en',
+                            timezone: 'UTC'
+                        })
+                    });
+                    
+                    if (createResponse.ok) {
+                        const createData = await createResponse.json();
+                        resultsDiv.innerHTML = `<span class="success">✓ Profile created</span>\n` +
+                            `Bio: ${createData.bio}\n` +
+                            `Phone: ${createData.phone}`;
+                    } else {
+                        resultsDiv.innerHTML = `<span class="error">✗ Error creating profile</span>`;
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<span class="error">✗ Error: ${data.message || response.statusText}</span>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testPasswordChange() {
+            const resultsDiv = document.getElementById('detail-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing password change...</span>';
+
+            try {
+                // Create a test user
+                await loginAs('super_admin');
+                
+                const testUser = {
+                    email: `pwtest.${Date.now()}@example.com`,
+                    password: 'OldPassword123!',
+                    first_name: 'Password',
+                    last_name: 'Test',
+                    role: 'student'
+                };
+                
+                const createResponse = await makeRequest('/users', {
+                    method: 'POST',
+                    body: JSON.stringify(testUser)
+                });
+                
+                if (createResponse.ok) {
+                    const createdUser = await createResponse.json();
+                    
+                    // Login as the test user
+                    const loginResponse = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: testUser.email,
+                            password: testUser.password
+                        })
+                    });
+                    
+                    if (loginResponse.ok) {
+                        const loginData = await loginResponse.json();
+                        const testToken = loginData.access_token;
+                        
+                        // Change password
+                        const changeResponse = await fetch(`${API_URL}/users/me/password`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${testToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                current_password: testUser.password,
+                                new_password: 'NewPassword123!',
+                                confirm_password: 'NewPassword123!'
+                            })
+                        });
+                        
+                        if (changeResponse.ok) {
+                            resultsDiv.innerHTML = '<span class="success">✓ Password changed successfully</span>';
+                        } else {
+                            const changeData = await changeResponse.json();
+                            resultsDiv.innerHTML = `<span class="error">✗ Error: ${changeData.message}</span>`;
+                        }
+                    } else {
+                        resultsDiv.innerHTML = '<span class="error">✗ Failed to login as test user</span>';
+                    }
+                } else {
+                    resultsDiv.innerHTML = '<span class="error">✗ Failed to create test user</span>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testUserActivities() {
+            const resultsDiv = document.getElementById('detail-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing user activities...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                // Get user activities
+                const response = await makeRequest(`/users/${currentUser.id}/activities`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    let html = '<span class="success">✓ Activities loaded</span>\n\n';
+                    
+                    if (data.items && data.items.length > 0) {
+                        html += 'Recent activities:\n';
+                        data.items.slice(0, 5).forEach(activity => {
+                            html += `- ${activity.action} at ${new Date(activity.created_at).toLocaleString()}\n`;
+                        });
+                    } else {
+                        html += 'No activities found';
+                    }
+                    
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = `<span class="error">✗ Error: ${data.message || response.statusText}</span>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testRoleChange() {
+            const resultsDiv = document.getElementById('role-results');
+            const newRole = document.getElementById('role-select').value;
+            resultsDiv.innerHTML = '<span class="loading">Testing role change...</span>';
+
+            try {
+                await loginAs('super_admin');
+                
+                // Create a user for role change
+                const testUser = {
+                    email: `roletest.${Date.now()}@example.com`,
+                    password: 'TestPassword123!',
+                    first_name: 'Role',
+                    last_name: 'Test',
+                    role: 'student'
+                };
+                
+                const createResponse = await makeRequest('/users', {
+                    method: 'POST',
+                    body: JSON.stringify(testUser)
+                });
+                
+                if (createResponse.ok) {
+                    const createdUser = await createResponse.json();
+                    
+                    // Change role
+                    const roleResponse = await makeRequest(`/users/${createdUser.id}/role`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ role: newRole })
+                    });
+                    
+                    if (roleResponse.ok) {
+                        const updatedUser = await roleResponse.json();
+                        resultsDiv.innerHTML = `<span class="success">✓ Role changed successfully</span>\n` +
+                            `User: ${updatedUser.email}\n` +
+                            `Old role: student\n` +
+                            `New role: ${updatedUser.role}`;
+                    } else {
+                        const roleData = await roleResponse.json();
+                        resultsDiv.innerHTML = `<span class="error">✗ Error: ${roleData.message}</span>`;
+                    }
+                } else {
+                    resultsDiv.innerHTML = '<span class="error">✗ Failed to create test user</span>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testRolePermissions() {
+            const resultsDiv = document.getElementById('role-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing role permissions...</span>';
+
+            try {
+                const roles = ['super_admin', 'tenant_admin', 'trainer', 'student'];
+                let html = '<span class="success">Testing permissions by role...</span>\n\n';
+                
+                for (const role of roles) {
+                    await loginAs(role);
+                    html += `<span class="info">${role}:</span>\n`;
+                    
+                    // Test various operations
+                    const operations = [
+                        { name: 'List users', method: 'GET', url: '/users' },
+                        { name: 'Create user', method: 'POST', url: '/users', 
+                          body: { email: 'test@test.com', password: 'Test123!', first_name: 'Test' }},
+                        { name: 'Update user', method: 'PUT', url: '/users/1', body: { first_name: 'Updated' }},
+                        { name: 'Delete user', method: 'DELETE', url: '/users/1' }
+                    ];
+                    
+                    for (const op of operations) {
+                        try {
+                            const response = await makeRequest(op.url, {
+                                method: op.method,
+                                body: op.body ? JSON.stringify(op.body) : undefined
+                            });
+                            
+                            if (response.ok) {
+                                html += `  ${op.name}: <span class="success">✓ Allowed</span>\n`;
+                            } else if (response.status === 403) {
+                                html += `  ${op.name}: <span class="warning">⊘ Forbidden</span>\n`;
+                            } else {
+                                html += `  ${op.name}: <span class="error">✗ Error (${response.status})</span>\n`;
+                            }
+                        } catch (error) {
+                            html += `  ${op.name}: <span class="error">✗ Error</span>\n`;
+                        }
+                    }
+                    html += '\n';
+                }
+                
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testTenantUsers() {
+            const resultsDiv = document.getElementById('tenant-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing tenant users...</span>';
+
+            try {
+                // Test as tenant admin
+                await loginAs('tenant_admin');
+                
+                // Get users for the tenant
+                const response = await makeRequest('/users');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    let html = '<span class="success">✓ Tenant users retrieved</span>\n';
+                    html += `Total users in tenant: ${data.pagination?.total_items || data.length}\n\n`;
+                    
+                    if (data.items || data.length > 0) {
+                        const users = data.items || data;
+                        html += 'Users:\n';
+                        users.forEach(user => {
+                            html += `- ${user.email} (${user.role}) - Tenant: ${user.tenant_name || 'N/A'}\n`;
+                        });
+                    }
+                    
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = `<span class="error">✗ Error: ${data.message || response.statusText}</span>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+
+        async function testCrossTenantAccess() {
+            const resultsDiv = document.getElementById('tenant-results');
+            resultsDiv.innerHTML = '<span class="loading">Testing cross-tenant access...</span>';
+
+            try {
+                // Login as super admin and create users in different tenants
+                await loginAs('super_admin');
+                
+                // Create or get tenants
+                const tenantsResponse = await makeRequest('/tenants');
+                const tenantsData = await tenantsResponse.json();
+                
+                if (tenantsData.items && tenantsData.items.length >= 2) {
+                    const tenant1 = tenantsData.items[0];
+                    const tenant2 = tenantsData.items[1];
+                    
+                    // Create users in different tenants
+                    const user1Response = await makeRequest('/users', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            email: `tenant1.${Date.now()}@example.com`,
+                            password: 'Test123!',
+                            first_name: 'Tenant1',
+                            last_name: 'User',
+                            role: 'trainer',
+                            tenant_id: tenant1.id
+                        })
+                    });
+                    
+                    const user2Response = await makeRequest('/users', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            email: `tenant2.${Date.now()}@example.com`,
+                            password: 'Test123!',
+                            first_name: 'Tenant2',
+                            last_name: 'User',
+                            role: 'trainer',
+                            tenant_id: tenant2.id
+                        })
+                    });
+                    
+                    if (user1Response.ok && user2Response.ok) {
+                        const user1 = await user1Response.json();
+                        const user2 = await user2Response.json();
+                        
+                        // Login as tenant1 admin and try to access tenant2 user
+                        await loginAs('tenant_admin');
+                        
+                        const accessResponse = await makeRequest(`/users/${user2.id}`);
+                        
+                        if (accessResponse.status === 403) {
+                            resultsDiv.innerHTML = '<span class="success">✓ Cross-tenant access correctly blocked</span>\n' +
+                                `Tenant admin cannot access users from other tenants`;
+                        } else {
+                            resultsDiv.innerHTML = '<span class="error">✗ Security issue: Cross-tenant access allowed</span>';
+                        }
+                    } else {
+                        resultsDiv.innerHTML = '<span class="error">✗ Failed to create test users</span>';
+                    }
+                } else {
+                    resultsDiv.innerHTML = '<span class="warning">⚠ Not enough tenants to test cross-tenant access</span>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

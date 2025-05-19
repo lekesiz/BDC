@@ -144,11 +144,23 @@ const PortalAssessmentsPage = () => {
   const getFilteredAssessments = () => {
     if (!assessmentsData) return [];
     
-    let allAssessments = [
-      ...assessmentsData.moduleAssessments,
-      ...assessmentsData.programAssessments,
-      ...assessmentsData.skillAssessments
-    ];
+    let allAssessments = [];
+    
+    // Handle different data structures
+    if (Array.isArray(assessmentsData)) {
+      // Direct array
+      allAssessments = [...assessmentsData];
+    } else if (assessmentsData.assessments) {
+      // Object with assessments property
+      allAssessments = [...assessmentsData.assessments];
+    } else {
+      // Original structure
+      allAssessments = [
+        ...(assessmentsData.moduleAssessments || []),
+        ...(assessmentsData.programAssessments || []),
+        ...(assessmentsData.skillAssessments || [])
+      ];
+    }
     
     // Apply status filter
     if (filter !== 'all') {

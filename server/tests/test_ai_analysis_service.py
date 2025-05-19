@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.models.user import User
 from app.extensions import db, cache
-from app.utils.logging import logger
+from app.utils.logger import logger
 
 # Henüz taşınmamış model modülleri için geçici sınıflar
 class Assessment:

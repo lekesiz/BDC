@@ -114,14 +114,17 @@ def get_dashboard():
 def get_courses():
     """Get student's enrolled courses/programs."""
     try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
         # Check if user is a student
-        if current_user.role != 'student':
+        if user.role != 'student':
             return jsonify({
                 'error': 'unauthorized',
                 'message': 'This endpoint is only accessible to students'
             }), 403
             
-        beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+        beneficiary = Beneficiary.query.filter_by(user_id=user.id).first()
         
         if not beneficiary:
             return jsonify({
@@ -187,14 +190,17 @@ def get_courses():
 def get_progress():
     """Get student's progress tracking across all programs."""
     try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
         # Check if user is a student
-        if current_user.role != 'student':
+        if user.role != 'student':
             return jsonify({
                 'error': 'unauthorized',
                 'message': 'This endpoint is only accessible to students'
             }), 403
             
-        beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+        beneficiary = Beneficiary.query.filter_by(user_id=user.id).first()
         
         if not beneficiary:
             return jsonify({
@@ -281,14 +287,17 @@ def get_progress():
 def get_achievements():
     """Get student's achievements and badges."""
     try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
         # Check if user is a student
-        if current_user.role != 'student':
+        if user.role != 'student':
             return jsonify({
                 'error': 'unauthorized',
                 'message': 'This endpoint is only accessible to students'
             }), 403
             
-        beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+        beneficiary = Beneficiary.query.filter_by(user_id=user.id).first()
         
         if not beneficiary:
             return jsonify({
@@ -391,14 +400,17 @@ def get_achievements():
 def get_assessments():
     """Get student's skill assessments and test results."""
     try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
         # Check if user is a student
-        if current_user.role != 'student':
+        if user.role != 'student':
             return jsonify({
                 'error': 'unauthorized',
                 'message': 'This endpoint is only accessible to students'
             }), 403
             
-        beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+        beneficiary = Beneficiary.query.filter_by(user_id=user.id).first()
         
         if not beneficiary:
             return jsonify({
@@ -483,14 +495,17 @@ def get_assessments():
 def get_calendar_events():
     """Get student's calendar events including sessions and appointments."""
     try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
         # Check if user is a student
-        if current_user.role != 'student':
+        if user.role != 'student':
             return jsonify({
                 'error': 'unauthorized',
                 'message': 'This endpoint is only accessible to students'
             }), 403
             
-        beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+        beneficiary = Beneficiary.query.filter_by(user_id=user.id).first()
         
         if not beneficiary:
             return jsonify({
@@ -589,14 +604,17 @@ def get_calendar_events():
 def get_resources():
     """Get student's resources and documents."""
     try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
         # Check if user is a student
-        if current_user.role != 'student':
+        if user.role != 'student':
             return jsonify({
                 'error': 'unauthorized',
                 'message': 'This endpoint is only accessible to students'
             }), 403
             
-        beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+        beneficiary = Beneficiary.query.filter_by(user_id=user.id).first()
         
         if not beneficiary:
             return jsonify({
@@ -677,14 +695,17 @@ def get_resources():
 def get_profile():
     """Get student's complete profile information."""
     try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
         # Check if user is a student
-        if current_user.role != 'student':
+        if user.role != 'student':
             return jsonify({
                 'error': 'unauthorized',
                 'message': 'This endpoint is only accessible to students'
             }), 403
             
-        beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+        beneficiary = Beneficiary.query.filter_by(user_id=user.id).first()
         
         if not beneficiary:
             return jsonify({
@@ -693,12 +714,12 @@ def get_profile():
             }), 404
         
         profile_data = {
-            'user': current_user.to_dict(include_profile=True),
+            'user': user.to_dict(include_profile=True),
             'beneficiary': beneficiary.to_dict(),
             'trainer': beneficiary.trainer.to_dict() if beneficiary.trainer else None,
             'enrollments': [e.to_dict() for e in beneficiary.program_enrollments.all()],
             'recent_activity': {
-                'last_login': current_user.last_login.isoformat() if current_user.last_login else None,
+                'last_login': user.last_login.isoformat() if user.last_login else None,
                 'recent_sessions': [],
                 'recent_tests': []
             }

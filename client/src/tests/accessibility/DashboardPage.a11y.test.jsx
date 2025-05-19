@@ -1,15 +1,16 @@
 import { render } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { BrowserRouter } from 'react-router-dom';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import DashboardPage from '../../pages/dashboard/DashboardPage';
 import { useAuth } from '../../hooks/useAuth';
 
-jest.mock('../../hooks/useAuth');
+vi.mock('../../hooks/useAuth');
 expect.extend(toHaveNoViolations);
 
 describe('DashboardPage Accessibility', () => {
   beforeEach(() => {
-    useAuth.mockReturnValue({
+    vi.mocked(useAuth).mockReturnValue({
       user: { id: 1, name: 'Test User', role: 'trainer' },
       isAuthenticated: true
     });

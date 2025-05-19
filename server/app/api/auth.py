@@ -37,48 +37,34 @@ def debug_auth():
 def login():
     """User login endpoint."""
     try:
-        # Debug logging
-        try:
-            json_data = request.get_json()
-            logger.info(f"Login attempt - Request data: {json_data}")
-        except Exception as e:
-            logger.error(f"Failed to parse JSON: {e}")
-            json_data = None
+        # Get JSON data
+        json_data = request.get_json()
+        
+        if not json_data:
+            return jsonify({
+                'error': 'invalid_request',
+                'message': 'Request body is empty'
+            }), 400
         
         # Validate request data
         schema = LoginSchema()
-        data = schema.load(json_data)
-        
-        # More debug logging
-        logger.info(f"Login attempt for email: {data['email']}")
-        
-        # Test the user lookup and password directly
-        from app.models import User
-        test_user = User.query.filter_by(email=data['email']).first()
-        if test_user:
-            logger.info(f"User found: {test_user.email}, active: {test_user.is_active}")
-            logger.info(f"Password verification: {test_user.verify_password(data['password'])}")
-        else:
-            logger.warning(f"User not found: {data['email']}")
+        try:
+            data = schema.load(json_data)
+        except ValidationError as e:
+            return jsonify({
+                'error': 'validation_error',
+                'message': 'Validation failed',
+                'errors': e.messages
+            }), 400
         
         # Authenticate user
         tokens = AuthService.login(
             email=data['email'],
             password=data['password'],
-            remember=data.get('remember_me', False)
+            remember=data.get('remember', False)
         )
         
         if not tokens:
-            logger.warning(f"Failed login attempt for {data['email']}")
-            # Check if user exists for debugging
-            from app.models import User
-            user = User.query.filter_by(email=data['email']).first()
-            if user:
-                logger.info(f"User exists: {user.email}, active: {user.is_active}")
-                logger.info(f"Password verification: {user.verify_password(data['password'])}")
-            else:
-                logger.info(f"User not found: {data['email']}")
-            
             return jsonify({
                 'error': 'invalid_credentials',
                 'message': 'Invalid email or password'
@@ -101,13 +87,6 @@ def login():
             }
         }
         return jsonify(response_data), 200
-    
-    except ValidationError as e:
-        return jsonify({
-            'error': 'validation_error',
-            'message': 'Validation failed',
-            'errors': e.messages
-        }), 400
     
     except Exception as e:
         logger.exception(f"Login error: {str(e)}")

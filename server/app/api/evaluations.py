@@ -59,7 +59,11 @@ def get_evaluations():
         elif current_user.role == 'student':
             # Students can only see evaluations assigned to them
             from app.models import Beneficiary
+            current_app.logger.info(f"Student user ID: {current_user.id}, Email: {current_user.email}")
             beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+            current_app.logger.info(f"Beneficiary found: {beneficiary is not None}")
+            if beneficiary:
+                current_app.logger.info(f"Beneficiary ID: {beneficiary.id}, User ID: {beneficiary.user_id}")
             beneficiary_id = beneficiary.id if beneficiary else None
             if not beneficiary_id:
                 return jsonify({

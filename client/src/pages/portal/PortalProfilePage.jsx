@@ -47,13 +47,16 @@ const PortalProfilePage = () => {
         setIsLoading(true);
         const response = await api.get('/api/portal/profile');
         setProfileData(response.data);
+        
+        // Safely access nested properties
+        const contact = response.data.contact || {};
         setEditableFields({
-          phone: response.data.contact.phone,
-          address: response.data.contact.address,
-          bio: response.data.bio,
-          education: response.data.education,
-          interests: response.data.interests,
-          goals: response.data.goals
+          phone: contact.phone || '',
+          address: contact.address || '',
+          bio: response.data.bio || '',
+          education: response.data.education || '',
+          interests: response.data.interests || '',
+          goals: response.data.goals || ''
         });
       } catch (error) {
         console.error('Error fetching profile data:', error);
@@ -68,7 +71,7 @@ const PortalProfilePage = () => {
     };
     
     fetchProfileData();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
   
   // Handle field change
   const handleFieldChange = (field, value) => {
@@ -117,14 +120,30 @@ const PortalProfilePage = () => {
   
   // Format date
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    if (!dateString) return 'Not set';
+    try {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    } catch (error) {
+      return 'Invalid date';
+    }
   };
   
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Loader className="w-10 h-10 text-primary animate-spin" />
+      </div>
+    );
+  }
+  
+  if (!profileData) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">No profile data available</h2>
+          <p className="text-gray-600 mt-2">Your profile information will appear here.</p>
+        </div>
       </div>
     );
   }
@@ -177,15 +196,15 @@ const PortalProfilePage = () => {
                   {profileData.avatar ? (
                     <img 
                       src={profileData.avatar} 
-                      alt={profileData.name}
+                      alt={profileData.name || 'User'}
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
                     <User className="h-12 w-12 text-gray-400" />
                   )}
                 </div>
-                <h2 className="text-xl font-bold text-white">{profileData.name}</h2>
-                <p className="text-white/80">{profileData.role}</p>
+                <h2 className="text-xl font-bold text-white">{profileData.name || 'Student'}</h2>
+                <p className="text-white/80">{profileData.role || 'Student'}</p>
               </div>
             </div>
             <div className="p-6 divide-y">
@@ -193,7 +212,7 @@ const PortalProfilePage = () => {
                 <Mail className="h-5 w-5 text-gray-400 mr-3" />
                 <div>
                   <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{profileData.contact.email}</p>
+                  <p className="font-medium">{profileData.contact?.email || profileData.email || 'Not set'}</p>
                 </div>
               </div>
               <div className="py-3 flex items-center">
@@ -207,7 +226,7 @@ const PortalProfilePage = () => {
                       className="mt-1"
                     />
                   ) : (
-                    <p className="font-medium">{profileData.contact.phone}</p>
+                    <p className="font-medium">{profileData.contact?.phone || 'Not set'}</p>
                   )}
                 </div>
               </div>
@@ -222,7 +241,7 @@ const PortalProfilePage = () => {
                       className="mt-1"
                     />
                   ) : (
-                    <p className="font-medium">{profileData.contact.address}</p>
+                    <p className="font-medium">{profileData.contact?.address || 'Not set'}</p>
                   )}
                 </div>
               </div>
@@ -244,15 +263,15 @@ const PortalProfilePage = () => {
             <div className="p-6 divide-y">
               <div className="py-3">
                 <p className="text-sm text-gray-500">Current Program</p>
-                <p className="font-medium">{profileData.program.name}</p>
+                <p className="font-medium">{profileData.program?.name || 'Not set'}</p>
               </div>
               <div className="py-3">
                 <p className="text-sm text-gray-500">Start Date</p>
-                <p className="font-medium">{formatDate(profileData.program.startDate)}</p>
+                <p className="font-medium">{formatDate(profileData.program?.startDate)}</p>
               </div>
               <div className="py-3">
                 <p className="text-sm text-gray-500">Expected Completion</p>
-                <p className="font-medium">{formatDate(profileData.program.expectedEndDate)}</p>
+                <p className="font-medium">{formatDate(profileData.program?.expectedEndDate)}</p>
               </div>
               <div className="py-3">
                 <p className="text-sm text-gray-500">Program Status</p>
@@ -260,10 +279,10 @@ const PortalProfilePage = () => {
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
                     <div 
                       className="bg-primary h-2.5 rounded-full" 
-                      style={{ width: `${profileData.program.progress}%` }}
+                      style={{ width: `${profileData.program?.progress || 0}%` }}
                     ></div>
                   </div>
-                  <span className="ml-2 text-sm font-medium">{profileData.program.progress}%</span>
+                  <span className="ml-2 text-sm font-medium">{profileData.program?.progress || 0}%</span>
                 </div>
               </div>
             </div>
@@ -287,7 +306,7 @@ const PortalProfilePage = () => {
                   ></textarea>
                 </div>
               ) : (
-                <p className="text-gray-700">{profileData.bio}</p>
+                <p className="text-gray-700">{profileData.bio || 'No biography provided'}</p>
               )}
             </div>
           </Card>
@@ -307,7 +326,7 @@ const PortalProfilePage = () => {
                   ></textarea>
                 </div>
               ) : (
-                <p className="text-gray-700">{profileData.education}</p>
+                <p className="text-gray-700">{profileData.education || 'No education background provided'}</p>
               )}
             </div>
           </Card>
@@ -318,7 +337,7 @@ const PortalProfilePage = () => {
               <h3 className="text-lg font-medium">Skills Development</h3>
             </div>
             <div className="p-6 space-y-4">
-              {profileData.skills.map(skill => (
+              {(profileData.skills || []).map(skill => (
                 <div key={skill.id} className="space-y-2">
                   <div className="flex justify-between items-center">
                     <h4 className="font-medium">{skill.name}</h4>
@@ -352,7 +371,7 @@ const PortalProfilePage = () => {
                   ></textarea>
                 </div>
               ) : (
-                <p className="text-gray-700">{profileData.interests}</p>
+                <p className="text-gray-700">{profileData.interests || 'No interests specified'}</p>
               )}
             </div>
           </Card>
@@ -372,7 +391,7 @@ const PortalProfilePage = () => {
                   ></textarea>
                 </div>
               ) : (
-                <p className="text-gray-700">{profileData.goals}</p>
+                <p className="text-gray-700">{profileData.goals || 'No goals specified'}</p>
               )}
             </div>
           </Card>

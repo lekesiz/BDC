@@ -82,7 +82,7 @@ const DocumentSharePage = () => {
     };
     
     fetchData();
-  }, [id, documentIds, navigate, toast]);
+  }, [id, documentIds, navigate]); // Remove toast dependency to prevent infinite loop
 
   // Search for users as typing
   useEffect(() => {

@@ -3,7 +3,7 @@ import os
 import tempfile
 from datetime import datetime, timedelta
 from app import create_app
-from app.models import db, User, Tenant, Beneficiary, Program, Test, TestQuestion
+from app.models import db, User, Tenant, Beneficiary, Program
 from flask_jwt_extended import create_access_token
 
 @pytest.fixture(scope='session')
@@ -12,7 +12,8 @@ def test_app():
     # Create a temporary file to isolate the database for each test
     db_fd, db_path = tempfile.mkstemp()
     
-    app = create_app('testing')
+    from config import TestingConfig
+    app = create_app(TestingConfig)
     app.config.update({
         'TESTING': True,
         'SQLALCHEMY_DATABASE_URI': f'sqlite:///{db_path}',
@@ -48,9 +49,8 @@ def db_session(test_app):
         connection = db.engine.connect()
         transaction = connection.begin()
         
-        options = dict(bind=connection, binds={})
-        session = db.create_scoped_session(options=options)
-        db.session = session
+        db.session.bind = connection
+        session = db.session
         
         yield session
         
@@ -61,9 +61,12 @@ def db_session(test_app):
 @pytest.fixture
 def test_tenant(db_session):
     """Create a test tenant."""
+    import uuid
+    unique_id = str(uuid.uuid4())[:8]
     tenant = Tenant(
-        name='Test Organization',
-        domain='test.org',
+        name=f'Test Organization {unique_id}',
+        slug=f'test-org-{unique_id}',
+        email=f'admin-{unique_id}@test.org',
         settings={'max_users': 100},
         is_active=True
     )
@@ -74,14 +77,18 @@ def test_tenant(db_session):
 @pytest.fixture
 def test_user(db_session, test_tenant):
     """Create a test user."""
+    import uuid
+    unique_id = str(uuid.uuid4())[:8]
     user = User(
-        email='test@example.com',
-        username='testuser',
+        email=f'test-{unique_id}@example.com',
+        username=f'testuser-{unique_id}',
+        first_name='Test',
+        last_name='User',
         tenant_id=test_tenant.id,
         role='tenant_admin',
         is_active=True
     )
-    user.set_password('password123')
+    user.password = 'password123'
     db_session.add(user)
     db_session.commit()
     return user
@@ -89,14 +96,18 @@ def test_user(db_session, test_tenant):
 @pytest.fixture
 def test_trainer(db_session, test_tenant):
     """Create a test trainer."""
+    import uuid
+    unique_id = str(uuid.uuid4())[:8]
     trainer = User(
-        email='trainer@example.com',
-        username='trainer',
+        email=f'trainer-{unique_id}@example.com',
+        username=f'trainer-{unique_id}',
+        first_name='Training',
+        last_name='Trainer',
         tenant_id=test_tenant.id,
         role='trainer',
         is_active=True
     )
-    trainer.set_password('password123')
+    trainer.password = 'password123'
     db_session.add(trainer)
     db_session.commit()
     return trainer
@@ -104,27 +115,65 @@ def test_trainer(db_session, test_tenant):
 @pytest.fixture
 def test_student(db_session, test_tenant):
     """Create a test student."""
+    import uuid
+    unique_id = str(uuid.uuid4())[:8]
     student = User(
-        email='student@example.com',
-        username='student',
+        email=f'student-{unique_id}@example.com',
+        username=f'student-{unique_id}',
+        first_name='Study',
+        last_name='Student',
         tenant_id=test_tenant.id,
         role='student',
         is_active=True
     )
-    student.set_password('password123')
+    student.password = 'password123'
     db_session.add(student)
     db_session.commit()
     return student
 
 @pytest.fixture
+def test_admin(db_session, test_tenant):
+    """Create a test admin."""
+    import uuid
+    unique_id = str(uuid.uuid4())[:8]
+    admin = User(
+        email=f'admin-{unique_id}@example.com',
+        username=f'admin-{unique_id}',
+        first_name='Admin',
+        last_name='User',
+        tenant_id=test_tenant.id,
+        role='super_admin',
+        is_active=True
+    )
+    admin.password = 'password123'
+    db_session.add(admin)
+    db_session.commit()
+    return admin
+
+@pytest.fixture
 def test_beneficiary(db_session, test_tenant, test_trainer):
     """Create a test beneficiary."""
-    beneficiary = Beneficiary(
+    # First create a user for the beneficiary
+    import uuid
+    unique_id = str(uuid.uuid4())[:8]
+    beneficiary_user = User(
+        email=f'beneficiary-{unique_id}@example.com',
+        username=f'beneficiary-{unique_id}',
         first_name='John',
         last_name='Doe',
-        email='john.doe@example.com',
+        tenant_id=test_tenant.id,
+        role='student',
+        is_active=True
+    )
+    beneficiary_user.password = 'password123'
+    db_session.add(beneficiary_user)
+    db_session.commit()
+    
+    # Now create the beneficiary profile
+    beneficiary = Beneficiary(
+        user_id=beneficiary_user.id,
         phone='+1234567890',
-        date_of_birth=datetime(1990, 1, 1),
+        birth_date=datetime(1990, 1, 1),
         tenant_id=test_tenant.id,
         trainer_id=test_trainer.id,
         status='active'
@@ -134,14 +183,16 @@ def test_beneficiary(db_session, test_tenant, test_trainer):
     return beneficiary
 
 @pytest.fixture
-def test_program(db_session, test_tenant):
+def test_program(db_session, test_tenant, test_trainer):
     """Create a test program."""
     program = Program(
         name='Test Program',
         description='A test training program',
         tenant_id=test_tenant.id,
+        created_by_id=test_trainer.id,
         start_date=datetime.now(),
         end_date=datetime.now() + timedelta(days=30),
+        status='active',
         is_active=True
     )
     db_session.add(program)
@@ -163,6 +214,38 @@ def test_test(db_session, test_tenant, test_user):
     db_session.add(test)
     db_session.commit()
     return test
+
+@pytest.fixture
+def test_document(db_session, test_trainer):
+    """Create a test document."""
+    from app.models.document import Document
+    document = Document(
+        title='Test Document',
+        description='A test document',
+        file_path='/uploads/test.pdf',
+        file_type='pdf',
+        file_size=1024,
+        document_type='general',
+        upload_by=test_trainer.id
+    )
+    db_session.add(document)
+    db_session.commit()
+    return document
+
+@pytest.fixture
+def test_notification(db_session, test_beneficiary):
+    """Create a test notification."""
+    from app.models.notification import Notification
+    notification = Notification(
+        user_id=test_beneficiary.user.id,
+        type='info',
+        title='Test Notification',
+        message='This is a test notification',
+        read=False
+    )
+    db_session.add(notification)
+    db_session.commit()
+    return notification
 
 @pytest.fixture
 def test_question(db_session, test_test):

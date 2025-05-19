@@ -2,7 +2,7 @@ import pytest
 from flask import Flask
 from app import create_app, db
 from app.models import User
-from app.tests.factories import UserFactory
+from tests.factories import UserFactory
 
 class TestSecurityXSSCSRF:
     """Test XSS and CSRF protection"""

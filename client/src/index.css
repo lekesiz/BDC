@@ -1,6 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Import dark theme styles */
+@import './styles/dark-theme.css';
  
 @layer base {
   :root {

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenants UI Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button.danger {
+            background-color: #dc3545;
+        }
+        button.danger:hover {
+            background-color: #c82333;
+        }
+        .tenant-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
+        .stat-box {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+        .filters {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .filters input, .filters select {
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tenants UI Test Page</h1>
+        
+        <div class="test-section">
+            <h3>Authentication</h3>
+            <div>
+                <input type="text" id="username" placeholder="Username" value="admin">
+                <input type="password" id="password" placeholder="Password" value="admin123">
+                <button onclick="login()">Login</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+            <div id="authResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>List Tenants</h3>
+            <div class="filters">
+                <input type="text" id="searchQuery" placeholder="Search tenants...">
+                <select id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+                <input type="number" id="pageSize" placeholder="Page size" value="10">
+                <button onclick="testListTenants()">List Tenants</button>
+            </div>
+            <div id="listResult" class="result"></div>
+            <div id="tenantsList"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Create Tenant</h3>
+            <div>
+                <input type="text" id="newTenantName" placeholder="Tenant name">
+                <input type="text" id="newTenantCode" placeholder="Tenant code">
+                <input type="email" id="newTenantEmail" placeholder="Admin email">
+                <select id="newTenantStatus">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <button onclick="testCreateTenant()">Create Tenant</button>
+            </div>
+            <div id="createResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Update Tenant</h3>
+            <div>
+                <input type="text" id="updateTenantId" placeholder="Tenant ID">
+                <input type="text" id="updateTenantName" placeholder="New name">
+                <select id="updateTenantStatus">
+                    <option value="">No change</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+                <button onclick="testUpdateTenant()">Update Tenant</button>
+            </div>
+            <div id="updateResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Tenant Statistics</h3>
+            <button onclick="testTenantStats()">Get Statistics</button>
+            <div id="statsResult" class="result"></div>
+            <div id="statsDisplay"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Tenant Configuration</h3>
+            <div>
+                <input type="text" id="configTenantId" placeholder="Tenant ID">
+                <textarea id="configSettings" placeholder="Settings JSON" rows="4" style="width: 100%">{
+  "defaultLanguage": "en",
+  "maxUsers": 50,
+  "features": ["appointments", "evaluations"]
+}</textarea>
+                <button onclick="testUpdateConfig()">Update Config</button>
+                <button onclick="testGetConfig()">Get Config</button>
+            </div>
+            <div id="configResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Suite</h3>
+            <button onclick="runAllTests()">Run All Tests</button>
+            <div id="suiteResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+        let authToken = localStorage.getItem('authToken') || '';
+
+        // Authentication
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    showResult('authResult', 'Login successful', 'success');
+                } else {
+                    showResult('authResult', `Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('authResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function logout() {
+            authToken = '';
+            localStorage.removeItem('authToken');
+            showResult('authResult', 'Logged out', 'success');
+        }
+
+        // List tenants
+        async function testListTenants() {
+            const search = document.getElementById('searchQuery').value;
+            const status = document.getElementById('statusFilter').value;
+            const pageSize = document.getElementById('pageSize').value;
+            
+            const params = new URLSearchParams({
+                page: 1,
+                per_page: pageSize
+            });
+            if (search) params.append('search', search);
+            if (status) params.append('status', status);
+            
+            try {
+                const response = await fetch(`${API_URL}/tenants/list?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    showResult('listResult', `Found ${data.total} tenants`, 'success');
+                    displayTenants(data.data);
+                } else {
+                    showResult('listResult', `Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('listResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function displayTenants(tenants) {
+            const container = document.getElementById('tenantsList');
+            if (!tenants || tenants.length === 0) {
+                container.innerHTML = '<p>No tenants found</p>';
+                return;
+            }
+            
+            container.innerHTML = tenants.map(tenant => `
+                <div class="tenant-card">
+                    <h4>${tenant.name} (${tenant.code})</h4>
+                    <p>Status: <strong>${tenant.status}</strong></p>
+                    <p>Created: ${new Date(tenant.created_at).toLocaleDateString()}</p>
+                    <p>Users: ${tenant.user_count || 0} | Beneficiaries: ${tenant.beneficiary_count || 0}</p>
+                    <button onclick="viewTenantDetails('${tenant.id}')">View Details</button>
+                    <button onclick="deleteTenant('${tenant.id}')" class="danger">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        // Create tenant
+        async function testCreateTenant() {
+            const tenantData = {
+                name: document.getElementById('newTenantName').value,
+                code: document.getElementById('newTenantCode').value,
+                admin_email: document.getElementById('newTenantEmail').value,
+                status: document.getElementById('newTenantStatus').value,
+                settings: {
+                    defaultLanguage: 'en',
+                    maxUsers: 50
+                }
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/tenants/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(tenantData)
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    showResult('createResult', `Tenant created with ID: ${data.id}`, 'success');
+                    testListTenants(); // Refresh list
+                } else {
+                    showResult('createResult', `Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('createResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Update tenant
+        async function testUpdateTenant() {
+            const tenantId = document.getElementById('updateTenantId').value;
+            const updateData = {};
+            
+            const name = document.getElementById('updateTenantName').value;
+            const status = document.getElementById('updateTenantStatus').value;
+            
+            if (name) updateData.name = name;
+            if (status) updateData.status = status;
+            
+            try {
+                const response = await fetch(`${API_URL}/tenants/update/${tenantId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    showResult('updateResult', 'Tenant updated successfully', 'success');
+                    testListTenants(); // Refresh list
+                } else {
+                    showResult('updateResult', `Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('updateResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Get tenant statistics
+        async function testTenantStats() {
+            try {
+                const response = await fetch(`${API_URL}/tenants/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    showResult('statsResult', 'Statistics retrieved', 'success');
+                    displayStats(data);
+                } else {
+                    showResult('statsResult', `Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('statsResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function displayStats(stats) {
+            const container = document.getElementById('statsDisplay');
+            container.innerHTML = `
+                <div class="stat-box">Total Tenants: <strong>${stats.total_tenants || 0}</strong></div>
+                <div class="stat-box">Active: <strong>${stats.active_tenants || 0}</strong></div>
+                <div class="stat-box">Inactive: <strong>${stats.inactive_tenants || 0}</strong></div>
+                <div class="stat-box">Total Users: <strong>${stats.total_users || 0}</strong></div>
+                <div class="stat-box">Total Beneficiaries: <strong>${stats.total_beneficiaries || 0}</strong></div>
+            `;
+        }
+
+        // Configuration management
+        async function testUpdateConfig() {
+            const tenantId = document.getElementById('configTenantId').value;
+            let settings;
+            
+            try {
+                settings = JSON.parse(document.getElementById('configSettings').value);
+            } catch (e) {
+                showResult('configResult', 'Invalid JSON format', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/tenants/${tenantId}/config`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ settings })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    showResult('configResult', 'Configuration updated', 'success');
+                } else {
+                    showResult('configResult', `Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('configResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetConfig() {
+            const tenantId = document.getElementById('configTenantId').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/tenants/${tenantId}/config`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('configSettings').value = JSON.stringify(data.settings, null, 2);
+                    showResult('configResult', 'Configuration retrieved', 'success');
+                } else {
+                    showResult('configResult', `Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('configResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Delete tenant
+        async function deleteTenant(tenantId) {
+            if (!confirm('Are you sure you want to delete this tenant?')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/tenants/delete/${tenantId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    showResult('listResult', 'Tenant deleted successfully', 'success');
+                    testListTenants(); // Refresh list
+                } else {
+                    showResult('listResult', `Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('listResult', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        // View tenant details
+        async function viewTenantDetails(tenantId) {
+            try {
+                const response = await fetch(`${API_URL}/tenants/${tenantId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    alert(JSON.stringify(data, null, 2));
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Test suite
+        async function runAllTests() {
+            const results = [];
+            
+            // Test 1: Authentication
+            results.push(await testAuth());
+            
+            // Test 2: List tenants
+            results.push(await testList());
+            
+            // Test 3: Create tenant
+            results.push(await testCreate());
+            
+            // Test 4: Update tenant
+            results.push(await testUpdate());
+            
+            // Test 5: Statistics
+            results.push(await testStats());
+            
+            // Test 6: Configuration
+            results.push(await testConfig());
+            
+            // Display results
+            const passed = results.filter(r => r.status === 'pass').length;
+            const failed = results.filter(r => r.status === 'fail').length;
+            
+            const summary = `
+                <h4>Test Results: ${passed} passed, ${failed} failed</h4>
+                ${results.map(r => `
+                    <div class="${r.status === 'pass' ? 'success' : 'error'}">
+                        ${r.name}: ${r.message}
+                    </div>
+                `).join('')}
+            `;
+            
+            document.getElementById('suiteResult').innerHTML = summary;
+        }
+
+        // Individual test functions
+        async function testAuth() {
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    return { name: 'Authentication', status: 'pass', message: 'Login successful' };
+                } else {
+                    return { name: 'Authentication', status: 'fail', message: 'Login failed' };
+                }
+            } catch (error) {
+                return { name: 'Authentication', status: 'fail', message: error.message };
+            }
+        }
+
+        async function testList() {
+            try {
+                const response = await fetch(`${API_URL}/tenants/list?page=1&per_page=10`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    return { name: 'List Tenants', status: 'pass', message: 'List retrieved' };
+                } else {
+                    return { name: 'List Tenants', status: 'fail', message: 'List failed' };
+                }
+            } catch (error) {
+                return { name: 'List Tenants', status: 'fail', message: error.message };
+            }
+        }
+
+        async function testCreate() {
+            try {
+                const response = await fetch(`${API_URL}/tenants/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: 'Test Tenant ' + Date.now(),
+                        code: 'TEST' + Date.now(),
+                        admin_email: 'test@example.com',
+                        status: 'active'
+                    })
+                });
+                
+                if (response.ok) {
+                    return { name: 'Create Tenant', status: 'pass', message: 'Tenant created' };
+                } else {
+                    return { name: 'Create Tenant', status: 'fail', message: 'Creation failed' };
+                }
+            } catch (error) {
+                return { name: 'Create Tenant', status: 'fail', message: error.message };
+            }
+        }
+
+        async function testUpdate() {
+            try {
+                // First get a tenant to update
+                const listResponse = await fetch(`${API_URL}/tenants/list?page=1&per_page=1`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (!listResponse.ok) {
+                    return { name: 'Update Tenant', status: 'fail', message: 'Could not get tenant list' };
+                }
+                
+                const listData = await listResponse.json();
+                if (!listData.data || listData.data.length === 0) {
+                    return { name: 'Update Tenant', status: 'fail', message: 'No tenants to update' };
+                }
+                
+                const tenantId = listData.data[0].id;
+                const response = await fetch(`${API_URL}/tenants/update/${tenantId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: 'Updated Tenant ' + Date.now()
+                    })
+                });
+                
+                if (response.ok) {
+                    return { name: 'Update Tenant', status: 'pass', message: 'Tenant updated' };
+                } else {
+                    return { name: 'Update Tenant', status: 'fail', message: 'Update failed' };
+                }
+            } catch (error) {
+                return { name: 'Update Tenant', status: 'fail', message: error.message };
+            }
+        }
+
+        async function testStats() {
+            try {
+                const response = await fetch(`${API_URL}/tenants/stats`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    return { name: 'Tenant Statistics', status: 'pass', message: 'Stats retrieved' };
+                } else {
+                    return { name: 'Tenant Statistics', status: 'fail', message: 'Stats failed' };
+                }
+            } catch (error) {
+                return { name: 'Tenant Statistics', status: 'fail', message: error.message };
+            }
+        }
+
+        async function testConfig() {
+            try {
+                // First get a tenant
+                const listResponse = await fetch(`${API_URL}/tenants/list?page=1&per_page=1`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (!listResponse.ok) {
+                    return { name: 'Configuration', status: 'fail', message: 'Could not get tenant list' };
+                }
+                
+                const listData = await listResponse.json();
+                if (!listData.data || listData.data.length === 0) {
+                    return { name: 'Configuration', status: 'fail', message: 'No tenants available' };
+                }
+                
+                const tenantId = listData.data[0].id;
+                const response = await fetch(`${API_URL}/tenants/${tenantId}/config`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    return { name: 'Configuration', status: 'pass', message: 'Config retrieved' };
+                } else {
+                    return { name: 'Configuration', status: 'fail', message: 'Config failed' };
+                }
+            } catch (error) {
+                return { name: 'Configuration', status: 'fail', message: error.message };
+            }
+        }
+
+        // Helper function
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+        }
+
+        // Initialize
+        window.onload = () => {
+            if (authToken) {
+                showResult('authResult', 'Using saved auth token', 'success');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -101,7 +101,7 @@ const CalendarPage = () => {
     };
     
     fetchAppointments();
-  }, [currentDate, viewMode, toast]);
+  }, [currentDate, viewMode]); // Remove toast dependency to prevent infinite loop
 
   // Apply filters to appointments
   const applyFilters = (appointmentsToFilter = appointments) => {

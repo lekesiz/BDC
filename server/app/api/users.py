@@ -192,6 +192,85 @@ def upload_profile_picture():
         }), 500
 
 
+@users_bp.route('/me/profile', methods=['GET'])
+@jwt_required()
+def get_me_profile():
+    """Get the current user's profile information."""
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({
+                'error': 'not_found',
+                'message': 'User not found'
+            }), 404
+        
+        # Use UserProfileSchema for detailed profile information
+        schema = UserProfileSchema()
+        profile_data = schema.dump(user)
+        
+        # Add additional profile information
+        profile_data['stats'] = {
+            'appointments_count': 0,  # To be implemented
+            'evaluations_count': 0,   # To be implemented
+            'documents_count': 0      # To be implemented
+        }
+        
+        return jsonify(profile_data), 200
+    
+    except Exception as e:
+        logger.exception(f"Get user profile error: {str(e)}")
+        return jsonify({
+            'error': 'server_error',
+            'message': 'An unexpected error occurred'
+        }), 500
+
+
+@users_bp.route('/me/profile', methods=['PUT', 'PATCH'])
+@jwt_required()
+def update_me_profile():
+    """Update the current user's profile information."""
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({
+                'error': 'not_found',
+                'message': 'User not found'
+            }), 404
+        
+        # Get update data
+        data = request.get_json()
+        
+        # Update user fields
+        updateable_fields = ['first_name', 'last_name', 'phone', 'bio', 'timezone', 'organization', 'address', 'city', 'state', 'zip_code', 'country', 'email_notifications', 'push_notifications', 'sms_notifications', 'language', 'theme']
+        for field in updateable_fields:
+            if field in data:
+                setattr(user, field, data[field])
+        
+        # Commit changes
+        db.session.commit()
+        
+        # Return updated profile
+        schema = UserProfileSchema()
+        updated_profile = schema.dump(user)
+        
+        return jsonify({
+            'message': 'Profile updated successfully',
+            'profile': updated_profile
+        }), 200
+    
+    except Exception as e:
+        logger.exception(f"Update user profile error: {str(e)}")
+        db.session.rollback()
+        return jsonify({
+            'error': 'server_error',
+            'message': 'An unexpected error occurred'
+        }), 500
+
+
 @users_bp.route('/<int:user_id>', methods=['GET'])
 @jwt_required()
 def get_user(user_id):

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { useToast } from '../../hooks/useToast';
+import { useToast } from '../../components/ui/toast';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
@@ -51,7 +51,7 @@ const ProgramDetailPage = () => {
       toast({
         title: 'Error',
         description: 'Failed to fetch program details',
-        variant: 'destructive'
+        type: 'error'
       });
     } finally {
       setLoading(false);

@@ -1,7 +1,7 @@
 import pytest
 import json
 from datetime import datetime
-from models import Beneficiary
+from app.models import Beneficiary
 
 class TestBeneficiaries:
     """Test beneficiary endpoints."""

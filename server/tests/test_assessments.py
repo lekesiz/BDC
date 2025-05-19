@@ -1,7 +1,7 @@
 import pytest
 import json
 from datetime import datetime, timedelta
-from models import Test, TestQuestion, TestSession, TestAnswer
+from app.models import Test, Question, TestSession, Response
 
 class TestAssessments:
     """Test assessment/test engine endpoints."""

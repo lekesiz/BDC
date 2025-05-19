@@ -1,0 +1,183 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "logout": "Logout",
+    "login": "Login",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "beneficiaries": "Beneficiaries",
+    "programs": "Programs",
+    "evaluations": "Evaluations",
+    "calendar": "Calendar",
+    "documents": "Documents",
+    "reports": "Reports",
+    "settings": "Settings",
+    "users": "Users",
+    "profile": "Profile"
+  },
+  "auth": {
+    "loginTitle": "Sign In",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "register": "Register",
+    "loginError": "Invalid email or password"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "overview": "Overview",
+    "recentActivity": "Recent Activity",
+    "statistics": "Statistics",
+    "totalUsers": "Total Users",
+    "activeBeneficiaries": "Active Beneficiaries",
+    "completedPrograms": "Completed Programs",
+    "upcomingAppointments": "Upcoming Appointments"
+  },
+  "beneficiaries": {
+    "title": "Beneficiaries",
+    "addNew": "Add New Beneficiary",
+    "list": "Beneficiary List",
+    "search": "Search beneficiaries...",
+    "filter": {
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "status": "Status",
+      "dateOfBirth": "Date of Birth",
+      "address": "Address"
+    }
+  },
+  "programs": {
+    "title": "Programs",
+    "createNew": "Create New Program",
+    "list": "Program List",
+    "details": "Program Details",
+    "fields": {
+      "name": "Program Name",
+      "description": "Description",
+      "duration": "Duration",
+      "capacity": "Capacity",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Status"
+    }
+  },
+  "evaluations": {
+    "title": "Evaluations",
+    "create": "Create Evaluation",
+    "list": "Evaluation List",
+    "types": {
+      "quiz": "Quiz",
+      "assignment": "Assignment",
+      "practical": "Practical Test"
+    },
+    "fields": {
+      "title": "Title",
+      "type": "Type",
+      "dueDate": "Due Date",
+      "points": "Points",
+      "timeLimit": "Time Limit"
+    }
+  },
+  "calendar": {
+    "title": "Calendar",
+    "today": "Today",
+    "month": "Month",
+    "week": "Week",
+    "day": "Day",
+    "newAppointment": "New Appointment",
+    "appointmentDetails": "Appointment Details"
+  },
+  "documents": {
+    "title": "Documents",
+    "upload": "Upload Document",
+    "folders": "Folders",
+    "recent": "Recent Documents",
+    "shared": "Shared with Me",
+    "fields": {
+      "name": "Document Name",
+      "type": "Type",
+      "size": "Size",
+      "uploadedBy": "Uploaded By",
+      "uploadDate": "Upload Date"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "generate": "Generate Report",
+    "types": {
+      "progress": "Progress Report",
+      "attendance": "Attendance Report",
+      "evaluation": "Evaluation Report",
+      "financial": "Financial Report"
+    },
+    "dateRange": "Date Range",
+    "export": "Export",
+    "schedule": "Schedule Report"
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "security": "Security",
+    "notifications": "Notifications",
+    "integrations": "Integrations",
+    "appearance": "Appearance",
+    "language": "Language",
+    "timezone": "Timezone",
+    "theme": "Theme"
+  },
+  "profile": {
+    "title": "My Profile",
+    "personalInfo": "Personal Information",
+    "changePassword": "Change Password",
+    "preferences": "Preferences",
+    "avatar": "Profile Picture",
+    "bio": "Biography"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "notFound": "Page not found",
+    "unauthorized": "You don't have permission to access this resource",
+    "validation": "Please check your input and try again"
+  },
+  "success": {
+    "saved": "Changes saved successfully",
+    "created": "Created successfully",
+    "updated": "Updated successfully",
+    "deleted": "Deleted successfully"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Must be no more than {max} characters",
+    "passwordMatch": "Passwords must match"
+  }
+}

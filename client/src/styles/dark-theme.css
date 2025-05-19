@@ -1,0 +1,141 @@
+/* Dark Theme Variables */
+.dark {
+  /* Background colors */
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  
+  /* Component backgrounds */
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  
+  /* Primary colors */
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  
+  /* Secondary colors */
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  
+  /* Muted colors */
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  
+  /* Borders */
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 48%;
+}
+
+/* Dark mode specific styles */
+.dark body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.dark .text-gray-900 {
+  color: hsl(var(--foreground));
+}
+
+.dark .text-gray-700 {
+  color: hsl(var(--muted-foreground));
+}
+
+.dark .text-gray-600 {
+  color: hsl(var(--muted-foreground));
+}
+
+.dark .text-gray-500 {
+  color: hsl(var(--muted-foreground));
+}
+
+.dark .bg-gray-50 {
+  background-color: hsl(217.2 32.6% 17.5%);
+}
+
+.dark .bg-gray-100 {
+  background-color: hsl(217.2 32.6% 15%);
+}
+
+.dark .bg-gray-200 {
+  background-color: hsl(217.2 32.6% 12%);
+}
+
+.dark .border-gray-200 {
+  border-color: hsl(var(--border));
+}
+
+.dark .border-gray-300 {
+  border-color: hsl(var(--border));
+}
+
+/* Dark mode hover states */
+.dark .hover\:bg-gray-50:hover {
+  background-color: hsl(217.2 32.6% 20%);
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: hsl(217.2 32.6% 22%);
+}
+
+/* Dark mode input fields */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: hsl(217.2 32.6% 10%);
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Dark mode cards */
+.dark .card {
+  background-color: hsl(222.2 84% 8%);
+  border-color: hsl(var(--border));
+}
+
+/* Dark mode buttons */
+.dark .btn-primary {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.dark .btn-outline {
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.dark .btn-outline:hover {
+  background-color: hsl(217.2 32.6% 17.5%);
+}
+
+/* Dark mode charts */
+.dark .recharts-cartesian-grid-horizontal line,
+.dark .recharts-cartesian-grid-vertical line {
+  stroke: hsl(var(--border));
+}
+
+.dark .recharts-text {
+  fill: hsl(var(--foreground));
+}
+
+/* Dark mode shadows */
+.dark .shadow {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5);
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+}
+
+/* Smooth transitions */
+.dark * {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}

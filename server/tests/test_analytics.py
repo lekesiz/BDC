@@ -9,9 +9,9 @@ from app.models import User, Beneficiary, Appointment, TestSession, TestSet
 from app.extensions import db
 
 @pytest.fixture
-def setup_data(session, app):
+def setup_data(db_session, test_app):
     """Setup test data for analytics tests."""
-    with app.app_context():
+    with test_app.app_context():
         # Create test users with unique usernames
         suffix = str(uuid.uuid4())[:8]
         
@@ -60,8 +60,8 @@ def setup_data(session, app):
         )
         beneficiary_user2.password = 'password123'
         
-        session.add_all([admin_user, psychologist_user, beneficiary_user1, beneficiary_user2])
-        session.flush()
+        db_session.add_all([admin_user, psychologist_user, beneficiary_user1, beneficiary_user2])
+        db_session.flush()
         
         # Create beneficiaries
         beneficiary1 = Beneficiary(
@@ -78,8 +78,8 @@ def setup_data(session, app):
             phone='0987654321'
         )
         
-        session.add_all([beneficiary1, beneficiary2])
-        session.flush()
+        db_session.add_all([beneficiary1, beneficiary2])
+        db_session.flush()
         
         # Create appointments
         now = datetime.utcnow()
@@ -112,8 +112,8 @@ def setup_data(session, app):
             tenant_id=1
         )
         
-        session.add(test_set)
-        session.flush()
+        db_session.add(test_set)
+        db_session.flush()
         
         # Create test sessions
         test_session1 = TestSession(
@@ -132,16 +132,16 @@ def setup_data(session, app):
         )
         
         # Add all to session
-        session.add_all([
+        db_session.add_all([
             beneficiary1, beneficiary2,
             appointment1, appointment2, test_set,
             test_session1, test_session2
         ])
-        session.commit()
+        db_session.commit()
         
         # Refresh to ensure they're properly attached to the session
-        session.refresh(admin_user)
-        session.refresh(psychologist_user)
+        db_session.refresh(admin_user)
+        db_session.refresh(psychologist_user)
         
         # Get the IDs before closing the session
         admin_id = admin_user.id
@@ -166,9 +166,9 @@ def setup_data(session, app):
         }
 
 
-def test_dashboard_stats_admin(client, auth_headers, setup_data, app):
+def test_dashboard_stats_admin(client, auth_headers, setup_data, test_app):
     """Test dashboard stats endpoint for admin."""
-    with app.app_context():
+    with test_app.app_context():
         # Generate auth headers for admin
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_data['admin_id'])
@@ -196,9 +196,9 @@ def test_dashboard_stats_admin(client, auth_headers, setup_data, app):
         assert 'recent_activity' in stats
 
 
-def test_beneficiary_activity_report(client, auth_headers, setup_data, app):
+def test_beneficiary_activity_report(client, auth_headers, setup_data, test_app):
     """Test beneficiary activity report."""
-    with app.app_context():
+    with test_app.app_context():
         # Generate auth headers for admin
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_data['admin_id'])
@@ -211,9 +211,9 @@ def test_beneficiary_activity_report(client, auth_headers, setup_data, app):
         assert len(data) >= 0  # Data format might be different
 
 
-def test_trainer_analytics(client, auth_headers, setup_data, app):
+def test_trainer_analytics(client, auth_headers, setup_data, test_app):
     """Test trainer analytics."""
-    with app.app_context():
+    with test_app.app_context():
         # Generate auth headers for admin
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_data['admin_id'])
@@ -226,9 +226,9 @@ def test_trainer_analytics(client, auth_headers, setup_data, app):
         assert len(data) >= 0  # Data format might be different
 
 
-def test_program_analytics(client, auth_headers, setup_data, app):
+def test_program_analytics(client, auth_headers, setup_data, test_app):
     """Test program analytics."""
-    with app.app_context():
+    with test_app.app_context():
         # Generate auth headers for admin
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_data['admin_id'])
@@ -241,9 +241,9 @@ def test_program_analytics(client, auth_headers, setup_data, app):
         assert len(data) >= 0  # Data format might be different
 
 
-def test_non_admin_role_dashboard(client, auth_headers, setup_data, app):
+def test_non_admin_role_dashboard(client, auth_headers, setup_data, test_app):
     """Test trainer role gets their own dashboard analytics."""
-    with app.app_context():
+    with test_app.app_context():
         # Generate auth headers for trainer/psychologist
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_data['psychologist_id'])
@@ -256,9 +256,9 @@ def test_non_admin_role_dashboard(client, auth_headers, setup_data, app):
         assert isinstance(data, dict)  # Should return some data
 
 
-def test_analytics_forbidden_non_admin(client, auth_headers, setup_data, app):
+def test_analytics_forbidden_non_admin(client, auth_headers, setup_data, test_app):
     """Test analytics access is forbidden for non-admin users."""
-    with app.app_context():
+    with test_app.app_context():
         # Generate auth headers for trainer/psychologist
         from flask_jwt_extended import create_access_token
         access_token = create_access_token(identity=setup_data['psychologist_id'])

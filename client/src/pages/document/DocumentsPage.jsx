@@ -92,7 +92,7 @@ const DocumentsPage = () => {
           
           setBreadcrumbs([
             { id: null, name: 'All Documents' },
-            ...folder.path.map(p => ({ id: p.id, name: p.name })),
+            ...(folder.path || []).map(p => ({ id: p.id, name: p.name })),
             { id: folder.id, name: folder.name }
           ]);
         } else {
@@ -113,7 +113,7 @@ const DocumentsPage = () => {
     };
     
     fetchDocuments();
-  }, [activeFolderId, toast]);
+  }, [activeFolderId]); // Remove toast dependency to prevent infinite loop
 
   // Filter documents based on search term and filters
   useEffect(() => {

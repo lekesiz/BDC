@@ -3,7 +3,7 @@ from cryptography.fernet import Fernet
 from app import create_app, db
 from app.models import User, Document
 from app.services.encryption import EncryptionService
-from app.tests.factories import UserFactory, DocumentFactory
+from tests.factories import UserFactory, DocumentFactory
 
 class TestSecurityEncryption:
     """Test data encryption and secure storage"""

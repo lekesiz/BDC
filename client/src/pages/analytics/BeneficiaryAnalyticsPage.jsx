@@ -61,7 +61,7 @@ const BeneficiaryAnalyticsPage = () => {
         
         // If an ID is provided, fetch that specific beneficiary
         if (id) {
-          const beneficiary = beneficiariesResponse.data.find(b => b.id.toString() === id);
+          const beneficiary = beneficiariesResponse.data?.find(b => b.id.toString() === id);
           if (beneficiary) {
             setSelectedBeneficiary(beneficiary);
           } else {
@@ -398,7 +398,7 @@ const BeneficiaryAnalyticsPage = () => {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {sessionTypeData.map((entry, index) => (
+                      {(sessionTypeData || []).map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -454,7 +454,7 @@ const BeneficiaryAnalyticsPage = () => {
               <div className="absolute left-4 inset-y-0 w-0.5 bg-gray-200"></div>
               
               <div className="space-y-8 relative">
-                {milestones.map((milestone, index) => (
+                {(milestones || []).map((milestone, index) => (
                   <div key={index} className="relative pl-10">
                     <div className={`absolute left-0 p-1 rounded-full ${
                       milestone.status === 'completed' 
@@ -510,7 +510,7 @@ const BeneficiaryAnalyticsPage = () => {
                         <div className="mt-3">
                           <p className="text-xs font-medium text-gray-500 mb-1">Achievements:</p>
                           <ul className="text-sm list-disc list-inside pl-1 space-y-1">
-                            {milestone.achievements.map((achievement, idx) => (
+                            {(milestone.achievements || []).map((achievement, idx) => (
                               <li key={idx}>{achievement}</li>
                             ))}
                           </ul>
@@ -534,7 +534,7 @@ const BeneficiaryAnalyticsPage = () => {
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Key Objectives</h3>
                   <ul className="list-disc pl-5 space-y-1">
-                    {actionPlan.objectives.map((objective, index) => (
+                    {(actionPlan?.objectives || []).map((objective, index) => (
                       <li key={index} className="text-sm">{objective}</li>
                     ))}
                   </ul>
@@ -545,7 +545,7 @@ const BeneficiaryAnalyticsPage = () => {
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Short-term Goals (1-3 months)</h3>
                   <ul className="list-disc pl-5 space-y-1">
-                    {actionPlan.shortTermGoals.map((goal, index) => (
+                    {(actionPlan?.shortTermGoals || []).map((goal, index) => (
                       <li key={index} className="text-sm">{goal}</li>
                     ))}
                   </ul>
@@ -556,7 +556,7 @@ const BeneficiaryAnalyticsPage = () => {
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Long-term Goals (4+ months)</h3>
                   <ul className="list-disc pl-5 space-y-1">
-                    {actionPlan.longTermGoals.map((goal, index) => (
+                    {(actionPlan?.longTermGoals || []).map((goal, index) => (
                       <li key={index} className="text-sm">{goal}</li>
                     ))}
                   </ul>
@@ -567,7 +567,7 @@ const BeneficiaryAnalyticsPage = () => {
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Trainer Recommendations</h3>
                   <ul className="list-disc pl-5 space-y-1">
-                    {actionPlan.recommendations.map((recommendation, index) => (
+                    {(actionPlan?.recommendations || []).map((recommendation, index) => (
                       <li key={index} className="text-sm">{recommendation}</li>
                     ))}
                   </ul>

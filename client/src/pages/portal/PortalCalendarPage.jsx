@@ -57,9 +57,13 @@ const PortalCalendarPage = () => {
             year: calendarData.currentYear
           }
         });
+        const sessions = Array.isArray(response.data) 
+          ? response.data 
+          : response.data.sessions || response.data.events || [];
+          
         setCalendarData(prevData => ({
           ...prevData,
-          sessions: response.data
+          sessions: sessions
         }));
       } catch (error) {
         console.error('Error fetching calendar data:', error);

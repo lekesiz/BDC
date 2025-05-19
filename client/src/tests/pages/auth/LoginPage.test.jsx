@@ -1,12 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import LoginPage from '../LoginPage'
+import LoginPage from '../../../pages/auth/LoginPage'
 import { render } from '../../../test/test-utils'
 import * as authService from '../../../services/auth.service'
 
 // Mock auth service
-vi.mock('../../../services/auth.service')
+vi.mock('../../../services/auth.service', () => ({
+  login: vi.fn(),
+  forgotPassword: vi.fn()
+}))
 
 describe('LoginPage', () => {
   const user = userEvent.setup()
@@ -18,58 +21,52 @@ describe('LoginPage', () => {
   it('renders login form', () => {
     render(<LoginPage />)
     
-    expect(screen.getByText(/Bienvenue/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Email/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Mot de passe/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Se connecter/i })).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/correo electrónico/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/contraseña/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /iniciar sesión/i })).toBeInTheDocument()
   })
 
-  it('shows validation errors for empty form submission', async () => {
+  it('shows validation errors for empty fields', async () => {
     render(<LoginPage />)
     
-    const submitButton = screen.getByRole('button', { name: /Se connecter/i })
+    const submitButton = screen.getByRole('button', { name: /iniciar sesión/i })
     await user.click(submitButton)
     
-    await waitFor(() => {
-      expect(screen.getByText(/Email requis/i)).toBeInTheDocument()
-      expect(screen.getByText(/Mot de passe requis/i)).toBeInTheDocument()
-    })
+    expect(await screen.findByText(/email é obrigatório/i)).toBeInTheDocument()
+    expect(await screen.findByText(/a senha é obrigatória/i)).toBeInTheDocument()
   })
 
   it('shows validation error for invalid email', async () => {
     render(<LoginPage />)
     
-    const emailInput = screen.getByLabelText(/Email/i)
+    const emailInput = screen.getByPlaceholderText(/correo electrónico/i)
     await user.type(emailInput, 'invalid-email')
     
-    const submitButton = screen.getByRole('button', { name: /Se connecter/i })
+    const submitButton = screen.getByRole('button', { name: /iniciar sesión/i })
     await user.click(submitButton)
     
-    await waitFor(() => {
-      expect(screen.getByText(/Format d'email invalide/i)).toBeInTheDocument()
-    })
+    expect(await screen.findByText(/digite um email válido/i)).toBeInTheDocument()
   })
 
   it('submits form with valid credentials', async () => {
-    const mockLogin = vi.fn().mockResolvedValue({
-      user: { id: 1, email: 'test@example.com' },
-      token: 'fake-token'
+    vi.mocked(authService).login.mockResolvedValue({
+      access_token: 'fake-token',
+      user: { email: 'test@example.com', role: 'trainer' }
     })
-    authService.login = mockLogin
-
+    
     render(<LoginPage />)
     
-    const emailInput = screen.getByLabelText(/Email/i)
-    const passwordInput = screen.getByLabelText(/Mot de passe/i)
+    const emailInput = screen.getByPlaceholderText(/correo electrónico/i)
+    const passwordInput = screen.getByPlaceholderText(/contraseña/i)
     
     await user.type(emailInput, 'test@example.com')
     await user.type(passwordInput, 'password123')
     
-    const submitButton = screen.getByRole('button', { name: /Se connecter/i })
+    const submitButton = screen.getByRole('button', { name: /iniciar sesión/i })
     await user.click(submitButton)
     
     await waitFor(() => {
-      expect(mockLogin).toHaveBeenCalledWith({
+      expect(authService.login).toHaveBeenCalledWith({
         email: 'test@example.com',
         password: 'password123'
       })
@@ -77,64 +74,94 @@ describe('LoginPage', () => {
   })
 
   it('shows error message on login failure', async () => {
-    const mockLogin = vi.fn().mockRejectedValue(new Error('Invalid credentials'))
-    authService.login = mockLogin
-
+    vi.mocked(authService).login.mockRejectedValue({
+      response: { data: { message: 'Invalid credentials' } }
+    })
+    
     render(<LoginPage />)
     
-    const emailInput = screen.getByLabelText(/Email/i)
-    const passwordInput = screen.getByLabelText(/Mot de passe/i)
+    const emailInput = screen.getByPlaceholderText(/correo electrónico/i)
+    const passwordInput = screen.getByPlaceholderText(/contraseña/i)
     
     await user.type(emailInput, 'test@example.com')
     await user.type(passwordInput, 'wrongpassword')
     
-    const submitButton = screen.getByRole('button', { name: /Se connecter/i })
+    const submitButton = screen.getByRole('button', { name: /iniciar sesión/i })
     await user.click(submitButton)
     
-    await waitFor(() => {
-      expect(screen.getByText(/Identifiants invalides/i)).toBeInTheDocument()
-    })
-  })
-
-  it('navigates to forgot password page', async () => {
-    render(<LoginPage />)
-    
-    const forgotPasswordLink = screen.getByText(/Mot de passe oublié/i)
-    await user.click(forgotPasswordLink)
-    
-    // Check that navigation was called
-    expect(window.location.pathname).toBe('/forgot-password')
+    expect(await screen.findByText(/Invalid credentials/i)).toBeInTheDocument()
   })
 
   it('navigates to register page', async () => {
     render(<LoginPage />)
     
-    const registerLink = screen.getByText(/S'inscrire/i)
-    await user.click(registerLink)
-    
-    // Check that navigation was called
-    expect(window.location.pathname).toBe('/register')
+    const registerLink = screen.getByText(/crear cuenta nueva/i)
+    expect(registerLink).toBeInTheDocument()
+    expect(registerLink).toHaveAttribute('href', '/register')
   })
 
-  it('shows loading state during login', async () => {
-    const mockLogin = vi.fn().mockImplementation(() => 
-      new Promise(resolve => setTimeout(resolve, 1000))
-    )
-    authService.login = mockLogin
-
+  it('opens forgot password modal', async () => {
     render(<LoginPage />)
     
-    const emailInput = screen.getByLabelText(/Email/i)
-    const passwordInput = screen.getByLabelText(/Mot de passe/i)
+    const forgotPasswordLink = screen.getByText(/olvidaste tu contraseña/i)
+    await user.click(forgotPasswordLink)
+    
+    expect(await screen.findByText(/recuperar contraseña/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/ingrese su correo electrónico/i)).toBeInTheDocument()
+  })
+
+  it('submits forgot password request', async () => {
+    vi.mocked(authService).forgotPassword.mockResolvedValue({
+      message: 'Reset link sent'
+    })
+    
+    render(<LoginPage />)
+    
+    const forgotPasswordLink = screen.getByText(/olvidaste tu contraseña/i)
+    await user.click(forgotPasswordLink)
+    
+    const emailInput = screen.getByPlaceholderText(/ingrese su correo electrónico/i)
+    await user.type(emailInput, 'test@example.com')
+    
+    const sendButton = screen.getByRole('button', { name: /enviar enlace/i })
+    await user.click(sendButton)
+    
+    await waitFor(() => {
+      expect(authService.forgotPassword).toHaveBeenCalledWith('test@example.com')
+    })
+    
+    expect(await screen.findByText(/se ha enviado un enlace/i)).toBeInTheDocument()
+  })
+
+  it('handles API error gracefully', async () => {
+    vi.mocked(authService).login.mockRejectedValue(new Error('Network error'))
+    
+    render(<LoginPage />)
+    
+    const emailInput = screen.getByPlaceholderText(/correo electrónico/i)
+    const passwordInput = screen.getByPlaceholderText(/contraseña/i)
     
     await user.type(emailInput, 'test@example.com')
     await user.type(passwordInput, 'password123')
     
-    const submitButton = screen.getByRole('button', { name: /Se connecter/i })
+    const submitButton = screen.getByRole('button', { name: /iniciar sesión/i })
     await user.click(submitButton)
     
-    // Check loading state
-    expect(screen.getByText(/Connexion en cours/i)).toBeInTheDocument()
-    expect(submitButton).toBeDisabled()
+    expect(await screen.findByText(/error al conectar/i)).toBeInTheDocument()
   })
-})
+
+  it('maintains form state when toggling password visibility', async () => {
+    render(<LoginPage />)
+    
+    const passwordInput = screen.getByPlaceholderText(/contraseña/i)
+    await user.type(passwordInput, 'mypassword')
+    
+    expect(passwordInput).toHaveAttribute('type', 'password')
+    
+    const toggleButton = screen.getByRole('button', { name: /mostrar contraseña/i })
+    await user.click(toggleButton)
+    
+    expect(passwordInput).toHaveAttribute('type', 'text')
+    expect(passwordInput).toHaveValue('mypassword')
+  })
+});

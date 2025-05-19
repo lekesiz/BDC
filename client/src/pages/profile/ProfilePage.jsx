@@ -29,6 +29,13 @@ const profileSchema = z.object({
   country: z.string().optional(),
   organization: z.string().optional(),
   bio: z.string().optional(),
+  // Preferences
+  email_notifications: z.boolean().optional(),
+  push_notifications: z.boolean().optional(),
+  sms_notifications: z.boolean().optional(),
+  language: z.string().optional(),
+  timezone: z.string().optional(),
+  theme: z.string().optional(),
 });
 
 // Password change validation schema
@@ -76,6 +83,13 @@ const ProfilePage = () => {
       country: user?.country || '',
       organization: user?.organization || '',
       bio: user?.bio || '',
+      // Preferences
+      email_notifications: user?.email_notifications ?? true,
+      push_notifications: user?.push_notifications ?? false,
+      sms_notifications: user?.sms_notifications ?? false,
+      language: user?.language || 'en',
+      timezone: user?.timezone || 'UTC',
+      theme: user?.theme || 'light',
     }
   });
   
@@ -129,11 +143,21 @@ const ProfilePage = () => {
       });
       
       // Update form with new data
-      reset(response.data);
+      // Merge the returned data with form data to keep all fields
+      const updatedData = {
+        ...data,  // Keep all submitted data
+        ...(response.data.profile || response.data)  // Override with returned data
+      };
+      
+      reset(updatedData);
       setUploadedImage(null);
       
-      // Refresh user data in auth context
-      await refreshToken();
+      // Fetch updated user data
+      const userResponse = await api.get('/api/users/me');
+      if (userResponse.data) {
+        // Update auth context with fresh data
+        // Don't reset form here as it might lose data
+      }
     } catch (err) {
       console.error('Profile update error:', err);
       
@@ -474,10 +498,102 @@ const ProfilePage = () => {
                 </TabContent>
                 
                 <TabContent value="preferences">
-                  <CardContent className="space-y-4">
-                    <Alert type="info" title="Coming Soon">
-                      Notification preferences and other settings will be available soon.
-                    </Alert>
+                  <CardContent className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Notification Preferences</h3>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between py-2">
+                          <div>
+                            <label className="font-medium">Email Notifications</label>
+                            <p className="text-sm text-gray-500">Receive notifications via email</p>
+                          </div>
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                            {...register('email_notifications')}
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between py-2">
+                          <div>
+                            <label className="font-medium">Push Notifications</label>
+                            <p className="text-sm text-gray-500">Receive push notifications in browser</p>
+                          </div>
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                            {...register('push_notifications')}
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between py-2">
+                          <div>
+                            <label className="font-medium">SMS Notifications</label>
+                            <p className="text-sm text-gray-500">Receive notifications via SMS</p>
+                          </div>
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                            {...register('sms_notifications')}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Language & Region</h3>
+                      <div className="space-y-4">
+                        <FormGroup>
+                          <FormLabel htmlFor="language">Language</FormLabel>
+                          <select
+                            id="language"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            {...register('language')}
+                          >
+                            <option value="en">English</option>
+                            <option value="fr">Français</option>
+                            <option value="es">Español</option>
+                            <option value="de">Deutsch</option>
+                          </select>
+                        </FormGroup>
+                        
+                        <FormGroup>
+                          <FormLabel htmlFor="timezone">Timezone</FormLabel>
+                          <select
+                            id="timezone"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            {...register('timezone')}
+                          >
+                            <option value="UTC">UTC</option>
+                            <option value="America/New_York">Eastern Time</option>
+                            <option value="America/Chicago">Central Time</option>
+                            <option value="America/Denver">Mountain Time</option>
+                            <option value="America/Los_Angeles">Pacific Time</option>
+                            <option value="Europe/London">London</option>
+                            <option value="Europe/Paris">Paris</option>
+                            <option value="Asia/Tokyo">Tokyo</option>
+                          </select>
+                        </FormGroup>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Display Preferences</h3>
+                      <div className="space-y-4">
+                        <FormGroup>
+                          <FormLabel htmlFor="theme">Theme</FormLabel>
+                          <select
+                            id="theme"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            {...register('theme')}
+                          >
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="system">System</option>
+                          </select>
+                        </FormGroup>
+                      </div>
+                    </div>
                   </CardContent>
                 </TabContent>
                 

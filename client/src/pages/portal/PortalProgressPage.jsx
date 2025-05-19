@@ -41,14 +41,60 @@ const PortalProgressPage = () => {
       try {
         setIsLoading(true);
         const response = await api.get('/api/portal/progress');
-        setProgressData(response.data);
+        
+        // Handle different response structures
+        let data = response.data;
+        
+        // If response has a 'progress' key with array data, transform it
+        if (data.progress && Array.isArray(data.progress)) {
+          // Transform from server format to expected format
+          const programs = data.progress;
+          const firstProgram = programs[0];
+          
+          data = {
+            program: firstProgram ? {
+              id: firstProgram.program.id,
+              name: firstProgram.program.name,
+              progress: firstProgram.progress_percent || 0,
+              startDate: firstProgram.enrollment_date,
+              expectedEndDate: firstProgram.enrollment_date // Default since not provided
+            } : null,
+            modules: [],
+            moduleStats: {
+              total: 0,
+              completed: 0,
+              completedPercentage: 0
+            },
+            assignments: [],
+            skills: []
+          };
+        }
+        
+        setProgressData(data);
         
         // Set the first module as selected by default if there are modules
-        if (response.data.modules && response.data.modules.length > 0) {
-          setSelectedModule(response.data.modules[0].id);
+        if (data.modules && data.modules.length > 0) {
+          setSelectedModule(data.modules[0].id);
         }
       } catch (error) {
         console.error('Error fetching progress data:', error);
+        // Set default data structure
+        setProgressData({
+          program: {
+            name: 'Program',
+            progress: 0,
+            startDate: new Date().toISOString(),
+            expectedEndDate: new Date().toISOString()
+          },
+          modules: [],
+          moduleStats: {
+            total: 0,
+            completed: 0,
+            completedPercentage: 0
+          },
+          assignments: [],
+          skills: []
+        });
         toast({
           title: 'Error',
           description: 'Failed to load progress data',
@@ -60,7 +106,7 @@ const PortalProgressPage = () => {
     };
     
     fetchProgressData();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
   
   // Format date
   const formatDate = (dateString) => {
@@ -84,14 +130,14 @@ const PortalProgressPage = () => {
   
   // Get the selected module details
   const getSelectedModuleDetails = () => {
-    if (!progressData || !selectedModule) return null;
+    if (!progressData || !selectedModule || !progressData.modules) return null;
     
     return progressData.modules.find(module => module.id === selectedModule);
   };
   
   // Calculate days remaining in program
   const getDaysRemaining = () => {
-    if (!progressData || !progressData.program.expectedEndDate) return 0;
+    if (!progressData || !progressData.program || !progressData.program.expectedEndDate) return 0;
     
     const endDate = new Date(progressData.program.expectedEndDate);
     const today = new Date();
@@ -109,6 +155,17 @@ const PortalProgressPage = () => {
     );
   }
   
+  if (!progressData || !progressData.program) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">No progress data available</h2>
+          <p className="text-gray-600 mt-2">Your progress information will appear here once you start a program.</p>
+        </div>
+      </div>
+    );
+  }
+  
   const selectedModuleDetails = getSelectedModuleDetails();
   const daysRemaining = getDaysRemaining();
   
@@ -118,7 +175,7 @@ const PortalProgressPage = () => {
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-2">My Program Progress</h1>
         <p className="text-gray-600">
-          Track your learning journey and progress in the {progressData.program.name} program
+          Track your learning journey and progress in the {progressData?.program?.name || 'your'} program
         </p>
       </div>
       

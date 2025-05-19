@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { Bell, Shield, Globe, Moon, Sun, Monitor } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, Shield, Globe, Moon, Sun, Monitor, Brain } from 'lucide-react';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/toast';
-import { Button } from '@/components/ui/button';
+import { AnimatedButton, AnimatedCard, AnimatedPage } from '@/components/animations';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsList, TabTrigger, TabContent } from '@/components/ui/tabs';
 import { Alert } from '@/components/ui/alert';
 import api from '@/lib/api';
+import AISettingsContent from './AISettingsContent';
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem } from '@/lib/animations';
 
 /**
  * Settings page component
@@ -58,6 +61,40 @@ const SettingsPage = () => {
     }));
   };
   
+  // Fetch notification settings on mount
+  useEffect(() => {
+    const fetchNotificationSettings = async () => {
+      try {
+        const response = await api.get('/api/settings/notifications');
+        setNotificationSettings(prev => ({
+          ...prev,
+          ...response.data
+        }));
+      } catch (err) {
+        console.error('Failed to fetch notification settings:', err);
+      }
+    };
+    
+    fetchNotificationSettings();
+  }, []);
+  
+  // Fetch privacy settings on mount
+  useEffect(() => {
+    const fetchPrivacySettings = async () => {
+      try {
+        const response = await api.get('/api/settings/privacy');
+        setPrivacySettings(prev => ({
+          ...prev,
+          ...response.data
+        }));
+      } catch (err) {
+        console.error('Failed to fetch privacy settings:', err);
+      }
+    };
+    
+    fetchPrivacySettings();
+  }, []);
+  
   // Handle theme change
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
@@ -92,7 +129,7 @@ const SettingsPage = () => {
       setIsLoading(true);
       
       // Call API to save notification settings
-      await api.put('/api/users/settings/notifications', notificationSettings);
+      await api.put('/api/settings/notifications', notificationSettings);
       
       addToast({
         type: 'success',
@@ -118,7 +155,7 @@ const SettingsPage = () => {
       setIsLoading(true);
       
       // Call API to save privacy settings
-      await api.put('/api/users/settings/privacy', privacySettings);
+      await api.put('/api/settings/privacy', privacySettings);
       
       addToast({
         type: 'success',
@@ -168,10 +205,17 @@ const SettingsPage = () => {
   };
   
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6">Settings</h1>
+    <AnimatedPage className="container mx-auto py-8 px-4">
+      <motion.h1 
+        className="text-2xl font-bold mb-6"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        Settings
+      </motion.h1>
       
-      <Card>
+      <AnimatedCard>
         <CardHeader>
           <CardTitle>Account Settings</CardTitle>
           <CardDescription>
@@ -194,16 +238,29 @@ const SettingsPage = () => {
                 <Globe className="h-4 w-4 mr-2" />
                 Preferences
               </TabTrigger>
+              <TabTrigger value="ai">
+                <Brain className="h-4 w-4 mr-2" />
+                AI
+              </TabTrigger>
             </TabsList>
           </CardContent>
           
           {/* Notifications Tab */}
           <TabContent value="notifications">
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Email Notifications</h3>
-                
-                <div className="space-y-3">
+            <CardContent>
+              <motion.div 
+                className="space-y-6"
+                variants={staggerContainer}
+                initial="initial"
+                animate="animate"
+              >
+                <motion.div 
+                  className="space-y-4"
+                  variants={staggerItem}
+                >
+                  <h3 className="text-lg font-medium">Email Notifications</h3>
+                  
+                  <div className="space-y-3">
                   {/* Email Notifications toggle */}
                   <div className="flex items-center justify-between">
                     <div>
@@ -550,19 +607,24 @@ const SettingsPage = () => {
             </CardContent>
             
             <CardFooter className="border-t pt-6">
-              <Button
+              <AnimatedButton
                 onClick={handleSavePreferences}
                 isLoading={isLoading}
                 disabled={isLoading}
                 className="ml-auto"
               >
                 Save Preferences
-              </Button>
+              </AnimatedButton>
             </CardFooter>
           </TabContent>
+          
+          {/* AI Tab */}
+          <TabContent value="ai">
+            <AISettingsContent />
+          </TabContent>
         </Tabs>
-      </Card>
-    </div>
+      </AnimatedCard>
+    </AnimatedPage>
   );
 };
 

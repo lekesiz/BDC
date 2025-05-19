@@ -54,7 +54,7 @@ const PortalAchievementsPage = () => {
     };
     
     fetchAchievements();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
   
   // Format date
   const formatDate = (dateString) => {
@@ -106,18 +106,18 @@ const PortalAchievementsPage = () => {
   const getFilteredAchievements = () => {
     if (filter === 'all') {
       return {
-        badges: achievements.badges,
-        certificates: achievements.certificates
+        badges: achievements.badges || [],
+        certificates: achievements.certificates || []
       };
     } else if (filter === 'badges') {
       return {
-        badges: achievements.badges,
+        badges: achievements.badges || [],
         certificates: []
       };
     } else if (filter === 'certificates') {
       return {
         badges: [],
-        certificates: achievements.certificates
+        certificates: achievements.certificates || []
       };
     }
     
@@ -150,7 +150,7 @@ const PortalAchievementsPage = () => {
       
       {/* Highlights */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {achievements.highlights.map(highlight => (
+        {(achievements.highlights || []).map(highlight => (
           <Card 
             key={highlight.id} 
             className="p-4 text-center flex flex-col items-center"
@@ -168,7 +168,7 @@ const PortalAchievementsPage = () => {
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Recently Earned</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {achievements.recentAchievements.map(achievement => (
+          {(achievements.recentAchievements || []).map(achievement => (
             <Card key={achievement.id} className="overflow-hidden">
               <div className={`h-2 ${achievement.type === 'badge' ? 'bg-purple-500' : achievement.type === 'certificate' ? 'bg-green-500' : 'bg-blue-500'}`}></div>
               <div className="p-6">

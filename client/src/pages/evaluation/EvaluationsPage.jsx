@@ -41,7 +41,7 @@ const EvaluationsPage = () => {
     };
 
     fetchEvaluations();
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent infinite loop
 
   // Handle filter changes
   const handleFilterChange = (key, value) => {
@@ -52,7 +52,7 @@ const EvaluationsPage = () => {
   };
 
   // Filter evaluations based on current filters
-  const filteredEvaluations = evaluations.filter(evaluation => {
+  const filteredEvaluations = (evaluations || []).filter(evaluation => {
     // Status filter
     if (filters.status !== 'all' && evaluation.status !== filters.status) {
       return false;
@@ -153,7 +153,7 @@ const EvaluationsPage = () => {
         </div>
       ) : filteredEvaluations.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvaluations.map((evaluation) => {
+          {(filteredEvaluations || []).map((evaluation) => {
             const { label, color } = getStatusLabel(evaluation.status);
             
             return (

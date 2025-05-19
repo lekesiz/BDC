@@ -52,6 +52,13 @@ class User(db.Model):
     bio = Column(db.Text, nullable=True)
     profile_picture = Column(String(255), nullable=True)
     
+    # Preference fields
+    email_notifications = Column(Boolean, default=True)
+    push_notifications = Column(Boolean, default=False)
+    sms_notifications = Column(Boolean, default=False)
+    language = Column(String(10), default='en')
+    theme = Column(String(20), default='light')
+    
     # Foreign key to tenant
     tenant_id = Column(Integer, ForeignKey('tenants.id'), nullable=True)
     

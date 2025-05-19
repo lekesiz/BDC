@@ -170,7 +170,12 @@ export const mockApiResponses = {
   getEvaluations: () => {
     return {
       status: 200,
-      data: mockEvaluations,
+      data: {
+        items: mockEvaluations,
+        total: mockEvaluations.length,
+        page: 1,
+        per_page: 10
+      },
     };
   },
   

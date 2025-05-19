@@ -1,63 +1,68 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import Card from '../../components/common/Card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
 
 describe('Card Component', () => {
   it('renders children correctly', () => {
     render(
       <Card>
-        <div>Card content</div>
+        <CardContent>Card content</CardContent>
       </Card>
     );
     expect(screen.getByText('Card content')).toBeInTheDocument();
   });
 
   it('renders title when provided', () => {
-    render(<Card title="Test Title">Content</Card>);
+    render(
+      <Card>
+        <CardHeader>
+          <CardTitle>Test Title</CardTitle>
+        </CardHeader>
+      </Card>
+    );
     expect(screen.getByText('Test Title')).toBeInTheDocument();
   });
 
-  it('renders subtitle when provided', () => {
-    render(<Card title="Title" subtitle="Subtitle">Content</Card>);
-    expect(screen.getByText('Subtitle')).toBeInTheDocument();
-  });
-
-  it('renders header actions', () => {
+  it('renders content and title', () => {
     render(
-      <Card 
-        title="Title"
-        headerActions={<button>Action</button>}
-      >
-        Content
+      <Card>
+        <CardHeader>
+          <CardTitle>Title</CardTitle>
+        </CardHeader>
+        <CardContent>Content</CardContent>
       </Card>
     );
-    expect(screen.getByText('Action')).toBeInTheDocument();
-  });
-
-  it('applies hover effect when hoverable', () => {
-    render(<Card hoverable>Content</Card>);
-    const card = screen.getByText('Content').parentElement;
-    expect(card).toHaveClass('hover:shadow-lg');
-  });
-
-  it('applies border when bordered', () => {
-    render(<Card bordered>Content</Card>);
-    const card = screen.getByText('Content').parentElement;
-    expect(card).toHaveClass('border');
+    expect(screen.getByText('Title')).toBeInTheDocument();
+    expect(screen.getByText('Content')).toBeInTheDocument();
   });
 
   it('renders footer when provided', () => {
     render(
-      <Card footer={<div>Footer content</div>}>
-        Content
+      <Card>
+        <CardContent>Content</CardContent>
+        <CardFooter>Footer content</CardFooter>
       </Card>
     );
     expect(screen.getByText('Footer content')).toBeInTheDocument();
   });
 
   it('applies custom className', () => {
-    render(<Card className="custom-class">Content</Card>);
-    const card = screen.getByText('Content').parentElement;
-    expect(card).toHaveClass('custom-class');
+    render(
+      <Card className="custom-class">
+        <CardContent>Content</CardContent>
+      </Card>
+    );
+    const card = screen.getByText('Content').closest('.custom-class');
+    expect(card).toBeInTheDocument();
+  });
+
+  it('has default card classes', () => {
+    render(
+      <Card>
+        <CardContent>Content</CardContent>
+      </Card>
+    );
+    const card = screen.getByText('Content').closest('.rounded-lg');
+    expect(card).toHaveClass('rounded-lg', 'border', 'bg-card');
   });
 });

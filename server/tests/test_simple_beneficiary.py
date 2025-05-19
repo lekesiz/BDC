@@ -1,27 +1,39 @@
 #!/usr/bin/env python
 """Test simple beneficiary creation."""
 
+import pytest
+import json
 from app import create_app
 from config import DevelopmentConfig
-import json
 
-app = create_app(DevelopmentConfig)
 
-with app.app_context():
-    client = app.test_client()
-    
-    # Get token
+@pytest.fixture
+def app():
+    """Create application for testing."""
+    app = create_app(DevelopmentConfig)
+    return app
+
+
+@pytest.fixture
+def client(app):
+    """Create test client."""
+    return app.test_client()
+
+
+@pytest.fixture
+def auth_headers(client):
+    """Get authentication headers."""
     response = client.post('/api/auth/login', 
                           json={'email': 'test.admin@bdc.com', 'password': 'Test123!'},
                           content_type='application/json')
     
-    if response.status_code != 200:
-        print("Failed to login")
-        exit(1)
-    
+    assert response.status_code == 200, "Failed to login"
     token = json.loads(response.data)['access_token']
-    
-    # Simple beneficiary data
+    return {'Authorization': f'Bearer {token}'}
+
+
+def test_simple_beneficiary_creation(client, auth_headers):
+    """Test creating a simple beneficiary."""
     beneficiary_data = {
         'first_name': 'John',
         'last_name': 'Doe',
@@ -29,11 +41,13 @@ with app.app_context():
         'phone': '+33123456789'
     }
     
-    # Create beneficiary
     response = client.post('/api/beneficiaries',
                           json=beneficiary_data,
-                          headers={'Authorization': f'Bearer {token}'},
+                          headers=auth_headers,
                           content_type='application/json')
     
-    print(f"Status: {response.status_code}")
-    print(f"Response: {response.data.decode()}")
+    assert response.status_code == 201
+    data = json.loads(response.data)
+    assert data['first_name'] == 'John'
+    assert data['last_name'] == 'Doe'
+    assert data['email'] == 'john.doe@example.com'

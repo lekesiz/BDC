@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDC Auth Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 3px solid #4CAF50;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .error {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+        .success {
+            border-left-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        .user-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            margin: 2px;
+            font-size: 0.85em;
+        }
+        .super_admin { background-color: #ff9800; color: white; }
+        .tenant_admin { background-color: #2196f3; color: white; }
+        .trainer { background-color: #9c27b0; color: white; }
+        .student { background-color: #4caf50; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BDC Authentication Test Page</h1>
+        
+        <div class="section">
+            <h2>🔐 Test Authentication</h2>
+            <p>Click any button below to test user authentication:</p>
+            
+            <button class="btn" onclick="testLogin('admin@bdc.com', 'Admin123!')">
+                Test Admin Login
+            </button>
+            <button class="btn" onclick="testLogin('tenant@bdc.com', 'Tenant123!')">
+                Test Tenant Admin Login
+            </button>
+            <button class="btn" onclick="testLogin('trainer@bdc.com', 'Trainer123!')">
+                Test Trainer Login
+            </button>
+            <button class="btn" onclick="testLogin('student@bdc.com', 'Student123!')">
+                Test Student Login
+            </button>
+            
+            <div id="loginResult" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="section">
+            <h2>🔑 Current Token</h2>
+            <div id="tokenInfo" class="result">No active token</div>
+        </div>
+        
+        <div class="section">
+            <h2>👤 User Profile</h2>
+            <button class="btn" onclick="testProfile()">Get Profile</button>
+            <div id="profileResult" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="section">
+            <h2>🚪 Logout</h2>
+            <button class="btn" onclick="testLogout()">Logout</button>
+            <div id="logoutResult" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = null;
+        const API_URL = 'http://localhost:5001/api';
+        
+        async function testLogin(email, password) {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password, remember_me: false })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentToken = data.access_token;
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Login Successful!\n\nUser Info:\n${JSON.stringify(data.user, null, 2)}\n\nToken Type: ${data.token_type}\nExpires In: ${data.expires_in} seconds`;
+                    
+                    // Update token info
+                    updateTokenInfo(data);
+                    
+                    // Add user badge
+                    const badge = document.createElement('span');
+                    badge.className = `user-badge ${data.user.role}`;
+                    badge.textContent = data.user.role.replace('_', ' ').toUpperCase();
+                    resultDiv.appendChild(badge);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Login Failed!\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        function updateTokenInfo(data) {
+            const tokenDiv = document.getElementById('tokenInfo');
+            tokenDiv.innerHTML = `Token Active: Yes\nUser: ${data.user.email}\nRole: ${data.user.role}\nExpires: ${new Date(Date.now() + data.expires_in * 1000).toLocaleString()}`;
+        }
+        
+        async function testProfile() {
+            const resultDiv = document.getElementById('profileResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            
+            if (!currentToken) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '❌ Please login first!';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/users/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Profile Retrieved!\n\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        async function testLogout() {
+            const resultDiv = document.getElementById('logoutResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            
+            if (!currentToken) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '❌ No active session!';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    currentToken = null;
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = '✅ Logged out successfully!';
+                    
+                    // Clear token info
+                    document.getElementById('tokenInfo').innerHTML = 'No active token';
+                } else {
+                    const data = await response.json();
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -6,6 +6,17 @@ import { setupBeneficiaryAnalyticsMockApi } from '@/components/analytics/setupBe
 import { setupReportsMockApi } from '@/components/reports/setupReportsMockApi';
 import { setupPortalMockApi } from '@/components/portal/setupPortalMockApi';
 import { setupAssessmentMockApi } from '@/components/assessment/setupAssessmentMockApi';
+import { setupBeneficiaryMockApi } from '@/components/beneficiary/setupBeneficiaryMockApi';
+import { setupDashboardMockApi } from '@/components/dashboard/setupDashboardMockApi';
+import { setupCalendarMockApi } from '@/components/calendar/setupCalendarMockApi';
+import { setupProgramsMockApi } from '@/components/programs/setupProgramsMockApi';
+import { setupSettingsMockApi } from '@/components/settings/setupSettingsMockApi';
+import { setupAIMockApi } from '@/components/ai/setupAIMockApi';
+import { setupIntegrationsMockApi } from '@/components/integrations/setupIntegrationsMockApi';
+import { setupComplianceMockApi } from '@/components/compliance/setupComplianceMockApi';
+import { setupNotificationsMockApi } from '@/components/notifications/setupNotificationsMockApi';
+import { setupAnalyticsMockApi } from '@/components/analytics/setupAnalyticsMockApi';
+import { setupAISettingsMockApi } from '@/components/settings/setupAISettingsMockApi';
 
 // This function sets up all mock API handlers
 export const setupMockApi = (api) => {
@@ -38,4 +49,37 @@ export const setupMockApi = (api) => {
   
   // Set up trainer assessment mock API
   setupAssessmentMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up beneficiary details mock API
+  setupBeneficiaryMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up dashboard mock API
+  setupDashboardMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up calendar/appointments mock API
+  setupCalendarMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up programs mock API
+  setupProgramsMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up settings mock API
+  setupSettingsMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up AI features mock API
+  setupAIMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up integrations mock API
+  setupIntegrationsMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up compliance mock API
+  setupComplianceMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up notifications mock API
+  setupNotificationsMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up analytics mock API
+  setupAnalyticsMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up AI settings mock API
+  setupAISettingsMockApi(api, originalGet, originalPost, originalPut, originalDelete);
 };

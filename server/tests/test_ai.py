@@ -15,11 +15,11 @@ class TestConfigureOpenAI:
     """Test the configure_openai function."""
     
     @patch('app.utils.ai.openai')
-    def test_configure_openai_with_config(self, mock_openai, app):
+    def test_configure_openai_with_config(self, mock_openai, test_app):
         """Test configuring OpenAI with application config."""
-        with app.app_context():
-            app.config['OPENAI_API_KEY'] = 'test-api-key'
-            app.config['OPENAI_ORGANIZATION'] = 'test-org'
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
+            test_app.config['OPENAI_ORGANIZATION'] = 'test-org'
             
             configure_openai()
             
@@ -28,11 +28,11 @@ class TestConfigureOpenAI:
     
     @patch('app.utils.ai.openai')
     @patch.dict(os.environ, {'OPENAI_API_KEY': 'env-api-key', 'OPENAI_ORGANIZATION': 'env-org'})
-    def test_configure_openai_with_env(self, mock_openai, app):
+    def test_configure_openai_with_env(self, mock_openai, test_app):
         """Test configuring OpenAI with environment variables."""
-        with app.app_context():
-            app.config.pop('OPENAI_API_KEY', None)
-            app.config.pop('OPENAI_ORGANIZATION', None)
+        with test_app.app_context():
+            test_app.config.pop('OPENAI_API_KEY', None)
+            test_app.config.pop('OPENAI_ORGANIZATION', None)
             
             configure_openai()
             
@@ -40,11 +40,11 @@ class TestConfigureOpenAI:
             assert mock_openai.organization == 'env-org'
     
     @patch('app.utils.ai.openai')
-    def test_configure_openai_no_org(self, mock_openai, app):
+    def test_configure_openai_no_org(self, mock_openai, test_app):
         """Test configuring OpenAI without organization."""
-        with app.app_context():
-            app.config['OPENAI_API_KEY'] = 'test-api-key'
-            app.config.pop('OPENAI_ORGANIZATION', None)
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
+            test_app.config.pop('OPENAI_ORGANIZATION', None)
             
             configure_openai()
             
@@ -57,11 +57,11 @@ class TestAnalyzeEvaluationResponses:
     """Test the analyze_evaluation_responses function."""
     
     @patch('app.utils.ai.openai')
-    def test_analyze_evaluation_no_api_key(self, mock_openai, app):
+    def test_analyze_evaluation_no_api_key(self, mock_openai, test_app):
         """Test analyze_evaluation_responses without API key."""
-        with app.app_context():
+        with test_app.app_context():
             mock_openai.api_key = None
-            app.config.pop('OPENAI_API_KEY', None)
+            test_app.config.pop('OPENAI_API_KEY', None)
             
             evaluation = {'title': 'Test Evaluation', 'questions': []}
             result = analyze_evaluation_responses(evaluation)
@@ -72,9 +72,10 @@ class TestAnalyzeEvaluationResponses:
             assert result['recommendations'] == []
     
     @patch('app.utils.ai.openai')
-    def test_analyze_evaluation_success(self, mock_openai, app):
+    def test_analyze_evaluation_success(self, mock_openai, test_app):
         """Test successful evaluation analysis."""
-        with app.app_context():
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
             mock_openai.api_key = 'test-api-key'
             
             # Mock the OpenAI response
@@ -111,9 +112,10 @@ class TestAnalyzeEvaluationResponses:
             assert result['summary'] == 'Overall good performance with room for improvement.'
     
     @patch('app.utils.ai.openai')
-    def test_analyze_evaluation_json_with_backticks(self, mock_openai, app):
+    def test_analyze_evaluation_json_with_backticks(self, mock_openai, test_app):
         """Test parsing JSON wrapped in markdown code blocks."""
-        with app.app_context():
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
             mock_openai.api_key = 'test-api-key'
             
             # Mock the OpenAI response with JSON in code blocks
@@ -138,9 +140,10 @@ class TestAnalyzeEvaluationResponses:
             assert result['summary'] == 'Summary here.'
     
     @patch('app.utils.ai.openai')
-    def test_analyze_evaluation_invalid_json(self, mock_openai, app):
+    def test_analyze_evaluation_invalid_json(self, mock_openai, test_app):
         """Test handling invalid JSON response."""
-        with app.app_context():
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
             mock_openai.api_key = 'test-api-key'
             
             # Mock the OpenAI response with invalid JSON
@@ -161,9 +164,10 @@ class TestAnalyzeEvaluationResponses:
             assert 'processing error' in result['summary']
     
     @patch('app.utils.ai.openai')
-    def test_analyze_evaluation_api_exception(self, mock_openai, app):
+    def test_analyze_evaluation_api_exception(self, mock_openai, test_app):
         """Test handling OpenAI API exceptions."""
-        with app.app_context():
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
             mock_openai.api_key = 'test-api-key'
             mock_openai.ChatCompletion.create.side_effect = Exception('API Error')
             
@@ -177,9 +181,10 @@ class TestAnalyzeEvaluationResponses:
             assert 'API error' in result['summary']
     
     @patch('app.utils.ai.openai')
-    def test_analyze_evaluation_missing_fields(self, mock_openai, app):
+    def test_analyze_evaluation_missing_fields(self, mock_openai, test_app):
         """Test handling response with missing required fields."""
-        with app.app_context():
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
             mock_openai.api_key = 'test-api-key'
             
             # Mock the OpenAI response with partial data
@@ -207,11 +212,11 @@ class TestGenerateReportContent:
     """Test the generate_report_content function."""
     
     @patch('app.utils.ai.openai')
-    def test_generate_report_no_api_key(self, mock_openai, app):
+    def test_generate_report_no_api_key(self, mock_openai, test_app):
         """Test generate_report_content without API key."""
-        with app.app_context():
+        with test_app.app_context():
             mock_openai.api_key = None
-            app.config.pop('OPENAI_API_KEY', None)
+            test_app.config.pop('OPENAI_API_KEY', None)
             
             beneficiary_data = {'first_name': 'John', 'last_name': 'Doe'}
             evaluation_data = []
@@ -225,9 +230,10 @@ class TestGenerateReportContent:
             assert result['conclusion'] == 'Not available'
     
     @patch('app.utils.ai.openai')
-    def test_generate_report_success(self, mock_openai, app):
+    def test_generate_report_success(self, mock_openai, test_app):
         """Test successful report generation."""
-        with app.app_context():
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
             mock_openai.api_key = 'test-api-key'
             
             # Mock the OpenAI response
@@ -266,9 +272,10 @@ class TestGenerateReportContent:
             assert result['conclusion'] == 'Great progress, continue the momentum.'
     
     @patch('app.utils.ai.openai')
-    def test_generate_report_json_with_backticks(self, mock_openai, app):
+    def test_generate_report_json_with_backticks(self, mock_openai, test_app):
         """Test parsing JSON wrapped in markdown code blocks."""
-        with app.app_context():
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
             mock_openai.api_key = 'test-api-key'
             
             # Mock the OpenAI response with JSON in code blocks
@@ -296,9 +303,10 @@ class TestGenerateReportContent:
             assert result['conclusion'] == 'Conclusion'
     
     @patch('app.utils.ai.openai')
-    def test_generate_report_invalid_json(self, mock_openai, app):
+    def test_generate_report_invalid_json(self, mock_openai, test_app):
         """Test handling invalid JSON response."""
-        with app.app_context():
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
             mock_openai.api_key = 'test-api-key'
             
             # Mock the OpenAI response with invalid JSON
@@ -321,9 +329,10 @@ class TestGenerateReportContent:
             assert 'processing error' in result['conclusion']
     
     @patch('app.utils.ai.openai')
-    def test_generate_report_api_exception(self, mock_openai, app):
+    def test_generate_report_api_exception(self, mock_openai, test_app):
         """Test handling OpenAI API exceptions."""
-        with app.app_context():
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
             mock_openai.api_key = 'test-api-key'
             mock_openai.ChatCompletion.create.side_effect = Exception('API Error')
             
@@ -339,9 +348,10 @@ class TestGenerateReportContent:
             assert 'API error' in result['conclusion']
     
     @patch('app.utils.ai.openai')
-    def test_generate_report_missing_fields(self, mock_openai, app):
+    def test_generate_report_missing_fields(self, mock_openai, test_app):
         """Test handling response with missing required fields."""
-        with app.app_context():
+        with test_app.app_context():
+            test_app.config['OPENAI_API_KEY'] = 'test-api-key'
             mock_openai.api_key = 'test-api-key'
             
             # Mock the OpenAI response with partial data

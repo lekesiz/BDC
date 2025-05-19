@@ -247,7 +247,7 @@ def get_beneficiary_analytics():
             result.append({
                 'id': beneficiary.id,
                 'name': f"{beneficiary.first_name} {beneficiary.last_name}",
-                'email': beneficiary.email,
+                'email': beneficiary.user.email if beneficiary.user else None,
                 'completed_tests': test_stats[0] or 0,
                 'average_score': float(test_stats[1] or 0),
                 'trainer': {
@@ -352,7 +352,7 @@ def get_program_analytics():
     if user.role not in ['super_admin', 'tenant_admin']:
         return jsonify({'error': 'Unauthorized'}), 403
     
-    from app.models.program import Program, ProgramEnrollment, Session, SessionAttendance, Module
+    from app.models.program import Program, ProgramEnrollment, TrainingSession, SessionAttendance, ProgramModule
     
     # Query parameters
     program_id = request.args.get('program_id', type=int)
@@ -373,8 +373,8 @@ def get_program_analytics():
         ).count()
         
         # Get attendance stats
-        total_sessions = Session.query.filter_by(program_id=program_id).count()
-        completed_sessions = Session.query.filter_by(
+        total_sessions = TrainingSession.query.filter_by(program_id=program_id).count()
+        completed_sessions = TrainingSession.query.filter_by(
             program_id=program_id,
             status='completed'
         ).count()
@@ -382,17 +382,17 @@ def get_program_analytics():
         # Calculate average attendance rate
         attendance_stats = db.session.query(
             func.avg(SessionAttendance.attendance_status == 'present')
-        ).join(Session).filter(
-            Session.program_id == program_id
+        ).join(TrainingSession).filter(
+            TrainingSession.program_id == program_id
         ).scalar() or 0
         
         # Get module progress
-        modules = Module.query.filter_by(program_id=program_id).order_by(Module.order).all()
+        modules = ProgramModule.query.filter_by(program_id=program_id).order_by(ProgramModule.order).all()
         module_progress = []
         
         for module in modules:
-            module_sessions = Session.query.filter_by(module_id=module.id).count()
-            completed_module_sessions = Session.query.filter_by(
+            module_sessions = TrainingSession.query.filter_by(module_id=module.id).count()
+            completed_module_sessions = TrainingSession.query.filter_by(
                 module_id=module.id,
                 status='completed'
             ).count()

@@ -1,5 +1,6 @@
 """Models package."""
 
+from app.extensions import db
 from app.models.user import User, TokenBlocklist, UserRole
 from app.models.beneficiary import Beneficiary, Note, BeneficiaryAppointment, BeneficiaryDocument
 from app.models.appointment import Appointment
@@ -16,6 +17,7 @@ from app.models.availability import AvailabilitySchedule, AvailabilitySlot, Avai
 
 # Export all models
 __all__ = [
+    'db',
     'User',
     'Tenant',
     'TokenBlocklist',

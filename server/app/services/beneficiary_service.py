@@ -211,6 +211,7 @@ class BeneficiaryService:
             if not beneficiary:
                 return None
             
+            
             # Separate user fields from beneficiary fields
             user_fields = ['first_name', 'last_name', 'email']
             user_data = {}
@@ -234,7 +235,16 @@ class BeneficiaryService:
                 if hasattr(beneficiary, key):
                     # Check if it's a property without a setter
                     prop = getattr(type(beneficiary), key, None)
-                    if prop is None or (hasattr(prop, 'fset') and prop.fset is not None):
+                    
+                    # The issue is that SQLAlchemy columns appear as properties too
+                    # So we need to check if it's a SQLAlchemy column or a real property
+                    from sqlalchemy.orm import class_mapper
+                    from sqlalchemy.orm.attributes import InstrumentedAttribute
+                    
+                    if isinstance(prop, InstrumentedAttribute):
+                        # It's a SQLAlchemy column, we can set it
+                        setattr(beneficiary, key, value)
+                    elif prop is None or (isinstance(prop, property) and prop.fset is not None):
                         # It's either not a property or a property with a setter
                         if key == 'custom_fields' and value is not None:
                             setattr(beneficiary, key, value)
@@ -244,6 +254,7 @@ class BeneficiaryService:
             beneficiary.updated_at = datetime.now(timezone.utc)
             
             db.session.commit()
+            
             
             # Clear cache
             clear_model_cache('beneficiaries')

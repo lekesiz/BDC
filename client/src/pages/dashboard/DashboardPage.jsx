@@ -172,7 +172,7 @@ const DashboardPage = () => {
           </div>
           <div className="border-t border-gray-200 divide-y divide-gray-200">
             {recentTests.length > 0 ? (
-              recentTests.map((test) => (
+              (recentTests || []).map((test) => (
                 <div key={test.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <Link 
@@ -248,7 +248,7 @@ const DashboardPage = () => {
           </div>
           <div className="border-t border-gray-200 divide-y divide-gray-200">
             {upcomingAppointments.length > 0 ? (
-              upcomingAppointments.map((appointment) => (
+              (upcomingAppointments || []).map((appointment) => (
                 <div key={appointment.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-900 truncate">

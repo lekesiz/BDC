@@ -60,11 +60,11 @@ const AnalyticsDashboardPage = () => {
         
         // Set default selections if none are made
         if (selectedTrainers.length === 0) {
-          setSelectedTrainers(trainersResponse.data.trainers.map(trainer => trainer.id));
+          setSelectedTrainers((trainersResponse.data?.trainers || []).map(trainer => trainer.id));
         }
         
         if (selectedPrograms.length === 0) {
-          setSelectedPrograms(programsResponse.data.programs.map(program => program.id));
+          setSelectedPrograms((programsResponse.data?.programs || []).map(program => program.id));
         }
         
         // Fetch analytics data with filters
@@ -121,12 +121,12 @@ const AnalyticsDashboardPage = () => {
 
   // Select all trainers
   const selectAllTrainers = () => {
-    setSelectedTrainers(trainers.map(trainer => trainer.id));
+    setSelectedTrainers((trainers || []).map(trainer => trainer.id));
   };
 
   // Select all programs
   const selectAllPrograms = () => {
-    setSelectedPrograms(programs.map(program => program.id));
+    setSelectedPrograms((programs || []).map(program => program.id));
   };
 
   // Clear all trainer selections
@@ -281,7 +281,7 @@ const AnalyticsDashboardPage = () => {
                     </div>
                   </div>
                   <div className="max-h-36 overflow-y-auto space-y-1">
-                    {trainers.map(trainer => (
+                    {(trainers || []).map(trainer => (
                       <div key={trainer.id} className="flex items-center">
                         <input
                           type="checkbox"
@@ -318,7 +318,7 @@ const AnalyticsDashboardPage = () => {
                     </div>
                   </div>
                   <div className="max-h-36 overflow-y-auto space-y-1">
-                    {programs.map(program => (
+                    {(programs || []).map(program => (
                       <div key={program.id} className="flex items-center">
                         <input
                           type="checkbox"

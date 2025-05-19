@@ -275,3 +275,31 @@ Building a comprehensive training management system (Beneficiary Development Cen
 5. CSRF protection needed for forms
 6. Rate limiting on API endpoints
 7. File upload validation required
+
+## Session 2025-05-19
+### Context
+Starting new intensive development session with goal to implement CI quality gates and begin modular backend refactor.
+
+### Plan (see DAILY_TODO_2025-05-19.md)
+1. Baseline test runs (backend & frontend).
+2. Add pre-commit hooks: black, isort, flake8, bandit, eslint, prettier.
+3. Configure GitHub Actions workflow for automated tests and lint.
+4. Refactor backend: extract beneficiaries API into subpackage; adjust blueprints.
+5. Re-run tests and ensure server healthy.
+6. Record progress and next steps.
+
+### Notes
+- Memory entries will be added before and after each major task to track progress.
+- DAILY_TODO_2025-05-19.md will serve as ticking checklist.
+
+### Progress 2025-05-19 10:00
+- Added `.pre-commit-config.yaml` with Python and JS linters/formatters.
+- Created GitHub Actions workflow `.github/workflows/ci.yml` for backend and frontend tests + lint.
+- Updated DAILY_TODO_2025-05-19.md tasks 4 & 5 to done.
+- Deferred local baseline tests due to Python 3.13 package issues; CI will handle.
+
+### Progress 2025-05-19 11:00
+- Created modular package `app/api/beneficiaries_v2` with blueprint and first GET endpoint.
+- Updated `register_blueprints` to use new blueprint; old beneficiaries blueprint no longer registered.
+- Daily TODO tasks 6 and 7 marked complete.
+- Deferred task 8 (backend test rerun) due to local env; will rely on CI.

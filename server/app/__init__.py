@@ -193,7 +193,7 @@ def register_blueprints(app):
     # Import blueprints
     from app.api.auth import auth_bp
     from app.api.users import users_bp
-    from app.api.beneficiaries import beneficiaries_bp
+    from app.api.beneficiaries_v2 import beneficiaries_bp as beneficiaries_v2_bp
     from app.api.evaluations import evaluations_bp
     from app.api.profile import profile_bp
     from app.api.documents import documents_bp
@@ -213,7 +213,7 @@ def register_blueprints(app):
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(users_bp, url_prefix='/api/users')
-    app.register_blueprint(beneficiaries_bp, url_prefix='/api/beneficiaries')
+    app.register_blueprint(beneficiaries_v2_bp, url_prefix='/api/beneficiaries')
     app.register_blueprint(evaluations_bp, url_prefix='/api/evaluations')
     app.register_blueprint(profile_bp, url_prefix='/api/profile')
     app.register_blueprint(documents_bp, url_prefix='/api')
@@ -240,7 +240,15 @@ def register_blueprints(app):
     
     # Portal blueprint
     from app.api.portal import portal_bp
-    app.register_blueprint(portal_bp, url_prefix='/api')
+    app.register_blueprint(portal_bp, url_prefix='/api/portal')
+    
+    # Settings blueprint
+    from app.api.settings import settings_bp
+    app.register_blueprint(settings_bp, url_prefix='/api')
+    
+    # Assessment blueprint
+    from app.api.assessment import assessment_bp
+    app.register_blueprint(assessment_bp, url_prefix='/api')
     
     # Add a simple test route
     @app.route('/api/test', methods=['GET', 'OPTIONS'])
@@ -279,8 +287,12 @@ def register_error_handlers(app):
 def register_middleware(app):
     """Register middleware."""
     from app.middleware.request_context import request_context_middleware
+    from app.middleware.cors_middleware import init_cors_middleware
     from flask import request, make_response
 
+    # Apply CORS middleware
+    init_cors_middleware(app)
+    
     # Apply middleware
     app.before_request(request_context_middleware)
     

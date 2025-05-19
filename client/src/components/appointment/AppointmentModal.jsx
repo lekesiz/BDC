@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { format, addHours, parseISO } from 'date-fns';
 import { Calendar, Clock, MapPin, Users, User, Tag, AlertTriangle, Trash2, Save, X, ExternalLink } from 'lucide-react';
+import { AnimatedModal } from '@/components/animations';
+import { AnimatedButton, AnimatedInput } from '@/components/animations';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/modal';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
 import api from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
@@ -270,24 +270,26 @@ const AppointmentModal = ({
   };
 
   return (
-    <Modal
+    <AnimatedModal
       isOpen={isOpen}
       onClose={onClose}
-      size="xl"
     >
-      <ModalHeader>
-        {appointment ? 'Edit Appointment' : 'Create Appointment'}
-      </ModalHeader>
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">
+            {appointment ? 'Edit Appointment' : 'Create Appointment'}
+          </h2>
+        </div>
       
-      <ModalBody>
-        <form onSubmit={handleSubmit}>
+        <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic info section */}
           <div className="space-y-4 mb-6">
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700">
                 Title*
               </label>
-              <Input
+              <AnimatedInput
                 id="title"
                 name="title"
                 value={formData.title}
@@ -598,16 +600,16 @@ const AppointmentModal = ({
               </div>
             </div>
           )}
-        </form>
-      </ModalBody>
+          </form>
+        </div>
       
-      <ModalFooter>
-        <div className="flex justify-between w-full">
+        <div className="px-6 py-4 border-t border-gray-200">
+          <div className="flex justify-between w-full">
           <div>
             {appointment && (
               <>
                 {appointment.status !== 'canceled' ? (
-                  <Button
+                  <AnimatedButton
                     type="button"
                     variant="outline"
                     onClick={handleCancel}
@@ -615,7 +617,7 @@ const AppointmentModal = ({
                     disabled={isSubmitting}
                   >
                     Cancel Appointment
-                  </Button>
+                  </AnimatedButton>
                 ) : null}
                 
                 <Button
@@ -654,8 +656,9 @@ const AppointmentModal = ({
             </Button>
           </div>
         </div>
-      </ModalFooter>
-    </Modal>
+        </div>
+      </div>
+    </AnimatedModal>
   );
 };
 
