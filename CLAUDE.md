@@ -222,5 +222,12 @@ lsof -ti:5001 | xargs kill -9
 cd /Users/mikail/Desktop/BDC/server && python check_student_beneficiary.py
 ```
 
+## Son Güncellemeler (19 Mayıs 2025)
+- Detaylı proje durum raporu CURRENT_PROJECT_STATUS_2025-05-19.md dosyasına kaydedildi
+- CI/CD quality gates kuruldu
+- Backend beneficiaries API v2'ye refactor edildi
+- Test coverage minimumları belirlendi (Frontend & Backend: %50)
+- Codecov entegrasyonu yapılandırıldı
+
 ---
 *Bu dosya test süreci boyunca güncellenecektir*

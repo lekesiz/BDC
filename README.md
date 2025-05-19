@@ -1,5 +1,7 @@
 # BDC (Beneficiary Development Center)
 
+[![codecov](https://codecov.io/gh/your-user-or-org/BDC/branch/main/graph/badge.svg?token=YOURTOKEN)](https://codecov.io/gh/your-user-or-org/BDC)
+
 Modern ve kapsamlı bir yetenek değerlendirme (Bilan de Compétence) platformu.
 
 ## Proje Açıklaması
@@ -112,6 +114,23 @@ Frontend testleri için:
 cd client
 npm run test
 ```
+
+### Coverage Raporları
+
+Backend için coverage raporu üretmek:
+```bash
+cd server
+python run_tests.py  # HTML raporu server/coverage_html içinde
+```
+
+Frontend için coverage raporu üretmek:
+```bash
+cd client
+npm run test:coverage
+open coverage/index.html  # HTML raporu
+```
+
+CI'de her push'ta coverage sonuçları Codecov'a gönderilir ve badge güncellenir. Fail-under eşikleri: Backend %50, Frontend %50 (hedef yakında >%60).
 
 ## Kurulum
 

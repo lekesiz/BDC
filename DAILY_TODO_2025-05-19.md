@@ -12,5 +12,18 @@ Establish CI quality gates (tests, lint, pre-commit, workflow) and begin modular
 - [x] 6. Backend refactor step 1: extract beneficiaries endpoints into sub-package `server/app/api/beneficiaries_v2/`
 - [x] 7. Update blueprint imports & ensure server passes healthcheck (register_blueprints updated)
 - [~] 8. Re-run backend tests to verify no regressions (will rely on CI)
-- [ ] 9. Commit & push changes to remote
-- [ ] 10. Update PROJECT_MEMORY.md with summary and next steps 
+- [x] 9. Commit & push changes to remote (git push completed)
+- [x] 10. Update PROJECT_MEMORY.md with summary and next steps
+- [x] 11. Bring over beneficiary detail/update/delete endpoints to v2 package
+- [x] 12. Migrate trainer endpoints (list & assign) to v2 package
+- [x] 13. Migrate notes endpoints to v2 package
+- [x] 14. Migrate documents list & profile-picture upload endpoints to v2 package
+- [x] 15. Migrate evaluations/sessions/progress/skills/comparison/report endpoints to v2 package
+- [x] 16. Mark legacy beneficiaries.py as DEPRECATED
+- [x] 17. Add initial unit test for v2 blueprint registration
+- [x] 18. Add parametric unauthorized (401) tests for all v2 endpoints
+- [x] 19. Add authorized happy-path test for beneficiaries list endpoint
+- [x] 20. Add beneficiary creation + notes flow test
+- [x] 21. Add authorized tests for documents, progress, skills endpoints
+- [x] 22. Enforce minimum 50% coverage in run_tests.py
+- [x] 23. Set frontend coverage thresholds in vitest config (≥50%) 

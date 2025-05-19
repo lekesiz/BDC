@@ -47,8 +47,14 @@ flask-socketio==5.3.6
 eventlet==0.33.3
 redis==5.0.1  # Already included above, just noting it's used for socketio as well
 
+# Monitoring
+prometheus-flask-exporter==0.22.4
+
 # Testing
 pytest==7.4.3
 pytest-flask==1.3.0
 factory-boy==3.3.0
 coverage==7.3.2
+
+# AWS
+boto3==1.34.4

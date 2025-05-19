@@ -1,0 +1,219 @@
+---
+- name: Deploy BDC Application
+  hosts: "{{ target_env }}"
+  become: yes
+  vars:
+    app_name: bdc
+    app_dir: "/opt/{{ app_name }}"
+    docker_compose_version: "2.20.0"
+    
+  tasks:
+    - name: Update system packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+        
+    - name: Install required packages
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+          - python3-pip
+          - git
+          - nginx
+          - certbot
+          - python3-certbot-nginx
+          - postgresql-client
+          - redis-tools
+        state: present
+        
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+        
+    - name: Create application directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: docker
+        mode: '0755'
+        
+    - name: Create subdirectories
+      file:
+        path: "{{ app_dir }}/{{ item }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: docker
+        mode: '0755'
+      loop:
+        - uploads
+        - logs
+        - backup
+        - ssl
+        - nginx
+        - prometheus
+        - grafana
+        
+    - name: Copy environment file
+      template:
+        src: ".env.{{ target_env }}.j2"
+        dest: "{{ app_dir }}/.env"
+        owner: "{{ ansible_user }}"
+        mode: '0600'
+        
+    - name: Copy docker-compose file
+      copy:
+        src: "../../docker/docker-compose.{{ target_env }}.yml"
+        dest: "{{ app_dir }}/docker-compose.yml"
+        owner: "{{ ansible_user }}"
+        mode: '0644'
+        
+    - name: Copy nginx configuration
+      template:
+        src: "nginx.{{ target_env }}.conf.j2"
+        dest: "{{ app_dir }}/nginx/nginx.conf"
+        owner: root
+        mode: '0644'
+        
+    - name: Copy Prometheus configuration
+      template:
+        src: "prometheus.{{ target_env }}.yml.j2"
+        dest: "{{ app_dir }}/prometheus/prometheus.yml"
+        owner: "{{ ansible_user }}"
+        mode: '0644'
+        
+    - name: Setup SSL certificate (production only)
+      shell: |
+        certbot --nginx -d {{ app_domain }} -d www.{{ app_domain }} \
+        --non-interactive --agree-tos -m {{ admin_email }}
+      when: target_env == "production"
+      
+    - name: Pull Docker images
+      docker_image:
+        name: "{{ item }}"
+        source: pull
+      loop:
+        - "ghcr.io/{{ github_repository }}/bdc-server:{{ app_version }}"
+        - "ghcr.io/{{ github_repository }}/bdc-client:{{ app_version }}"
+        
+    - name: Run database migrations
+      shell: |
+        cd {{ app_dir }}
+        docker-compose run --rm backend flask db upgrade
+        
+    - name: Start application
+      shell: |
+        cd {{ app_dir }}
+        docker-compose up -d
+        
+    - name: Setup backup cron job
+      cron:
+        name: "BDC database backup"
+        minute: "0"
+        hour: "3"
+        job: "{{ app_dir }}/scripts/backup.sh"
+        
+    - name: Setup log rotation
+      copy:
+        content: |
+          {{ app_dir }}/logs/*.log {
+              daily
+              rotate 14
+              compress
+              delaycompress
+              notifempty
+              create 0640 {{ ansible_user }} docker
+              sharedscripts
+              postrotate
+                  docker-compose -f {{ app_dir }}/docker-compose.yml restart backend
+              endscript
+          }
+        dest: /etc/logrotate.d/{{ app_name }}
+        
+    - name: Configure firewall
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - "80"
+        - "443"
+        - "22"
+        
+    - name: Enable firewall
+      ufw:
+        state: enabled
+        
+    - name: Run health checks
+      uri:
+        url: "https://{{ app_domain }}/api/health"
+        method: GET
+        status_code: 200
+      retries: 5
+      delay: 10
+      
+    - name: Send deployment notification
+      mail:
+        to: "{{ admin_email }}"
+        subject: "BDC Deployment Successful - {{ target_env }}"
+        body: "The BDC application has been successfully deployed to {{ target_env }} environment."
+      when: send_notifications is defined and send_notifications
+
+- name: Setup monitoring alerts
+  hosts: "{{ target_env }}"
+  become: yes
+  vars:
+    app_dir: "/opt/bdc"
+    
+  tasks:
+    - name: Configure Prometheus alerts
+      copy:
+        content: |
+          groups:
+            - name: bdc_alerts
+              interval: 30s
+              rules:
+                - alert: ServiceDown
+                  expr: up{job="bdc"} == 0
+                  for: 2m
+                  labels:
+                    severity: critical
+                  annotations:
+                    summary: "BDC service is down"
+                    description: "{{ $labels.instance }} has been down for more than 2 minutes."
+                    
+                - alert: HighMemoryUsage
+                  expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.85
+                  for: 5m
+                  labels:
+                    severity: warning
+                  annotations:
+                    summary: "High memory usage detected"
+                    description: "Memory usage is above 85% on {{ $labels.instance }}"
+                    
+                - alert: HighCPUUsage
+                  expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+                  for: 5m
+                  labels:
+                    severity: warning
+                  annotations:
+                    summary: "High CPU usage detected"
+                    description: "CPU usage is above 80% on {{ $labels.instance }}"
+                    
+                - alert: DiskSpaceLow
+                  expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.15
+                  for: 5m
+                  labels:
+                    severity: warning
+                  annotations:
+                    summary: "Low disk space"
+                    description: "Disk space is below 15% on {{ $labels.instance }}"
+        dest: "{{ app_dir }}/prometheus/alerts.yml"
+        
+    - name: Restart Prometheus to load alerts
+      shell: |
+        cd {{ app_dir }}
+        docker-compose restart prometheus

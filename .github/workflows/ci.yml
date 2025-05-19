@@ -43,6 +43,13 @@ jobs:
       with:
         name: coverage-report
         path: server/coverage_html/
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: server/coverage_html
+        flags: backend
+        name: codecov-coverage-backend
         
   lint:
     runs-on: ubuntu-latest
@@ -125,11 +132,20 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.DEV_SSH_KEY }}
+    
     - name: Deploy to Development
+      env:
+        DEV_HOST: ${{ secrets.DEV_HOST }}
+        DEV_USER: ${{ secrets.DEV_USER }}
+        DEV_DIR: ${{ secrets.DEV_DIR }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
       run: |
-        echo "Deploying to development environment..."
-        # Add deployment steps here
-        # For example, use SSH to connect to server and pull/update containers
+        export TAG=${{ github.sha }}
+        ./scripts/deploy.sh development $TAG
         
   deploy-prod:
     runs-on: ubuntu-latest
@@ -139,11 +155,26 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
+    
     - name: Deploy to Production
+      env:
+        PROD_HOST: ${{ secrets.PROD_HOST }}
+        PROD_USER: ${{ secrets.PROD_USER }}
+        PROD_DIR: ${{ secrets.PROD_DIR }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
       run: |
-        echo "Deploying to production environment..."
-        # Add deployment steps here
-        # For example, use SSH to connect to server and pull/update containers
+        export TAG=${{ github.sha }}
+        ./scripts/deploy.sh production $TAG
+    
+    - name: Run Production Health Checks
+      env:
+        PROD_URL: ${{ secrets.PROD_URL }}
+      run: |
+        ./scripts/health_check.sh $PROD_URL
 
   backend:
     runs-on: ubuntu-latest

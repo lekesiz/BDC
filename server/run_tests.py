@@ -18,6 +18,7 @@ def main():
         '--cov=app',  # coverage for app directory
         '--cov-report=term',  # terminal coverage report
         '--cov-report=html:coverage_html',  # HTML coverage report
+        '--cov-fail-under=65',  # fail if coverage below 65%
         'tests'  # test directory
     ]
     

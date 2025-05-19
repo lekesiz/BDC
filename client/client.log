@@ -1121,3 +1121,113 @@ Error:   Failed to scan for dependencies from entries:
    |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 7  |   
 8  |  @layer base {
+2:13:57 PM [vite] Internal server error: /Users/mikail/Desktop/BDC/client/src/App.jsx: Identifier 'ThemeProvider' has already been declared. (99:7)
+
+   97 | import NotificationPreferencesPageV2 from './pages/settings/NotificationPreferencesPageV2';
+   98 | import NotificationProviderV2 from './providers/NotificationProviderV2';
+>  99 | import ThemeProvider from './providers/ThemeProvider';
+      |        ^
+  100 | import GlobalErrorHandler from './components/common/GlobalErrorHandler';
+  101 |
+  102 | // Dashboard
+  Plugin: vite:react-babel
+  File: /Users/mikail/Desktop/BDC/client/src/App.jsx:99:7
+  97 |  import NotificationPreferencesPageV2 from './pages/settings/NotificationPreferencesPageV2';
+  98 |  import NotificationProviderV2 from './providers/NotificationProviderV2';
+  99 |  import ThemeProvider from './providers/ThemeProvider';
+     |         ^
+  100|  import GlobalErrorHandler from './components/common/GlobalErrorHandler';
+  101|  
+      at constructor (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:360:19)
+      at JSXParserMixin.raise (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:6613:19)
+      at ScopeHandler.checkRedeclarationInScope (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:1620:19)
+      at ScopeHandler.declareName (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:1586:12)
+      at JSXParserMixin.declareNameFromIdentifier (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:7542:16)
+      at JSXParserMixin.checkIdentifier (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:7538:12)
+      at JSXParserMixin.checkLVal (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:7479:12)
+      at JSXParserMixin.finishImportSpecifier (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14138:10)
+      at JSXParserMixin.parseImportSpecifierLocal (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14135:31)
+      at JSXParserMixin.maybeParseDefaultImportSpecifier (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14242:12)
+      at JSXParserMixin.parseImportSpecifiersAndAfter (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14111:29)
+      at JSXParserMixin.parseImport (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14107:17)
+      at JSXParserMixin.parseStatementContent (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:12752:27)
+      at JSXParserMixin.parseStatementLike (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:12644:17)
+      at JSXParserMixin.parseModuleItem (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:12621:17)
+      at JSXParserMixin.parseBlockOrModuleBlockBody (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:13192:36)
+      at JSXParserMixin.parseBlockBody (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:13185:10)
+      at JSXParserMixin.parseProgram (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:12514:10)
+      at JSXParserMixin.parseTopLevel (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:12504:25)
+      at JSXParserMixin.parse (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14364:10)
+      at parse (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14398:38)
+      at parser (/Users/mikail/Desktop/BDC/client/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/Users/mikail/Desktop/BDC/client/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/Users/mikail/Desktop/BDC/client/node_modules/@babel/core/lib/transformation/index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (/Users/mikail/Desktop/BDC/client/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:261:32)
+      at /Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:223:11)
+      at /Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:189:28
+      at /Users/mikail/Desktop/BDC/client/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
+      at /Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:113:33
+      at step (/Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:287:14)
+      at /Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:223:11)
+4:38:16 PM [vite] Internal server error: /Users/mikail/Desktop/BDC/client/src/App.jsx: Identifier 'ThemeProvider' has already been declared. (99:7)
+
+   97 | import NotificationPreferencesPageV2 from './pages/settings/NotificationPreferencesPageV2';
+   98 | import NotificationProviderV2 from './providers/NotificationProviderV2';
+>  99 | import ThemeProvider from './providers/ThemeProvider';
+      |        ^
+  100 | import GlobalErrorHandler from './components/common/GlobalErrorHandler';
+  101 |
+  102 | // Dashboard
+  Plugin: vite:react-babel
+  File: /Users/mikail/Desktop/BDC/client/src/App.jsx:99:7
+  97 |  import NotificationPreferencesPageV2 from './pages/settings/NotificationPreferencesPageV2';
+  98 |  import NotificationProviderV2 from './providers/NotificationProviderV2';
+  99 |  import ThemeProvider from './providers/ThemeProvider';
+     |         ^
+  100|  import GlobalErrorHandler from './components/common/GlobalErrorHandler';
+  101|  
+      at constructor (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:360:19)
+      at JSXParserMixin.raise (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:6613:19)
+      at ScopeHandler.checkRedeclarationInScope (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:1620:19)
+      at ScopeHandler.declareName (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:1586:12)
+      at JSXParserMixin.declareNameFromIdentifier (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:7542:16)
+      at JSXParserMixin.checkIdentifier (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:7538:12)
+      at JSXParserMixin.checkLVal (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:7479:12)
+      at JSXParserMixin.finishImportSpecifier (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14138:10)
+      at JSXParserMixin.parseImportSpecifierLocal (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14135:31)
+      at JSXParserMixin.maybeParseDefaultImportSpecifier (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14242:12)
+      at JSXParserMixin.parseImportSpecifiersAndAfter (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14111:29)
+      at JSXParserMixin.parseImport (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14107:17)
+      at JSXParserMixin.parseStatementContent (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:12752:27)
+      at JSXParserMixin.parseStatementLike (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:12644:17)
+      at JSXParserMixin.parseModuleItem (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:12621:17)
+      at JSXParserMixin.parseBlockOrModuleBlockBody (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:13192:36)
+      at JSXParserMixin.parseBlockBody (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:13185:10)
+      at JSXParserMixin.parseProgram (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:12514:10)
+      at JSXParserMixin.parseTopLevel (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:12504:25)
+      at JSXParserMixin.parse (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14364:10)
+      at parse (/Users/mikail/Desktop/BDC/client/node_modules/@babel/parser/lib/index.js:14398:38)
+      at parser (/Users/mikail/Desktop/BDC/client/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/Users/mikail/Desktop/BDC/client/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/Users/mikail/Desktop/BDC/client/node_modules/@babel/core/lib/transformation/index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (/Users/mikail/Desktop/BDC/client/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:261:32)
+      at /Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:223:11)
+      at /Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:189:28
+      at /Users/mikail/Desktop/BDC/client/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
+      at /Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:113:33
+      at step (/Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:287:14)
+      at /Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/Users/mikail/Desktop/BDC/client/node_modules/gensync/index.js:223:11)

@@ -7,6 +7,23 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 import magic
 
+# Optional S3 support
+USE_S3 = os.getenv('STORAGE_BACKEND', 'local') == 's3'
+if USE_S3:
+    try:
+        import boto3
+        from botocore.exceptions import BotoCoreError, ClientError
+
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+            region_name=os.getenv('AWS_REGION', 'us-east-1'),
+        )
+        S3_BUCKET = os.getenv('S3_BUCKET', 'bdc-dev-bucket')
+    except ImportError:  # Fallback if boto3 missing
+        USE_S3 = False
+
 class StorageService:
     """Service for handling file storage operations."""
     
@@ -105,7 +122,14 @@ class StorageService:
         # Generate unique filename
         filename = self.generate_unique_filename(file.filename)
         
-        # Save file
+        if USE_S3:
+            try:
+                s3_client.upload_fileobj(file, S3_BUCKET, filename, ExtraArgs={'ACL': 'private'})
+                return f's3://{S3_BUCKET}/{filename}', None
+            except (BotoCoreError, ClientError) as e:
+                self.app.logger.error(f"S3 upload failed: {e}")
+                raise
+        # Local filesystem fallback
         file_path = os.path.join(self.upload_folder, directory, filename)
         file.save(file_path)
         

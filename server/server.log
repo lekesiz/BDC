@@ -24438,3 +24438,967 @@ Server initialized for eventlet.
 [2025-05-19 13:34:26,454] INFO in __init__: Total users in database: 16
  * Debugger is active!
  * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries_v2/detail_routes.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:36:53,267] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries_v2/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:37:00,630] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries_v2/trainer_routes.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:38:12,588] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries_v2/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:38:18,900] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries_v2/notes_routes.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:39:07,356] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries_v2/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:39:14,730] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries_v2/documents_routes.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:40:11,312] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries_v2/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:40:18,683] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries_v2/evaluations_routes.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:41:31,746] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries_v2/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:41:40,123] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/beneficiaries.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:49:19,194] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_beneficiaries_v2_unauthorized.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:50:39,468] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_beneficiaries_v2_authorized.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:51:46,365] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_beneficiaries_v2_flow.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:52:39,919] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_beneficiaries_v2_authorized_details.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:54:40,131] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/run_tests.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 13:55:53,020] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_beneficiary_service_unit.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:03:13,522] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_document_service_unit.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:04:22,463] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_evaluation_service_unit.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:05:32,410] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_notification_service_unit.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:07:38,934] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_availability_service_unit.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:08:20,220] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/programs_v2/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:38:39,079] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/api/programs_v2/list_routes.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:39:11,063] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:39:22,504] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_programs_v2_unauthorized.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:39:33,978] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_programs_v2_authorized.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:39:49,537] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:40:38,034] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:43:02,086] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_metrics_endpoint.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:43:21,832] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:45:32,269] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/services/storage_service.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:45:59,183] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/tests/test_program_model_unit.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Server initialized for eventlet.
+[2025-05-19 14:51:08,512] INFO in __init__: Total users in database: 16
+ * Debugger is active!
+ * Debugger PIN: 376-864-709
+ * Detected change in '/Users/mikail/Desktop/BDC/server/app/__init__.py', reloading
+Admin user already exists
+Admin password verified successfully
+
+Users in database: 16
+- admin@bdc.com (super_admin)
+- tenant@bdc.com (tenant_admin)
+- trainer@bdc.com (trainer)
+- student@bdc.com (student)
+- mikail@lekesiz.fr (tenant_admin)
+- mehmet@tuzcu.fr (trainee)
+- mikaill@lekesizz.fr (student)
+- test@newuser.com (student)
+- test.beneficiary.1747361121.423653@example.com (student)
+- test.beneficiary.1747361133.883549@example.com (student)
+- testttt@test.fr (student)
+- maaa@miii.com (student)
+- test@test.com (student)
+- seyma@lekesiz.fr (trainer)
+- seyda@lekesiz.fr (student)
+- mikail.test@lekesiz.fr (student)
+
+Starting Flask server on http://localhost:5001
+ * Restarting with stat
+Server initialized for eventlet.
+Traceback (most recent call last):
+  File "/Users/mikail/Desktop/BDC/server/run_app.py", line 16, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 65, in create_app
+    register_blueprints(app)
+  File "/Users/mikail/Desktop/BDC/server/app/__init__.py", line 259, in register_blueprints
+    from app.api.calendars_availability import calendar_availability_bp
+  File "/Users/mikail/Desktop/BDC/server/app/api/calendars_availability.py", line 7, in <module>
+    from app.models.availability import Availability
+ImportError: cannot import name 'Availability' from 'app.models.availability' (/Users/mikail/Desktop/BDC/server/app/models/availability.py)

@@ -45,6 +45,7 @@ services:
       - SECRET_KEY=${SECRET_KEY:-dev_secret_key}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev_jwt_secret_key}
       - CORS_ORIGINS=http://localhost:5173
+      - PROMETHEUS_ENABLED=true
     ports:
       - "5000:5000"
     volumes:

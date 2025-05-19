@@ -82,6 +82,15 @@ def create_app(config_object=None):
     # Configure SocketIO
     configure_socketio(app)
 
+    # Prometheus metrics
+    if os.getenv('PROMETHEUS_ENABLED', 'false').lower() == 'true':
+        try:
+            from prometheus_flask_exporter import PrometheusMetrics
+            PrometheusMetrics(app, path='/metrics')
+            app.logger.info('Prometheus metrics enabled at /metrics')
+        except ImportError:
+            app.logger.warning('prometheus_flask_exporter not installed; metrics disabled')
+
     # Create uploads directory if it doesn't exist
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
@@ -213,6 +222,10 @@ def register_blueprints(app):
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(users_bp, url_prefix='/api/users')
+    
+    # User profile blueprint
+    from app.api.users_profile import users_profile_bp
+    app.register_blueprint(users_profile_bp, url_prefix='/api')
     app.register_blueprint(beneficiaries_v2_bp, url_prefix='/api/beneficiaries')
     app.register_blueprint(evaluations_bp, url_prefix='/api/evaluations')
     app.register_blueprint(profile_bp, url_prefix='/api/profile')
@@ -236,19 +249,30 @@ def register_blueprints(app):
     
     # Programs blueprint
     from app.api.programs import programs_bp
-    app.register_blueprint(programs_bp, url_prefix='/api')
+    from app.api.programs_v2 import programs_bp as programs_v2_bp
+    app.register_blueprint(programs_v2_bp, url_prefix='/api')
     
     # Portal blueprint
     from app.api.portal import portal_bp
     app.register_blueprint(portal_bp, url_prefix='/api/portal')
     
-    # Settings blueprint
+    # Settings blueprints
     from app.api.settings import settings_bp
-    app.register_blueprint(settings_bp, url_prefix='/api')
+    from app.api.settings_general import settings_general_bp
+    from app.api.settings_appearance import settings_appearance_bp
+    from app.api.calendars_availability import calendar_availability_bp
     
-    # Assessment blueprint
+    app.register_blueprint(settings_bp, url_prefix='/api')
+    app.register_blueprint(settings_general_bp, url_prefix='/api')
+    app.register_blueprint(settings_appearance_bp, url_prefix='/api')
+    app.register_blueprint(calendar_availability_bp, url_prefix='/api')
+    
+    # Assessment blueprints
     from app.api.assessment import assessment_bp
+    from app.api.assessment_templates import assessment_templates_bp
+    
     app.register_blueprint(assessment_bp, url_prefix='/api')
+    app.register_blueprint(assessment_templates_bp, url_prefix='/api')
     
     # Add a simple test route
     @app.route('/api/test', methods=['GET', 'OPTIONS'])
