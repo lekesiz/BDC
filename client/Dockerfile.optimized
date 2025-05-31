@@ -1,0 +1,329 @@
+# Multi-stage optimized Dockerfile for BDC Frontend
+# Supports both development and production builds
+
+ARG NODE_VERSION=18
+ARG BUILD_ENV=production
+
+# ===============================
+# Base Stage - Common Dependencies
+# ===============================
+FROM node:${NODE_VERSION}-alpine as base
+
+# Set environment variables
+ENV NODE_ENV=production \
+    NPM_CONFIG_UPDATE_NOTIFIER=false \
+    NPM_CONFIG_FUND=false
+
+# Install system dependencies
+RUN apk add --no-cache \
+    curl \
+    bash \
+    git \
+    python3 \
+    make \
+    g++
+
+# Create app user
+RUN addgroup -g 1001 -S appuser && \
+    adduser -S appuser -u 1001
+
+# Create app directory
+WORKDIR /app
+RUN chown appuser:appuser /app
+
+# ===============================
+# Dependencies Stage
+# ===============================
+FROM base as dependencies
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies with cache mount
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --only=production && \
+    npm cache clean --force
+
+# ===============================
+# Development Dependencies
+# ===============================
+FROM dependencies as dev-dependencies
+
+# Install all dependencies including dev
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci && \
+    npm cache clean --force
+
+# ===============================
+# Development Stage
+# ===============================
+FROM dev-dependencies as development
+
+# Copy source code
+COPY --chown=appuser:appuser . .
+
+# Switch to app user
+USER appuser
+
+# Development environment
+ENV NODE_ENV=development \
+    VITE_API_URL=http://localhost:5000 \
+    CHOKIDAR_USEPOLLING=true
+
+# Create volumes for hot reload
+VOLUME ["/app/src", "/app/public"]
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:5173 || exit 1
+
+# Expose port
+EXPOSE 5173
+
+# Development command with hot reload
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+# ===============================
+# Build Stage
+# ===============================
+FROM dev-dependencies as builder
+
+# Copy source code
+COPY . .
+
+# Build arguments for production
+ARG VITE_API_URL=https://api.yourdomain.com
+ARG VITE_APP_NAME="BDC Production"
+ARG VITE_ENVIRONMENT=production
+
+# Set build environment variables
+ENV VITE_API_URL=${VITE_API_URL} \
+    VITE_APP_NAME=${VITE_APP_NAME} \
+    VITE_ENVIRONMENT=${VITE_ENVIRONMENT} \
+    NODE_ENV=production
+
+# Build the application
+RUN npm run build
+
+# Verify build output
+RUN ls -la dist/ && \
+    test -f dist/index.html || (echo "Build failed: index.html not found" && exit 1)
+
+# ===============================
+# Nginx Base
+# ===============================
+FROM nginx:alpine as nginx-base
+
+# Install additional tools
+RUN apk add --no-cache \
+    curl \
+    bash \
+    openssl
+
+# Create nginx user
+RUN addgroup -g 1001 -S appuser && \
+    adduser -S appuser -u 1001
+
+# ===============================
+# Production Stage
+# ===============================
+FROM nginx-base as production
+
+# Copy built application from builder
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy optimized nginx configuration
+COPY --chown=appuser:appuser <<EOF /etc/nginx/nginx.conf
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log notice;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+    use epoll;
+    multi_accept on;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    # Logging
+    log_format main '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+                    '\$status \$body_bytes_sent "\$http_referer" '
+                    '"\$http_user_agent" "\$http_x_forwarded_for"';
+
+    access_log /var/log/nginx/access.log main;
+
+    # Performance optimizations
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    server_tokens off;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types
+        application/atom+xml
+        application/geo+json
+        application/javascript
+        application/x-javascript
+        application/json
+        application/ld+json
+        application/manifest+json
+        application/rdf+xml
+        application/rss+xml
+        application/xhtml+xml
+        application/xml
+        font/eot
+        font/otf
+        font/ttf
+        image/svg+xml
+        text/css
+        text/javascript
+        text/plain
+        text/xml;
+
+    # Brotli compression (if module available)
+    # brotli on;
+    # brotli_comp_level 6;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https: wss:;" always;
+
+    server {
+        listen 80;
+        server_name _;
+        root /usr/share/nginx/html;
+        index index.html;
+
+        # Health check endpoint
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+
+        # Static assets with caching
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)\$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            add_header Vary "Accept-Encoding";
+        }
+
+        # HTML files with no cache
+        location ~* \.html\$ {
+            expires -1;
+            add_header Cache-Control "no-cache, no-store, must-revalidate";
+            add_header Pragma "no-cache";
+        }
+
+        # API proxy
+        location /api/ {
+            proxy_pass http://backend:5000;
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 30s;
+            proxy_read_timeout 30s;
+        }
+
+        # WebSocket proxy
+        location /ws/ {
+            proxy_pass http://backend:5000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade \$http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+            proxy_cache_bypass \$http_upgrade;
+        }
+
+        # SPA fallback
+        location / {
+            try_files \$uri \$uri/ /index.html;
+        }
+
+        # Error pages
+        error_page 404 /404.html;
+        error_page 500 502 503 504 /50x.html;
+    }
+}
+EOF
+
+# Create health check script
+COPY --chown=appuser:appuser <<EOF /usr/local/bin/healthcheck.sh
+#!/bin/bash
+set -eo pipefail
+curl -f http://localhost:80/health || exit 1
+EOF
+
+RUN chmod +x /usr/local/bin/healthcheck.sh
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD /usr/local/bin/healthcheck.sh
+
+# Expose port
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+# ===============================
+# SSL/HTTPS Production Stage
+# ===============================
+FROM production as production-ssl
+
+# Copy SSL configuration
+COPY --chown=appuser:appuser <<EOF /etc/nginx/conf.d/ssl.conf
+server {
+    listen 443 ssl http2;
+    server_name \${SSL_DOMAIN};
+
+    ssl_certificate /etc/nginx/ssl/cert.pem;
+    ssl_certificate_key /etc/nginx/ssl/key.pem;
+    
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    # HSTS
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # Include main server config
+    include /etc/nginx/nginx.conf;
+}
+
+# Redirect HTTP to HTTPS
+server {
+    listen 80;
+    server_name \${SSL_DOMAIN};
+    return 301 https://\$server_name\$request_uri;
+}
+EOF
+
+# Expose HTTPS port
+EXPOSE 443
+
+# ===============================
+# Final Stage Selection
+# ===============================
+FROM ${BUILD_ENV} as final
