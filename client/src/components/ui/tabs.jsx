@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -52,6 +52,50 @@ const Tabs = ({
  * @returns {JSX.Element} TabsList component
  */
 const TabsList = ({ className, children, ...props }) => {
+  const tabsRef = useRef([]);
+  const { value: activeValue } = React.useContext(TabsContext);
+  
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const currentIndex = tabsRef.current.findIndex(tab => tab === e.target);
+      if (currentIndex === -1) return;
+      
+      let nextIndex;
+      switch (e.key) {
+        case 'ArrowRight':
+          e.preventDefault();
+          nextIndex = (currentIndex + 1) % tabsRef.current.length;
+          tabsRef.current[nextIndex]?.focus();
+          tabsRef.current[nextIndex]?.click();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          nextIndex = currentIndex === 0 ? tabsRef.current.length - 1 : currentIndex - 1;
+          tabsRef.current[nextIndex]?.focus();
+          tabsRef.current[nextIndex]?.click();
+          break;
+        case 'Home':
+          e.preventDefault();
+          tabsRef.current[0]?.focus();
+          tabsRef.current[0]?.click();
+          break;
+        case 'End':
+          e.preventDefault();
+          tabsRef.current[tabsRef.current.length - 1]?.focus();
+          tabsRef.current[tabsRef.current.length - 1]?.click();
+          break;
+      }
+    };
+    
+    const tabList = tabsRef.current[0]?.parentElement;
+    tabList?.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      tabList?.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+  
   return (
     <div 
       className={cn(
@@ -59,9 +103,18 @@ const TabsList = ({ className, children, ...props }) => {
         className
       )} 
       role="tablist"
+      aria-orientation="horizontal"
       {...props}
     >
-      {children}
+      {React.Children.map(children, (child, index) => {
+        if (React.isValidElement(child) && child.type === TabTrigger) {
+          return React.cloneElement(child, {
+            ref: (el) => tabsRef.current[index] = el,
+            tabIndex: child.props.value === activeValue ? 0 : -1,
+          });
+        }
+        return child;
+      })}
     </div>
   );
 };
@@ -76,13 +129,15 @@ const TabsList = ({ className, children, ...props }) => {
  * @param {React.ReactNode} props.children - Tab content
  * @returns {JSX.Element} TabTrigger component
  */
-const TabTrigger = ({ value, className, disabled, children, ...props }) => {
+const TabTrigger = React.forwardRef(({ value, className, disabled, children, ...props }, ref) => {
   const { value: activeValue, onValueChange } = React.useContext(TabsContext);
   const isActive = activeValue === value;
   
   return (
     <button
+      ref={ref}
       role="tab"
+      id={`trigger-${value}`}
       aria-selected={isActive}
       aria-controls={`panel-${value}`}
       data-state={isActive ? "active" : "inactive"}
@@ -92,13 +147,15 @@ const TabTrigger = ({ value, className, disabled, children, ...props }) => {
         isActive ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
         className
       )}
-      onClick={() => onValueChange(value)}
+      onClick={() => !disabled && onValueChange(value)}
       {...props}
     >
       {children}
     </button>
   );
-};
+});
+
+TabTrigger.displayName = 'TabTrigger';
 
 /**
  * Tab content panel that displays when its associated trigger is active
@@ -109,11 +166,11 @@ const TabTrigger = ({ value, className, disabled, children, ...props }) => {
  * @param {React.ReactNode} props.children - Panel content
  * @returns {JSX.Element|null} TabContent component or null if inactive
  */
-const TabContent = ({ value, className, children, ...props }) => {
+const TabContent = ({ value, className, children, forceRender = false, ...props }) => {
   const { value: activeValue } = React.useContext(TabsContext);
   const isActive = activeValue === value;
   
-  if (!isActive) return null;
+  if (!isActive && !forceRender) return null;
   
   return (
     <div
@@ -121,8 +178,11 @@ const TabContent = ({ value, className, children, ...props }) => {
       id={`panel-${value}`}
       aria-labelledby={`trigger-${value}`}
       data-state={isActive ? "active" : "inactive"}
+      hidden={!isActive}
+      tabIndex={0}
       className={cn(
         "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        !isActive && "hidden",
         className
       )}
       {...props}

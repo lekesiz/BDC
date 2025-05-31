@@ -1,7 +1,7 @@
 """Program model."""
 
 from datetime import datetime
-from app import db
+from app.extensions import db
 
 class Program(db.Model):
     """Model for training programs."""
@@ -32,19 +32,19 @@ class Program(db.Model):
     max_participants = db.Column(db.Integer)
     
     # Foreign keys
-    tenant_id = db.Column(db.Integer, db.ForeignKey('tenants.id'), nullable=False)
-    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    tenant_id = db.Column(db.Integer, db.ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    tenant = db.relationship('Tenant', back_populates='programs')
-    created_by = db.relationship('User', back_populates='programs_created')
-    modules = db.relationship('ProgramModule', back_populates='program', cascade='all, delete-orphan')
-    enrollments = db.relationship('ProgramEnrollment', back_populates='program', cascade='all, delete-orphan')
-    sessions = db.relationship('TrainingSession', back_populates='program', cascade='all, delete-orphan')
+    tenant = db.relationship('Tenant', back_populates='programs', lazy='select')
+    created_by = db.relationship('User', back_populates='programs_created', lazy='select')
+    modules = db.relationship('ProgramModule', back_populates='program', cascade='all, delete-orphan', lazy='dynamic')
+    enrollments = db.relationship('ProgramEnrollment', back_populates='program', cascade='all, delete-orphan', lazy='dynamic')
+    sessions = db.relationship('TrainingSession', back_populates='program', cascade='all, delete-orphan', lazy='dynamic')
     
     def to_dict(self):
         """Convert program to dictionary."""
@@ -54,6 +54,7 @@ class Program(db.Model):
             'description': self.description,
             'code': self.code,
             'duration': self.duration,
+            'duration_weeks': round(self.duration / 7.0, 2) if self.duration else None,
             'level': self.level,
             'category': self.category,
             'prerequisites': self.prerequisites,
@@ -77,7 +78,7 @@ class ProgramModule(db.Model):
     __tablename__ = 'program_modules'
     
     id = db.Column(db.Integer, primary_key=True)
-    program_id = db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False)
+    program_id = db.Column(db.Integer, db.ForeignKey('programs.id', ondelete='CASCADE'), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
     order = db.Column(db.Integer, default=0)
@@ -95,8 +96,8 @@ class ProgramModule(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    program = db.relationship('Program', back_populates='modules')
-    sessions = db.relationship('TrainingSession', back_populates='module')
+    program = db.relationship('Program', back_populates='modules', lazy='select')
+    sessions = db.relationship('TrainingSession', back_populates='module', lazy='dynamic')
     
     def to_dict(self):
         """Convert module to dictionary."""
@@ -120,8 +121,8 @@ class ProgramEnrollment(db.Model):
     __tablename__ = 'program_enrollments'
     
     id = db.Column(db.Integer, primary_key=True)
-    program_id = db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False)
-    beneficiary_id = db.Column(db.Integer, db.ForeignKey('beneficiaries.id'), nullable=False)
+    program_id = db.Column(db.Integer, db.ForeignKey('programs.id', ondelete='CASCADE'), nullable=False)
+    beneficiary_id = db.Column(db.Integer, db.ForeignKey('beneficiaries.id', ondelete='CASCADE'), nullable=False)
     
     # Enrollment details
     enrollment_date = db.Column(db.DateTime, default=datetime.utcnow)
@@ -142,8 +143,8 @@ class ProgramEnrollment(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    program = db.relationship('Program', back_populates='enrollments')
-    beneficiary = db.relationship('Beneficiary', back_populates='program_enrollments')
+    program = db.relationship('Program', back_populates='enrollments', lazy='select')
+    beneficiary = db.relationship('Beneficiary', back_populates='program_enrollments', lazy='select')
     
     def to_dict(self):
         """Convert enrollment to dictionary."""
@@ -225,6 +226,7 @@ class TrainingSession(db.Model):
             'description': self.description,
             'session_date': self.session_date.isoformat() if self.session_date else None,
             'duration': self.duration,
+            'duration_weeks': round(self.duration / 7.0, 2) if self.duration else None,
             'location': self.location,
             'online_link': self.online_link,
             'max_participants': self.max_participants,

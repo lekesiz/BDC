@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../../providers/ThemeProvider';
+import { useTheme } from '../../contexts/ThemeContext';
 import { FaMoon, FaSun, FaDesktop, FaPalette, FaTextHeight, FaCheck } from 'react-icons/fa';
 
 const ThemeSettingsPage = () => {

@@ -1,0 +1,60 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'bdc-api'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['backend:5000']
+        labels:
+          instance: 'api-server'
+          environment: 'production'
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: 
+        - 'node-exporter:9100'
+        labels:
+          instance: 'app-server'
+      - targets:
+        - 'api.bdc.com:9100'
+        labels:
+          instance: 'api-server'
+
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        labels:
+          instance: 'postgres-prod'
+
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+        labels:
+          instance: 'redis-prod'
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: 
+        - 'cadvisor:8080'
+        labels:
+          instance: 'app-server'
+      - targets:
+        - 'api.bdc.com:8080'
+        labels:
+          instance: 'api-server'

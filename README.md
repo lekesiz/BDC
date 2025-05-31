@@ -105,14 +105,20 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 Backend testleri için:
 ```bash
-cd backend
-pytest
+cd server
+python run_tests.py
 ```
 
 Frontend testleri için:
 ```bash
 cd client
 npm run test
+```
+
+WebSocket integration testleri için:
+```bash
+cd client
+npm run test -- --grep "WebSocket"
 ```
 
 ### Coverage Raporları

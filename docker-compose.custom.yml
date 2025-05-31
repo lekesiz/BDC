@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: bdc_nginx
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    volumes:
+      - ./client/dist:/usr/share/nginx/html
+    networks:
+      - bdc_network
+
+networks:
+  bdc_network:
+    driver: bridge

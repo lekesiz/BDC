@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BDC Frontend Test</title>
+</head>
+<body>
+    <h1>BDC Frontend Test</h1>
+    <p>Testing login functionality...</p>
+    
+    <div id="results"></div>
+    
+    <script>
+        async function testLogin() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@bdc.com',
+                        password: 'Admin123!',
+                        remember: false
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultsDiv.innerHTML = '<h2 style="color: green;">✓ Login successful!</h2>' +
+                        '<pre>' + JSON.stringify(data, null, 2) + '</pre>' +
+                        '<p>Access Token: ' + data.access_token.substring(0, 50) + '...</p>';
+                    
+                    // Store token
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('refresh_token', data.refresh_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = 'http://localhost:5173/';
+                    }, 2000);
+                } else {
+                    resultsDiv.innerHTML = '<h2 style="color: red;">✗ Login failed!</h2>' +
+                        '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<h2 style="color: red;">✗ Error!</h2>' +
+                    '<p>' + error.message + '</p>';
+            }
+        }
+        
+        // Run test
+        testLogin();
+    </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+---
+- name: Rollback BDC Application
+  hosts: "{{ target_env }}"
+  become: yes
+  vars:
+    app_name: bdc
+    app_dir: "/opt/{{ app_name }}"
+    
+  tasks:
+    - name: Check if backup directory exists
+      stat:
+        path: "{{ app_dir }}/backup"
+      register: backup_dir
+      
+    - name: Check for previous version backups
+      find:
+        paths: "{{ app_dir }}/backup"
+        patterns: "*.backup.tar.gz"
+        recurse: no
+      register: backup_files
+      when: backup_dir.stat.exists
+      
+    - name: Fail if no backups found
+      fail:
+        msg: "No backup files found in {{ app_dir }}/backup"
+      when: not backup_dir.stat.exists or backup_files.matched == 0
+
+    - name: Find latest backup
+      set_fact:
+        latest_backup: "{{ backup_files.files | sort(attribute='mtime') | last }}"
+      when: backup_files.matched > 0
+      
+    - name: Stop current application
+      shell: |
+        cd {{ app_dir }}
+        docker-compose down
+        
+    - name: Extract backup version
+      set_fact:
+        rollback_version: "{{ latest_backup.path | basename | regex_replace('.*-(\\d+\\.\\d+\\.\\d+)\\.backup\\.tar\\.gz', '\\1') }}"
+      when: backup_files.matched > 0
+      
+    - name: Show rollback version
+      debug:
+        msg: "Rolling back to version {{ rollback_version }}"
+        
+    - name: Restore database
+      shell: |
+        cd {{ app_dir }}
+        docker-compose up -d postgres
+        sleep 10  # Wait for PostgreSQL to start
+        docker-compose exec -T postgres sh -c 'psql -U postgres -c "DROP DATABASE IF EXISTS bdc_{{ target_env }};"'
+        docker-compose exec -T postgres sh -c 'psql -U postgres -c "CREATE DATABASE bdc_{{ target_env }};"'
+        docker-compose exec -T postgres sh -c 'pg_restore -U postgres -d bdc_{{ target_env }} < /backup/bdc_{{ target_env }}_{{ rollback_version }}.sql'
+      when: backup_files.matched > 0
+      
+    - name: Restore configuration files
+      shell: |
+        cd {{ app_dir }}
+        tar -xzf {{ latest_backup.path }} -C {{ app_dir }}
+      when: backup_files.matched > 0
+      
+    - name: Pull previous version images
+      docker_image:
+        name: "{{ item }}:{{ rollback_version }}"
+        source: pull
+      loop:
+        - "ghcr.io/{{ github_repository }}/bdc-server"
+        - "ghcr.io/{{ github_repository }}/bdc-client"
+      when: rollback_version is defined
+        
+    - name: Start application with previous version
+      shell: |
+        cd {{ app_dir }}
+        TAG={{ rollback_version }} docker-compose up -d
+      when: rollback_version is defined
+        
+    - name: Run health checks
+      uri:
+        url: "https://{{ app_domain }}/api/health"
+        method: GET
+        status_code: 200
+      retries: 5
+      delay: 10
+      register: health_check
+      failed_when: health_check.status != 200
+      
+    - name: Verify rollback
+      debug:
+        msg: "Rollback to version {{ rollback_version }} completed successfully"
+      when: rollback_version is defined and health_check.status == 200
+        
+    - name: Send rollback notification
+      mail:
+        to: "{{ admin_email }}"
+        subject: "BDC Rollback Successful - {{ target_env }}"
+        body: "The BDC application has been successfully rolled back to version {{ rollback_version }} in the {{ target_env }} environment."
+      when: send_notifications is defined and send_notifications

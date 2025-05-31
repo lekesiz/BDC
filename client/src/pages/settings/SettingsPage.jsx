@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, Shield, Globe, Moon, Sun, Monitor, Brain } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/toast';
@@ -7,6 +8,7 @@ import { AnimatedButton, AnimatedCard, AnimatedPage } from '@/components/animati
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsList, TabTrigger, TabContent } from '@/components/ui/tabs';
 import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import AISettingsContent from './AISettingsContent';
 import { motion } from 'framer-motion';
@@ -18,12 +20,13 @@ import { fadeInUp, staggerContainer, staggerItem } from '@/lib/animations';
 const SettingsPage = () => {
   const { user, refreshToken } = useAuth();
   const { addToast } = useToast();
+  const { t, i18n } = useTranslation();
   
   // State management
   const [activeTab, setActiveTab] = useState('notifications');
   const [isLoading, setIsLoading] = useState(false);
   const [theme, setTheme] = useState('system');
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState(i18n.language || 'en');
   
   // Notification settings state
   const [notificationSettings, setNotificationSettings] = useState({
@@ -120,7 +123,8 @@ const SettingsPage = () => {
   const handleLanguageChange = (e) => {
     const newLanguage = e.target.value;
     setLanguage(newLanguage);
-    // In a real app, this would update the language throughout the app
+    i18n.changeLanguage(newLanguage);
+    localStorage.setItem('language', newLanguage);
   };
   
   // Handle notification settings save
@@ -293,7 +297,8 @@ const SettingsPage = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
+              </motion.div>
               
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Push Notifications</h3>

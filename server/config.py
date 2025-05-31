@@ -44,7 +44,7 @@ class Config:
     LOG_FORMAT = os.getenv('LOG_FORMAT', 'json')
 
     # CORS
-    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:5173,http://localhost:3000,http://localhost:3001,http://127.0.0.1:5173,http://localhost:5001,http://127.0.0.1:5001').split(',')
+    CORS_ORIGINS = ['*']  # Allow all origins in development
 
     # Security
     SESSION_COOKIE_SECURE = True
@@ -103,6 +103,53 @@ class ProductionConfig(Config):
     REDIS_URL = os.getenv('REDIS_URL')
     RATELIMIT_STORAGE_URL = REDIS_URL
     CACHE_REDIS_URL = REDIS_URL
+    
+    # Enhanced security for production
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=2)
+    
+    # Performance optimizations
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_size': 20,
+        'pool_timeout': 30,
+        'pool_recycle': 3600,
+        'max_overflow': 0,
+        'pool_pre_ping': True
+    }
+    
+    # Rate limiting for production
+    RATELIMIT_DEFAULT = "60 per minute"
+    RATELIMIT_STRATEGY = "sliding-window"
+    
+    # Security headers
+    FORCE_HTTPS = True
+    
+    @classmethod
+    def init_app(cls, app):
+        """Initialize production-specific configurations."""
+        # Production logging
+        import logging
+        from logging.handlers import RotatingFileHandler
+        
+        if not app.debug:
+            if not os.path.exists('logs'):
+                os.mkdir('logs')
+                
+            file_handler = RotatingFileHandler(
+                'logs/bdc_production.log',
+                maxBytes=10240000,  # 10MB
+                backupCount=10
+            )
+            file_handler.setFormatter(logging.Formatter(
+                '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+            ))
+            file_handler.setLevel(logging.INFO)
+            app.logger.addHandler(file_handler)
+            
+            app.logger.setLevel(logging.INFO)
+            app.logger.info('BDC Production Startup')
 
 
 config = {

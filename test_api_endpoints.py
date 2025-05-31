@@ -47,7 +47,7 @@ def login(email, password):
     """Login and get access token."""
     response = requests.post(
         urljoin(API_BASE, "/api/auth/login"),
-        json={"email": email, "password": password, "remember_me": False}
+        json={"email": email, "password": password}
     )
     
     if response.status_code == 200:

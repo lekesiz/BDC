@@ -1,0 +1,30 @@
+services:
+  # API servisi - mevcut test API'sini kullanalım
+  test-api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.test-api
+    container_name: bdc_test_api
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    networks:
+      - bdc_network
+
+  # Test App servisi - HTML/JS uygulamamızı serve edelim
+  test-app:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.test-app
+    container_name: bdc_test_app
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    networks:
+      - bdc_network
+    depends_on:
+      - test-api
+
+networks:
+  bdc_network:
+    driver: bridge

@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App.jsx';
-import { AuthProvider } from './context/AuthContext.jsx';
+import { AuthProvider } from './contexts/AuthContext.jsx';
+import { reportWebVitals } from './utils/performanceOptimization';
+import './i18n/config'; // Initialize i18n
 import './index.css';
 
 // Create a client
@@ -32,3 +34,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>,
 );
+
+// Report web vitals
+if (process.env.NODE_ENV === 'production') {
+  reportWebVitals(console.log);
+}

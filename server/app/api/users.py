@@ -50,7 +50,7 @@ def get_users():
     try:
         # Get query parameters with both naming conventions for compatibility
         page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', request.args.get('limit', 10, type=int))
+        per_page = request.args.get('per_page', request.args.get('limit', 10, type=int), type=int)
         role = request.args.get('role')
         # Dikkat: is_active parametresini parse ederken None kontrolü yapıyoruz
         is_active_param = request.args.get('is_active')

@@ -13,7 +13,7 @@ import { Tabs, TabsList, TabTrigger, TabContent } from '@/components/ui/tabs';
 import QuestionEditor from '@/components/evaluation/QuestionEditor';
 import PreviewTest from '@/components/evaluation/PreviewTest';
 import { useToast } from '@/components/ui/toast';
-import { AuthContext } from '@/context/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
 
 // Validation schema for test creation
 const testSchema = z.object({

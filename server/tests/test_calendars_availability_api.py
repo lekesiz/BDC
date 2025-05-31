@@ -4,7 +4,6 @@ import pytest
 from datetime import datetime, timedelta
 from flask_jwt_extended import create_access_token
 from app import create_app, db
-from app.config import TestConfig
 from app.models.user import User
 from app.models.availability import AvailabilitySchedule, AvailabilitySlot, AvailabilityException
 

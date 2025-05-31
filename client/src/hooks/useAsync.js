@@ -66,7 +66,7 @@ export const useAsync = (asyncFunction, dependencies = [], immediate = false) =>
     return () => {
       isMountedRef.current = false;
     };
-  }, [...dependencies]);
+  }, dependencies);
 
   return {
     execute,

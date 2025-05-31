@@ -67,6 +67,7 @@ export const API_ENDPOINTS = {
   },
   DOCUMENTS: {
     BASE: '/api/documents',
+    DOCUMENT: id => `/api/documents/${id}`,
     FOLDERS: '/api/documents/folders',
     FOLDER: id => `/api/documents/folders/${id}`,
     UPLOAD: '/api/documents/upload',
@@ -77,11 +78,8 @@ export const API_ENDPOINTS = {
     UNREAD_COUNT: '/api/notifications/unread-count',
     MARK_READ: id => `/api/notifications/${id}/read`,
   },
-  DOCUMENTS: {
-    BASE: '/api/documents',
-    DOCUMENT: id => `/api/documents/${id}`,
-    DOWNLOAD: id => `/api/documents/${id}/download`,
-    FOLDERS: '/api/folders',
+  FOLDERS: {
+    BASE: '/api/folders',
     FOLDER: id => `/api/folders/${id}`,
   }
 };

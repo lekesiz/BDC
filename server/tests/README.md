@@ -27,6 +27,8 @@ tests/
 ├── test_notifications*.py  # Notification tests
 ├── test_performance*.py    # Performance tests
 ├── test_programs.py        # Program tests
+├── test_programs_v2_students.py  # Program v2 students endpoint tests
+├── test_students_endpoint.py     # Simplified students endpoint tests
 ├── test_reports*.py        # Report tests
 ├── test_security*.py       # Security tests
 ├── test_users*.py          # User tests
@@ -82,6 +84,22 @@ pytest -m security
 pytest -m "not slow"
 ```
 
+## Programs V2 Students Endpoint
+
+For the `/api/programs/<id>/students` endpoint, we have the following test implementations:
+
+1. `test_programs_v2_students.py` - Full test suite using DB fixtures (has environment issues)
+2. `test_students_endpoint.py` - Minimal tests for authorization and not-found cases
+
+The current recommended tests to run are in `test_students_endpoint.py` which verify:
+- Unauthorized access is properly rejected
+- Nonexistent programs return 404
+
+To expand test coverage, we would need to set up proper database fixtures with transaction support to test:
+- Students listing with real data
+- Cross-tenant access restrictions
+- Response formatting and field validation
+
 ## Test Fixtures
 
 Common fixtures defined in `conftest.py`:
@@ -123,7 +141,7 @@ Common fixtures defined in `conftest.py`:
 ### Feature Tests
 - Authentication (`test_auth*.py`)
 - Beneficiaries (`test_beneficiaries*.py`)
-- Programs (`test_programs.py`)
+- Programs (`test_programs.py`, `test_programs_v2_students.py`)
 - Assessments (`test_assessments.py`)
 - Appointments (`test_appointments*.py`)
 - Documents (`test_documents*.py`)

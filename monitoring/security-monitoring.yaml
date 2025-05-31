@@ -1,0 +1,558 @@
+# Security Monitoring Stack Configuration
+# Includes Prometheus, Grafana, Falco, and custom security alerts
+
+---
+# Prometheus Configuration for Security Metrics
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-security-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              - alertmanager:9093
+    
+    rule_files:
+      - "security_rules.yml"
+      - "application_rules.yml"
+    
+    scrape_configs:
+      - job_name: 'bdc-backend'
+        static_configs:
+          - targets: ['bdc-backend:8080']
+        metrics_path: '/metrics'
+        scrape_interval: 10s
+        
+      - job_name: 'bdc-nginx'
+        static_configs:
+          - targets: ['bdc-frontend:9113']
+        metrics_path: '/metrics'
+        
+      - job_name: 'postgres-exporter'
+        static_configs:
+          - targets: ['postgres-exporter:9187']
+          
+      - job_name: 'redis-exporter'
+        static_configs:
+          - targets: ['redis-exporter:9121']
+          
+      - job_name: 'node-exporter'
+        static_configs:
+          - targets: ['node-exporter:9100']
+          
+      - job_name: 'falco'
+        static_configs:
+          - targets: ['falco:8765']
+          
+      - job_name: 'blackbox'
+        static_configs:
+          - targets: ['blackbox-exporter:9115']
+        params:
+          module: [http_2xx]
+          target: ['https://bdc.company.com']
+
+  security_rules.yml: |
+    groups:
+    - name: security_alerts
+      rules:
+      # High error rate indicating potential attack
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"4..|5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors per second"
+          
+      # Suspicious authentication attempts
+      - alert: HighFailedLogins
+        expr: rate(auth_failed_attempts_total[5m]) > 0.05
+        for: 1m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "High failed login attempts"
+          description: "Failed login rate: {{ $value }} per second"
+          
+      # DDoS attack detection
+      - alert: PossibleDDoSAttack
+        expr: rate(http_requests_total[1m]) > 100
+        for: 30s
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Possible DDoS attack detected"
+          description: "Request rate: {{ $value }} requests per second"
+          
+      # SQL injection attempts
+      - alert: SQLInjectionAttempt
+        expr: rate(security_sql_injection_attempts_total[5m]) > 0
+        for: 0s
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "SQL injection attempt detected"
+          description: "SQL injection attempts: {{ $value }} per second"
+          
+      # XSS attack attempts
+      - alert: XSSAttempt
+        expr: rate(security_xss_attempts_total[5m]) > 0
+        for: 0s
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "XSS attempt detected"
+          description: "XSS attempts: {{ $value }} per second"
+          
+      # Privilege escalation attempts
+      - alert: PrivilegeEscalation
+        expr: rate(security_privilege_escalation_total[5m]) > 0
+        for: 0s
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Privilege escalation attempt"
+          description: "Privilege escalation attempts detected"
+          
+      # Unusual network activity
+      - alert: UnusualNetworkActivity
+        expr: rate(network_suspicious_connections_total[5m]) > 0
+        for: 30s
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "Unusual network activity"
+          description: "Suspicious network connections detected"
+          
+      # File system tampering
+      - alert: FileSystemTampering
+        expr: rate(filesystem_unauthorized_access_total[5m]) > 0
+        for: 0s
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Unauthorized file system access"
+          description: "Unauthorized file access detected"
+          
+      # Rate limit violations
+      - alert: RateLimitViolations
+        expr: rate(rate_limit_violations_total[5m]) > 0.1
+        for: 1m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "High rate limit violations"
+          description: "Rate limit violations: {{ $value }} per second"
+
+  application_rules.yml: |
+    groups:
+    - name: application_alerts
+      rules:
+      # Database connection issues
+      - alert: DatabaseConnectionError
+        expr: db_connection_errors_total > 0
+        for: 30s
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "Database connection errors"
+          description: "Database connection failures detected"
+          
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 90%"
+          
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is above 80%"
+          
+      # SSL certificate expiry
+      - alert: SSLCertificateExpiry
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 30
+        for: 1h
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "SSL certificate expires in less than 30 days"
+
+---
+# Alertmanager Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: monitoring
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: 'smtp.company.com:587'
+      smtp_from: 'alerts@company.com'
+      smtp_auth_username: 'alerts@company.com'
+      smtp_auth_password: 'password'
+      
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: 'default'
+      routes:
+      - match:
+          category: security
+        receiver: 'security-team'
+        group_wait: 5s
+        repeat_interval: 30m
+      - match:
+          severity: critical
+        receiver: 'on-call'
+        group_wait: 5s
+        repeat_interval: 15m
+        
+    receivers:
+    - name: 'default'
+      email_configs:
+      - to: 'admin@company.com'
+        subject: '[BDC] Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Labels: {{ range .Labels.SortedPairs }}{{ .Name }}: {{ .Value }}{{ end }}
+          {{ end }}
+          
+    - name: 'security-team'
+      email_configs:
+      - to: 'security@company.com'
+        subject: '[BDC SECURITY] {{ .GroupLabels.alertname }}'
+        body: |
+          SECURITY ALERT for BDC Application
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Time: {{ .StartsAt }}
+          Labels: {{ range .Labels.SortedPairs }}{{ .Name }}: {{ .Value }}{{ end }}
+          {{ end }}
+          
+          Please investigate immediately.
+      slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#security-alerts'
+        title: 'BDC Security Alert'
+        text: |
+          {{ range .Alerts }}
+          *{{ .Annotations.summary }}*
+          {{ .Annotations.description }}
+          {{ end }}
+          
+    - name: 'on-call'
+      email_configs:
+      - to: 'oncall@company.com'
+        subject: '[BDC CRITICAL] {{ .GroupLabels.alertname }}'
+      pagerduty_configs:
+      - service_key: 'YOUR_PAGERDUTY_SERVICE_KEY'
+        description: |
+          {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}
+
+---
+# Grafana Security Dashboard
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-security-dashboard
+  namespace: monitoring
+data:
+  security-dashboard.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "BDC Security Dashboard",
+        "tags": ["security", "bdc"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Security Events",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "sum(rate(security_events_total[5m]))",
+                "legendFormat": "Security Events/sec"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "steps": [
+                    {"color": "green", "value": null},
+                    {"color": "yellow", "value": 0.1},
+                    {"color": "red", "value": 1}
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "id": 2,
+            "title": "Failed Authentication Attempts",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(auth_failed_attempts_total[5m])",
+                "legendFormat": "Failed Logins/sec"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "title": "HTTP Error Rates",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(http_requests_total{status=~\"4..|5..\"}[5m])",
+                "legendFormat": "{{status}} errors/sec"
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "title": "Rate Limit Violations",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(rate_limit_violations_total[5m])",
+                "legendFormat": "Rate Limit Violations/sec"
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "title": "SQL Injection Attempts",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "sum(security_sql_injection_attempts_total)",
+                "legendFormat": "Total SQL Injection Attempts"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "steps": [
+                    {"color": "green", "value": null},
+                    {"color": "red", "value": 1}
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "id": 6,
+            "title": "XSS Attempts",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "sum(security_xss_attempts_total)",
+                "legendFormat": "Total XSS Attempts"
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "title": "Top IPs by Request Volume",
+            "type": "table",
+            "targets": [
+              {
+                "expr": "topk(10, sum by (client_ip) (rate(http_requests_total[5m])))",
+                "format": "table"
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "title": "Security Alert Timeline",
+            "type": "logs",
+            "targets": [
+              {
+                "expr": "{job=\"falco\"} |= \"Priority\"",
+                "refId": "A"
+              }
+            ]
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "10s"
+      }
+    }
+
+---
+# Falco Deployment for Runtime Security
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: falco
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: falco
+  template:
+    metadata:
+      labels:
+        app: falco
+    spec:
+      serviceAccount: falco
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - name: falco
+        image: falcosecurity/falco:latest
+        securityContext:
+          privileged: true
+        args:
+          - /usr/bin/falco
+          - --cri=/run/containerd/containerd.sock
+          - --k8s-api=https://kubernetes.default.svc.cluster.local
+        env:
+        - name: FALCO_K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - mountPath: /host/var/run/docker.sock
+          name: docker-socket
+        - mountPath: /host/dev
+          name: dev-fs
+        - mountPath: /host/proc
+          name: proc-fs
+          readOnly: true
+        - mountPath: /host/boot
+          name: boot-fs
+          readOnly: true
+        - mountPath: /host/lib/modules
+          name: lib-modules
+          readOnly: true
+        - mountPath: /host/usr
+          name: usr-fs
+          readOnly: true
+        - mountPath: /etc/falco
+          name: falco-config
+      volumes:
+      - name: docker-socket
+        hostPath:
+          path: /var/run/docker.sock
+      - name: dev-fs
+        hostPath:
+          path: /dev
+      - name: proc-fs
+        hostPath:
+          path: /proc
+      - name: boot-fs
+        hostPath:
+          path: /boot
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+      - name: usr-fs
+        hostPath:
+          path: /usr
+      - name: falco-config
+        configMap:
+          name: falco-rules
+
+---
+# Security Scanning CronJob
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: security-scan
+  namespace: monitoring
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: security-scanner
+            image: aquasec/trivy:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Scan images for vulnerabilities
+              trivy image --exit-code 1 --severity HIGH,CRITICAL your-registry.com/bdc/backend:latest
+              trivy image --exit-code 1 --severity HIGH,CRITICAL your-registry.com/bdc/frontend:latest
+              
+              # Scan filesystem
+              trivy fs --exit-code 1 --severity HIGH,CRITICAL /app
+              
+              # Generate report
+              trivy image --format json --output /reports/vulnerability-report.json your-registry.com/bdc/backend:latest
+            volumeMounts:
+            - name: reports
+              mountPath: /reports
+          volumes:
+          - name: reports
+            persistentVolumeClaim:
+              claimName: security-reports-pvc
+          restartPolicy: OnFailure
+
+---
+# Vulnerability Report Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: security-reports-pvc
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

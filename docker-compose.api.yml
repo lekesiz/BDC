@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  test-api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.test-api
+    container_name: bdc_test_api
+    restart: unless-stopped
+    ports:
+      - "8888:8888"

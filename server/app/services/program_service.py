@@ -26,6 +26,18 @@ class ProgramService:
         program = Program(name=name, tenant_id=tenant_id, is_active=True, **kwargs)
         db.session.add(program)
         db.session.commit()
+        # Emit real-time event for program creation
+        try:
+            from app.realtime import emit_to_tenant
+            emit_to_tenant(
+                tenant_id,
+                'program_created',
+                {
+                    'program': program.to_dict()
+                }
+            )
+        except Exception as e:
+            current_app.logger.warning(f"Failed to emit program_created event: {e}")
         return program
 
     @staticmethod
@@ -35,9 +47,35 @@ class ProgramService:
                 setattr(program, key, value)
         program.updated_at = datetime.utcnow()
         db.session.commit()
+        # Emit real-time event for program update
+        try:
+            from app.realtime import emit_to_tenant
+            emit_to_tenant(
+                program.tenant_id,
+                'program_updated',
+                {
+                    'program': program.to_dict()
+                }
+            )
+        except Exception as e:
+            current_app.logger.warning(f"Failed to emit program_updated event: {e}")
         return program
 
     @staticmethod
     def delete_program(program: Program) -> None:
+        tenant_id = program.tenant_id
+        program_id = program.id
         db.session.delete(program)
-        db.session.commit() 
+        db.session.commit()
+        # Emit real-time event for program deletion
+        try:
+            from app.realtime import emit_to_tenant
+            emit_to_tenant(
+                tenant_id,
+                'program_deleted',
+                {
+                    'program_id': program_id
+                }
+            )
+        except Exception as e:
+            current_app.logger.warning(f"Failed to emit program_deleted event: {e}") 

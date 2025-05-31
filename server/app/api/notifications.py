@@ -1,15 +1,23 @@
-"""Notification API endpoints."""
+"""Fixed Notification API endpoints with proper dependency injection."""
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, g
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 
 from app.extensions import db
 from app.models.notification import Notification
 from app.models.user import User
-from app.services.notification_service import NotificationService
+from app.container import get_container
 
 notifications_bp = Blueprint('notifications', __name__)
+
+
+def get_notification_service():
+    """Get notification service instance from DI container."""
+    if not hasattr(g, '_notification_service'):
+        container = get_container()
+        g._notification_service = container.resolve('notification_service')
+    return g._notification_service
 
 
 @notifications_bp.route('/notifications', methods=['GET'])
@@ -24,8 +32,11 @@ def get_notifications():
     unread_only = request.args.get('unread_only', False, type=bool)
     notification_type = request.args.get('type')
     
+    # Get notification service
+    notification_service = get_notification_service()
+    
     # Get notifications
-    notifications = NotificationService.get_user_notifications(
+    notifications = notification_service.get_user_notifications(
         user_id=user_id,
         limit=limit,
         offset=offset,
@@ -34,7 +45,7 @@ def get_notifications():
     )
     
     # Get unread count
-    unread_count = NotificationService.get_unread_count(user_id)
+    unread_count = notification_service.get_unread_count(user_id)
     
     return jsonify({
         'notifications': notifications,
@@ -51,8 +62,11 @@ def get_unread_count():
     """Get the count of unread notifications for the current user."""
     user_id = get_jwt_identity()
     
+    # Get notification service
+    notification_service = get_notification_service()
+    
     # Get unread count
-    unread_count = NotificationService.get_unread_count(user_id)
+    unread_count = notification_service.get_unread_count(user_id)
     
     return jsonify({
         'unread_count': unread_count
@@ -65,8 +79,11 @@ def mark_notification_as_read(notification_id):
     """Mark a notification as read."""
     user_id = get_jwt_identity()
     
+    # Get notification service
+    notification_service = get_notification_service()
+    
     # Mark notification as read
-    success = NotificationService.mark_as_read(notification_id, user_id)
+    success = notification_service.mark_as_read(notification_id, user_id)
     
     if not success:
         return jsonify({
@@ -86,10 +103,13 @@ def mark_all_notifications_as_read():
     user_id = get_jwt_identity()
     
     # Get notification type from request
-    notification_type = request.json.get('type')
+    notification_type = request.json.get('type') if request.json else None
+    
+    # Get notification service
+    notification_service = get_notification_service()
     
     # Mark all notifications as read
-    count = NotificationService.mark_all_as_read(user_id, notification_type)
+    count = notification_service.mark_all_as_read(user_id, notification_type)
     
     return jsonify({
         'message': f'{count} notifications marked as read'
@@ -102,8 +122,11 @@ def delete_notification(notification_id):
     """Delete a notification."""
     user_id = get_jwt_identity()
     
+    # Get notification service
+    notification_service = get_notification_service()
+    
     # Delete notification
-    success = NotificationService.delete_notification(notification_id, user_id)
+    success = notification_service.delete_notification(notification_id, user_id)
     
     if not success:
         return jsonify({
@@ -130,8 +153,11 @@ def create_test_notification():
     user_id = get_jwt_identity()
     user = User.query.get_or_404(user_id)
     
+    # Get notification service
+    notification_service = get_notification_service()
+    
     # Create notification
-    notification = NotificationService.create_notification(
+    notification = notification_service.create_notification(
         user_id=user_id,
         type='test',
         title='Test Notification',
@@ -141,7 +167,7 @@ def create_test_notification():
         related_type=None,
         sender_id=None,
         priority='normal',
-        send_email=request.json.get('send_email', False)
+        send_email=request.json.get('send_email', False) if request.json else False
     )
     
     if not notification:
@@ -163,11 +189,20 @@ def send_notification():
     current_user_id = get_jwt_identity()
     data = request.get_json()
     
+    if not data:
+        return jsonify({
+            'error': 'invalid_request',
+            'message': 'Invalid request data'
+        }), 400
+    
     # Determine recipient
     recipient_id = data.get('recipient_id', current_user_id)
     
+    # Get notification service
+    notification_service = get_notification_service()
+    
     # Create notification
-    notification = NotificationService.create_notification(
+    notification = notification_service.create_notification(
         user_id=recipient_id,
         type=data.get('type', 'info'),
         title=data.get('title', 'Notification'),
@@ -206,13 +241,22 @@ def broadcast_notification():
     
     data = request.get_json()
     
+    if not data:
+        return jsonify({
+            'error': 'invalid_request',
+            'message': 'Invalid request data'
+        }), 400
+    
     # Get all active users
     users = User.query.filter_by(is_active=True).all()
+    
+    # Get notification service
+    notification_service = get_notification_service()
     
     # Create notifications for all users
     created_count = 0
     for user in users:
-        notification = NotificationService.create_notification(
+        notification = notification_service.create_notification(
             user_id=user.id,
             type=data.get('type', 'info'),
             title=data.get('title', 'Broadcast'),
@@ -260,8 +304,11 @@ def create_notification():
             'message': 'User ID is required'
         }), 400
     
+    # Get notification service
+    notification_service = get_notification_service()
+    
     # Create notification
-    notification = NotificationService.create_notification(
+    notification = notification_service.create_notification(
         user_id=user_id,
         type=request.json.get('type', 'system'),
         title=request.json.get('title', 'System Notification'),
@@ -315,8 +362,11 @@ def create_bulk_notifications():
             'message': 'User IDs are required as a list'
         }), 400
     
+    # Get notification service
+    notification_service = get_notification_service()
+    
     # Create notifications
-    notifications = NotificationService.create_bulk_notifications(
+    notifications = notification_service.create_bulk_notifications(
         user_ids=user_ids,
         type=request.json.get('type', 'system'),
         title=request.json.get('title', 'System Notification'),
@@ -363,8 +413,11 @@ def create_role_notification():
             'message': 'Role is required'
         }), 400
     
+    # Get notification service
+    notification_service = get_notification_service()
+    
     # Create notifications
-    notifications = NotificationService.create_role_notification(
+    notifications = notification_service.create_role_notification(
         role=role,
         type=request.json.get('type', 'system'),
         title=request.json.get('title', 'System Notification'),

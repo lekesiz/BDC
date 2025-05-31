@@ -1,14 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { PlusCircle, Minus, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
 import { QUESTION_TYPES } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { RichTextEditor } from '@/components/editor';
 
 /**
  * Question Editor component for creating and editing test questions
  */
 const QuestionEditor = ({ register, control, index, errors, watch, setValue, trigger }) => {
+  const [questionContent, setQuestionContent] = useState(watch(`questions.${index}.question_text`) || '');
   // Get the question type for this index
   const questionType = watch(`questions.${index}.question_type`);
   
@@ -181,13 +183,20 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
       {/* Question text and type */}
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <div className="md:col-span-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Question Text*
           </label>
-          <textarea
-            {...register(`questions.${index}.question_text`)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-            rows="3"
+          <RichTextEditor
+            content={questionContent}
+            onChange={({ html }) => {
+              setQuestionContent(html);
+              setValue(`questions.${index}.question_text`, html);
+              trigger(`questions.${index}.question_text`);
+            }}
+            placeholder="Enter your question here..."
+            minHeight="120px"
+            maxHeight="400px"
+            className="mb-2"
           />
           {errors.questions?.[index]?.question_text && (
             <p className="mt-1 text-sm text-red-600">{errors.questions[index].question_text.message}</p>

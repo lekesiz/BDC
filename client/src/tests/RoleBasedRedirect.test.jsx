@@ -1,22 +1,62 @@
-import { render } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
-import { MemoryRouter } from 'react-router-dom'
-import RoleBasedRedirect from '@/components/common/RoleBasedRedirect'
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import RoleBasedRedirect from '@/components/common/RoleBasedRedirect';
 
-vi.mock('@/hooks/useAuth', () => {
-  return {
-    useAuth: () => ({ user: { role: 'student' }, isLoading: false }),
-  }
-})
+// Mock the DashboardPageEnhanced component
+vi.mock('@/pages/dashboard/DashboardPageEnhanced', () => ({
+  default: () => <div data-testid="dashboard">Dashboard</div>
+}));
+
+// Mock the useAuth hook
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: vi.fn()
+}));
+
+import { useAuth } from '@/hooks/useAuth';
 
 describe('RoleBasedRedirect', () => {
   it('redirects students to /portal', () => {
-    const { container } = render(
+    // Set up the mock to return student role
+    useAuth.mockReturnValue({ user: { role: 'student' }, isLoading: false });
+    
+    render(
       <MemoryRouter initialEntries={["/"]}>
-        <RoleBasedRedirect />
+        <Routes>
+          <Route path="/" element={<RoleBasedRedirect />} />
+          <Route path="/portal" element={<div data-testid="portal">Portal</div>} />
+        </Routes>
       </MemoryRouter>
-    )
-    // Navigate renders <a href="/portal"> fallback in test DOM
-    expect(container.innerHTML).toContain('/portal')
-  })
-}) 
+    );
+    
+    expect(screen.getByTestId('portal')).toBeInTheDocument();
+  });
+  
+  it('shows dashboard for admin/trainer', () => {
+    useAuth.mockReturnValue({ user: { role: 'admin' }, isLoading: false });
+    
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<RoleBasedRedirect />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    
+    expect(screen.getByTestId('dashboard')).toBeInTheDocument();
+  });
+  
+  it('shows loading state', () => {
+    useAuth.mockReturnValue({ user: null, isLoading: true });
+    
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<RoleBasedRedirect />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    
+    expect(screen.getByRole('status')).toBeInTheDocument();
+  });
+});

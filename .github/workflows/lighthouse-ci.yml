@@ -1,0 +1,51 @@
+name: Lighthouse CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'client/**'
+      - '.github/workflows/lighthouse-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'client/**'
+      - '.github/workflows/lighthouse-ci.yml'
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: Build project
+        working-directory: ./client
+        run: npm run build
+
+      - name: Run Lighthouse CI (Desktop)
+        working-directory: ./client
+        run: |
+          npm install -g @lhci/cli@0.14.0
+          lhci autorun --collect.settings.formFactor=desktop
+
+      - name: Run Lighthouse CI (Mobile)
+        working-directory: ./client
+        run: |
+          lhci autorun --collect.settings.formFactor=mobile
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: lighthouse-reports
+          path: ./client/lighthouse-results/

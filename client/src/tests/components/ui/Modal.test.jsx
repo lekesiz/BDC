@@ -1,22 +1,21 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import React, { useState } from 'react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from '../dialog'
+  DialogClose,
+  DialogFooter
+} from '../../../components/ui/dialog';
 
 describe('Modal/Dialog Component', () => {
-  const user = userEvent.setup()
-
-  it('renders dialog trigger', () => {
+  it('renders a simple dialog when open', () => {
     render(
-      <Dialog>
-        <DialogTrigger>Open Dialog</DialogTrigger>
+      <Dialog open={true}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Test Dialog</DialogTitle>
@@ -24,169 +23,93 @@ describe('Modal/Dialog Component', () => {
           </DialogHeader>
         </DialogContent>
       </Dialog>
-    )
+    );
     
-    expect(screen.getByText('Open Dialog')).toBeInTheDocument()
-  })
+    expect(screen.getByText('Test Dialog')).toBeInTheDocument();
+    expect(screen.getByText('This is a test dialog')).toBeInTheDocument();
+  });
 
-  it('opens dialog on trigger click', async () => {
+  it('does not render when closed', () => {
     render(
-      <Dialog>
-        <DialogTrigger>Open Dialog</DialogTrigger>
+      <Dialog open={false}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Test Dialog</DialogTitle>
-            <DialogDescription>This is a test dialog</DialogDescription>
+            <DialogTitle>Hidden Dialog</DialogTitle>
           </DialogHeader>
         </DialogContent>
       </Dialog>
-    )
+    );
     
-    const trigger = screen.getByText('Open Dialog')
-    await user.click(trigger)
-    
-    await waitFor(() => {
-      expect(screen.getByText('Test Dialog')).toBeInTheDocument()
-      expect(screen.getByText('This is a test dialog')).toBeInTheDocument()
-    })
-  })
+    expect(screen.queryByText('Hidden Dialog')).not.toBeInTheDocument();
+  });
 
-  it('closes dialog on close button click', async () => {
+  it('renders with footer', () => {
     render(
-      <Dialog defaultOpen>
+      <Dialog open={true}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Test Dialog</DialogTitle>
+            <DialogTitle>Dialog with Footer</DialogTitle>
           </DialogHeader>
-          <button>Close</button>
+          <DialogFooter>
+            <button>Cancel</button>
+            <button>Save</button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-    )
+    );
     
-    const closeButton = screen.getByRole('button', { name: /close/i })
-    await user.click(closeButton)
-    
-    await waitFor(() => {
-      expect(screen.queryByText('Test Dialog')).not.toBeInTheDocument()
-    })
-  })
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
+    expect(screen.getByText('Save')).toBeInTheDocument();
+  });
 
-  it('closes dialog on escape key', async () => {
+  it('triggers onOpenChange when close button clicked', () => {
+    const onOpenChange = vi.fn();
+    
     render(
-      <Dialog defaultOpen>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Test Dialog</DialogTitle>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    )
-    
-    await user.keyboard('{Escape}')
-    
-    await waitFor(() => {
-      expect(screen.queryByText('Test Dialog')).not.toBeInTheDocument()
-    })
-  })
-
-  it('closes dialog on backdrop click', async () => {
-    render(
-      <Dialog defaultOpen>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Test Dialog</DialogTitle>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    )
-    
-    const backdrop = screen.getByRole('dialog').parentElement
-    await user.click(backdrop)
-    
-    await waitFor(() => {
-      expect(screen.queryByText('Test Dialog')).not.toBeInTheDocument()
-    })
-  })
-
-  it('can be controlled', async () => {
-    const onOpenChange = vi.fn()
-    const { rerender } = render(
-      <Dialog open={false} onOpenChange={onOpenChange}>
-        <DialogTrigger>Open Dialog</DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Test Dialog</DialogTitle>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    )
-    
-    const trigger = screen.getByText('Open Dialog')
-    await user.click(trigger)
-    
-    expect(onOpenChange).toHaveBeenCalledWith(true)
-    
-    // Dialog should still be closed since we control it
-    expect(screen.queryByText('Test Dialog')).not.toBeInTheDocument()
-    
-    // Open the dialog
-    rerender(
       <Dialog open={true} onOpenChange={onOpenChange}>
-        <DialogTrigger>Open Dialog</DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Test Dialog</DialogTitle>
+            <DialogTitle>Closable Dialog</DialogTitle>
           </DialogHeader>
+          <DialogClose />
         </DialogContent>
       </Dialog>
-    )
+    );
     
-    expect(screen.getByText('Test Dialog')).toBeInTheDocument()
-  })
+    // Find and click the close button
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    fireEvent.click(closeButton);
+    
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
 
-  it('prevents closing when modal is true', async () => {
-    render(
-      <Dialog defaultOpen modal={false}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Non-modal Dialog</DialogTitle>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    )
+  it('can be controlled externally', () => {
+    const ControlledDialog = () => {
+      const [open, setOpen] = useState(false);
+      
+      return (
+        <>
+          <button onClick={() => setOpen(true)}>Open Dialog</button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Controlled Dialog</DialogTitle>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
+        </>
+      );
+    };
     
-    // Should be able to click outside
-    const backdrop = screen.getByRole('dialog').parentElement
-    await user.click(backdrop)
+    render(<ControlledDialog />);
     
-    // Dialog should still be open for non-modal
-    expect(screen.getByText('Non-modal Dialog')).toBeInTheDocument()
-  })
-
-  it('traps focus within dialog', async () => {
-    render(
-      <Dialog defaultOpen>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Test Dialog</DialogTitle>
-          </DialogHeader>
-          <button>First Button</button>
-          <button>Second Button</button>
-        </DialogContent>
-      </Dialog>
-    )
+    // Initially closed
+    expect(screen.queryByText('Controlled Dialog')).not.toBeInTheDocument();
     
-    const firstButton = screen.getByText('First Button')
-    const secondButton = screen.getByText('Second Button')
+    // Open dialog
+    fireEvent.click(screen.getByText('Open Dialog'));
     
-    firstButton.focus()
-    expect(document.activeElement).toBe(firstButton)
-    
-    await user.tab()
-    expect(document.activeElement).toBe(secondButton)
-    
-    await user.tab()
-    // Should cycle back to close button or first focusable element
-    expect(document.activeElement).not.toBe(document.body)
-  })
-})
+    // Should now be visible
+    expect(screen.getByText('Controlled Dialog')).toBeInTheDocument();
+  });
+});

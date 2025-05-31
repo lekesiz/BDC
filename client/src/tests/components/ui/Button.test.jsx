@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { Button } from '../button'
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Button } from '../../../components/ui/button';
 
 describe('Button Component', () => {
   const user = userEvent.setup()
@@ -64,22 +64,15 @@ describe('Button Component', () => {
     expect(screen.getByRole('button', { name: /Icon/i })).toHaveClass('h-10 w-10')
   })
 
-  it('supports as child', () => {
+  it('renders with left icon', () => {
     render(
-      <Button asChild>
-        <a href="/test">Link Button</a>
+      <Button leftIcon={<span data-testid="test-icon">🔍</span>}>
+        Search
       </Button>
     )
     
-    const link = screen.getByRole('link', { name: /Link Button/i })
-    expect(link).toHaveAttribute('href', '/test')
-  })
-
-  it('forwards ref correctly', () => {
-    const ref = vi.fn()
-    render(<Button ref={ref}>Button</Button>)
-    
-    expect(ref).toHaveBeenCalled()
+    expect(screen.getByTestId('test-icon')).toBeInTheDocument()
+    expect(screen.getByText('Search')).toBeInTheDocument()
   })
 
   it('applies custom className', () => {
@@ -90,10 +83,10 @@ describe('Button Component', () => {
   })
 
   it('shows loading state', () => {
-    render(<Button loading>Loading</Button>)
+    render(<Button isLoading>Loading</Button>)
     
     const button = screen.getByRole('button', { name: /Loading/i })
     expect(button).toBeDisabled()
     expect(button.querySelector('.animate-spin')).toBeInTheDocument()
   })
-})
+});

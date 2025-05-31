@@ -18,16 +18,16 @@ class Document(db.Model):
     file_size = Column(Integer, nullable=False)
     document_type = Column(String(50), nullable=False, default='general')
     is_active = Column(Boolean, default=True)
-    upload_by = Column(Integer, ForeignKey('users.id'), nullable=False)
-    beneficiary_id = Column(Integer, ForeignKey('beneficiaries.id'), nullable=True)
-    evaluation_id = Column(Integer, ForeignKey('evaluations.id'), nullable=True)
+    upload_by = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    beneficiary_id = Column(Integer, ForeignKey('beneficiaries.id', ondelete='CASCADE'), nullable=True)
+    evaluation_id = Column(Integer, ForeignKey('evaluations.id', ondelete='CASCADE'), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    uploader = relationship('User', backref='uploaded_documents')
-    beneficiary = relationship('Beneficiary', back_populates='documents')
-    evaluation = relationship('Evaluation', backref='documents')
+    uploader = relationship('User', backref='uploaded_documents', lazy='select')
+    beneficiary = relationship('Beneficiary', back_populates='documents', lazy='select')
+    evaluation = relationship('Evaluation', backref='documents', lazy='select')
     
     def to_dict(self):
         """Return a dict representation of the document."""

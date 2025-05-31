@@ -1,0 +1,70 @@
+# Production requirements for BDC application
+# Includes all runtime dependencies with security updates
+
+# Flask and extensions
+Flask==3.0.3
+flask-sqlalchemy==3.1.1
+flask-migrate==4.0.7
+flask-jwt-extended==4.6.0
+flask-marshmallow==1.2.1
+flask-cors==4.0.0
+flask-caching==2.3.0
+flask-limiter==3.5.0
+flask-mail==0.9.1
+marshmallow-sqlalchemy==1.0.0
+python-dotenv==1.0.1
+gunicorn==21.2.0
+
+# Database
+SQLAlchemy==2.0.25
+alembic==1.13.1
+psycopg2-binary==2.9.9
+
+# Caching and messaging
+redis==5.0.1
+
+# Security and crypto
+Werkzeug==3.0.1
+PyJWT==2.8.0
+pycryptodome==3.19.0
+cryptography==41.0.8
+
+# Utilities
+structlog==24.1.0
+email-validator==2.1.0
+python-dateutil==2.8.2
+reportlab==4.0.9
+Pillow==10.2.0
+
+# AI and ML
+openai==1.12.0
+langchain==0.1.6
+numpy==1.26.4
+pandas==2.2.0
+
+# Google Calendar Integration
+google-auth==2.27.0
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.119.0
+
+# Real-time Communications
+flask-socketio==5.3.6
+eventlet==0.33.3
+
+# Monitoring and observability
+prometheus-flask-exporter==0.23.0
+sentry-sdk[flask]==1.40.6
+
+# AWS services
+boto3==1.34.34
+
+# System monitoring
+psutil==5.9.8
+
+# Backup and compression
+schedule==1.2.0
+
+# Production server
+gevent==23.9.1
+greenlet==3.0.3

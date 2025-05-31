@@ -12,15 +12,15 @@ from app.schemas import (
     ResponseSchema, ResponseCreateSchema,
     AIFeedbackSchema, AIFeedbackUpdateSchema
 )
-from app.services import (
-    EvaluationService, QuestionService, TestSessionService, 
-    ResponseService, AIFeedbackService
-)
+from app.services.evaluation_service_factory import EvaluationServiceFactory
 from app.middleware.request_context import auth_required, role_required
 from app.utils import cache_response
 
 
 evaluations_bp = Blueprint('evaluations', __name__)
+
+# Create service instance
+evaluation_service = EvaluationServiceFactory.create()
 
 # Import additional endpoints
 from app.api.evaluations_endpoints import register_additional_routes
@@ -72,16 +72,19 @@ def get_evaluations():
                 }), 400
         
         # Get evaluations
-        evaluations, total, pages = EvaluationService.get_evaluations(
+        result = evaluation_service.get_evaluations(
             tenant_id=tenant_id,
             creator_id=creator_id,
             beneficiary_id=beneficiary_id,
             status=status,
-            type=type,
+            evaluation_type=type,
             is_template=is_template,
             page=page,
             per_page=per_page
         )
+        evaluations = result.items
+        total = result.total
+        pages = result.pages
         
         # Serialize data
         schema = EvaluationSchema(many=True)
@@ -111,7 +114,7 @@ def get_evaluation(id):
     """Get an evaluation by ID."""
     try:
         # Get evaluation
-        evaluation = EvaluationService.get_evaluation(id)
+        evaluation = evaluation_service.get_evaluation_by_id(id)
         
         if not evaluation:
             return jsonify({
@@ -218,7 +221,7 @@ def create_evaluation():
                     }), 403
         
         # Create evaluation
-        evaluation = EvaluationService.create_evaluation(current_user.id, data)
+        evaluation = evaluation_service.create_evaluation(current_user.id, data)
         
         # Serialize data
         response_schema = EvaluationSchema()
@@ -249,7 +252,7 @@ def update_evaluation(id):
     """Update an evaluation."""
     try:
         # Get evaluation
-        evaluation = EvaluationService.get_evaluation(id)
+        evaluation = evaluation_service.get_evaluation_by_id(id)
         
         if not evaluation:
             return jsonify({
@@ -277,7 +280,7 @@ def update_evaluation(id):
         data = schema.load(request.json)
         
         # Update evaluation
-        updated_evaluation = EvaluationService.update_evaluation(id, data)
+        updated_evaluation = evaluation_service.update_evaluation(id, data)
         
         # Serialize data
         response_schema = EvaluationSchema()
@@ -308,7 +311,7 @@ def delete_evaluation(id):
     """Delete an evaluation."""
     try:
         # Get evaluation
-        evaluation = EvaluationService.get_evaluation(id)
+        evaluation = evaluation_service.get_evaluation_by_id(id)
         
         if not evaluation:
             return jsonify({
@@ -332,7 +335,7 @@ def delete_evaluation(id):
                 }), 403
         
         # Delete evaluation
-        success = EvaluationService.delete_evaluation(id)
+        success = evaluation_service.delete_evaluation(id)
         
         if not success:
             return jsonify({
@@ -361,7 +364,7 @@ def get_questions(evaluation_id):
     """Get questions for an evaluation."""
     try:
         # Get evaluation
-        evaluation = EvaluationService.get_evaluation(evaluation_id)
+        evaluation = evaluation_service.get_evaluation_by_id(evaluation_id)
         
         if not evaluation:
             return jsonify({
@@ -455,7 +458,7 @@ def create_question(evaluation_id):
     """Create a new question for an evaluation."""
     try:
         # Get evaluation
-        evaluation = EvaluationService.get_evaluation(evaluation_id)
+        evaluation = evaluation_service.get_evaluation_by_id(evaluation_id)
         
         if not evaluation:
             return jsonify({
@@ -526,7 +529,7 @@ def update_question(question_id):
             }), 404
         
         # Get evaluation
-        evaluation = EvaluationService.get_evaluation(question.evaluation_id)
+        evaluation = evaluation_service.get_evaluation_by_id(question.evaluation_id)
         
         # Check permissions
         if current_user.role == 'tenant_admin':
@@ -588,7 +591,7 @@ def delete_question(question_id):
             }), 404
         
         # Get evaluation
-        evaluation = EvaluationService.get_evaluation(question.evaluation_id)
+        evaluation = evaluation_service.get_evaluation_by_id(question.evaluation_id)
         
         # Check permissions
         if current_user.role == 'tenant_admin':
@@ -645,7 +648,7 @@ def get_sessions():
         if current_user.role == 'tenant_admin':
             # Tenant admins can only see sessions for evaluations from their tenant
             if evaluation_id:
-                evaluation = EvaluationService.get_evaluation(evaluation_id)
+                evaluation = evaluation_service.get_evaluation_by_id(evaluation_id)
                 tenant_id = current_user.tenants[0].id if current_user.tenants else None
                 if not tenant_id or (evaluation and evaluation.tenant_id != tenant_id):
                     return jsonify({
@@ -671,7 +674,7 @@ def get_sessions():
         elif current_user.role == 'trainer':
             # Trainers can only see sessions for their beneficiaries or evaluations they created
             if evaluation_id:
-                evaluation = EvaluationService.get_evaluation(evaluation_id)
+                evaluation = evaluation_service.get_evaluation_by_id(evaluation_id)
                 if evaluation and evaluation.creator_id != current_user.id:
                     return jsonify({
                         'error': 'forbidden',

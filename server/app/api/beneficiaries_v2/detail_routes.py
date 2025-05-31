@@ -35,7 +35,7 @@ def get_beneficiary(beneficiary_id):
         if current_user.role == 'student' and beneficiary.user_id != current_user.id:
             return jsonify({'error': 'forbidden', 'message': 'Forbidden'}), 403
 
-        return BeneficiarySchema().jsonify(beneficiary), 200
+        return jsonify(BeneficiarySchema().dump(beneficiary)), 200
     except Exception as err:
         current_app.logger.exception(err)
         return jsonify({'error': 'server_error', 'message': 'Unexpected error'}), 500
@@ -63,7 +63,7 @@ def put_beneficiary(beneficiary_id):
         data = request.get_json()
         validated = BeneficiaryUpdateSchema().load(data)
         updated = BeneficiaryService.update_beneficiary(beneficiary_id, validated)
-        return BeneficiarySchema().jsonify(updated), 200
+        return jsonify(BeneficiarySchema().dump(updated)), 200
     except ValidationError as ve:
         return jsonify({'error': 'validation_error', 'message': 'Validation failed', 'errors': ve.messages}), 400
     except Exception as err:

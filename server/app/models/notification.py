@@ -74,7 +74,7 @@ class Notification(db.Model):
         """Mark the notification as read."""
         self.read = True
         self.read_at = datetime.utcnow()
-        db.session.commit()
+        # Note: db.session.commit() should be called by the service layer, not the model
     
     def __repr__(self):
         """String representation of the notification."""

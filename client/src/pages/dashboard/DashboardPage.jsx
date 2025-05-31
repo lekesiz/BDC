@@ -33,12 +33,14 @@ const DashboardPage = () => {
   const [programs, setPrograms] = useState([]);
   const [activities, setActivities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   // Fetch dashboard data
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
+        setError(null);
         
         // Get dashboard analytics
         const analyticsResponse = await api.get(API_ENDPOINTS.ANALYTICS.DASHBOARD);
@@ -83,6 +85,7 @@ const DashboardPage = () => {
         
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        setError('Error fetching dashboard data. Please try again later.');
       } finally {
         setIsLoading(false);
       }
@@ -102,9 +105,39 @@ const DashboardPage = () => {
         </p>
       </div>
       
-      {/* Stats cards */}
-      {(user?.role === 'super_admin' || user?.role === 'tenant_admin' || user?.role === 'trainer') && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Loading state */}
+      {isLoading && (
+        <div className="flex justify-center items-center p-10">
+          <Loader className="animate-spin h-10 w-10 text-primary" />
+          <span className="ml-2">Loading dashboard data...</span>
+        </div>
+      )}
+      
+      {/* Error state */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4 mt-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Main content - only show when not loading and no error */}
+      {!isLoading && !error && (
+        <>
+          {/* Stats cards */}
+          {(user?.role === 'super_admin' || user?.role === 'tenant_admin' || user?.role === 'trainer') && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatsCard
             title="Beneficiaries"
             value={stats.totalBeneficiaries}
@@ -351,6 +384,8 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };

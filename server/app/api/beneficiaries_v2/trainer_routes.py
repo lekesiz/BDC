@@ -60,7 +60,7 @@ def assign_trainer(beneficiary_id):
         if not updated:
             return jsonify({'error': 'assign_failed', 'message': 'Failed to assign trainer'}), 400
 
-        return BeneficiarySchema().jsonify(updated), 200
+        return jsonify(BeneficiarySchema().dump(updated)), 200
     except Exception as err:
         current_app.logger.exception(err)
         return jsonify({'error': 'server_error', 'message': 'Unexpected error'}), 500 

@@ -3,7 +3,6 @@
 import pytest
 from flask_jwt_extended import create_access_token
 from app import create_app, db
-from app.config import TestConfig
 from app.models.user import User
 from app.models.assessment import AssessmentTemplate, AssessmentSection, AssessmentQuestion
 

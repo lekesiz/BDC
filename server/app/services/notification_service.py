@@ -1,19 +1,38 @@
-"""Notification service module."""
+"""Notification service module with dependency injection support."""
 
 from datetime import datetime, timezone
+from typing import List, Optional, Dict, Any
 from flask import current_app
 
 from app.extensions import db
 from app.realtime import emit_to_user, user_is_online, emit_to_role, emit_to_tenant
 from app.services.email_service import send_notification_email
+from app.services.interfaces.notification_service_interface import INotificationService
+from app.models.notification import Notification
+from app.repositories.interfaces.notification_repository_interface import INotificationRepository
 
 
-class NotificationService:
-    """Notification service for managing user notifications."""
+class NotificationService(INotificationService):
+    """Notification service for managing user notifications with dependency injection."""
     
-    @staticmethod
-    def create_notification(user_id, type, title, message, data=None, related_id=None, related_type=None, 
-                         sender_id=None, priority='normal', send_email=False, tenant_id=None):
+    def __init__(self, notification_repository: INotificationRepository):
+        """Initialize notification service with repository dependency."""
+        self._notification_repository = notification_repository
+    
+    def create_notification(
+        self, 
+        user_id: int, 
+        type: str, 
+        title: str, 
+        message: str, 
+        data: Optional[Dict[str, Any]] = None, 
+        related_id: Optional[int] = None, 
+        related_type: Optional[str] = None, 
+        sender_id: Optional[int] = None, 
+        priority: str = 'normal', 
+        send_email: bool = False, 
+        tenant_id: Optional[int] = None
+    ) -> Optional[Notification]:
         """
         Create a new notification.
         
@@ -34,10 +53,8 @@ class NotificationService:
             Notification: The created notification or None if creation fails
         """
         try:
-            from app.models.notification import Notification
-            
-            # Create notification
-            notification = Notification(
+            # Create notification using repository
+            notification = self._notification_repository.create(
                 user_id=user_id,
                 type=type,
                 title=title,
@@ -50,38 +67,45 @@ class NotificationService:
                 tenant_id=tenant_id
             )
             
-            db.session.add(notification)
-            db.session.commit()
-            
-            # Send real-time notification if user is online
-            if user_is_online(user_id):
-                emit_to_user(user_id, 'notification', notification.to_dict())
-            
-            # Send email if requested
-            if send_email:
-                from app.models.user import User
-                user = User.query.get(user_id)
+            if notification:
+                # Send real-time notification if user is online
+                if user_is_online(user_id):
+                    emit_to_user(user_id, 'notification', notification.to_dict())
                 
-                if user and user.email:
-                    send_notification_email(
-                        user=user,
-                        notification={
-                            'subject': title,
-                            'message': message
-                        }
-                    )
+                # Send email if requested
+                if send_email:
+                    from app.models.user import User
+                    user = User.query.get(user_id)
+                    
+                    if user and user.email:
+                        send_notification_email(
+                            user=user,
+                            notification={
+                                'subject': title,
+                                'message': message
+                            }
+                        )
             
             return notification
             
         except Exception as e:
             current_app.logger.error(f"Error creating notification: {str(e)}")
-            db.session.rollback()
             return None
     
-    @staticmethod
-    def create_bulk_notifications(user_ids, type, title, message, data=None, related_id=None, 
-                               related_type=None, sender_id=None, priority='normal', 
-                               send_email=False, tenant_id=None):
+    def create_bulk_notifications(
+        self,
+        user_ids: List[int],
+        type: str,
+        title: str,
+        message: str,
+        data: Optional[Dict[str, Any]] = None,
+        related_id: Optional[int] = None,
+        related_type: Optional[str] = None,
+        sender_id: Optional[int] = None,
+        priority: str = 'normal',
+        send_email: bool = False,
+        tenant_id: Optional[int] = None
+    ) -> List[Notification]:
         """
         Create notifications for multiple users.
         
@@ -104,7 +128,7 @@ class NotificationService:
         notifications = []
         
         for user_id in user_ids:
-            notification = NotificationService.create_notification(
+            notification = self.create_notification(
                 user_id=user_id,
                 type=type,
                 title=title,
@@ -123,10 +147,20 @@ class NotificationService:
         
         return notifications
     
-    @staticmethod
-    def create_role_notification(role, type, title, message, data=None, related_id=None, 
-                              related_type=None, sender_id=None, priority='normal', 
-                              send_email=False, tenant_id=None):
+    def create_role_notification(
+        self,
+        role: str,
+        type: str,
+        title: str,
+        message: str,
+        data: Optional[Dict[str, Any]] = None,
+        related_id: Optional[int] = None,
+        related_type: Optional[str] = None,
+        sender_id: Optional[int] = None,
+        priority: str = 'normal',
+        send_email: bool = False,
+        tenant_id: Optional[int] = None
+    ) -> List[Notification]:
         """
         Create notification for users with a specific role.
         
@@ -148,17 +182,17 @@ class NotificationService:
         """
         try:
             # Get users with the specified role
-            from app.models.user import User
+            from app.models.user import User, user_tenant
+            
             users = User.query.filter_by(role=role, is_active=True)
             
             if tenant_id:
-                from app.models.user import user_tenant
                 users = users.join(user_tenant).filter(user_tenant.c.tenant_id == tenant_id)
             
             user_ids = [user.id for user in users]
             
             # Create notifications
-            notifications = NotificationService.create_bulk_notifications(
+            notifications = self.create_bulk_notifications(
                 user_ids=user_ids,
                 type=type,
                 title=title,
@@ -192,10 +226,20 @@ class NotificationService:
             current_app.logger.error(f"Error creating role notification: {str(e)}")
             return []
     
-    @staticmethod
-    def create_tenant_notification(tenant_id, type, title, message, data=None, related_id=None, 
-                                related_type=None, sender_id=None, priority='normal', 
-                                send_email=False, exclude_roles=None):
+    def create_tenant_notification(
+        self,
+        tenant_id: int,
+        type: str,
+        title: str,
+        message: str,
+        data: Optional[Dict[str, Any]] = None,
+        related_id: Optional[int] = None,
+        related_type: Optional[str] = None,
+        sender_id: Optional[int] = None,
+        priority: str = 'normal',
+        send_email: bool = False,
+        exclude_roles: Optional[List[str]] = None
+    ) -> List[Notification]:
         """
         Create notification for all users in a tenant.
         
@@ -230,7 +274,7 @@ class NotificationService:
             user_ids = [user.id for user in query]
             
             # Create notifications
-            notifications = NotificationService.create_bulk_notifications(
+            notifications = self.create_bulk_notifications(
                 user_ids=user_ids,
                 type=type,
                 title=title,
@@ -264,8 +308,7 @@ class NotificationService:
             current_app.logger.error(f"Error creating tenant notification: {str(e)}")
             return []
     
-    @staticmethod
-    def mark_as_read(notification_id, user_id):
+    def mark_as_read(self, notification_id: int, user_id: int) -> bool:
         """
         Mark a notification as read.
         
@@ -277,30 +320,12 @@ class NotificationService:
             bool: True if successful, False otherwise
         """
         try:
-            from app.models.notification import Notification
-            
-            notification = Notification.query.filter_by(
-                id=notification_id,
-                user_id=user_id
-            ).first()
-            
-            if not notification:
-                return False
-            
-            notification.read = True
-            notification.read_at = datetime.now(timezone.utc)
-            
-            db.session.commit()
-            
-            return True
-            
+            return self._notification_repository.mark_as_read(notification_id, user_id)
         except Exception as e:
             current_app.logger.error(f"Error marking notification as read: {str(e)}")
-            db.session.rollback()
             return False
     
-    @staticmethod
-    def mark_all_as_read(user_id, type=None):
+    def mark_all_as_read(self, user_id: int, type: Optional[str] = None) -> int:
         """
         Mark all notifications as read for a user.
         
@@ -312,32 +337,12 @@ class NotificationService:
             int: Number of notifications updated
         """
         try:
-            from app.models.notification import Notification
-            
-            query = Notification.query.filter_by(
-                user_id=user_id,
-                read=False
-            )
-            
-            if type:
-                query = query.filter_by(type=type)
-            
-            count = query.update({
-                'read': True,
-                'read_at': datetime.now(timezone.utc)
-            })
-            
-            db.session.commit()
-            
-            return count
-            
+            return self._notification_repository.mark_all_as_read(user_id, type)
         except Exception as e:
             current_app.logger.error(f"Error marking all notifications as read: {str(e)}")
-            db.session.rollback()
             return 0
     
-    @staticmethod
-    def delete_notification(notification_id, user_id):
+    def delete_notification(self, notification_id: int, user_id: int) -> bool:
         """
         Delete a notification.
         
@@ -349,28 +354,19 @@ class NotificationService:
             bool: True if successful, False otherwise
         """
         try:
-            from app.models.notification import Notification
-            
-            notification = Notification.query.filter_by(
-                id=notification_id,
-                user_id=user_id
-            ).first()
-            
-            if not notification:
-                return False
-            
-            db.session.delete(notification)
-            db.session.commit()
-            
-            return True
-            
+            return self._notification_repository.delete(notification_id, user_id)
         except Exception as e:
             current_app.logger.error(f"Error deleting notification: {str(e)}")
-            db.session.rollback()
             return False
     
-    @staticmethod
-    def get_user_notifications(user_id, limit=20, offset=0, unread_only=False, type=None):
+    def get_user_notifications(
+        self,
+        user_id: int,
+        limit: int = 20,
+        offset: int = 0,
+        unread_only: bool = False,
+        type: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
         """
         Get notifications for a user.
         
@@ -385,28 +381,15 @@ class NotificationService:
             list: List of notifications
         """
         try:
-            from app.models.notification import Notification
-            
-            query = Notification.query.filter_by(user_id=user_id)
-            
-            if unread_only:
-                query = query.filter_by(read=False)
-            
-            if type:
-                query = query.filter_by(type=type)
-            
-            notifications = query.order_by(
-                Notification.created_at.desc()
-            ).limit(limit).offset(offset).all()
-            
+            notifications = self._notification_repository.get_user_notifications(
+                user_id, limit, offset, unread_only, type
+            )
             return [notification.to_dict() for notification in notifications]
-            
         except Exception as e:
             current_app.logger.error(f"Error getting user notifications: {str(e)}")
             return []
     
-    @staticmethod
-    def get_unread_count(user_id, type=None):
+    def get_unread_count(self, user_id: int, type: Optional[str] = None) -> int:
         """
         Get count of unread notifications for a user.
         
@@ -418,18 +401,7 @@ class NotificationService:
             int: Number of unread notifications
         """
         try:
-            from app.models.notification import Notification
-            
-            query = Notification.query.filter_by(
-                user_id=user_id,
-                read=False
-            )
-            
-            if type:
-                query = query.filter_by(type=type)
-            
-            return query.count()
-            
+            return self._notification_repository.get_unread_count(user_id, type)
         except Exception as e:
             current_app.logger.error(f"Error getting unread count: {str(e)}")
             return 0

@@ -60,10 +60,10 @@ class User(db.Model):
     theme = Column(String(20), default='light')
     
     # Foreign key to tenant
-    tenant_id = Column(Integer, ForeignKey('tenants.id'), nullable=True)
+    tenant_id = Column(Integer, ForeignKey('tenants.id', ondelete='SET NULL'), nullable=True)
     
     # Relationships
-    tenants = relationship('Tenant', secondary=user_tenant, back_populates='users')
+    tenants = relationship('Tenant', secondary=user_tenant, back_populates='users', lazy='select')
     folders = relationship('Folder', back_populates='owner', lazy='dynamic')
     reports = relationship('Report', back_populates='created_by', lazy='dynamic')
     programs_created = relationship('Program', back_populates='created_by', lazy='dynamic')

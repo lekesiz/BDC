@@ -17,6 +17,16 @@ export const ThemeProvider = ({ children }) => {
     return savedTheme || 'light';
   });
 
+  const [accentColor, setAccentColor] = useState(() => {
+    const savedColor = localStorage.getItem('accentColor');
+    return savedColor || 'blue';
+  });
+
+  const [fontSize, setFontSize] = useState(() => {
+    const savedSize = localStorage.getItem('fontSize');
+    return savedSize || 'medium';
+  });
+
   // Apply theme to document root
   useEffect(() => {
     const root = document.documentElement;
@@ -31,15 +41,46 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Apply accent color
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-accent', accentColor);
+    localStorage.setItem('accentColor', accentColor);
+  }, [accentColor]);
+
+  // Apply font size
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-font-size', fontSize);
+    localStorage.setItem('fontSize', fontSize);
+  }, [fontSize]);
+
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
+
+  const changeTheme = (newTheme) => {
+    setTheme(newTheme);
+  };
+
+  const changeAccentColor = (newColor) => {
+    setAccentColor(newColor);
+  };
+
+  const changeFontSize = (newSize) => {
+    setFontSize(newSize);
   };
 
   const value = {
     theme,
     setTheme,
     toggleTheme,
-    isDark: theme === 'dark'
+    changeTheme,
+    isDark: theme === 'dark',
+    accentColor,
+    changeAccentColor,
+    fontSize,
+    changeFontSize
   };
 
   return (

@@ -1,0 +1,144 @@
+# Multi-stage production Dockerfile with security hardening
+# Stage 1: Build frontend
+FROM node:18-alpine AS frontend-builder
+
+# Security: Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY client/package*.json ./
+
+# Security: Verify package integrity and install dependencies
+RUN npm ci --only=production --ignore-scripts && \
+    npm cache clean --force
+
+# Copy source code
+COPY client/ .
+
+# Security: Set proper ownership
+RUN chown -R nextjs:nodejs /app
+USER nextjs
+
+# Build application
+RUN npm run build
+
+# Stage 2: Build backend
+FROM python:3.11-alpine AS backend-builder
+
+# Security: Install security updates
+RUN apk update && apk upgrade
+
+# Install build dependencies
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    postgresql-dev \
+    cargo \
+    rust
+
+# Create non-root user
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -S appuser -u 1001 -G appgroup
+
+WORKDIR /app
+
+# Copy requirements
+COPY server/requirements-production.txt .
+
+# Security: Install dependencies with integrity checks
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements-production.txt
+
+# Stage 3: Production runtime
+FROM python:3.11-alpine AS production
+
+# Security: Install only runtime dependencies and security updates
+RUN apk update && apk upgrade && \
+    apk add --no-cache \
+    postgresql-client \
+    nginx \
+    supervisor \
+    curl \
+    ca-certificates \
+    tzdata && \
+    rm -rf /var/cache/apk/*
+
+# Security: Create non-root user with specific UID/GID
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -S appuser -u 1001 -G appgroup
+
+# Create application directories
+RUN mkdir -p /app /app/logs /app/uploads /app/static /var/log/supervisor && \
+    chown -R appuser:appgroup /app
+
+# Copy backend from builder
+COPY --from=backend-builder --chown=appuser:appgroup /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
+COPY --from=backend-builder --chown=appuser:appgroup /usr/local/bin/ /usr/local/bin/
+
+# Copy frontend build
+COPY --from=frontend-builder --chown=appuser:appgroup /app/dist /app/static
+
+# Copy application code
+COPY --chown=appuser:appgroup server/ /app/
+
+# Copy configuration files
+COPY --chown=root:root docker/nginx.production.conf /etc/nginx/nginx.conf
+COPY --chown=root:root docker/supervisord.production.conf /etc/supervisor/conf.d/supervisord.conf
+COPY --chown=appuser:appgroup docker/gunicorn.production.conf.py /app/gunicorn.conf.py
+
+# Security: Set proper permissions
+RUN chmod 644 /etc/nginx/nginx.conf && \
+    chmod 644 /etc/supervisor/conf.d/supervisord.conf && \
+    chmod 644 /app/gunicorn.conf.py && \
+    chmod 755 /app && \
+    chmod -R 750 /app/logs && \
+    chmod -R 750 /app/uploads
+
+# Security: Remove unnecessary packages and files
+RUN apk del curl && \
+    rm -rf /tmp/* /var/tmp/* /root/.cache
+
+# Security: Set resource limits
+RUN echo "appuser soft nproc 1024" >> /etc/security/limits.conf && \
+    echo "appuser hard nproc 2048" >> /etc/security/limits.conf && \
+    echo "appuser soft nofile 1024" >> /etc/security/limits.conf && \
+    echo "appuser hard nofile 2048" >> /etc/security/limits.conf
+
+# Security: Disable root login and unnecessary services
+RUN sed -i 's/^root:.*$/root:!:0:0:disabled:/etc/passwd'
+
+# Health check script
+COPY --chown=appuser:appgroup docker/healthcheck.sh /app/healthcheck.sh
+RUN chmod +x /app/healthcheck.sh
+
+# Security: Create startup script with security checks
+COPY --chown=root:root docker/secure-startup.sh /usr/local/bin/secure-startup.sh
+RUN chmod +x /usr/local/bin/secure-startup.sh
+
+# Expose port (non-privileged)
+EXPOSE 8080
+
+# Security: Use non-root user
+USER appuser
+
+# Working directory
+WORKDIR /app
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD ./healthcheck.sh
+
+# Security labels
+LABEL security.scan="enabled" \
+      security.non-root="true" \
+      security.readonly-rootfs="true" \
+      maintainer="bdc-security@company.com"
+
+# Start services with security checks
+CMD ["/usr/local/bin/secure-startup.sh"]

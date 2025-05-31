@@ -19,7 +19,7 @@ const RoleBasedRedirect = () => {
   }
   
   // Redirect students to portal
-  if (user?.role === 'student') {
+  if (user?.role === 'student' || user?.role === 'trainee') {
     return <Navigate to="/portal" replace />;
   }
   

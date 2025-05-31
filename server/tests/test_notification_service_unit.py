@@ -1,7 +1,7 @@
 import pytest
 
 from app import create_app
-from app.services import NotificationService
+from app.services.notification_service import NotificationService
 
 
 @pytest.fixture()

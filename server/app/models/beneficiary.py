@@ -12,9 +12,9 @@ class Beneficiary(db.Model):
     __tablename__ = 'beneficiaries'
     
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    trainer_id = Column(Integer, ForeignKey('users.id'), nullable=True)
-    tenant_id = Column(Integer, ForeignKey('tenants.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    trainer_id = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    tenant_id = Column(Integer, ForeignKey('tenants.id', ondelete='CASCADE'), nullable=False)
     
     # Personal information
     gender = Column(String(10), nullable=True)
@@ -86,13 +86,13 @@ class Beneficiary(db.Model):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    user = relationship('User', foreign_keys=[user_id], backref='beneficiary_profile')
-    trainer = relationship('User', foreign_keys=[trainer_id], backref='trainees')
-    tenant = relationship('Tenant', backref='beneficiaries')
-    appointments = relationship('Appointment', back_populates='beneficiary', lazy='dynamic')
+    user = relationship('User', foreign_keys=[user_id], backref='beneficiary_profile', lazy='select')
+    trainer = relationship('User', foreign_keys=[trainer_id], backref='trainees', lazy='select')
+    tenant = relationship('Tenant', backref='beneficiaries', lazy='select')
+    appointments = relationship('Appointment', back_populates='beneficiary', lazy='dynamic', cascade='all, delete-orphan')
     documents = relationship('Document', back_populates='beneficiary', lazy='dynamic')
     evaluations = relationship('Evaluation', back_populates='beneficiary', lazy='dynamic')
-    notes_rel = relationship('Note', back_populates='beneficiary', lazy='dynamic')
+    notes_rel = relationship('Note', back_populates='beneficiary', lazy='dynamic', cascade='all, delete-orphan')
     program_enrollments = relationship('ProgramEnrollment', back_populates='beneficiary', lazy='dynamic')
     session_attendance = relationship('SessionAttendance', back_populates='beneficiary', lazy='dynamic')
     
@@ -131,8 +131,8 @@ class Note(db.Model):
     __tablename__ = 'notes'
     
     id = Column(Integer, primary_key=True)
-    beneficiary_id = Column(Integer, ForeignKey('beneficiaries.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  # Who created the note
+    beneficiary_id = Column(Integer, ForeignKey('beneficiaries.id', ondelete='CASCADE'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)  # Who created the note
     
     content = Column(Text, nullable=False)
     type = Column(String(20), default='general')  # general, private, assessment, etc.
@@ -142,8 +142,8 @@ class Note(db.Model):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    beneficiary = relationship('Beneficiary', back_populates='notes_rel')
-    user = relationship('User', backref='notes')
+    beneficiary = relationship('Beneficiary', back_populates='notes_rel', lazy='select')
+    user = relationship('User', backref='notes', lazy='select')
     
     def to_dict(self):
         """Return a dict representation of the note."""

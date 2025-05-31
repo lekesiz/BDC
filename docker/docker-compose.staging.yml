@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  backend:
+  server:
     image: ghcr.io/${GITHUB_REPOSITORY}/bdc-server:${TAG:-latest}
-    container_name: bdc-backend-staging
+    container_name: bdc-server-staging
     environment:
       - FLASK_ENV=staging
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/bdc_staging
@@ -43,7 +43,7 @@ services:
     ports:
       - "3001:80"
     depends_on:
-      - backend
+      - server
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
@@ -93,7 +93,7 @@ services:
       - ./nginx/staging.conf:/etc/nginx/nginx.conf:ro
       - ./ssl/staging:/etc/nginx/ssl:ro
     depends_on:
-      - backend
+      - server
       - frontend
     restart: unless-stopped
 

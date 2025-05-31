@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaArrowLeft, FaDownload, FaShare, FaEdit, FaTrash, FaStar, FaComment, FaExpand, FaCompress, FaTag, FaEye, FaClock, FaPrint, FaBookmark } from 'react-icons/fa';
+import { DocumentViewer, DocumentService } from '../../components/document';
 import { toast } from 'react-toastify';
 
 const DocumentViewerPageV2 = () => {
@@ -86,28 +87,15 @@ const DocumentViewerPageV2 = () => {
   };
 
   const handleDownload = async () => {
+    setDownloadProgress(0);
     try {
-      const response = await axios({
-        url: `/api/documents/${id}/download`,
-        method: 'GET',
-        responseType: 'blob',
-        onDownloadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setDownloadProgress(percentCompleted);
-        }
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', document.name);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      
-      toast.success('Doküman indirildi');
+      await DocumentService.downloadDocument(
+        id,
+        document?.name,
+        (progress) => setDownloadProgress(progress)
+      );
     } catch (error) {
-      toast.error('İndirme başarısız');
+      console.error('Download error:', error);
     } finally {
       setDownloadProgress(0);
     }
@@ -200,76 +188,16 @@ const DocumentViewerPageV2 = () => {
 
   const renderDocumentContent = () => {
     if (!document) return null;
-
-    switch (document.type) {
-      case 'pdf':
-        return (
-          <div className="relative">
-            <iframe
-              src={`${document.url}#page=${currentPage}`}
-              className="w-full h-[800px] border-0"
-              style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top left' }}
-              title={document.name}
-            />
-            {totalPages > 1 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white shadow-lg rounded-lg px-4 py-2 flex items-center space-x-4">
-                <button
-                  onClick={() => navigatePage('prev')}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                >
-                  ← Önceki
-                </button>
-                <span>
-                  {currentPage} / {totalPages}
-                </span>
-                <button
-                  onClick={() => navigatePage('next')}
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                >
-                  Sonraki →
-                </button>
-              </div>
-            )}
-          </div>
-        );
-      
-      case 'image':
-        return (
-          <img
-            src={document.url}
-            alt={document.name}
-            className="max-w-full h-auto mx-auto"
-            style={{ transform: `scale(${zoom / 100})` }}
-          />
-        );
-      
-      case 'document':
-      case 'docx':
-      case 'doc':
-        return (
-          <iframe
-            src={`https://docs.google.com/viewer?url=${encodeURIComponent(document.url)}&embedded=true`}
-            className="w-full h-[800px] border-0"
-            title={document.name}
-          />
-        );
-      
-      default:
-        return (
-          <div className="text-center py-16">
-            <FaEye className="text-6xl text-gray-400 mx-auto mb-4" />
-            <p className="text-xl mb-4">Bu dosya türü önizlenemez</p>
-            <button
-              onClick={handleDownload}
-              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-            >
-              Dosyayı İndir
-            </button>
-          </div>
-        );
-    }
+    
+    return (
+      <DocumentViewer
+        document={document}
+        onDownload={handleDownload}
+        showToolbar={false}
+        initialZoom={zoom}
+        height="800px"
+      />
+    );
   };
 
   if (loading) {

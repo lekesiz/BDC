@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { toast } from 'react-toastify';
+import io from 'socket.io-client';
 
 const NotificationContext = createContext();
 
@@ -53,19 +54,10 @@ export const NotificationProviderV2 = ({ children }) => {
   };
 
   const connectWebSocket = () => {
-    // Temporarily disable WebSocket
-    console.log('WebSocket temporarily disabled');
-    return;
-    
+    // Enable WebSocket notifications
     try {
       const token = localStorage.getItem('access_token');
       if (!token) {
-        return;
-      }
-      
-      const io = window.io;
-      if (!io) {
-        console.error('Socket.IO not available');
         return;
       }
       

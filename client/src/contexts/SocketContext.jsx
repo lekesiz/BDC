@@ -21,17 +21,17 @@ export const SocketProvider = ({ children }) => {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    // Temporarily disable Socket.IO
-    console.log('Socket.IO temporarily disabled');
-    return;
-    
+    // Enable Socket.IO connection when user is authenticated
     if (user && isAuthenticated) {
       // Create socket connection
       const token = localStorage.getItem('access_token');
       const newSocket = io('http://localhost:5001', {
-        transports: ['polling'],
+        auth: { token },
+        query: { token }, // Also pass token as query parameter
+        transports: ['polling', 'websocket'],
         reconnectionAttempts: 5,
-        reconnectionDelay: 1000
+        reconnectionDelay: 1000,
+        timeout: 20000
       });
 
       socketRef.current = newSocket;
@@ -75,6 +75,28 @@ export const SocketProvider = ({ children }) => {
       newSocket.on('message', (data) => {
         console.log('Message received:', data);
         // Handle chat messages
+      });
+
+      // Program real-time events
+      newSocket.on('program_created', (data) => {
+        console.log('Program created:', data);
+        toast.success(`New program created: ${data.program?.name}`);
+        // Trigger program list refresh
+        window.dispatchEvent(new CustomEvent('programCreated', { detail: data.program }));
+      });
+
+      newSocket.on('program_updated', (data) => {
+        console.log('Program updated:', data);
+        toast.info(`Program updated: ${data.program?.name}`);
+        // Trigger program list/detail refresh
+        window.dispatchEvent(new CustomEvent('programUpdated', { detail: data.program }));
+      });
+
+      newSocket.on('program_deleted', (data) => {
+        console.log('Program deleted:', data);
+        toast.warning(`Program deleted: ${data.program?.name}`);
+        // Trigger program list refresh
+        window.dispatchEvent(new CustomEvent('programDeleted', { detail: data.program }));
       });
 
       setSocket(newSocket);

@@ -1,0 +1,183 @@
+{
+  "common": {
+    "welcome": "Hoş geldiniz",
+    "logout": "Çıkış Yap",
+    "login": "Giriş Yap",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "submit": "Gönder",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "loading": "Yükleniyor...",
+    "error": "Hata",
+    "success": "Başarılı",
+    "confirm": "Onayla",
+    "back": "Geri",
+    "next": "İleri",
+    "previous": "Önceki",
+    "yes": "Evet",
+    "no": "Hayır"
+  },
+  "navigation": {
+    "dashboard": "Kontrol Paneli",
+    "beneficiaries": "Yararlanıcılar",
+    "programs": "Programlar",
+    "evaluations": "Değerlendirmeler",
+    "calendar": "Takvim",
+    "documents": "Belgeler",
+    "reports": "Raporlar",
+    "settings": "Ayarlar",
+    "users": "Kullanıcılar",
+    "profile": "Profil"
+  },
+  "auth": {
+    "loginTitle": "Giriş Yap",
+    "email": "E-posta",
+    "password": "Şifre",
+    "rememberMe": "Beni hatırla",
+    "forgotPassword": "Şifremi unuttum?",
+    "signIn": "Giriş Yap",
+    "signOut": "Çıkış Yap",
+    "register": "Kayıt Ol",
+    "loginError": "Geçersiz e-posta veya şifre"
+  },
+  "dashboard": {
+    "title": "Kontrol Paneli",
+    "overview": "Genel Bakış",
+    "recentActivity": "Son Aktiviteler",
+    "statistics": "İstatistikler",
+    "totalUsers": "Toplam Kullanıcı",
+    "activeBeneficiaries": "Aktif Yararlanıcılar",
+    "completedPrograms": "Tamamlanan Programlar",
+    "upcomingAppointments": "Yaklaşan Randevular"
+  },
+  "beneficiaries": {
+    "title": "Yararlanıcılar",
+    "addNew": "Yeni Yararlanıcı Ekle",
+    "list": "Yararlanıcı Listesi",
+    "search": "Yararlanıcı ara...",
+    "filter": {
+      "all": "Tümü",
+      "active": "Aktif",
+      "inactive": "Pasif"
+    },
+    "fields": {
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "status": "Durum",
+      "dateOfBirth": "Doğum Tarihi",
+      "address": "Adres"
+    }
+  },
+  "programs": {
+    "title": "Programlar",
+    "createNew": "Yeni Program Oluştur",
+    "list": "Program Listesi",
+    "details": "Program Detayları",
+    "fields": {
+      "name": "Program Adı",
+      "description": "Açıklama",
+      "duration": "Süre",
+      "capacity": "Kapasite",
+      "startDate": "Başlangıç Tarihi",
+      "endDate": "Bitiş Tarihi",
+      "status": "Durum"
+    }
+  },
+  "evaluations": {
+    "title": "Değerlendirmeler",
+    "create": "Değerlendirme Oluştur",
+    "list": "Değerlendirme Listesi",
+    "types": {
+      "quiz": "Sınav",
+      "assignment": "Ödev",
+      "practical": "Uygulama Testi"
+    },
+    "fields": {
+      "title": "Başlık",
+      "type": "Tür",
+      "dueDate": "Son Tarih",
+      "points": "Puan",
+      "timeLimit": "Süre Sınırı"
+    }
+  },
+  "calendar": {
+    "title": "Takvim",
+    "today": "Bugün",
+    "month": "Ay",
+    "week": "Hafta",
+    "day": "Gün",
+    "newAppointment": "Yeni Randevu",
+    "appointmentDetails": "Randevu Detayları"
+  },
+  "documents": {
+    "title": "Belgeler",
+    "upload": "Belge Yükle",
+    "folders": "Klasörler",
+    "recent": "Son Belgeler",
+    "shared": "Benimle Paylaşılan",
+    "fields": {
+      "name": "Belge Adı",
+      "type": "Tür",
+      "size": "Boyut",
+      "uploadedBy": "Yükleyen",
+      "uploadDate": "Yükleme Tarihi"
+    }
+  },
+  "reports": {
+    "title": "Raporlar",
+    "generate": "Rapor Oluştur",
+    "types": {
+      "progress": "İlerleme Raporu",
+      "attendance": "Katılım Raporu",
+      "evaluation": "Değerlendirme Raporu",
+      "financial": "Mali Rapor"
+    },
+    "dateRange": "Tarih Aralığı",
+    "export": "Dışa Aktar",
+    "schedule": "Rapor Zamanla"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "general": "Genel",
+    "security": "Güvenlik",
+    "notifications": "Bildirimler",
+    "integrations": "Entegrasyonlar",
+    "appearance": "Görünüm",
+    "language": "Dil",
+    "timezone": "Saat Dilimi",
+    "theme": "Tema"
+  },
+  "profile": {
+    "title": "Profilim",
+    "personalInfo": "Kişisel Bilgiler",
+    "changePassword": "Şifre Değiştir",
+    "preferences": "Tercihler",
+    "avatar": "Profil Resmi",
+    "bio": "Biyografi"
+  },
+  "errors": {
+    "generic": "Bir hata oluştu. Lütfen tekrar deneyin.",
+    "network": "Ağ hatası. Lütfen bağlantınızı kontrol edin.",
+    "notFound": "Sayfa bulunamadı",
+    "unauthorized": "Bu kaynağa erişim izniniz yok",
+    "validation": "Lütfen girdiğiniz bilgileri kontrol edip tekrar deneyin"
+  },
+  "success": {
+    "saved": "Değişiklikler başarıyla kaydedildi",
+    "created": "Başarıyla oluşturuldu",
+    "updated": "Başarıyla güncellendi",
+    "deleted": "Başarıyla silindi"
+  },
+  "validation": {
+    "required": "Bu alan zorunludur",
+    "email": "Lütfen geçerli bir e-posta adresi girin",
+    "minLength": "En az {min} karakter olmalıdır",
+    "maxLength": "En fazla {max} karakter olmalıdır",
+    "passwordMatch": "Şifreler eşleşmelidir"
+  }
+}

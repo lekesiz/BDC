@@ -1,5 +1,5 @@
-from app import db
 from datetime import datetime
+from app.extensions import db
 
 class Folder(db.Model):
     """Model for organizing documents into folders."""

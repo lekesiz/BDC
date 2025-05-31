@@ -410,6 +410,28 @@ Response:
 }
 ```
 
+#### Get Program Students
+```http
+GET /api/programs/{id}/students
+```
+Returns a simplified list of students (beneficiaries) enrolled in a specific program.
+
+Response:
+```json
+[
+  {
+    "id": 1,
+    "full_name": "Jane Student",
+    "email": "jane@example.com"
+  },
+  {
+    "id": 2,
+    "full_name": "John Student",
+    "email": "john@example.com"
+  }
+]
+```
+
 #### Create Program
 ```http
 POST /api/programs

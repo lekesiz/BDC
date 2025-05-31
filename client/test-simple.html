@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDC Test Page</title>
+</head>
+<body>
+    <h1>BDC Frontend Test</h1>
+    <p>Bu sayfa çalışıyorsa, server erişimi var demektir.</p>
+    <script>
+        console.log('Test sayfası yüklendi');
+        fetch('http://localhost:5001/api/health')
+            .then(response => response.json())
+            .then(data => {
+                document.body.innerHTML += '<p>Backend Status: ' + data.status + '</p>';
+            })
+            .catch(error => {
+                document.body.innerHTML += '<p>Backend Error: ' + error.message + '</p>';
+            });
+    </script>
+</body>
+</html>
+</html>

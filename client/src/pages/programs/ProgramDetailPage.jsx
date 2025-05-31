@@ -17,12 +17,16 @@ import {
   Target,
   ChevronRight
 } from 'lucide-react';
+import EditProgramModal from '@/components/programs/EditProgramModal'
+import DeleteProgramModal from '@/components/programs/DeleteProgramModal'
+import { useSocket } from '@/contexts/SocketContext'
 
 const ProgramDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { on } = useSocket();
   const [loading, setLoading] = useState(true);
   const [program, setProgram] = useState(null);
   const [enrolledStudents, setEnrolledStudents] = useState([]);
@@ -33,6 +37,27 @@ const ProgramDetailPage = () => {
     fetchEnrolledStudents();
     fetchProgramSessions();
   }, [id]);
+
+  // Socket listeners for program updates/deletion
+  useEffect(() => {
+    const offUpdated = on('program_updated', ({ program: updated }) => {
+      if (updated.id === Number(id)) {
+        setProgram(updated);
+      }
+    });
+
+    const offDeleted = on('program_deleted', ({ program_id }) => {
+      if (program_id === Number(id)) {
+        toast({ title: 'Program deleted', description: 'This program was deleted', type: 'info' });
+        navigate('/programs');
+      }
+    });
+
+    return () => {
+      offUpdated && offUpdated();
+      offDeleted && offDeleted();
+    };
+  }, [id, on]);
 
   const fetchProgramDetails = async () => {
     try {
@@ -150,10 +175,10 @@ const ProgramDetailPage = () => {
         </div>
         
         {(user.role === 'super_admin' || user.role === 'tenant_admin') && (
-          <Button onClick={() => navigate(`/programs/${id}/edit`)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit Program
-          </Button>
+          <div className="flex gap-3">
+            <EditProgramModal program={program} onUpdated={fetchProgramDetails} />
+            <DeleteProgramModal programId={program.id} onDeleted={() => navigate('/programs')} />
+          </div>
         )}
       </div>
 

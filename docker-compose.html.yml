@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  html-server:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.html
+    container_name: bdc_html
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    networks:
+      - bdc-network
+
+  # Mock API server for testing
+  test-api:
+    build: 
+      context: .
+      dockerfile: ./docker/Dockerfile.test-api
+    container_name: bdc_test_api
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    networks:
+      - bdc-network
+
+networks:
+  bdc-network:
+    driver: bridge

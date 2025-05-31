@@ -1,0 +1,183 @@
+{
+  "common": {
+    "welcome": "Bienvenue",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "submit": "Soumettre",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "beneficiaries": "Bénéficiaires",
+    "programs": "Programmes",
+    "evaluations": "Évaluations",
+    "calendar": "Calendrier",
+    "documents": "Documents",
+    "reports": "Rapports",
+    "settings": "Paramètres",
+    "users": "Utilisateurs",
+    "profile": "Profil"
+  },
+  "auth": {
+    "loginTitle": "Se connecter",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "rememberMe": "Se souvenir de moi",
+    "forgotPassword": "Mot de passe oublié?",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter",
+    "register": "S'inscrire",
+    "loginError": "E-mail ou mot de passe invalide"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "overview": "Vue d'ensemble",
+    "recentActivity": "Activité récente",
+    "statistics": "Statistiques",
+    "totalUsers": "Utilisateurs totaux",
+    "activeBeneficiaries": "Bénéficiaires actifs",
+    "completedPrograms": "Programmes terminés",
+    "upcomingAppointments": "Rendez-vous à venir"
+  },
+  "beneficiaries": {
+    "title": "Bénéficiaires",
+    "addNew": "Ajouter un nouveau bénéficiaire",
+    "list": "Liste des bénéficiaires",
+    "search": "Rechercher des bénéficiaires...",
+    "filter": {
+      "all": "Tous",
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "fields": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "status": "Statut",
+      "dateOfBirth": "Date de naissance",
+      "address": "Adresse"
+    }
+  },
+  "programs": {
+    "title": "Programmes",
+    "createNew": "Créer un nouveau programme",
+    "list": "Liste des programmes",
+    "details": "Détails du programme",
+    "fields": {
+      "name": "Nom du programme",
+      "description": "Description",
+      "duration": "Durée",
+      "capacity": "Capacité",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "status": "Statut"
+    }
+  },
+  "evaluations": {
+    "title": "Évaluations",
+    "create": "Créer une évaluation",
+    "list": "Liste des évaluations",
+    "types": {
+      "quiz": "Quiz",
+      "assignment": "Devoir",
+      "practical": "Test pratique"
+    },
+    "fields": {
+      "title": "Titre",
+      "type": "Type",
+      "dueDate": "Date limite",
+      "points": "Points",
+      "timeLimit": "Limite de temps"
+    }
+  },
+  "calendar": {
+    "title": "Calendrier",
+    "today": "Aujourd'hui",
+    "month": "Mois",
+    "week": "Semaine",
+    "day": "Jour",
+    "newAppointment": "Nouveau rendez-vous",
+    "appointmentDetails": "Détails du rendez-vous"
+  },
+  "documents": {
+    "title": "Documents",
+    "upload": "Télécharger un document",
+    "folders": "Dossiers",
+    "recent": "Documents récents",
+    "shared": "Partagé avec moi",
+    "fields": {
+      "name": "Nom du document",
+      "type": "Type",
+      "size": "Taille",
+      "uploadedBy": "Téléchargé par",
+      "uploadDate": "Date de téléchargement"
+    }
+  },
+  "reports": {
+    "title": "Rapports",
+    "generate": "Générer un rapport",
+    "types": {
+      "progress": "Rapport de progression",
+      "attendance": "Rapport de présence",
+      "evaluation": "Rapport d'évaluation",
+      "financial": "Rapport financier"
+    },
+    "dateRange": "Plage de dates",
+    "export": "Exporter",
+    "schedule": "Planifier un rapport"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "general": "Général",
+    "security": "Sécurité",
+    "notifications": "Notifications",
+    "integrations": "Intégrations",
+    "appearance": "Apparence",
+    "language": "Langue",
+    "timezone": "Fuseau horaire",
+    "theme": "Thème"
+  },
+  "profile": {
+    "title": "Mon profil",
+    "personalInfo": "Informations personnelles",
+    "changePassword": "Changer le mot de passe",
+    "preferences": "Préférences",
+    "avatar": "Photo de profil",
+    "bio": "Biographie"
+  },
+  "errors": {
+    "generic": "Une erreur s'est produite. Veuillez réessayer.",
+    "network": "Erreur réseau. Veuillez vérifier votre connexion.",
+    "notFound": "Page non trouvée",
+    "unauthorized": "Vous n'avez pas la permission d'accéder à cette ressource",
+    "validation": "Veuillez vérifier vos informations et réessayer"
+  },
+  "success": {
+    "saved": "Modifications enregistrées avec succès",
+    "created": "Créé avec succès",
+    "updated": "Mis à jour avec succès",
+    "deleted": "Supprimé avec succès"
+  },
+  "validation": {
+    "required": "Ce champ est obligatoire",
+    "email": "Veuillez entrer une adresse e-mail valide",
+    "minLength": "Doit contenir au moins {min} caractères",
+    "maxLength": "Ne doit pas dépasser {max} caractères",
+    "passwordMatch": "Les mots de passe doivent correspondre"
+  }
+}

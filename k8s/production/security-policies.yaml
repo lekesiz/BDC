@@ -1,0 +1,420 @@
+# Kubernetes Security Policies for BDC Production Environment
+
+# Pod Security Policy
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: bdc-restricted
+  namespace: bdc-production
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+  allowedCapabilities: []
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  readOnlyRootFilesystem: true
+  seLinux:
+    rule: 'RunAsAny'
+
+---
+# Network Policy - Default Deny All
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: bdc-production
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+# Network Policy - Allow Backend to Database
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-to-db
+  namespace: bdc-production
+spec:
+  podSelector:
+    matchLabels:
+      app: bdc-backend
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+    ports:
+    - protocol: TCP
+      port: 5432
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+
+---
+# Network Policy - Allow Frontend to Backend
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-to-backend
+  namespace: bdc-production
+spec:
+  podSelector:
+    matchLabels:
+      app: bdc-frontend
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: bdc-backend
+    ports:
+    - protocol: TCP
+      port: 8080
+
+---
+# Network Policy - Allow Ingress to Frontend
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-to-frontend
+  namespace: bdc-production
+spec:
+  podSelector:
+    matchLabels:
+      app: bdc-frontend
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+
+---
+# Security Context Constraints
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: bdc-restricted-scc
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegedContainer: false
+allowedCapabilities: []
+defaultAddCapabilities: []
+requiredDropCapabilities:
+- ALL
+allowedFlexVolumes: []
+fsGroup:
+  type: MustRunAs
+  ranges:
+  - min: 1000
+    max: 65535
+readOnlyRootFilesystem: true
+runAsUser:
+  type: MustRunAsNonRoot
+seLinuxContext:
+  type: MustRunAs
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- persistentVolumeClaim
+- projected
+- secret
+
+---
+# Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: bdc-backend-pdb
+  namespace: bdc-production
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: bdc-backend
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: bdc-frontend-pdb
+  namespace: bdc-production
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: bdc-frontend
+
+---
+# Resource Quotas
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: bdc-resource-quota
+  namespace: bdc-production
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    persistentvolumeclaims: "10"
+    services: "10"
+    secrets: "20"
+    configmaps: "20"
+    pods: "20"
+
+---
+# Limit Ranges
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: bdc-limit-range
+  namespace: bdc-production
+spec:
+  limits:
+  - default:
+      cpu: 500m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 128Mi
+    type: Container
+  - max:
+      cpu: 2
+      memory: 2Gi
+    min:
+      cpu: 50m
+      memory: 64Mi
+    type: Container
+
+---
+# Service Account with minimal permissions
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bdc-service-account
+  namespace: bdc-production
+automountServiceAccountToken: false
+
+---
+# Role with minimal required permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bdc-minimal-role
+  namespace: bdc-production
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+
+---
+# Role Binding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bdc-role-binding
+  namespace: bdc-production
+subjects:
+- kind: ServiceAccount
+  name: bdc-service-account
+  namespace: bdc-production
+roleRef:
+  kind: Role
+  name: bdc-minimal-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Admission Controller - OPA Gatekeeper Policy
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredsecuritycontext
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredSecurityContext
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            runAsNonRoot:
+              type: boolean
+            readOnlyRootFilesystem:
+              type: boolean
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredsecuritycontext
+        
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          not container.securityContext.runAsNonRoot
+          msg := "Container must run as non-root user"
+        }
+        
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          not container.securityContext.readOnlyRootFilesystem
+          msg := "Container must have read-only root filesystem"
+        }
+
+---
+# Apply the security constraint
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredSecurityContext
+metadata:
+  name: security-context-constraint
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+    namespaces: ["bdc-production"]
+  parameters:
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+
+---
+# Image Security Policy
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sallowedrepos
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAllowedRepos
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            repos:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sallowedrepos
+        
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
+          not any(satisfied)
+          msg := sprintf("Container image <%v> comes from untrusted registry", [container.image])
+        }
+
+---
+# Apply image repository constraint
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedRepos
+metadata:
+  name: allowed-repos
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+    namespaces: ["bdc-production"]
+  parameters:
+    repos:
+      - "your-registry.com/bdc/"
+      - "docker.io/library/"
+
+---
+# Falco Security Rules ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-rules
+  namespace: bdc-production
+data:
+  bdc_rules.yaml: |
+    - rule: BDC Suspicious Network Activity
+      desc: Detect suspicious network connections from BDC containers
+      condition: >
+        spawned_process and container and
+        k8s.ns.name = "bdc-production" and
+        (proc.name in (nc, ncat, netcat, socat, wget, curl) or
+         proc.cmdline contains "reverse" or
+         proc.cmdline contains "shell")
+      output: >
+        Suspicious network activity in BDC namespace
+        (user=%user.name container=%container.name command=%proc.cmdline)
+      priority: WARNING
+      tags: [network, bdc]
+    
+    - rule: BDC Unauthorized File Access
+      desc: Detect unauthorized file access in BDC application
+      condition: >
+        open_read and container and
+        k8s.ns.name = "bdc-production" and
+        (fd.name startswith "/etc/passwd" or
+         fd.name startswith "/etc/shadow" or
+         fd.name startswith "/proc/")
+      output: >
+        Unauthorized file access detected in BDC
+        (user=%user.name file=%fd.name container=%container.name)
+      priority: WARNING
+      tags: [filesystem, bdc]
+    
+    - rule: BDC Privilege Escalation
+      desc: Detect privilege escalation attempts in BDC containers
+      condition: >
+        spawned_process and container and
+        k8s.ns.name = "bdc-production" and
+        (proc.name in (su, sudo, doas) or
+         proc.aname in (su, sudo, doas))
+      output: >
+        Privilege escalation attempt in BDC container
+        (user=%user.name command=%proc.cmdline container=%container.name)
+      priority: ERROR
+      tags: [privilege_escalation, bdc]

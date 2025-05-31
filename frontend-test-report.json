@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-05-28T11:22:16.903Z",
+  "summary": {
+    "total": 0,
+    "success": 0,
+    "errors": 0
+  },
+  "results": [
+    {
+      "user": "admin",
+      "error": "No element found for selector: input[name=\"email\"]",
+      "results": []
+    },
+    {
+      "user": "student",
+      "error": "No element found for selector: input[name=\"email\"]",
+      "results": []
+    }
+  ]
+}

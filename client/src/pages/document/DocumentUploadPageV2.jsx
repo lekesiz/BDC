@@ -1,15 +1,14 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { FaUpload, FaFile, FaTimes, FaCheck, FaFolder, FaTag, FaUsers, FaLock, FaEye, FaInfoCircle } from 'react-icons/fa';
+import { FaFolder, FaTag, FaLock, FaInfoCircle } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import { DocumentUploader, DocumentViewer } from '../../components/document';
 
 const DocumentUploadPageV2 = () => {
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState({});
-  const [files, setFiles] = useState([]);
+  const [uploadComplete, setUploadComplete] = useState(false);
+  const [uploadedDocuments, setUploadedDocuments] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -39,68 +38,24 @@ const DocumentUploadPageV2 = () => {
   const [tagInput, setTagInput] = useState('');
   const [previewFile, setPreviewFile] = useState(null);
 
-  const handleFileSelect = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    const newFiles = selectedFiles.map(file => ({
-      id: Date.now() + Math.random(),
-      file,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      status: 'pending',
-      progress: 0
-    }));
-    setFiles([...files, ...newFiles]);
+  const handleUploadComplete = (documents, errors) => {
+    setUploadedDocuments(documents);
+    setUploadComplete(true);
+    setLoading(false);
+    
+    if (documents.length > 0) {
+      toast.success(`${documents.length} dosya başarıyla yüklendi`);
+      setTimeout(() => navigate('/documents'), 2000);
+    }
+    
+    if (errors.length > 0) {
+      toast.error(`${errors.length} dosya yüklenemedi`);
+    }
   };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.currentTarget.classList.add('border-blue-500');
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove('border-blue-500');
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove('border-blue-500');
-    const droppedFiles = Array.from(e.dataTransfer.files);
-    const newFiles = droppedFiles.map(file => ({
-      id: Date.now() + Math.random(),
-      file,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      status: 'pending',
-      progress: 0
-    }));
-    setFiles([...files, ...newFiles]);
-  };
-
-  const removeFile = (fileId) => {
-    setFiles(files.filter(f => f.id !== fileId));
-  };
-
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  const getFileIcon = (fileType) => {
-    if (fileType.includes('image')) return '🖼️';
-    if (fileType.includes('pdf')) return '📄';
-    if (fileType.includes('word') || fileType.includes('document')) return '📝';
-    if (fileType.includes('sheet') || fileType.includes('excel')) return '📊';
-    if (fileType.includes('presentation') || fileType.includes('powerpoint')) return '📊';
-    if (fileType.includes('video')) return '🎥';
-    if (fileType.includes('audio')) return '🎵';
-    if (fileType.includes('zip') || fileType.includes('rar')) return '📦';
-    return '📎';
+  
+  const handleUploadError = (errorMessages) => {
+    errorMessages.forEach(msg => toast.error(msg));
+    setLoading(false);
   };
 
   const handleAddTag = (e) => {
@@ -116,102 +71,26 @@ const DocumentUploadPageV2 = () => {
     setFormData({ ...formData, tags: formData.tags.filter(t => t !== tag) });
   };
 
-  const uploadFiles = async () => {
-    setLoading(true);
-    const uploadPromises = files.map(async (fileItem) => {
-      const data = new FormData();
-      data.append('file', fileItem.file);
-      data.append('title', formData.title || fileItem.name);
-      data.append('description', formData.description);
-      data.append('category', formData.category);
-      data.append('tags', JSON.stringify(formData.tags));
-      data.append('visibility', formData.visibility);
-      data.append('permissions', JSON.stringify(formData.permissions));
-      data.append('folder', formData.folder);
-      data.append('metadata', JSON.stringify(formData.metadata));
-
-      try {
-        setFiles(prevFiles => prevFiles.map(f => 
-          f.id === fileItem.id ? { ...f, status: 'uploading' } : f
-        ));
-
-        const response = await axios.post('/api/documents/upload', data, {
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadProgress(prev => ({ ...prev, [fileItem.id]: percentCompleted }));
-            setFiles(prevFiles => prevFiles.map(f => 
-              f.id === fileItem.id ? { ...f, progress: percentCompleted } : f
-            ));
-          }
-        });
-
-        setFiles(prevFiles => prevFiles.map(f => 
-          f.id === fileItem.id ? { ...f, status: 'completed', documentId: response.data.id } : f
-        ));
-
-        return response.data;
-      } catch (error) {
-        setFiles(prevFiles => prevFiles.map(f => 
-          f.id === fileItem.id ? { ...f, status: 'error', error: error.message } : f
-        ));
-        throw error;
-      }
-    });
-
-    try {
-      const results = await Promise.allSettled(uploadPromises);
-      const successful = results.filter(r => r.status === 'fulfilled').length;
-      const failed = results.filter(r => r.status === 'rejected').length;
-
-      if (successful > 0) {
-        toast.success(`${successful} dosya başarıyla yüklendi`);
-      }
-      if (failed > 0) {
-        toast.error(`${failed} dosya yüklenemedi`);
-      }
-
-      if (successful > 0) {
-        setTimeout(() => navigate('/documents'), 2000);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (files.length === 0) {
-      toast.error('Lütfen en az bir dosya seçin');
-      return;
-    }
-    await uploadFiles();
+    setLoading(true);
   };
-
-  const previewDocument = (fileItem) => {
-    if (fileItem.file.type.includes('image')) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewFile({
-          name: fileItem.name,
-          type: 'image',
-          url: e.target.result
-        });
-      };
-      reader.readAsDataURL(fileItem.file);
-    } else if (fileItem.file.type === 'application/pdf') {
-      const url = URL.createObjectURL(fileItem.file);
-      setPreviewFile({
-        name: fileItem.name,
-        type: 'pdf',
-        url
-      });
-    } else {
-      setPreviewFile({
-        name: fileItem.name,
-        type: 'other',
-        url: null
-      });
-    }
+  
+  const getUploadMetadata = () => {
+    return {
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      tags: JSON.stringify(formData.tags),
+      visibility: formData.visibility,
+      permissions: JSON.stringify(formData.permissions),
+      folder: formData.folder,
+      metadata: JSON.stringify(formData.metadata)
+    };
+  };
+  
+  const handlePreviewDocument = (document) => {
+    setPreviewFile(document);
   };
 
   return (
@@ -233,90 +112,16 @@ const DocumentUploadPageV2 = () => {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-lg font-semibold mb-4">Dosya Seçimi</h3>
             
-            <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              <FaUpload className="text-5xl text-gray-400 mx-auto mb-4" />
-              <p className="text-lg mb-2">
-                Dosyaları buraya sürükleyin veya tıklayarak seçin
-              </p>
-              <p className="text-sm text-gray-600">
-                Desteklenen formatlar: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, JPG, PNG, ZIP
-              </p>
-              <p className="text-sm text-gray-600">
-                Maksimum dosya boyutu: 100MB
-              </p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                onChange={handleFileSelect}
-                className="hidden"
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip,.rar"
-              />
-            </div>
-
-            {/* Selected Files */}
-            {files.length > 0 && (
-              <div className="mt-6">
-                <h4 className="font-medium mb-3">Seçilen Dosyalar ({files.length})</h4>
-                <div className="space-y-3">
-                  {files.map((fileItem) => (
-                    <div key={fileItem.id} className="bg-gray-50 rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center flex-1">
-                          <span className="text-2xl mr-3">{getFileIcon(fileItem.type)}</span>
-                          <div className="flex-1">
-                            <p className="font-medium">{fileItem.name}</p>
-                            <p className="text-sm text-gray-600">
-                              {formatFileSize(fileItem.size)}
-                            </p>
-                          </div>
-                          {fileItem.status === 'uploading' && (
-                            <div className="w-32 mr-4">
-                              <div className="bg-gray-200 rounded-full h-2">
-                                <div
-                                  className="bg-blue-500 h-2 rounded-full transition-all"
-                                  style={{ width: `${fileItem.progress}%` }}
-                                />
-                              </div>
-                              <p className="text-xs text-center mt-1">{fileItem.progress}%</p>
-                            </div>
-                          )}
-                          {fileItem.status === 'completed' && (
-                            <FaCheck className="text-green-500 mr-4" />
-                          )}
-                          {fileItem.status === 'error' && (
-                            <span className="text-red-500 text-sm mr-4">Hata</span>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            type="button"
-                            onClick={() => previewDocument(fileItem)}
-                            className="text-blue-500 hover:text-blue-600"
-                          >
-                            <FaEye />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => removeFile(fileItem.id)}
-                            className="text-red-500 hover:text-red-600"
-                            disabled={fileItem.status === 'uploading'}
-                          >
-                            <FaTimes />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <DocumentUploader
+              onUploadComplete={handleUploadComplete}
+              onUploadError={handleUploadError}
+              metadata={getUploadMetadata()}
+              maxFileSize={100 * 1024 * 1024} // 100MB
+              allowMultiple={true}
+              maxFiles={10}
+              acceptedFileTypes={['pdf', 'office', 'image', 'text', 'archive']}
+              onPreview={handlePreviewDocument}
+            />
           </div>
 
           {/* Document Details */}
@@ -486,10 +291,10 @@ const DocumentUploadPageV2 = () => {
             </button>
             <button
               type="submit"
-              disabled={loading || files.length === 0}
+              disabled={loading || uploadComplete}
               className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
             >
-              {loading ? 'Yükleniyor...' : `${files.length} Dosyayı Yükle`}
+              {loading ? 'Yükleniyor...' : uploadComplete ? 'Yükleme Tamamlandı' : 'Dosyaları Yükle'}
             </button>
           </div>
         </form>
@@ -505,30 +310,14 @@ const DocumentUploadPageV2 = () => {
                 onClick={() => setPreviewFile(null)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <FaTimes />
+                ✕
               </button>
             </div>
             <div className="p-4 overflow-auto max-h-[calc(90vh-8rem)]">
-              {previewFile.type === 'image' && (
-                <img
-                  src={previewFile.url}
-                  alt={previewFile.name}
-                  className="max-w-full h-auto mx-auto"
-                />
-              )}
-              {previewFile.type === 'pdf' && (
-                <iframe
-                  src={previewFile.url}
-                  title={previewFile.name}
-                  className="w-full h-[600px]"
-                />
-              )}
-              {previewFile.type === 'other' && (
-                <div className="text-center py-8">
-                  <FaFile className="text-6xl text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">Bu dosya türü önizlenemez</p>
-                </div>
-              )}
+              <DocumentViewer 
+                document={previewFile}
+                height="600px"
+              />
             </div>
           </div>
         </div>

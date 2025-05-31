@@ -1,0 +1,284 @@
+name: Cypress E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 6 AM UTC
+    - cron: '0 6 * * *'
+
+jobs:
+  cypress-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chrome, firefox, edge]
+        viewport: [desktop, mobile]
+      fail-fast: false
+
+    services:
+      # MongoDB service for testing
+      mongodb:
+        image: mongo:5.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongo --eval 'db.adminCommand(\"ismaster\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+
+    - name: Start backend server
+      run: |
+        npm run start:backend &
+        npx wait-on http://localhost:5001/api/health --timeout 60000
+      env:
+        NODE_ENV: test
+        DB_URL: mongodb://localhost:27017/bdc_test
+        JWT_SECRET: test-secret-key-for-ci
+
+    - name: Start frontend server
+      run: |
+        npm run dev &
+        npx wait-on http://localhost:5173 --timeout 60000
+      env:
+        NODE_ENV: test
+
+    - name: Set viewport for mobile tests
+      if: matrix.viewport == 'mobile'
+      run: echo "CYPRESS_viewportWidth=375" >> $GITHUB_ENV && echo "CYPRESS_viewportHeight=667" >> $GITHUB_ENV
+
+    - name: Run Cypress tests
+      uses: cypress-io/github-action@v6
+      with:
+        browser: ${{ matrix.browser }}
+        wait-on: 'http://localhost:5173, http://localhost:5001/api/health'
+        wait-on-timeout: 120
+        config: video=true,screenshotOnRunFailure=true
+      env:
+        CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+        CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+        CYPRESS_apiUrl: http://localhost:5001/api
+        CYPRESS_baseUrl: http://localhost:5173
+        CYPRESS_adminEmail: admin@bdc.test
+        CYPRESS_adminPassword: Admin123!Test
+        CYPRESS_trainerEmail: trainer@bdc.test
+        CYPRESS_trainerPassword: Trainer123!Test
+        CYPRESS_studentEmail: student@bdc.test
+        CYPRESS_studentPassword: Student123!Test
+        CYPRESS_tenantEmail: tenant@bdc.test
+        CYPRESS_tenantPassword: Tenant123!Test
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cypress-results-${{ matrix.browser }}-${{ matrix.viewport }}
+        path: |
+          cypress/screenshots
+          cypress/videos
+          cypress/reports
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      if: matrix.browser == 'chrome' && matrix.viewport == 'desktop'
+      with:
+        files: coverage/cypress/coverage-final.json
+        flags: e2e
+        name: cypress-coverage
+
+  accessibility-tests:
+    runs-on: ubuntu-latest
+    needs: cypress-tests
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Start services
+      run: |
+        npm run start:backend &
+        npm run dev &
+        npx wait-on http://localhost:5173 http://localhost:5001/api/health --timeout 120000
+
+    - name: Run accessibility tests
+      run: npm run cy:run -- --spec "cypress/e2e/accessibility-comprehensive.cy.js"
+      env:
+        CYPRESS_apiUrl: http://localhost:5001/api
+        CYPRESS_baseUrl: http://localhost:5173
+
+    - name: Generate accessibility report
+      run: |
+        npx cypress run --spec "cypress/e2e/accessibility-comprehensive.cy.js" --reporter mochawesome
+        npx marge cypress/reports/mochawesome.json --reportDir cypress/reports --inline
+
+    - name: Upload accessibility report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: accessibility-report
+        path: cypress/reports
+
+  visual-regression-tests:
+    runs-on: ubuntu-latest
+    needs: cypress-tests
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Start services
+      run: |
+        npm run start:backend &
+        npm run dev &
+        npx wait-on http://localhost:5173 http://localhost:5001/api/health --timeout 120000
+
+    - name: Run visual regression tests
+      run: npm run cy:run -- --spec "cypress/e2e/*visual*.cy.js"
+      env:
+        CYPRESS_apiUrl: http://localhost:5001/api
+        CYPRESS_baseUrl: http://localhost:5173
+
+    - name: Upload visual diff report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: visual-regression-report
+        path: |
+          cypress/screenshots
+          cypress/visual-regression
+
+  performance-tests:
+    runs-on: ubuntu-latest
+    needs: cypress-tests
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build and start services
+      run: |
+        npm run build
+        npm run start:backend &
+        npm run preview &
+        npx wait-on http://localhost:4173 http://localhost:5001/api/health --timeout 120000
+
+    - name: Run Lighthouse CI
+      run: npm run lighthouse:ci
+      env:
+        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+    - name: Upload Lighthouse report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: lighthouse-report
+        path: .lighthouseci
+
+  test-summary:
+    runs-on: ubuntu-latest
+    needs: [cypress-tests, accessibility-tests, visual-regression-tests, performance-tests]
+    if: always()
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+
+    - name: Generate test summary
+      run: |
+        echo "# Test Results Summary" > test-summary.md
+        echo "" >> test-summary.md
+        echo "## E2E Test Results" >> test-summary.md
+        
+        # Check if any Cypress tests failed
+        if ls cypress-results-*/cypress/screenshots/*.png >/dev/null 2>&1; then
+          echo "❌ Some E2E tests failed. Screenshots available in artifacts." >> test-summary.md
+        else
+          echo "✅ All E2E tests passed successfully." >> test-summary.md
+        fi
+        
+        echo "" >> test-summary.md
+        echo "## Accessibility Test Results" >> test-summary.md
+        
+        if [ -d "accessibility-report" ]; then
+          echo "✅ Accessibility tests completed. Report available in artifacts." >> test-summary.md
+        else
+          echo "❌ Accessibility tests failed or were skipped." >> test-summary.md
+        fi
+        
+        echo "" >> test-summary.md
+        echo "## Performance Test Results" >> test-summary.md
+        
+        if [ -d "lighthouse-report" ]; then
+          echo "✅ Performance tests completed. Lighthouse report available in artifacts." >> test-summary.md
+        else
+          echo "❌ Performance tests failed or were skipped." >> test-summary.md
+        fi
+
+    - name: Comment PR with test summary
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const testSummary = fs.readFileSync('test-summary.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: testSummary
+          });
+
+    - name: Upload test summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-summary
+        path: test-summary.md

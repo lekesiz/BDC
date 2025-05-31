@@ -20,6 +20,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useSocket } from '@/contexts/SocketContext';
 
 /**
  * ProgramsListPage displays all training programs
@@ -28,6 +29,7 @@ const ProgramsListPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { on } = useSocket();
   
   const [programs, setPrograms] = useState([]);
   const [filteredPrograms, setFilteredPrograms] = useState([]);
@@ -60,6 +62,43 @@ const ProgramsListPage = () => {
     
     fetchPrograms();
   }, []); // Remove toast dependency to prevent infinite loop
+
+  // Real-time program updates
+  useEffect(() => {
+    const handleProgramCreated = (event) => {
+      const newProgram = event.detail;
+      if (newProgram) {
+        setPrograms(prev => [newProgram, ...prev]);
+      }
+    };
+
+    const handleProgramUpdated = (event) => {
+      const updatedProgram = event.detail;
+      if (updatedProgram) {
+        setPrograms(prev => prev.map(p => 
+          p.id === updatedProgram.id ? updatedProgram : p
+        ));
+      }
+    };
+
+    const handleProgramDeleted = (event) => {
+      const deletedProgram = event.detail;
+      if (deletedProgram) {
+        setPrograms(prev => prev.filter(p => p.id !== deletedProgram.id));
+      }
+    };
+
+    // Listen to custom events from Socket context
+    window.addEventListener('programCreated', handleProgramCreated);
+    window.addEventListener('programUpdated', handleProgramUpdated);
+    window.addEventListener('programDeleted', handleProgramDeleted);
+
+    return () => {
+      window.removeEventListener('programCreated', handleProgramCreated);
+      window.removeEventListener('programUpdated', handleProgramUpdated);
+      window.removeEventListener('programDeleted', handleProgramDeleted);
+    };
+  }, []);
   
   // Filter programs based on search and filters
   useEffect(() => {
@@ -148,6 +187,31 @@ const ProgramsListPage = () => {
         return null;
     }
   };
+  
+  // Real-time program events
+  useEffect(() => {
+    const offCreated = on('program_created', ({ program }) => {
+      setPrograms(prev => [program, ...prev]);
+      setFilteredPrograms(prev => [program, ...prev]);
+    });
+
+    const offUpdated = on('program_updated', ({ program }) => {
+      setPrograms(prev => prev.map(p => (p.id === program.id ? program : p)));
+      setFilteredPrograms(prev => prev.map(p => (p.id === program.id ? program : p)));
+    });
+
+    const offDeleted = on('program_deleted', ({ program_id }) => {
+      setPrograms(prev => prev.filter(p => p.id !== program_id));
+      setFilteredPrograms(prev => prev.filter(p => p.id !== program_id));
+    });
+
+    // Cleanup
+    return () => {
+      offCreated && offCreated();
+      offUpdated && offUpdated();
+      offDeleted && offDeleted();
+    };
+  }, [on]);
   
   if (isLoading) {
     return (

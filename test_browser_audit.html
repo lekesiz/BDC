@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDC Frontend Audit</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .error { color: red; }
+        .success { color: green; }
+        .warning { color: orange; }
+        button { padding: 10px 15px; margin: 5px; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; max-height: 200px; overflow-y: scroll; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>BDC Frontend Audit Tool</h1>
+    
+    <div class="test-section">
+        <h2>1. Backend API Connection Test</h2>
+        <button onclick="testAPI()">Test API Connection</button>
+        <div id="api-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Authentication Test</h2>
+        <button onclick="testLogin()">Test Login (admin@bdc.com)</button>
+        <button onclick="testStudentLogin()">Test Student Login</button>
+        <div id="auth-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Frontend Pages Load Test</h2>
+        <button onclick="testFrontendPages()">Test Key Pages</button>
+        <div id="pages-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Console Errors</h2>
+        <button onclick="clearErrors()">Clear</button>
+        <div id="console-errors" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Network Requests</h2>
+        <button onclick="clearNetwork()">Clear</button>
+        <div id="network-log" class="log"></div>
+    </div>
+
+    <script>
+        let errors = [];
+        let networkRequests = [];
+        
+        // Capture console errors
+        const originalError = console.error;
+        console.error = function(...args) {
+            errors.push({
+                timestamp: new Date().toISOString(),
+                message: args.join(' ')
+            });
+            updateErrorDisplay();
+            originalError.apply(console, args);
+        };
+        
+        // Capture network requests
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            const request = {
+                timestamp: new Date().toISOString(),
+                url: args[0],
+                options: args[1]
+            };
+            networkRequests.push(request);
+            updateNetworkDisplay();
+            
+            return originalFetch.apply(this, args).then(response => {
+                request.status = response.status;
+                request.statusText = response.statusText;
+                updateNetworkDisplay();
+                return response;
+            }).catch(error => {
+                request.error = error.message;
+                updateNetworkDisplay();
+                throw error;
+            });
+        };
+        
+        function updateErrorDisplay() {
+            const container = document.getElementById('console-errors');
+            container.innerHTML = errors.map(err => 
+                `<div class="error">[${err.timestamp}] ${err.message}</div>`
+            ).join('');
+        }
+        
+        function updateNetworkDisplay() {
+            const container = document.getElementById('network-log');
+            container.innerHTML = networkRequests.map(req => 
+                `<div class="${req.error ? 'error' : req.status >= 400 ? 'error' : 'success'}">[${req.timestamp}] ${req.url} - ${req.status || 'PENDING'} ${req.error || ''}</div>`
+            ).join('');
+        }
+        
+        function clearErrors() {
+            errors = [];
+            updateErrorDisplay();
+        }
+        
+        function clearNetwork() {
+            networkRequests = [];
+            updateNetworkDisplay();
+        }
+        
+        async function testAPI() {
+            const container = document.getElementById('api-result');
+            container.innerHTML = '<div>Testing API connection...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:5001/api/health');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    container.innerHTML = `<div class="success">✅ API Connected: ${data.status}</div>`;
+                } else {
+                    container.innerHTML = `<div class="error">❌ API Error: ${response.status}</div>`;
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ API Connection Failed: ${error.message}</div>`;
+            }
+        }
+        
+        async function testLogin() {
+            const container = document.getElementById('auth-result');
+            container.innerHTML = '<div>Testing admin login...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@bdc.com',
+                        password: 'Admin123!',
+                        remember: false
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('access_token', data.access_token);
+                    container.innerHTML = `<div class="success">✅ Admin Login Success: ${data.user.email} (${data.user.role})</div>`;
+                } else {
+                    container.innerHTML = `<div class="error">❌ Login Failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ Login Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testStudentLogin() {
+            const container = document.getElementById('auth-result');
+            container.innerHTML = '<div>Testing student login...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'student@bdc.com',
+                        password: 'Student123!',
+                        remember: false
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('access_token', data.access_token);
+                    container.innerHTML = `<div class="success">✅ Student Login Success: ${data.user.email} (${data.user.role})</div>`;
+                } else {
+                    container.innerHTML = `<div class="error">❌ Student Login Failed: ${data.message}</div>`;
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ Student Login Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testFrontendPages() {
+            const container = document.getElementById('pages-result');
+            container.innerHTML = '<div>Testing frontend pages...</div>';
+            
+            const pages = [
+                { name: 'Home', url: 'http://localhost:5173/' },
+                { name: 'Login', url: 'http://localhost:5173/login' },
+                { name: 'Dashboard', url: 'http://localhost:5173/dashboard' },
+                { name: 'Users', url: 'http://localhost:5173/users' },
+                { name: 'Beneficiaries', url: 'http://localhost:5173/beneficiaries' }
+            ];
+            
+            let results = '<h3>Page Load Results:</h3>';
+            
+            for (const page of pages) {
+                try {
+                    const response = await fetch(page.url);
+                    if (response.ok) {
+                        results += `<div class="success">✅ ${page.name}: OK</div>`;
+                    } else {
+                        results += `<div class="error">❌ ${page.name}: ${response.status}</div>`;
+                    }
+                } catch (error) {
+                    results += `<div class="error">❌ ${page.name}: ${error.message}</div>`;
+                }
+            }
+            
+            container.innerHTML = results;
+        }
+    </script>
+</body>
+</html>

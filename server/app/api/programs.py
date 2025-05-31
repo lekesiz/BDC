@@ -1,6 +1,6 @@
 """Programs API endpoints."""
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
 from app import db
@@ -85,6 +85,16 @@ def create_program():
         db.session.add(program)
         db.session.commit()
         
+        # Emit program creation event via Socket.IO
+        try:
+            from app.realtime import emit_to_tenant
+            emit_to_tenant(user.tenant_id, 'program_created', {
+                'program': program.to_dict(),
+                'message': f'New program "{program.name}" has been created'
+            })
+        except Exception as e:
+            current_app.logger.warning(f'Failed to emit program_created event: {e}')
+        
         return jsonify(program.to_dict()), 201
         
     except Exception as e:
@@ -121,7 +131,61 @@ def update_program(program_id):
     
     db.session.commit()
     
+    # Emit program update event via Socket.IO
+    try:
+        from app.realtime import emit_to_tenant
+        emit_to_tenant(program.tenant_id, 'program_updated', {
+            'program': program.to_dict(),
+            'message': f'Program "{program.name}" has been updated'
+        })
+    except Exception as e:
+        current_app.logger.warning(f'Failed to emit program_updated event: {e}')
+    
     return jsonify(program.to_dict()), 200
+
+
+@programs_bp.route('/programs/<int:program_id>', methods=['DELETE'])
+@jwt_required()
+def delete_program(program_id):
+    """Delete a program."""
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    
+    program = Program.query.get_or_404(program_id)
+    
+    # Check permissions
+    if user.role not in ['super_admin', 'tenant_admin']:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    # Check if program belongs to user's tenant
+    if user.tenant_id and program.tenant_id != user.tenant_id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    try:
+        # Store program info for the event
+        program_data = program.to_dict()
+        tenant_id = program.tenant_id
+        
+        # Delete the program (cascade will handle related records)
+        db.session.delete(program)
+        db.session.commit()
+        
+        # Emit program deletion event via Socket.IO
+        try:
+            from app.realtime import emit_to_tenant
+            emit_to_tenant(tenant_id, 'program_deleted', {
+                'program': program_data,
+                'program_id': program_id,
+                'message': f'Program "{program_data["name"]}" has been deleted'
+            })
+        except Exception as e:
+            current_app.logger.warning(f'Failed to emit program_deleted event: {e}')
+        
+        return jsonify({'message': 'Program deleted successfully'}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
 @programs_bp.route('/programs/<int:program_id>/modules', methods=['POST'])
@@ -364,3 +428,22 @@ def get_program_levels():
     ]
     
     return jsonify(levels), 200
+
+
+@programs_bp.route('/programs/<int:program_id>/students', methods=['GET'])
+@jwt_required()
+def get_program_students(program_id):
+    """Return enrolled students (beneficiaries) for a program."""
+    # Reuse existing enrollments
+    enrollments = ProgramEnrollment.query.filter_by(program_id=program_id).all()
+    students = []
+    for enrollment in enrollments:
+        beneficiary = enrollment.beneficiary
+        if not beneficiary or not beneficiary.user:
+            continue
+        students.append({
+            'id': beneficiary.id,
+            'full_name': f"{beneficiary.user.first_name} {beneficiary.user.last_name}",
+            'email': beneficiary.user.email
+        })
+    return jsonify(students), 200

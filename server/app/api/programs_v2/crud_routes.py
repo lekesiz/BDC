@@ -21,7 +21,14 @@ def create_program():
     if not _check_admin(user):
         return jsonify({'error': 'Unauthorized'}), 403
     data = request.get_json()
-    program = ProgramService.create_program(name=data['name'], tenant_id=user.tenant_id)
+    # Extract name and pass other fields as kwargs
+    name = data.pop('name')
+    program = ProgramService.create_program(
+        name=name, 
+        tenant_id=user.tenant_id, 
+        created_by_id=user_id,
+        **data
+    )
     return jsonify(program.to_dict()), 201
 
 

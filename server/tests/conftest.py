@@ -1,7 +1,12 @@
 import pytest
 import os
+import sys
 import tempfile
 from datetime import datetime, timedelta
+
+# Add parent directory to path to find config module
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from app import create_app
 from app.models import db, User, Tenant, Beneficiary, Program
 from flask_jwt_extended import create_access_token
@@ -202,14 +207,15 @@ def test_program(db_session, test_tenant, test_trainer):
 @pytest.fixture
 def test_test(db_session, test_tenant, test_user):
     """Create a test assessment."""
-    test = Test(
-        name='Test Assessment',
+    from app.models.test import TestSet
+    test = TestSet(
+        title='Test Assessment',
         description='A test assessment',
         tenant_id=test_tenant.id,
-        created_by=test_user.id,
-        duration_minutes=60,
+        creator_id=test_user.id,
+        time_limit=60,
         passing_score=70,
-        is_active=True
+        status='active'
     )
     db_session.add(test)
     db_session.commit()
@@ -250,13 +256,14 @@ def test_notification(db_session, test_beneficiary):
 @pytest.fixture
 def test_question(db_session, test_test):
     """Create a test question."""
-    question = TestQuestion(
-        test_id=test_test.id,
-        question_text='What is 2 + 2?',
-        question_type='multiple_choice',
+    from app.models.test import Question
+    question = Question(
+        test_set_id=test_test.id,
+        text='What is 2 + 2?',
+        type='multiple_choice',
         points=10,
         correct_answer='4',
-        answer_options=['1', '2', '3', '4']
+        options=['1', '2', '3', '4']
     )
     db_session.add(question)
     db_session.commit()

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { useBreakpoint } from '@/hooks/useMediaQuery';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/toast';
@@ -17,6 +18,7 @@ const LoginPage = () => {
   const { addToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isMobile } = useBreakpoint();
   
   // Form state
   const [email, setEmail] = useState('');
@@ -107,33 +109,33 @@ const LoginPage = () => {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
       <motion.div 
         className="w-full max-w-md"
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: isMobile ? 10 : 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: isMobile ? 0.3 : 0.5 }}
       >
         <motion.div 
-          className="text-center mb-10"
-          initial={{ opacity: 0, y: -20 }}
+          className="text-center mb-6 sm:mb-10"
+          initial={{ opacity: 0, y: isMobile ? -10 : -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
+          transition={{ delay: 0.1, duration: isMobile ? 0.3 : 0.5 }}
         >
           <div className="inline-block">
             <motion.div 
-              className="w-12 h-12 mx-auto bg-primary rounded-md flex items-center justify-center"
+              className="w-12 h-12 sm:w-14 sm:h-14 mx-auto bg-primary dark:bg-primary-dark rounded-md flex items-center justify-center"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
             >
-              <span className="text-white font-bold text-2xl">B</span>
+              <span className="text-white font-bold text-2xl sm:text-3xl">B</span>
             </motion.div>
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <h2 className="mt-4 sm:mt-6 text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100">Sign in to your account</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
-            <Link to="/register" className="font-medium text-primary hover:text-primary-dark">
+            <Link to="/register" className="font-medium text-primary dark:text-primary-light hover:text-primary-dark dark:hover:text-primary">
               create a new account
             </Link>
           </p>
@@ -145,16 +147,16 @@ const LoginPage = () => {
           animate="animate"
           transition={{ delay: 0.3 }}
         >
-          <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Welcome back</CardTitle>
-            <CardDescription>
+          <Card className="border-0 sm:border shadow-xl sm:shadow-sm">
+          <CardHeader className="space-y-1 px-4 sm:px-6">
+            <CardTitle className="text-lg sm:text-xl">Welcome back</CardTitle>
+            <CardDescription className="text-sm">
               Enter your credentials to access your account
             </CardDescription>
           </CardHeader>
           
           <AnimatedForm onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6">
               <AnimatedInput
                 id="email"
                 type="email"
@@ -167,6 +169,8 @@ const LoginPage = () => {
                 error={errors.email}
                 disabled={isLoading}
                 required
+                className="min-h-[44px]"
+                inputMode="email"
               />
               
               <AnimatedInput
@@ -180,7 +184,8 @@ const LoginPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-gray-400 hover:text-gray-500"
+                    className="p-2 -m-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -194,29 +199,31 @@ const LoginPage = () => {
                 error={errors.password}
                 disabled={isLoading}
                 required
+                className="min-h-[44px]"
               />
               
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <AnimatedCheckbox
                   id="remember-me"
                   name="remember-me"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
                   label="Remember me"
+                  className="min-h-[44px]"
                 />
                 
-                <div className="text-sm">
-                  <Link to="/forgot-password" className="font-medium text-primary hover:text-primary-dark">
+                <div className="text-sm text-center sm:text-right">
+                  <Link to="/forgot-password" className="font-medium text-primary dark:text-primary-light hover:text-primary-dark dark:hover:text-primary">
                     Forgot your password?
                   </Link>
                 </div>
               </div>
             </CardContent>
             
-            <CardFooter>
+            <CardFooter className="px-4 sm:px-6 pb-6">
               <AnimatedButton
                 type="submit"
-                className="w-full"
+                className="w-full min-h-[44px] text-base sm:text-sm"
                 isLoading={isLoading}
                 disabled={isLoading}
               >
@@ -227,14 +234,14 @@ const LoginPage = () => {
         </Card>
         
         <motion.div 
-          className="mt-6 text-center"
+          className="mt-4 sm:mt-6 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: isMobile ? 0.3 : 0.5 }}
         >
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Don't have an account?{' '}
-            <Link to="/register" className="font-medium text-primary hover:text-primary-dark">
+            <Link to="/register" className="font-medium text-primary dark:text-primary-light hover:text-primary-dark dark:hover:text-primary">
               Sign up
             </Link>
           </p>

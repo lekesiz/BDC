@@ -18,7 +18,7 @@ export const Form = ({ onSubmit, children, className = '', ...props }) => {
 
   return (
     <form
-      className={cn('space-y-4', className)}
+      className={cn('space-y-4 sm:space-y-6', className)}
       onSubmit={handleSubmit}
       {...props}
     >
@@ -63,7 +63,7 @@ export const FormLabel = ({
   return (
     <label
       htmlFor={htmlFor}
-      className={cn('block text-sm font-medium text-gray-700', className)}
+      className={cn('block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', className)}
       {...props}
     >
       {children}
@@ -157,7 +157,7 @@ export const Checkbox = ({
   ...props 
 }) => {
   return (
-    <div className="flex items-center">
+    <div className="flex items-start sm:items-center min-h-[44px] py-2">
       <input
         type="checkbox"
         id={id}
@@ -165,7 +165,7 @@ export const Checkbox = ({
         checked={checked}
         onChange={onChange}
         className={cn(
-          'h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary',
+          'h-5 w-5 sm:h-4 sm:w-4 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary mt-0.5 sm:mt-0',
           className
         )}
         {...props}
@@ -173,7 +173,7 @@ export const Checkbox = ({
       {label && (
         <label
           htmlFor={id}
-          className="ml-2 block text-sm text-gray-700"
+          className="ml-3 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none"
         >
           {label}
         </label>
@@ -204,7 +204,7 @@ export const Radio = ({
   ...props 
 }) => {
   return (
-    <div className="flex items-center">
+    <div className="flex items-start sm:items-center min-h-[44px] py-2">
       <input
         type="radio"
         id={id}
@@ -212,7 +212,7 @@ export const Radio = ({
         checked={checked}
         onChange={onChange}
         className={cn(
-          'h-4 w-4 border-gray-300 text-primary focus:ring-primary',
+          'h-5 w-5 sm:h-4 sm:w-4 border-gray-300 dark:border-gray-600 text-primary focus:ring-primary mt-0.5 sm:mt-0',
           className
         )}
         {...props}
@@ -220,7 +220,7 @@ export const Radio = ({
       {label && (
         <label
           htmlFor={id}
-          className="ml-2 block text-sm text-gray-700"
+          className="ml-3 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none"
         >
           {label}
         </label>
@@ -256,7 +256,8 @@ export const Select = ({
       name={name}
       onChange={onChange}
       className={cn(
-        'block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm',
+        'block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-primary focus:ring-primary',
+        'min-h-[44px] px-3 py-2 text-base sm:text-sm',
         className
       )}
       {...props}

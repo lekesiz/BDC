@@ -8,11 +8,11 @@ class Evaluation(db.Model):
     __tablename__ = 'evaluations'
     
     id = db.Column(db.Integer, primary_key=True)
-    beneficiary_id = db.Column(db.Integer, db.ForeignKey('beneficiaries.id'), nullable=False)
-    test_id = db.Column(db.Integer, db.ForeignKey('tests.id'), nullable=False)
-    trainer_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    tenant_id = db.Column(db.Integer, db.ForeignKey('tenants.id'), nullable=True)
-    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    beneficiary_id = db.Column(db.Integer, db.ForeignKey('beneficiaries.id', ondelete='CASCADE'), nullable=False)
+    test_id = db.Column(db.Integer, db.ForeignKey('tests.id', ondelete='CASCADE'), nullable=False)
+    trainer_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    tenant_id = db.Column(db.Integer, db.ForeignKey('tenants.id', ondelete='CASCADE'), nullable=True)
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
     
     score = db.Column(db.Float)
     feedback = db.Column(db.Text)
@@ -31,11 +31,11 @@ class Evaluation(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    beneficiary = db.relationship('Beneficiary', back_populates='evaluations', lazy='joined')
-    test = db.relationship('Test', backref='evaluations', lazy='joined')
-    trainer = db.relationship('User', foreign_keys=[trainer_id], backref='evaluations_as_trainer', lazy='joined')
-    creator = db.relationship('User', foreign_keys=[creator_id], backref='evaluations_created', lazy='joined')
-    tenant = db.relationship('Tenant', backref='evaluations', lazy='joined')
+    beneficiary = db.relationship('Beneficiary', back_populates='evaluations', lazy='select')
+    test = db.relationship('Test', backref='evaluations', lazy='select')
+    trainer = db.relationship('User', foreign_keys=[trainer_id], backref='evaluations_as_trainer', lazy='select')
+    creator = db.relationship('User', foreign_keys=[creator_id], backref='evaluations_created', lazy='select')
+    tenant = db.relationship('Tenant', backref='evaluations', lazy='select')
     
     def to_dict(self):
         """Convert evaluation to dictionary."""
@@ -76,8 +76,10 @@ class Evaluation(db.Model):
         """Mark evaluation as completed."""
         self.status = 'completed'
         self.completed_at = datetime.utcnow()
+        # Note: db.session.commit() should be called by the service layer, not the model
         
     def review(self):
         """Mark evaluation as reviewed."""
         self.status = 'reviewed'
         self.reviewed_at = datetime.utcnow()
+        # Note: db.session.commit() should be called by the service layer, not the model

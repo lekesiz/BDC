@@ -36,38 +36,25 @@ class PDFGenerator:
         
     def _setup_custom_styles(self):
         """Set up custom paragraph styles."""
-        self.styles.add(ParagraphStyle(
-            name='Heading1',
-            parent=self.styles['Heading1'],
-            fontSize=16,
-            spaceAfter=12
-        ))
-        self.styles.add(ParagraphStyle(
-            name='Heading2',
-            parent=self.styles['Heading2'],
-            fontSize=14,
-            spaceAfter=10,
-            spaceBefore=10
-        ))
-        self.styles.add(ParagraphStyle(
-            name='Heading3',
-            parent=self.styles['Heading3'],
-            fontSize=12,
-            spaceAfter=8,
-            spaceBefore=8
-        ))
-        self.styles.add(ParagraphStyle(
-            name='Normal',
-            parent=self.styles['Normal'],
-            fontSize=10,
-            spaceAfter=6
-        ))
-        self.styles.add(ParagraphStyle(
-            name='Italic',
-            parent=self.styles['Italic'],
-            fontSize=10,
-            spaceAfter=6
-        ))
+        # Override existing styles by modifying them directly
+        self.styles['Heading1'].fontSize = 16
+        self.styles['Heading1'].spaceAfter = 12
+        
+        self.styles['Heading2'].fontSize = 14
+        self.styles['Heading2'].spaceAfter = 10
+        self.styles['Heading2'].spaceBefore = 10
+        
+        self.styles['Heading3'].fontSize = 12
+        self.styles['Heading3'].spaceAfter = 8
+        self.styles['Heading3'].spaceBefore = 8
+        
+        self.styles['Normal'].fontSize = 10
+        self.styles['Normal'].spaceAfter = 6
+        
+        self.styles['Italic'].fontSize = 10
+        self.styles['Italic'].spaceAfter = 6
+        
+        # Add new Bold style (doesn't exist in base styles)
         self.styles.add(ParagraphStyle(
             name='Bold',
             parent=self.styles['Normal'],

@@ -56,7 +56,7 @@ class ErrorMetrics(db.Model):
     count = Column(Integer, default=0)
     average_response_time = Column(Integer)  # milliseconds
     affected_users = Column(Integer, default=0)
-    metadata = Column(JSON)
+    meta_data = Column(JSON)
     
     # Indexes for efficient querying
     __table_args__ = (
@@ -77,7 +77,7 @@ class ErrorMetrics(db.Model):
             'count': self.count,
             'average_response_time': self.average_response_time,
             'affected_users': self.affected_users,
-            'metadata': self.metadata
+            'metadata': self.meta_data
         }
 
 
@@ -96,7 +96,7 @@ class AlarmRule(db.Model):
     cooldown = Column(Integer, default=300)  # seconds before re-triggering
     notification_channels = Column(JSON, default=[])
     enabled = Column(Boolean, default=True)
-    metadata = Column(JSON)
+    meta_data = Column(JSON)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -121,7 +121,7 @@ class AlarmRule(db.Model):
             'cooldown': self.cooldown,
             'notification_channels': self.notification_channels,
             'enabled': self.enabled,
-            'metadata': self.metadata,
+            'metadata': self.meta_data,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
@@ -173,7 +173,7 @@ class AIAnalysis(db.Model):
     raw_output = Column(Text)
     final_output = Column(Text)  # After human verification
     confidence_score = Column(Float, default=0.0)
-    metadata = Column(JSON)
+    meta_data = Column(JSON)
     human_verified = Column(Boolean, default=False)
     verification_status = Column(String(20))  # approved, rejected, modified
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -198,7 +198,7 @@ class AIAnalysis(db.Model):
             'raw_output': self.raw_output,
             'final_output': self.final_output,
             'confidence_score': self.confidence_score,
-            'metadata': self.metadata,
+            'metadata': self.meta_data,
             'human_verified': self.human_verified,
             'verification_status': self.verification_status,
             'created_at': self.created_at.isoformat() if self.created_at else None,
@@ -251,4 +251,8 @@ class HumanVerification(db.Model):
             'auto_approved': self.auto_approved,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'reviewed_at': self.reviewed_at.isoformat() if self.reviewed_at else None
-        } 
+        }
+
+
+# Create an alias for backward compatibility
+Monitoring = ErrorLog

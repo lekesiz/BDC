@@ -152,9 +152,10 @@ async function cacheFirst(request) {
   const response = await fetch(request);
   
   // Cache successful responses
-  if (response.ok) {
+  if (response.ok && response.status === 200) {
+    const responseClone = response.clone();
     const cache = await caches.open(DYNAMIC_CACHE_NAME);
-    cache.put(request, response.clone());
+    cache.put(request, responseClone);
   }
   
   return response;
@@ -166,10 +167,11 @@ async function networkFirst(request) {
     const response = await fetch(request);
     
     // Cache successful responses
-    if (response.ok) {
+    if (response.ok && response.status === 200) {
+      const responseClone = response.clone();
       const cacheName = API_PATTERN.test(request.url) ? API_CACHE_NAME : DYNAMIC_CACHE_NAME;
       const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
+      cache.put(request, responseClone);
     }
     
     return response;
@@ -205,9 +207,12 @@ async function staleWhileRevalidate(request) {
   const cached = await caches.match(request);
   
   const fetchPromise = fetch(request).then((response) => {
-    if (response.ok) {
-      const cache = caches.open(DYNAMIC_CACHE_NAME);
-      cache.then((c) => c.put(request, response.clone()));
+    if (response.ok && response.status === 200) {
+      // Clone the response before using it
+      const responseClone = response.clone();
+      caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+        cache.put(request, responseClone);
+      });
     }
     return response;
   });

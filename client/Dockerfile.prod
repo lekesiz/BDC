@@ -1,0 +1,69 @@
+# Production Dockerfile for React Frontend
+# Multi-stage build for optimized image size
+
+# Stage 1: Build the application
+FROM node:20-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache git
+
+# Copy package files first (better Docker layer caching)
+COPY package*.json ./
+
+# Install dependencies with exact versions for production
+RUN npm ci --only=production --silent
+
+# Copy source code
+COPY . .
+
+# Set production environment
+ENV NODE_ENV=production
+ENV GENERATE_SOURCEMAP=false
+ENV INLINE_RUNTIME_CHUNK=false
+
+# Build the application
+RUN npm run build
+
+# Stage 2: Production runtime
+FROM nginx:1.25-alpine AS production
+
+# Install security updates
+RUN apk upgrade --no-cache
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+# Copy built assets from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy custom nginx configuration
+COPY nginx.prod.conf /etc/nginx/nginx.conf
+
+# Copy SSL configuration
+COPY ssl.conf /etc/nginx/conf.d/ssl.conf
+
+# Create necessary directories and set permissions
+RUN mkdir -p /var/cache/nginx /var/log/nginx /etc/nginx/ssl && \
+    chown -R nginx:nginx /var/cache/nginx /var/log/nginx /etc/nginx/ssl && \
+    chmod -R 755 /var/cache/nginx /var/log/nginx
+
+# Add health check
+COPY healthcheck.sh /usr/local/bin/healthcheck.sh
+RUN chmod +x /usr/local/bin/healthcheck.sh
+
+# Security headers and optimizations
+RUN echo 'server_tokens off;' >> /etc/nginx/conf.d/security.conf
+
+# Expose port
+EXPOSE 80 443
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD /usr/local/bin/healthcheck.sh
+
+# Run nginx
+CMD ["nginx", "-g", "daemon off;"]

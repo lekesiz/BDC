@@ -1,7 +1,7 @@
 """Report model."""
 
 from datetime import datetime
-from app import db
+from app.extensions import db
 
 class Report(db.Model):
     """Model for system reports."""

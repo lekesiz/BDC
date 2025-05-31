@@ -181,3 +181,9 @@ class UserSearchSchema(Schema):
     per_page = fields.Integer(validate=validate.Range(min=1, max=100), load_default=20)
     sort_by = fields.String(validate=validate.OneOf(['email', 'first_name', 'last_name', 'created_at']))
     order = fields.String(validate=validate.OneOf(['asc', 'desc']), load_default='asc')
+
+
+# Add aliases for backward compatibility
+UserCreate = UserCreateSchema
+UserUpdate = UserUpdateSchema
+UserResponse = UserSchema

@@ -3,8 +3,7 @@
 import pytest
 from datetime import datetime, timezone
 from app.services.auth_service import AuthService
-from app.models.user import User
-from app.models.security import TokenBlocklist
+from app.models.user import User, TokenBlocklist
 
 
 class TestAuthServiceV2:

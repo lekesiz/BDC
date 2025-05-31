@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
 
 /**
@@ -129,7 +129,7 @@ export const useApiCall = (apiFunction, options = {}) => {
     return execute(() => apiFunction(...args));
   }, [execute, apiFunction]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (immediate) {
       call();
     }

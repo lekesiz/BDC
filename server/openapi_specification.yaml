@@ -1,0 +1,1944 @@
+openapi: 3.0.3
+info:
+  title: BDC Backend API
+  description: Comprehensive API documentation for the BDC (Business Development Center) backend system
+  version: 1.0.0
+  contact:
+    name: BDC API Support
+    email: api-support@bdc.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:5000/api
+    description: Development server
+  - url: https://api.bdc.com/api
+    description: Production server
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        username:
+          type: string
+          example: "johndoe"
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        role:
+          type: string
+          enum: [super_admin, tenant_admin, trainer, student, beneficiary]
+          example: "student"
+        is_active:
+          type: boolean
+          example: true
+        phone:
+          type: string
+          example: "+1234567890"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Beneficiary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 1
+        trainer_id:
+          type: integer
+          example: 2
+        enrollment_date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [active, inactive, completed, withdrawn]
+          example: "active"
+        progress:
+          type: number
+          format: float
+          example: 75.5
+        phone:
+          type: string
+          example: "+1234567890"
+        address:
+          type: string
+          example: "123 Main St"
+        city:
+          type: string
+          example: "New York"
+        created_at:
+          type: string
+          format: date-time
+
+    Evaluation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "JavaScript Fundamentals Test"
+        description:
+          type: string
+          example: "Assessment of basic JavaScript knowledge"
+        beneficiary_id:
+          type: integer
+          example: 1
+        creator_id:
+          type: integer
+          example: 2
+        status:
+          type: string
+          enum: [draft, published, in_progress, completed, cancelled]
+          example: "published"
+        type:
+          type: string
+          enum: [assessment, quiz, exam, project]
+          example: "assessment"
+        score:
+          type: number
+          format: float
+          example: 85.5
+        max_score:
+          type: number
+          format: float
+          example: 100.0
+        duration_minutes:
+          type: integer
+          example: 60
+        is_template:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Course Certificate"
+        description:
+          type: string
+          example: "Certificate of completion for JavaScript course"
+        file_path:
+          type: string
+          example: "/uploads/documents/cert_123.pdf"
+        file_size:
+          type: integer
+          example: 1024576
+        mime_type:
+          type: string
+          example: "application/pdf"
+        document_type:
+          type: string
+          enum: [certificate, report, assignment, resource, other]
+          example: "certificate"
+        beneficiary_id:
+          type: integer
+          example: 1
+        uploaded_by_id:
+          type: integer
+          example: 2
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "JavaScript Tutoring Session"
+        description:
+          type: string
+          example: "One-on-one tutoring for JavaScript concepts"
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        location:
+          type: string
+          example: "Room 101"
+        trainer_id:
+          type: integer
+          example: 2
+        beneficiary_id:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum: [scheduled, confirmed, in_progress, completed, cancelled, no_show]
+          example: "scheduled"
+        meeting_link:
+          type: string
+          example: "https://meet.google.com/abc-defg-hij"
+        notes:
+          type: string
+          example: "Remember to bring laptop"
+        created_at:
+          type: string
+          format: date-time
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "New Assignment Available"
+        message:
+          type: string
+          example: "You have a new JavaScript assignment to complete"
+        type:
+          type: string
+          enum: [info, warning, success, error, appointment, evaluation, document]
+          example: "info"
+        is_read:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
+        read_at:
+          type: string
+          format: date-time
+
+    Program:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Web Development Bootcamp"
+        description:
+          type: string
+          example: "Comprehensive web development training program"
+        code:
+          type: string
+          example: "WDB-2024"
+        duration:
+          type: integer
+          example: 12
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+          example: "beginner"
+        category:
+          type: string
+          example: "Technology"
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          example: "password123"
+        remember:
+          type: boolean
+          example: false
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refresh_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        token_type:
+          type: string
+          example: "bearer"
+        expires_in:
+          type: integer
+          example: 3600
+        user:
+          $ref: '#/components/schemas/User'
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - first_name
+        - last_name
+      properties:
+        email:
+          type: string
+          format: email
+          example: "newuser@example.com"
+        password:
+          type: string
+          format: password
+          example: "password123"
+        first_name:
+          type: string
+          example: "Jane"
+        last_name:
+          type: string
+          example: "Smith"
+        role:
+          type: string
+          enum: [student, trainer, tenant_admin]
+          example: "student"
+        tenant_id:
+          type: integer
+          example: 1
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "validation_error"
+        message:
+          type: string
+          example: "Validation failed"
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    PaginatedResponse:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        per_page:
+          type: integer
+          example: 10
+        total:
+          type: integer
+          example: 100
+        pages:
+          type: integer
+          example: 10
+
+paths:
+  # Authentication Endpoints
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and return JWT tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: User registration
+      description: Register a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Validation error or user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Get a new access token using refresh token
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
+        '401':
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Invalidate current session and revoke tokens
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully logged out"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/change-password:
+    post:
+      tags:
+        - Authentication
+      summary: Change password
+      description: Change user's password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - current_password
+                - new_password
+              properties:
+                current_password:
+                  type: string
+                  format: password
+                new_password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Password changed successfully
+        '400':
+          description: Invalid current password or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password
+      description: Reset user's password using reset token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - password
+              properties:
+                token:
+                  type: string
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Password reset successful
+        '400':
+          description: Invalid token or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # User Management Endpoints
+  /users/me:
+    get:
+      tags:
+        - User Management
+      summary: Get current user
+      description: Get the authenticated user's profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    get:
+      tags:
+        - User Management
+      summary: Get all users
+      description: Get paginated list of users with filtering options
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [super_admin, tenant_admin, trainer, student, beneficiary]
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: tenant_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+
+    post:
+      tags:
+        - User Management
+      summary: Create user
+      description: Create a new user account
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{user_id}:
+    get:
+      tags:
+        - User Management
+      summary: Get user by ID
+      description: Get a specific user by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - User Management
+      summary: Update user
+      description: Update a user's information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                role:
+                  type: string
+                is_active:
+                  type: boolean
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - User Management
+      summary: Delete user
+      description: Soft delete a user (deactivate)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User deactivated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Beneficiary Management Endpoints
+  /beneficiaries:
+    get:
+      tags:
+        - Beneficiary Management
+      summary: Get all beneficiaries
+      description: Get paginated list of beneficiaries with filtering
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, completed, withdrawn]
+        - name: trainer_id
+          in: query
+          schema:
+            type: integer
+        - name: tenant_id
+          in: query
+          schema:
+            type: integer
+        - name: query
+          in: query
+          description: Search query for name or email
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Beneficiaries retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Beneficiary'
+
+    post:
+      tags:
+        - Beneficiary Management
+      summary: Create beneficiary
+      description: Create a new beneficiary profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+              properties:
+                user_id:
+                  type: integer
+                trainer_id:
+                  type: integer
+                phone:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                enrollment_date:
+                  type: string
+                  format: date
+      responses:
+        '201':
+          description: Beneficiary created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  beneficiary:
+                    $ref: '#/components/schemas/Beneficiary'
+
+  /beneficiaries/{beneficiary_id}:
+    get:
+      tags:
+        - Beneficiary Management
+      summary: Get beneficiary by ID
+      description: Get detailed beneficiary information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: beneficiary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Beneficiary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Beneficiary'
+        '404':
+          description: Beneficiary not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Beneficiary Management
+      summary: Update beneficiary
+      description: Update beneficiary information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: beneficiary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trainer_id:
+                  type: integer
+                phone:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                status:
+                  type: string
+                  enum: [active, inactive, completed, withdrawn]
+                progress:
+                  type: number
+                  format: float
+      responses:
+        '200':
+          description: Beneficiary updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  beneficiary:
+                    $ref: '#/components/schemas/Beneficiary'
+
+    delete:
+      tags:
+        - Beneficiary Management
+      summary: Delete beneficiary
+      description: Delete a beneficiary profile
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: beneficiary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Beneficiary deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /beneficiaries/{beneficiary_id}/notes:
+    get:
+      tags:
+        - Beneficiary Management
+      summary: Get beneficiary notes
+      description: Get all notes for a beneficiary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: beneficiary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: include_private
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Notes retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        content:
+                          type: string
+                        note_type:
+                          type: string
+                        is_private:
+                          type: boolean
+                        created_by_id:
+                          type: integer
+                        created_at:
+                          type: string
+                          format: date-time
+
+    post:
+      tags:
+        - Beneficiary Management
+      summary: Add beneficiary note
+      description: Add a new note to beneficiary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: beneficiary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                note_type:
+                  type: string
+                  enum: [general, progress, behavioral, academic]
+                  default: general
+                is_private:
+                  type: boolean
+                  default: false
+      responses:
+        '201':
+          description: Note added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  note:
+                    type: object
+
+  # Evaluation System Endpoints
+  /evaluations:
+    get:
+      tags:
+        - Evaluation System
+      summary: Get evaluations
+      description: Get paginated list of evaluations with filtering
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: beneficiary_id
+          in: query
+          schema:
+            type: integer
+        - name: creator_id
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, published, in_progress, completed, cancelled]
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [assessment, quiz, exam, project]
+        - name: is_template
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Evaluations retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Evaluation'
+
+    post:
+      tags:
+        - Evaluation System
+      summary: Create evaluation
+      description: Create a new evaluation or assessment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - type
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                type:
+                  type: string
+                  enum: [assessment, quiz, exam, project]
+                beneficiary_id:
+                  type: integer
+                duration_minutes:
+                  type: integer
+                max_score:
+                  type: number
+                  format: float
+                is_template:
+                  type: boolean
+                  default: false
+      responses:
+        '201':
+          description: Evaluation created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  evaluation:
+                    $ref: '#/components/schemas/Evaluation'
+
+  /evaluations/{evaluation_id}:
+    get:
+      tags:
+        - Evaluation System
+      summary: Get evaluation by ID
+      description: Get detailed evaluation information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: evaluation_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Evaluation retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evaluation'
+        '404':
+          description: Evaluation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Evaluation System
+      summary: Update evaluation
+      description: Update evaluation information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: evaluation_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                status:
+                  type: string
+                  enum: [draft, published, in_progress, completed, cancelled]
+                duration_minutes:
+                  type: integer
+                max_score:
+                  type: number
+                  format: float
+      responses:
+        '200':
+          description: Evaluation updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  evaluation:
+                    $ref: '#/components/schemas/Evaluation'
+
+    delete:
+      tags:
+        - Evaluation System
+      summary: Delete evaluation
+      description: Delete an evaluation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: evaluation_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Evaluation deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  # Document Management Endpoints
+  /documents:
+    get:
+      tags:
+        - Document Management
+      summary: Get documents
+      description: Get paginated list of documents accessible to current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [certificate, report, assignment, resource, other]
+        - name: search
+          in: query
+          description: Search query for document title
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Documents retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      documents:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Document'
+
+    post:
+      tags:
+        - Document Management
+      summary: Upload document
+      description: Upload a new document
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                title:
+                  type: string
+                description:
+                  type: string
+                document_type:
+                  type: string
+                  enum: [certificate, report, assignment, resource, other]
+                beneficiary_id:
+                  type: integer
+      responses:
+        '201':
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  document:
+                    $ref: '#/components/schemas/Document'
+
+  /documents/{document_id}:
+    get:
+      tags:
+        - Document Management
+      summary: Download document
+      description: Download a document file
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Document Management
+      summary: Delete document
+      description: Delete a document
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  # Appointment/Calendar Management
+  /appointments:
+    get:
+      tags:
+        - Appointments
+      summary: Get appointments
+      description: Get appointments for current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [scheduled, confirmed, in_progress, completed, cancelled, no_show]
+      responses:
+        '200':
+          description: Appointments retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Appointment'
+
+    post:
+      tags:
+        - Appointments
+      summary: Create appointment
+      description: Schedule a new appointment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - start_time
+                - end_time
+                - beneficiary_id
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                start_time:
+                  type: string
+                  format: date-time
+                end_time:
+                  type: string
+                  format: date-time
+                location:
+                  type: string
+                beneficiary_id:
+                  type: integer
+                meeting_link:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Appointment created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  appointment:
+                    $ref: '#/components/schemas/Appointment'
+
+  /appointments/{appointment_id}:
+    get:
+      tags:
+        - Appointments
+      summary: Get appointment by ID
+      description: Get detailed appointment information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: appointment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Appointment retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+
+    put:
+      tags:
+        - Appointments
+      summary: Update appointment
+      description: Update appointment information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: appointment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                start_time:
+                  type: string
+                  format: date-time
+                end_time:
+                  type: string
+                  format: date-time
+                location:
+                  type: string
+                status:
+                  type: string
+                  enum: [scheduled, confirmed, in_progress, completed, cancelled, no_show]
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Appointment updated successfully
+
+    delete:
+      tags:
+        - Appointments
+      summary: Cancel appointment
+      description: Cancel an appointment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: appointment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Appointment cancelled successfully
+
+  # Notification Management
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get notifications
+      description: Get notifications for current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: unread_only
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [info, warning, success, error, appointment, evaluation, document]
+      responses:
+        '200':
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  unread_count:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                  total:
+                    type: integer
+
+  /notifications/unread-count:
+    get:
+      tags:
+        - Notifications
+      summary: Get unread count
+      description: Get count of unread notifications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Unread count retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  unread_count:
+                    type: integer
+
+  /notifications/{notification_id}/read:
+    post:
+      tags:
+        - Notifications
+      summary: Mark notification as read
+      description: Mark a specific notification as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: notification_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /notifications/read-all:
+    post:
+      tags:
+        - Notifications
+      summary: Mark all notifications as read
+      description: Mark all notifications as read for current user
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Optional notification type filter
+      responses:
+        '200':
+          description: Notifications marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  # Program Management
+  /programs:
+    get:
+      tags:
+        - Program Management
+      summary: Get programs
+      description: Get all available programs
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Programs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Program'
+
+    post:
+      tags:
+        - Program Management
+      summary: Create program
+      description: Create a new training program
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                code:
+                  type: string
+                duration:
+                  type: integer
+                level:
+                  type: string
+                  enum: [beginner, intermediate, advanced]
+                category:
+                  type: string
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+                prerequisites:
+                  type: string
+                minimum_attendance:
+                  type: number
+                  format: float
+                  default: 80.0
+                passing_score:
+                  type: number
+                  format: float
+                  default: 70.0
+                max_participants:
+                  type: integer
+      responses:
+        '201':
+          description: Program created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+
+  /programs/{program_id}:
+    get:
+      tags:
+        - Program Management
+      summary: Get program by ID
+      description: Get detailed program information including modules
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: program_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Program retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Program'
+                  - type: object
+                    properties:
+                      modules:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            description:
+                              type: string
+                            order:
+                              type: integer
+                            duration_hours:
+                              type: integer
+
+  # Settings Management
+  /settings/general:
+    get:
+      tags:
+        - Settings
+      summary: Get general settings
+      description: Get general settings for current user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Settings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      email:
+                        type: string
+                      username:
+                        type: string
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      role:
+                        type: string
+                      phone:
+                        type: string
+                      timezone:
+                        type: string
+                  tenant:
+                    type: object
+                    properties:
+                      tenant_name:
+                        type: string
+                      tenant_id:
+                        type: integer
+                      tenant_logo:
+                        type: string
+                      tenant_email:
+                        type: string
+                  system:
+                    type: object
+                    properties:
+                      version:
+                        type: string
+                      features:
+                        type: object
+
+    put:
+      tags:
+        - Settings
+      summary: Update general settings
+      description: Update general settings for current user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                    phone:
+                      type: string
+                preferences:
+                  type: object
+                  properties:
+                    timezone:
+                      type: string
+      responses:
+        '200':
+          description: Settings updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: User Management
+    description: User account management and profile operations
+  - name: Beneficiary Management
+    description: Beneficiary profile and data management
+  - name: Evaluation System
+    description: Assessment and evaluation management
+  - name: Document Management
+    description: Document upload, storage, and retrieval
+  - name: Appointments
+    description: Appointment scheduling and management
+  - name: Notifications
+    description: Notification system management
+  - name: Program Management
+    description: Training program management
+  - name: Settings
+    description: Application settings and preferences

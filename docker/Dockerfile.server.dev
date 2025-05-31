@@ -16,11 +16,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     FLASK_ENV=development
 
 # Install Python dependencies
-COPY backend/requirements.txt ./
+COPY server/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY backend/ .
+COPY server/ .
 
 # Create uploads directory
 RUN mkdir -p uploads

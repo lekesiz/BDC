@@ -1,0 +1,96 @@
+name: Coverage Check
+
+on:
+  pull_request:
+    paths:
+      - 'server/**'
+      - '.github/workflows/coverage-check.yml'
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Full history for diff
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('server/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        cd server
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest-cov coverage-badge diff-cover
+    
+    - name: Get base branch coverage
+      run: |
+        cd server
+        git checkout ${{ github.base_ref }}
+        python -m pytest tests/ --cov=app --cov-report=xml:base-coverage.xml --cov-report=term || true
+        cp base-coverage.xml /tmp/
+        git checkout -
+    
+    - name: Run tests with coverage
+      run: |
+        cd server
+        python -m pytest tests/ --cov=app --cov-report=xml:coverage.xml --cov-report=term --cov-report=html
+    
+    - name: Generate diff coverage
+      run: |
+        cd server
+        diff-cover coverage.xml --compare-branch=origin/${{ github.base_ref }} --fail-under=80
+    
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-reports
+        path: |
+          server/coverage.xml
+          server/htmlcov/
+    
+    - name: Comment PR with coverage
+      uses: py-cov-action/python-coverage-comment-action@v3
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        MINIMUM_GREEN: 85
+        MINIMUM_ORANGE: 70
+        ANNOTATE_MISSING_LINES: true
+        ANNOTATION_TYPE: warning
+    
+    - name: Check coverage increase
+      run: |
+        cd server
+        python scripts/check_coverage_increase.py /tmp/base-coverage.xml coverage.xml
+    
+    - name: Update coverage badge
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        cd server
+        coverage-badge -o coverage.svg -f
+        
+    - name: Fail if coverage decreased
+      run: |
+        cd server
+        BASE_COV=$(python -c "import xml.etree.ElementTree as ET; tree = ET.parse('/tmp/base-coverage.xml'); root = tree.getroot(); print(float(root.get('line-rate', 0)) * 100)")
+        CURRENT_COV=$(python -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); root = tree.getroot(); print(float(root.get('line-rate', 0)) * 100)")
+        
+        echo "Base coverage: $BASE_COV%"
+        echo "Current coverage: $CURRENT_COV%"
+        
+        if (( $(echo "$CURRENT_COV < $BASE_COV" | bc -l) )); then
+          echo "Coverage decreased! This PR must increase or maintain coverage."
+          exit 1
+        fi

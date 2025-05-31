@@ -1,0 +1,30 @@
+services:
+  # API servisi - mevcut test API'sini kullanalım
+  test-api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.test-api
+    container_name: bdc_test_api
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    networks:
+      - bdc_network
+
+  # Frontend servisi - React uygulamasını build edip Nginx ile serve edelim
+  frontend:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.frontend
+    container_name: bdc_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    networks:
+      - bdc_network
+    depends_on:
+      - test-api
+
+networks:
+  bdc_network:
+    driver: bridge

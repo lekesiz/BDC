@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import axios from 'axios'
-import api from '../api'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import axios from 'axios';
+import api from '../../services/api';
 
 vi.mock('axios')
 
@@ -140,4 +140,4 @@ describe('API Service', () => {
     expect(axios.delete).toHaveBeenCalledWith('/test/1', undefined)
     expect(result).toEqual(mockResponse)
   })
-})
+});

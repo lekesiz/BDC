@@ -1,0 +1,254 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cdn-config
+  namespace: bdc-production
+data:
+  cloudflare-config.json: |
+    {
+      "zone_id": "${CLOUDFLARE_ZONE_ID}",
+      "settings": {
+        "cache_level": "aggressive",
+        "browser_cache_ttl": 31536000,
+        "edge_cache_ttl": 2592000,
+        "polish": "lossless",
+        "mirage": true,
+        "webp": true,
+        "brotli": true,
+        "minify": {
+          "css": true,
+          "html": true,
+          "js": true
+        },
+        "rocket_loader": true,
+        "http2": true,
+        "http3": true,
+        "0rtt": true,
+        "security_level": "medium",
+        "ssl": "full_strict",
+        "always_use_https": true,
+        "opportunistic_encryption": true,
+        "automatic_https_rewrites": true
+      },
+      "page_rules": [
+        {
+          "targets": ["api.bdc.com/*"],
+          "actions": {
+            "cache_level": "bypass",
+            "disable_apps": true,
+            "disable_performance": true
+          }
+        },
+        {
+          "targets": ["*.bdc.com/static/*"],
+          "actions": {
+            "cache_level": "cache_everything",
+            "edge_cache_ttl": 31536000,
+            "browser_cache_ttl": 31536000
+          }
+        },
+        {
+          "targets": ["*.bdc.com/images/*"],
+          "actions": {
+            "cache_level": "cache_everything",
+            "edge_cache_ttl": 31536000,
+            "browser_cache_ttl": 31536000,
+            "polish": "lossless",
+            "mirage": true
+          }
+        }
+      ],
+      "workers": {
+        "routes": [
+          {
+            "pattern": "*/api/*",
+            "script": "api-router"
+          },
+          {
+            "pattern": "*/health",
+            "script": "health-check"
+          }
+        ]
+      },
+      "firewall_rules": [
+        {
+          "expression": "(cf.threat_score > 50)",
+          "action": "challenge"
+        },
+        {
+          "expression": "(ip.geoip.country in {\"CN\" \"RU\" \"KP\"})",
+          "action": "block"
+        }
+      ],
+      "rate_limiting": [
+        {
+          "threshold": 50,
+          "period": 60,
+          "action": "simulate",
+          "url_pattern": "*/api/*"
+        },
+        {
+          "threshold": 5,
+          "period": 60,
+          "action": "block",
+          "url_pattern": "*/api/auth/login"
+        }
+      ]
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fastly-config
+  namespace: bdc-production
+data:
+  fastly-vcl.vcl: |
+    # Fastly VCL Configuration
+    
+    sub vcl_recv {
+      # Normalize the host header
+      set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");
+      
+      # Remove tracking parameters
+      if (req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|utm_content|gclid|fbclid)=") {
+        set req.url = regsuball(req.url, "(utm_source|utm_medium|utm_campaign|utm_content|gclid|fbclid)=[^&]+&?", "");
+        set req.url = regsub(req.url, "(\?|&)$", "");
+      }
+      
+      # Handle WebSocket upgrade
+      if (req.http.Upgrade ~ "(?i)websocket") {
+        return (pipe);
+      }
+      
+      # Bypass cache for authenticated requests
+      if (req.http.Authorization || req.http.Cookie ~ "session=") {
+        return (pass);
+      }
+      
+      # Cache static assets
+      if (req.url ~ "\.(jpg|jpeg|png|gif|ico|css|js|woff|woff2|ttf|svg|eot)(\?|$)") {
+        unset req.http.Cookie;
+        return (hash);
+      }
+      
+      # API endpoints - no caching
+      if (req.url ~ "^/api/") {
+        return (pass);
+      }
+      
+      # Grace mode for backend failures
+      set req.grace = 6h;
+      
+      return (hash);
+    }
+    
+    sub vcl_hash {
+      # Include protocol in cache key
+      hash_data(req.http.X-Forwarded-Proto);
+      
+      # Include API version if present
+      if (req.http.Accept ~ "application/vnd.api") {
+        hash_data(req.http.Accept);
+      }
+    }
+    
+    sub vcl_backend_response {
+      # Enable grace mode
+      set beresp.grace = 6h;
+      
+      # Cache 404s for a short time
+      if (beresp.status == 404) {
+        set beresp.ttl = 120s;
+      }
+      
+      # Long cache for static assets
+      if (bereq.url ~ "\.(jpg|jpeg|png|gif|ico|css|js|woff|woff2|ttf|svg|eot)(\?|$)") {
+        set beresp.ttl = 365d;
+        set beresp.http.Cache-Control = "public, max-age=31536000, immutable";
+      }
+      
+      # Short cache for HTML
+      if (beresp.http.Content-Type ~ "text/html") {
+        set beresp.ttl = 1h;
+        set beresp.http.Cache-Control = "public, max-age=3600, must-revalidate";
+      }
+      
+      # Enable compression
+      if (beresp.http.Content-Type ~ "text/|application/javascript|application/json") {
+        set beresp.gzip = true;
+      }
+      
+      return (deliver);
+    }
+    
+    sub vcl_deliver {
+      # Add cache status header
+      if (obj.hits > 0) {
+        set resp.http.X-Cache = "HIT";
+        set resp.http.X-Cache-Hits = obj.hits;
+      } else {
+        set resp.http.X-Cache = "MISS";
+      }
+      
+      # Security headers
+      set resp.http.X-Frame-Options = "SAMEORIGIN";
+      set resp.http.X-Content-Type-Options = "nosniff";
+      set resp.http.X-XSS-Protection = "1; mode=block";
+      set resp.http.Referrer-Policy = "strict-origin-when-cross-origin";
+      set resp.http.Permissions-Policy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";
+      
+      # HSTS
+      if (req.http.X-Forwarded-Proto == "https") {
+        set resp.http.Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload";
+      }
+      
+      return (deliver);
+    }
+    
+    sub vcl_error {
+      # Custom error pages
+      if (obj.status == 503 && req.restarts < 3) {
+        return (restart);
+      }
+      
+      # Serve stale content if available
+      if (obj.status >= 500 && obj.status < 600) {
+        return (deliver_stale);
+      }
+      
+      # Default error page
+      synthetic {"
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Error "} + obj.status + {"</title>
+          <style>
+            body { font-family: sans-serif; text-align: center; padding: 50px; }
+            h1 { font-size: 50px; }
+            p { font-size: 20px; }
+          </style>
+        </head>
+        <body>
+          <h1>Error "} + obj.status + {"</h1>
+          <p>"} + obj.response + {"</p>
+          <p>Request ID: "} + req.xid + {"</p>
+        </body>
+        </html>
+      "};
+      
+      return (deliver);
+    }
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cdn-credentials
+  namespace: bdc-production
+type: Opaque
+stringData:
+  cloudflare-api-token: ${CLOUDFLARE_API_TOKEN}
+  fastly-api-key: ${FASTLY_API_KEY}
+  aws-cloudfront-key-id: ${AWS_CLOUDFRONT_KEY_ID}
+  aws-cloudfront-private-key: ${AWS_CLOUDFRONT_PRIVATE_KEY}

@@ -1,0 +1,8 @@
+# Kubernetes namespace for BDC application
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bdc-production
+  labels:
+    name: bdc-production
+    environment: production

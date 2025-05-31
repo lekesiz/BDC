@@ -1,232 +1,233 @@
-"""Tests for authentication service."""
-
 import pytest
-from datetime import datetime
-from unittest.mock import patch, MagicMock
-from flask_jwt_extended import create_access_token, decode_token
+from unittest.mock import Mock, patch, MagicMock
+from datetime import datetime, timedelta, timezone
+from flask_jwt_extended import create_access_token, create_refresh_token
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from app import create_app, db
 from app.models import User, TokenBlocklist
 from app.services.auth_service import AuthService
-from app.extensions import db
-from werkzeug.security import generate_password_hash
-
-@pytest.fixture
-def auth_service():
-    """Create auth service instance."""
-    return AuthService()
 
 
-@pytest.fixture
-def setup_auth_data(session, app):
-    """Setup test data for auth service tests."""
-    with app.app_context():
+class TestAuthService:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.app = create_app('config.TestingConfig')
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        self.client = self.app.test_client()
+        
+        db.create_all()
+        
         # Create test user
-        user = User(
-            username='testuser',
+        self.test_user = User(
             email='test@example.com',
             first_name='Test',
             last_name='User',
-            is_active=True,
-            role='user',
-            tenant_id=1
+            role='student',
+            is_active=True
         )
-        user.password = 'password123'
+        self.test_user.password = 'password123'
+        db.session.add(self.test_user)
+        db.session.commit()
         
-        # Create inactive user
-        inactive_user = User(
-            username='inactiveuser',
-            email='inactive@example.com',
-            first_name='Inactive',
-            last_name='User',
-            is_active=False,
-            role='user',
-            tenant_id=1
-        )
-        inactive_user.password = 'password123'
+        self.auth_service = AuthService()
         
-        session.add_all([user, inactive_user])
-        session.commit()
+        yield
         
-        # Refresh to ensure they're properly attached to the session
-        session.refresh(user)
-        session.refresh(inactive_user)
-        
-        # Get the IDs before closing the session
-        user_id = user.id
-        inactive_user_id = inactive_user.id
-        
-        return {
-            'user': user,
-            'inactive_user': inactive_user,
-            'user_id': user_id,
-            'inactive_user_id': inactive_user_id
-        }
-
-
-@patch('app.services.email_service.send_welcome_email')
-def test_register_user(mock_send_email, auth_service, session, app):
-    """Test user registration."""
-    with app.app_context():
-        user = auth_service.register(
-            email='newuser@example.com',
-            password='SecurePassword123!',
-            first_name='New',
-            last_name='User',
-            role='user'
-        )
-        
-        assert user is not None
-        assert user.email == 'newuser@example.com'
-        assert user.first_name == 'New'
-        assert user.last_name == 'User'
-        assert user.role == 'user'
-        mock_send_email.assert_called_once()
-
-
-@patch('app.services.email_service.send_welcome_email')
-def test_register_duplicate_email(mock_send_email, auth_service, setup_auth_data, session, app):
-    """Test registration with duplicate email."""
-    with app.app_context():
-        user = auth_service.register(
-            email='test@example.com',  # Already exists
-            password='SecurePassword123!',
-            first_name='Another',
-            last_name='User',
-            role='user'
-        )
-        
-        assert user is None
-
-
-def test_login_success(auth_service, setup_auth_data, app):
-    """Test successful login."""
-    with app.app_context():
-        result = auth_service.login('test@example.com', 'password123')
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+    
+    def test_login_success(self):
+        """Test successful login"""
+        result = self.auth_service.login('test@example.com', 'password123')
         
         assert result is not None
         assert 'access_token' in result
         assert 'refresh_token' in result
+        assert 'token_type' in result
         assert result['token_type'] == 'bearer'
-
-
-def test_login_invalid_password(auth_service, setup_auth_data, app):
-    """Test login with invalid password."""
-    with app.app_context():
-        result = auth_service.login('test@example.com', 'wrongpassword')
-        
+        assert result['expires_in'] == 3600
+    
+    def test_login_invalid_credentials(self):
+        """Test login with invalid credentials"""
+        result = self.auth_service.login('test@example.com', 'wrongpassword')
         assert result is None
-
-
-def test_login_nonexistent_user(auth_service, session, app):
-    """Test login with non-existent user."""
-    with app.app_context():
-        result = auth_service.login('nonexistent@example.com', 'password123')
-        
+    
+    def test_login_user_not_found(self):
+        """Test login with non-existent user"""
+        result = self.auth_service.login('nonexistent@example.com', 'password123')
         assert result is None
-
-
-def test_login_inactive_user(auth_service, setup_auth_data, app):
-    """Test login with inactive user."""
-    with app.app_context():
-        result = auth_service.login('inactive@example.com', 'password123')
+    
+    def test_login_inactive_user(self):
+        """Test login with inactive user"""
+        self.test_user.is_active = False
+        db.session.commit()
         
+        result = self.auth_service.login('test@example.com', 'password123')
         assert result is None
-
-
-def test_logout(auth_service, setup_auth_data, app):
-    """Test logout."""
-    with app.app_context():
+    
+    @patch('app.services.email_service.send_welcome_email')
+    def test_register_success(self, mock_send_email):
+        """Test successful user registration"""
+        result = self.auth_service.register(
+            email='newuser@example.com',
+            password='password123',
+            first_name='New',
+            last_name='User',
+            role='student'
+        )
+        
+        assert result is not None
+        assert isinstance(result, User)
+        assert result.email == 'newuser@example.com'
+        assert result.first_name == 'New'
+        assert result.last_name == 'User'
+        assert result.role == 'student'
+        
+        # Check user was created in database
+        user = User.query.filter_by(email='newuser@example.com').first()
+        assert user is not None
+        assert user.verify_password('password123')
+        
+        # Check email was sent
+        mock_send_email.assert_called_once_with(result)
+    
+    def test_register_duplicate_email(self):
+        """Test registration with existing email"""
+        result = self.auth_service.register(
+            email='test@example.com',
+            password='password123',
+            first_name='Another',
+            last_name='User',
+            role='student'
+        )
+        
+        # Should return None due to database constraint
+        assert result is None
+    
+    def test_logout_success(self):
+        """Test successful logout"""
         # Create a mock token
         token = {
-            'jti': 'test_jti_123',
+            'jti': 'test-jti',
             'type': 'access',
-            'sub': setup_auth_data['user_id'],
-            'exp': int((datetime.utcnow().timestamp()) + 3600)
+            'sub': str(self.test_user.id),
+            'exp': int((datetime.now(timezone.utc) + timedelta(hours=1)).timestamp())
         }
         
-        result = auth_service.logout(token)
-        
-        assert result is True
-
-
-def test_change_password(auth_service, setup_auth_data, app):
-    """Test password change."""
-    with app.app_context():
-        user_id = setup_auth_data['user_id']
-        result = auth_service.change_password(
-            user_id,
-            'password123',
-            'NewPassword123!'
-        )
+        result = self.auth_service.logout(token)
         
         assert result is True
         
-        # Verify new password works
-        login_result = auth_service.login('test@example.com', 'NewPassword123!')
-        assert login_result is not None
-
-
-def test_change_password_wrong_current(auth_service, setup_auth_data, app):
-    """Test password change with wrong current password."""
-    with app.app_context():
-        user_id = setup_auth_data['user_id']
-        result = auth_service.change_password(
-            user_id,
-            'wrongpassword',
-            'NewPassword123!'
-        )
+        # Check token was blacklisted
+        blacklisted = TokenBlocklist.query.filter_by(jti='test-jti').first()
+        assert blacklisted is not None
+        assert blacklisted.token_type == 'access'
+        assert blacklisted.user_id == self.test_user.id
+    
+    def test_logout_failure(self):
+        """Test logout failure"""
+        # Create a mock token without proper data
+        token = {
+            'jti': None,  # Invalid jti
+            'type': 'access',
+            'sub': str(self.test_user.id),
+            'exp': int((datetime.now(timezone.utc) + timedelta(hours=1)).timestamp())
+        }
+        
+        result = self.auth_service.logout(token)
         
         assert result is False
-
-
-@patch('app.services.email_service.send_password_reset_email')
-def test_request_password_reset(mock_send_email, auth_service, setup_auth_data, app):
-    """Test password reset request."""
-    with app.app_context():
+    
+    @patch('app.services.email_service.send_password_reset_email')
+    def test_request_password_reset_success(self, mock_send_email):
+        """Test successful password reset request"""
         mock_send_email.return_value = True
         
-        result = auth_service.request_password_reset('test@example.com')
+        result = self.auth_service.request_password_reset('test@example.com')
         
         assert result is True
         mock_send_email.assert_called_once()
-
-
-@patch('app.services.email_service.send_password_reset_email')
-def test_request_password_reset_nonexistent_user(mock_send_email, auth_service, session, app):
-    """Test password reset request for non-existent user."""
-    with app.app_context():
-        result = auth_service.request_password_reset('nonexistent@example.com')
-        
+    
+    def test_request_password_reset_user_not_found(self):
+        """Test password reset for non-existent user"""
+        result = self.auth_service.request_password_reset('nonexistent@example.com')
         assert result is False
-        mock_send_email.assert_not_called()
-
-
-@patch('app.services.email_service.verify_email_token')
-def test_reset_password(mock_verify_token, auth_service, setup_auth_data, app):
-    """Test password reset."""
-    with app.app_context():
-        mock_verify_token.return_value = {'user_id': setup_auth_data['user_id']}
+    
+    @patch('app.services.email_service.verify_email_token')
+    def test_reset_password_success(self, mock_verify_token):
+        """Test successful password reset"""
+        # Mock token verification
+        mock_verify_token.return_value = {'user_id': self.test_user.id}
         
-        result = auth_service.reset_password(
-            'valid_token',
-            'NewPassword123!'
-        )
+        result = self.auth_service.reset_password('valid-token', 'newpassword123')
         
         assert result is True
         
-        # Verify new password works
-        login_result = auth_service.login('test@example.com', 'NewPassword123!')
-        assert login_result is not None
-
-
-@patch('app.services.email_service.verify_email_token')
-def test_reset_password_invalid_token(mock_verify_token, auth_service, app):
-    """Test password reset with invalid token."""
-    with app.app_context():
+        # Check password was changed
+        user = User.query.get(self.test_user.id)
+        assert user.verify_password('newpassword123')
+    
+    @patch('app.services.email_service.verify_email_token')
+    def test_reset_password_invalid_token(self, mock_verify_token):
+        """Test password reset with invalid token"""
+        # Mock token verification failure
         mock_verify_token.return_value = None
         
-        result = auth_service.reset_password(
-            'invalid_token',
-            'NewPassword123!'
-        )
+        result = self.auth_service.reset_password('invalid-token', 'newpassword123')
         
         assert result is False
+    
+    @patch('app.services.email_service.verify_email_token')
+    def test_reset_password_user_not_found(self, mock_verify_token):
+        """Test password reset with valid token but non-existent user"""
+        # Mock token verification with non-existent user
+        mock_verify_token.return_value = {'user_id': 999999}
+        
+        result = self.auth_service.reset_password('valid-token', 'newpassword123')
+        
+        assert result is False
+    
+    def test_register_with_tenant(self):
+        """Test registration with tenant assignment"""
+        from app.models import Tenant
+        
+        # Create a test tenant
+        tenant = Tenant(
+            name='Test Tenant',
+            slug='test-tenant',
+            email='tenant@test.com',
+            is_active=True
+        )
+        db.session.add(tenant)
+        db.session.commit()
+        
+        with patch('app.services.email_service.send_welcome_email'):
+            result = self.auth_service.register(
+                email='tenant_user@example.com',
+                password='password123',
+                first_name='Tenant',
+                last_name='User',
+                role='student',
+                tenant_id=tenant.id
+            )
+        
+        assert result is not None
+        assert tenant in result.tenants
+    
+    def test_last_login_update(self):
+        """Test that last login time is updated on successful login"""
+        # Get initial last_login
+        initial_last_login = self.test_user.last_login
+        
+        # Login
+        result = self.auth_service.login('test@example.com', 'password123')
+        
+        assert result is not None
+        
+        # Refresh user from database
+        user = User.query.get(self.test_user.id)
+        assert user.last_login is not None
+        assert user.last_login > initial_last_login if initial_last_login else True

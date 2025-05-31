@@ -1,0 +1,220 @@
+# BDC Application deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bdc-app
+  namespace: bdc-production
+  labels:
+    app: bdc-app
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: bdc-app
+  template:
+    metadata:
+      labels:
+        app: bdc-app
+    spec:
+      containers:
+      - name: bdc-app
+        image: ghcr.io/your-org/bdc:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: FLASK_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: bdc-config
+              key: FLASK_ENV
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bdc-secrets
+              key: SECRET_KEY
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bdc-secrets
+              key: JWT_SECRET_KEY
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: bdc-secrets
+              key: DATABASE_URL
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: bdc-secrets
+              key: REDIS_URL
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: bdc-config
+              key: LOG_LEVEL
+        - name: CORS_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              name: bdc-config
+              key: CORS_ORIGINS
+        - name: TRUSTED_HOSTS
+          valueFrom:
+            configMapKeyRef:
+              name: bdc-config
+              key: TRUSTED_HOSTS
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bdc-secrets
+              key: OPENAI_API_KEY
+        - name: MAIL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: bdc-secrets
+              key: MAIL_USERNAME
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: bdc-secrets
+              key: MAIL_PASSWORD
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+        - name: logs
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+      initContainers:
+      - name: db-migration
+        image: ghcr.io/your-org/bdc:latest
+        command: ['flask', 'db', 'upgrade']
+        env:
+        - name: FLASK_ENV
+          value: "production"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: bdc-secrets
+              key: DATABASE_URL
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bdc-secrets
+              key: SECRET_KEY
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: logs-pvc
+
+---
+# BDC Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: bdc-app-service
+  namespace: bdc-production
+  labels:
+    app: bdc-app
+spec:
+  selector:
+    app: bdc-app
+  ports:
+  - port: 80
+    targetPort: 8000
+    protocol: TCP
+  type: ClusterIP
+
+---
+# Uploads PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: bdc-production
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: file-storage
+
+---
+# Logs PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: logs-pvc
+  namespace: bdc-production
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: file-storage
+
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: bdc-app-hpa
+  namespace: bdc-production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: bdc-app
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

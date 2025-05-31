@@ -13,6 +13,14 @@ export default {
         "2xl": "1400px",
       },
     },
+    screens: {
+      'xs': '320px',      // iPhone SE
+      'sm': '375px',      // iPhone 6/7/8
+      'md': '414px',      // iPhone Plus
+      'lg': '768px',      // iPad
+      'xl': '1024px',     // Desktop
+      '2xl': '1280px',    // Large Desktop
+    },
     extend: {
       colors: {
         border: "hsl(var(--border))",

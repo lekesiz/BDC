@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useBreakpoint } from '@/hooks/useMediaQuery';
 
 /**
  * Table component
@@ -9,15 +10,40 @@ import { cn } from '@/lib/utils';
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Table component
  */
-export const Table = ({ children, className = '', ...props }) => {
+export const Table = ({ 
+  children, 
+  className = '', 
+  caption,
+  summary,
+  'aria-label': ariaLabel,
+  responsive = true,
+  ...props 
+}) => {
   return (
-    <div className="overflow-x-auto">
-      <table
-        className={cn('min-w-full divide-y divide-gray-200', className)}
-        {...props}
-      >
-        {children}
-      </table>
+    <div className={cn(
+      responsive && "overflow-x-auto -mx-3 sm:-mx-4 lg:mx-0",
+      "rounded-lg"
+    )} role="region" aria-label={ariaLabel || "Data table"}>
+      <div className={responsive && "inline-block min-w-full align-middle"}>
+        <table
+          className={cn(
+            'min-w-full divide-y divide-gray-200 dark:divide-gray-700',
+            responsive && "sm:rounded-lg",
+            className
+          )}
+          role="table"
+          aria-label={ariaLabel}
+          {...props}
+        >
+          {caption && (
+            <caption className="sr-only">{caption}</caption>
+          )}
+          {summary && (
+            <caption className="text-sm text-gray-500 dark:text-gray-400 text-left py-2 px-3 sm:px-6">{summary}</caption>
+          )}
+          {children}
+        </table>
+      </div>
     </div>
   );
 };
@@ -32,7 +58,7 @@ export const Table = ({ children, className = '', ...props }) => {
  */
 export const TableHeader = ({ children, className = '', ...props }) => {
   return (
-    <thead className={cn('bg-gray-50', className)} {...props}>
+    <thead className={cn('bg-gray-50 dark:bg-gray-800', className)} {...props}>
       {children}
     </thead>
   );
@@ -48,7 +74,7 @@ export const TableHeader = ({ children, className = '', ...props }) => {
  */
 export const TableBody = ({ children, className = '', ...props }) => {
   return (
-    <tbody className={cn('bg-white divide-y divide-gray-200', className)} {...props}>
+    <tbody className={cn('bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700', className)} {...props}>
       {children}
     </tbody>
   );
@@ -72,7 +98,8 @@ export const TableRow = ({
   return (
     <tr 
       className={cn(
-        isHeader ? 'bg-gray-50' : 'hover:bg-gray-50',
+        isHeader ? 'bg-gray-50 dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-800',
+        'transition-colors',
         className
       )} 
       {...props}
@@ -95,20 +122,45 @@ export const TableCell = ({
   children, 
   isHeader = false,
   className = '', 
+  scope,
+  colSpan,
+  rowSpan,
+  'aria-sort': ariaSort,
+  mobileLabel,
+  hideOnMobile = false,
   ...props 
 }) => {
   const Component = isHeader ? 'th' : 'td';
+  const { isMobile } = useBreakpoint();
+  
+  // Determine scope for header cells
+  const cellScope = scope || (isHeader ? 'col' : undefined);
+  
+  if (hideOnMobile && isMobile) {
+    return null;
+  }
   
   return (
     <Component
       className={cn(
         isHeader
-          ? 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
-          : 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+          ? 'px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'
+          : 'px-3 sm:px-6 py-3 sm:py-4 text-sm text-gray-900 dark:text-gray-100',
+        !isHeader && 'relative',
         className
       )}
+      scope={cellScope}
+      colSpan={colSpan}
+      rowSpan={rowSpan}
+      aria-sort={ariaSort}
       {...props}
     >
+      {/* Mobile label for better context */}
+      {mobileLabel && !isHeader && (
+        <span className="font-medium text-gray-700 dark:text-gray-300 sm:hidden block mb-1">
+          {mobileLabel}:
+        </span>
+      )}
       {children}
     </Component>
   );
@@ -137,6 +189,7 @@ export const TablePagination = ({
   onPageSizeChange
 }) => {
   const totalPages = propTotalPages || Math.ceil(totalItems / itemsPerPage) || 0;
+  const { isMobile } = useBreakpoint();
   
   // Generate page numbers to display
   const getPageNumbers = () => {
@@ -175,20 +228,28 @@ export const TablePagination = ({
   
   return (
     <div
-      className={cn('flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6', className)}
+      className={cn(
+        'flex items-center justify-between px-3 sm:px-6 py-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700',
+        className
+      )}
     >
       <div className="flex justify-between flex-1 sm:hidden">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          aria-label="Go to previous page"
         >
           Previous
         </button>
+        <span className="text-sm text-gray-700 dark:text-gray-300">
+          {currentPage} / {totalPages}
+        </span>
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          aria-label="Go to next page"
         >
           Next
         </button>
@@ -196,7 +257,7 @@ export const TablePagination = ({
       
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
             Showing{' '}
             <span className="font-medium">
               {Math.min((currentPage - 1) * (itemsPerPage || pageSize || 10) + 1, totalItems || 0)}
@@ -215,7 +276,8 @@ export const TablePagination = ({
             <button
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              aria-label="Go to previous page"
             >
               <span className="sr-only">Previous</span>
               <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -234,11 +296,13 @@ export const TablePagination = ({
                   key={`page-${page}`}
                   onClick={() => onPageChange(page)}
                   className={cn(
-                    'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+                    'relative inline-flex items-center px-3 sm:px-4 py-2 border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors',
                     currentPage === page
                       ? 'z-10 bg-primary border-primary text-white'
-                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                      : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
                   )}
+                  aria-label={`Go to page ${page}`}
+                  aria-current={currentPage === page ? 'page' : undefined}
                 >
                   {page}
                 </button>
@@ -249,7 +313,8 @@ export const TablePagination = ({
             <button
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              aria-label="Go to next page"
             >
               <span className="sr-only">Next</span>
               <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

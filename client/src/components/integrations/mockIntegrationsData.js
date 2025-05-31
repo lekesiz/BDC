@@ -3,49 +3,48 @@ export const generateIntegrationsData = () => {
   return {
     available: [
       {
-        id: "google",
-        name: "Google Workspace",
-        description: "Integrate with Google Calendar, Drive, and Meet",
+        id: "google-calendar",
+        name: "Google Calendar",
+        description: "Sync events and manage appointments with Google Calendar",
         category: "productivity",
         icon: "/api/placeholder/64/64",
         features: [
-          "Calendar synchronization",
-          "File storage and sharing",
-          "Video conferencing",
-          "Document collaboration"
+          "Two-way calendar sync",
+          "Automatic event creation",
+          "Google Meet integration",
+          "Multiple calendar support"
         ],
         status: "connected",
         connectionDetails: {
           email: "user@example.com",
           connectedAt: "2023-11-15T10:30:00Z",
           lastSync: new Date(Date.now() - 3600000).toISOString(),
-          permissions: ["calendar.read", "calendar.write", "drive.read", "meet.create"]
+          permissions: ["calendar.read", "calendar.write", "calendar.events"]
         },
         settings: {
-          calendarSync: true,
-          driveSync: true,
-          meetIntegration: true,
-          autoCreateMeetings: false
+          autoSync: true,
+          syncInterval: 15,
+          autoCreateMeetLinks: true
         }
       },
       {
-        id: "microsoft",
-        name: "Microsoft 365",
-        description: "Connect with Teams, Outlook, and OneDrive",
-        category: "productivity",
+        id: "microsoft-teams",
+        name: "Microsoft Teams",
+        description: "Create meetings and send notifications through Teams",
+        category: "communication",
         icon: "/api/placeholder/64/64",
         features: [
-          "Teams integration",
-          "Outlook calendar sync",
-          "OneDrive storage",
-          "Office document editing"
+          "Teams meeting creation",
+          "Channel notifications",
+          "Direct messaging",
+          "File sharing"
         ],
         status: "disconnected",
         connectionDetails: null,
         settings: {
-          teamsNotifications: true,
-          outlookSync: true,
-          oneDriveBackup: false
+          defaultTeam: "",
+          notificationTypes: true,
+          autoCreateMeetings: true
         }
       },
       {
@@ -101,23 +100,49 @@ export const generateIntegrationsData = () => {
         }
       },
       {
-        id: "github",
-        name: "GitHub",
-        description: "Connect code repositories and submissions",
-        category: "development",
+        id: "google-drive",
+        name: "Google Drive",
+        description: "Store and share documents with Google Drive",
+        category: "storage",
         icon: "/api/placeholder/64/64",
         features: [
-          "Repository access",
-          "Code submission",
-          "Issue tracking",
-          "Pull request integration"
+          "File synchronization",
+          "Folder management",
+          "Sharing permissions",
+          "Automatic backup"
+        ],
+        status: "connected",
+        connectionDetails: {
+          email: "user@example.com",
+          connectedAt: "2023-11-10T14:20:00Z",
+          lastSync: new Date(Date.now() - 1800000).toISOString(),
+          storageUsed: "45.2 GB",
+          storageTotal: "100 GB"
+        },
+        settings: {
+          autoSync: true,
+          syncInterval: 30,
+          preserveFolderStructure: true
+        }
+      },
+      {
+        id: "dropbox",
+        name: "Dropbox",
+        description: "Backup files and sync documents with Dropbox",
+        category: "storage",
+        icon: "/api/placeholder/64/64",
+        features: [
+          "Automatic backup",
+          "Version control",
+          "Team folders",
+          "Smart sync"
         ],
         status: "disconnected",
         connectionDetails: null,
         settings: {
-          autoSubmit: false,
-          privateRepos: true,
-          issueTracking: true
+          autoBackup: true,
+          versioning: true,
+          compression: true
         }
       },
       {
@@ -166,73 +191,27 @@ export const generateIntegrationsData = () => {
         }
       },
       {
-        id: "zapier",
-        name: "Zapier",
-        description: "Automate workflows with 3000+ apps",
+        id: "webhooks",
+        name: "Webhooks",
+        description: "Send real-time updates to external services",
         category: "automation",
         icon: "/api/placeholder/64/64",
         features: [
-          "Workflow automation",
-          "Multi-app integration",
-          "Custom triggers",
-          "Data synchronization"
+          "Custom webhook endpoints",
+          "Event filtering",
+          "Retry logic",
+          "Signature verification"
         ],
         status: "connected",
         connectionDetails: {
-          accountEmail: "user@example.com",
-          connectedAt: "2023-11-01T16:45:00Z",
-          activeZaps: 12,
-          monthlyTasks: 2450
+          activeWebhooks: 3,
+          totalCalls: 156789,
+          successRate: 97.8
         },
         settings: {
-          enableTriggers: true,
-          debugMode: false,
-          taskLimit: 5000
-        }
-      },
-      {
-        id: "pennylane",
-        name: "Pennylane",
-        description: "Accounting and financial management",
-        category: "finance",
-        icon: "/api/placeholder/64/64",
-        features: [
-          "Invoice management",
-          "Expense tracking",
-          "Financial reporting",
-          "Tax preparation"
-        ],
-        status: "connected",
-        connectionDetails: {
-          companyId: "comp_987654321",
-          connectedAt: "2023-08-15T13:30:00Z",
-          syncFrequency: "daily",
-          lastSync: new Date(Date.now() - 86400000).toISOString()
-        },
-        settings: {
-          autoExport: true,
-          categorizeExpenses: true,
-          generateReports: true
-        }
-      },
-      {
-        id: "wedof",
-        name: "Wedof",
-        description: "Training management and certification",
-        category: "education",
-        icon: "/api/placeholder/64/64",
-        features: [
-          "Training program management",
-          "Certification tracking",
-          "Compliance reporting",
-          "Skill assessment"
-        ],
-        status: "disconnected",
-        connectionDetails: null,
-        settings: {
-          syncPrograms: true,
-          importCertifications: true,
-          exportReports: true
+          retryAttempts: 3,
+          timeout: 30,
+          enableLogging: true
         }
       },
       {

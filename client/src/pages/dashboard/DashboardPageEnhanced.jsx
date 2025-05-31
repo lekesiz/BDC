@@ -179,7 +179,7 @@ const DashboardPageEnhanced = () => {
             </div>
           </div>
         </div>
-      </Card>
+      </AnimatedCard>
     </Link>
   );
 
@@ -275,10 +275,10 @@ const DashboardPageEnhanced = () => {
               </>
             )}
           </AsyncBoundary>
-        </div>
+        </motion.div>
 
         {/* Main content grid */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <motion.div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Recent Tests Section */}
           <AsyncBoundary
             loading={testsAsync.loading}

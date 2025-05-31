@@ -11,8 +11,8 @@ class Appointment(db.Model):
     __tablename__ = 'appointments'
     
     id = Column(Integer, primary_key=True)
-    beneficiary_id = Column(Integer, ForeignKey('beneficiaries.id'), nullable=False)
-    trainer_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    beneficiary_id = Column(Integer, ForeignKey('beneficiaries.id', ondelete='CASCADE'), nullable=False)
+    trainer_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     title = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
     start_time = Column(DateTime, nullable=False)
@@ -25,8 +25,8 @@ class Appointment(db.Model):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    beneficiary = relationship('Beneficiary', back_populates='appointments')
-    trainer = relationship('User', backref='trainer_appointments')
+    beneficiary = relationship('Beneficiary', back_populates='appointments', lazy='select')
+    trainer = relationship('User', backref='trainer_appointments', lazy='select')
     
     def to_dict(self):
         """Return a dict representation of the appointment."""

@@ -1,41 +1,23 @@
-"""Authentication API."""
+"""Improved authentication API with dependency injection."""
 
 from flask import Blueprint, request, jsonify, current_app
-from flask_jwt_extended import (
-    jwt_required, get_jwt_identity, get_jwt, create_access_token, 
-    create_refresh_token
-)
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from marshmallow import ValidationError
 
-from app.extensions import db, logger
 from app.schemas import (
     LoginSchema, RegisterSchema, TokenSchema, RefreshTokenSchema,
     ResetPasswordRequestSchema, ResetPasswordSchema, ChangePasswordSchema
 )
-from app.services import AuthService
-from app.models import User
+from app.core.improved_container import get_auth_service
+from app.services.interfaces.auth_service_interface import IAuthService
 
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/debug', methods=['GET'])
-def debug_auth():
-    """Debug endpoint to check auth."""
-    from app.models import User
-    admin = User.query.filter_by(email='admin@bdc.com').first()
-    
-    return jsonify({
-        'admin_exists': admin is not None,
-        'admin_active': admin.is_active if admin else None,
-        'admin_role': admin.role if admin else None,
-        'password_test': admin.verify_password('Admin123!') if admin else None,
-        'total_users': User.query.count()
-    })
-
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    """User login endpoint."""
+    """User login endpoint with improved architecture."""
     try:
         # Get JSON data
         json_data = request.get_json()
@@ -57,39 +39,26 @@ def login():
                 'errors': e.messages
             }), 400
         
+        # Get auth service through dependency injection
+        auth_service: IAuthService = get_auth_service()
+        
         # Authenticate user
-        tokens = AuthService.login(
+        result = auth_service.login(
             email=data['email'],
             password=data['password'],
             remember=data.get('remember', False)
         )
         
-        if not tokens:
+        if not result:
             return jsonify({
                 'error': 'invalid_credentials',
                 'message': 'Invalid email or password'
             }), 401
         
-        # Get user data to include in response
-        from app.models import User
-        user = User.query.filter_by(email=data['email']).first()
-        
-        # Return tokens with user data
-        response_data = {
-            **tokens,
-            'user': {
-                'id': user.id,
-                'email': user.email,
-                'username': user.username,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'role': user.role
-            }
-        }
-        return jsonify(response_data), 200
+        return jsonify(result), 200
     
     except Exception as e:
-        logger.exception(f"Login error: {str(e)}")
+        current_app.logger.exception(f"Login error: {str(e)}")
         return jsonify({
             'error': 'server_error',
             'message': 'An unexpected error occurred'
@@ -98,48 +67,54 @@ def login():
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    """User registration endpoint."""
+    """User registration endpoint with improved architecture."""
     try:
+        # Get JSON data
+        json_data = request.get_json()
+        
+        if not json_data:
+            return jsonify({
+                'error': 'invalid_request',
+                'message': 'Request body is empty'
+            }), 400
+        
         # Validate request data
         schema = RegisterSchema()
-        data = schema.load(request.json)
+        try:
+            data = schema.load(json_data)
+        except ValidationError as e:
+            return jsonify({
+                'error': 'validation_error',
+                'message': 'Validation failed',
+                'errors': e.messages
+            }), 400
+        
+        # Get auth service through dependency injection
+        auth_service: IAuthService = get_auth_service()
         
         # Register user
-        user = AuthService.register(
+        user = auth_service.register(
             email=data['email'],
             password=data['password'],
             first_name=data['first_name'],
             last_name=data['last_name'],
-            role=data.get('role', 'student')
+            role=data.get('role', 'student'),
+            tenant_id=data.get('tenant_id')
         )
         
         if not user:
             return jsonify({
                 'error': 'registration_failed',
-                'message': 'Registration failed'
+                'message': 'User registration failed. Email may already exist.'
             }), 400
         
-        # Create tokens
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
-        
-        # Return tokens
         return jsonify({
-            'access_token': access_token,
-            'refresh_token': refresh_token,
-            'token_type': 'bearer',
-            'expires_in': 3600  # 1 hour in seconds
+            'message': 'User registered successfully',
+            'user_id': user.id
         }), 201
     
-    except ValidationError as e:
-        return jsonify({
-            'error': 'validation_error',
-            'message': 'Validation failed',
-            'errors': e.messages
-        }), 400
-    
     except Exception as e:
-        logger.exception(f"Registration error: {str(e)}")
+        current_app.logger.exception(f"Registration error: {str(e)}")
         return jsonify({
             'error': 'server_error',
             'message': 'An unexpected error occurred'
@@ -149,23 +124,26 @@ def register():
 @auth_bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
 def refresh():
-    """Token refresh endpoint."""
+    """Token refresh endpoint with improved architecture."""
     try:
-        # Get user identity
         user_id = get_jwt_identity()
         
-        # Create new access token
-        access_token = create_access_token(identity=user_id)
+        # Get auth service through dependency injection
+        auth_service: IAuthService = get_auth_service()
         
-        # Return new access token
-        return jsonify({
-            'access_token': access_token,
-            'token_type': 'bearer',
-            'expires_in': 3600  # 1 hour in seconds
-        }), 200
+        # Refresh token
+        result = auth_service.refresh_token(user_id)
+        
+        if not result:
+            return jsonify({
+                'error': 'refresh_failed',
+                'message': 'Failed to refresh token'
+            }), 401
+        
+        return jsonify(result), 200
     
     except Exception as e:
-        logger.exception(f"Token refresh error: {str(e)}")
+        current_app.logger.exception(f"Token refresh error: {str(e)}")
         return jsonify({
             'error': 'server_error',
             'message': 'An unexpected error occurred'
@@ -175,98 +153,28 @@ def refresh():
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
 def logout():
-    """User logout endpoint."""
+    """User logout endpoint with improved architecture."""
     try:
-        # Get JWT token
-        token = get_jwt()
+        jti = get_jwt()['jti']
         
-        # Revoke token
-        success = AuthService.logout(token)
+        # Get auth service through dependency injection
+        auth_service: IAuthService = get_auth_service()
+        
+        # Logout user
+        success = auth_service.logout(jti)
         
         if not success:
             return jsonify({
                 'error': 'logout_failed',
-                'message': 'Logout failed'
-            }), 400
+                'message': 'Failed to logout'
+            }), 500
         
-        # Return success response
         return jsonify({
             'message': 'Successfully logged out'
         }), 200
     
     except Exception as e:
-        logger.exception(f"Logout error: {str(e)}")
-        return jsonify({
-            'error': 'server_error',
-            'message': 'An unexpected error occurred'
-        }), 500
-
-
-@auth_bp.route('/reset-password/request', methods=['POST'])
-def request_password_reset():
-    """Password reset request endpoint."""
-    try:
-        # Validate request data
-        schema = ResetPasswordRequestSchema()
-        data = schema.load(request.json)
-        
-        # Request password reset
-        success = AuthService.request_password_reset(data['email'])
-        
-        # Always return success to prevent email enumeration
-        return jsonify({
-            'message': 'If your email is registered, you will receive a password reset link'
-        }), 200
-    
-    except ValidationError as e:
-        return jsonify({
-            'error': 'validation_error',
-            'message': 'Validation failed',
-            'errors': e.messages
-        }), 400
-    
-    except Exception as e:
-        logger.exception(f"Password reset request error: {str(e)}")
-        return jsonify({
-            'error': 'server_error',
-            'message': 'An unexpected error occurred'
-        }), 500
-
-
-@auth_bp.route('/reset-password', methods=['POST'])
-def reset_password():
-    """Password reset endpoint."""
-    try:
-        # Validate request data
-        schema = ResetPasswordSchema()
-        data = schema.load(request.json)
-        
-        # Reset password
-        success = AuthService.reset_password(
-            token=data['token'],
-            password=data['password']
-        )
-        
-        if not success:
-            return jsonify({
-                'error': 'reset_failed',
-                'message': 'Password reset failed'
-            }), 400
-        
-        # Return success response
-        return jsonify({
-            'message': 'Password reset successful'
-        }), 200
-    
-    except ValidationError as e:
-        return jsonify({
-            'error': 'validation_error',
-            'message': 'Validation failed',
-            'errors': e.messages
-        }), 400
-    
-    except Exception as e:
-        logger.exception(f"Password reset error: {str(e)}")
+        current_app.logger.exception(f"Logout error: {str(e)}")
         return jsonify({
             'error': 'server_error',
             'message': 'An unexpected error occurred'
@@ -276,17 +184,35 @@ def reset_password():
 @auth_bp.route('/change-password', methods=['POST'])
 @jwt_required()
 def change_password():
-    """Password change endpoint."""
+    """Change password endpoint with improved architecture."""
     try:
-        # Get user identity
-        user_id = get_jwt_identity()
+        # Get JSON data
+        json_data = request.get_json()
+        
+        if not json_data:
+            return jsonify({
+                'error': 'invalid_request',
+                'message': 'Request body is empty'
+            }), 400
         
         # Validate request data
         schema = ChangePasswordSchema()
-        data = schema.load(request.json)
+        try:
+            data = schema.load(json_data)
+        except ValidationError as e:
+            return jsonify({
+                'error': 'validation_error',
+                'message': 'Validation failed',
+                'errors': e.messages
+            }), 400
+        
+        user_id = get_jwt_identity()
+        
+        # Get auth service through dependency injection
+        auth_service: IAuthService = get_auth_service()
         
         # Change password
-        success = AuthService.change_password(
+        success = auth_service.change_password(
             user_id=user_id,
             current_password=data['current_password'],
             new_password=data['new_password']
@@ -294,24 +220,67 @@ def change_password():
         
         if not success:
             return jsonify({
-                'error': 'change_failed',
-                'message': 'Password change failed'
+                'error': 'change_password_failed',
+                'message': 'Failed to change password. Current password may be incorrect.'
             }), 400
         
-        # Return success response
         return jsonify({
             'message': 'Password changed successfully'
         }), 200
     
-    except ValidationError as e:
+    except Exception as e:
+        current_app.logger.exception(f"Change password error: {str(e)}")
         return jsonify({
-            'error': 'validation_error',
-            'message': 'Validation failed',
-            'errors': e.messages
-        }), 400
+            'error': 'server_error',
+            'message': 'An unexpected error occurred'
+        }), 500
+
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    """Reset password endpoint with improved architecture."""
+    try:
+        # Get JSON data
+        json_data = request.get_json()
+        
+        if not json_data:
+            return jsonify({
+                'error': 'invalid_request',
+                'message': 'Request body is empty'
+            }), 400
+        
+        # Validate request data
+        schema = ResetPasswordSchema()
+        try:
+            data = schema.load(json_data)
+        except ValidationError as e:
+            return jsonify({
+                'error': 'validation_error',
+                'message': 'Validation failed',
+                'errors': e.messages
+            }), 400
+        
+        # Get auth service through dependency injection
+        auth_service: IAuthService = get_auth_service()
+        
+        # Reset password
+        success = auth_service.reset_password(
+            email=data['email'],
+            new_password=data['new_password']
+        )
+        
+        if not success:
+            return jsonify({
+                'error': 'reset_password_failed',
+                'message': 'Failed to reset password. User may not exist.'
+            }), 400
+        
+        return jsonify({
+            'message': 'Password reset successfully'
+        }), 200
     
     except Exception as e:
-        logger.exception(f"Password change error: {str(e)}")
+        current_app.logger.exception(f"Reset password error: {str(e)}")
         return jsonify({
             'error': 'server_error',
             'message': 'An unexpected error occurred'

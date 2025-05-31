@@ -332,6 +332,7 @@ const PortalDashboardV3 = () => {
               </Button>
             </Link>
           </AnimatedCard>
+          </OptimizedAnimation>
 
           {/* Achievements */}
           <AnimatedCard className="p-6">

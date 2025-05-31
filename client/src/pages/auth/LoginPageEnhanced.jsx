@@ -277,10 +277,10 @@ const LoginPageEnhanced = () => {
         {process.env.NODE_ENV === 'development' && (
           <div className="mt-4 text-xs text-gray-500 text-center">
             <p>Test accounts:</p>
-            <p>admin@bdc.com / Admin123!</p>
-            <p>tenant@bdc.com / Tenant123!</p>
-            <p>trainer@bdc.com / Trainer123!</p>
-            <p>student@bdc.com / Student123!</p>
+            <p>admin@bdc.com / admin123</p>
+            <p>tenant@bdc.com / tenant123</p>
+            <p>trainer@bdc.com / trainer123</p>
+            <p>student@bdc.com / student123</p>
           </div>
         )}
       </motion.div>

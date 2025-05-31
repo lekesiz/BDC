@@ -17,6 +17,9 @@ import { setupComplianceMockApi } from '@/components/compliance/setupComplianceM
 import { setupNotificationsMockApi } from '@/components/notifications/setupNotificationsMockApi';
 import { setupAnalyticsMockApi } from '@/components/analytics/setupAnalyticsMockApi';
 import { setupAISettingsMockApi } from '@/components/settings/setupAISettingsMockApi';
+import { setupBeneficiariesMockApi } from '@/lib/mockData/setupBeneficiariesMockApi';
+import { setupUsersMockApi } from '@/lib/mockData/setupUsersMockApi';
+import { setupQuickMockAPIs } from '@/lib/mockData/quickMockData';
 
 // This function sets up all mock API handlers
 export const setupMockApi = (api) => {
@@ -25,6 +28,35 @@ export const setupMockApi = (api) => {
   const originalPost = api.post;
   const originalPut = api.put;
   const originalDelete = api.delete;
+  
+  // Create a hybrid approach: auth endpoints go to real backend, others use mock
+  const hybridGet = (url, config) => {
+    if (url.includes('/api/auth/') || url.includes('/api/users/me')) {
+      return originalGet.call(api, url, config);
+    }
+    return api.get.call(api, url, config);
+  };
+  
+  const hybridPost = (url, data, config) => {
+    if (url.includes('/api/auth/')) {
+      return originalPost.call(api, url, data, config);
+    }
+    return api.post.call(api, url, data, config);
+  };
+  
+  const hybridPut = (url, data, config) => {
+    if (url.includes('/api/auth/')) {
+      return originalPut.call(api, url, data, config);
+    }
+    return api.put.call(api, url, data, config);
+  };
+  
+  const hybridDelete = (url, config) => {
+    if (url.includes('/api/auth/')) {
+      return originalDelete.call(api, url, config);
+    }
+    return api.delete.call(api, url, config);
+  };
   
   // Set up evaluation mock API
   setupEvaluationMockApi(api);
@@ -52,6 +84,12 @@ export const setupMockApi = (api) => {
   
   // Set up beneficiary details mock API
   setupBeneficiaryMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up comprehensive beneficiaries mock API
+  setupBeneficiariesMockApi(api, hybridGet, hybridPost, hybridPut, hybridDelete);
+  
+  // Set up users mock API  
+  setupUsersMockApi(api, hybridGet, hybridPost, hybridPut, hybridDelete);
   
   // Set up dashboard mock API
   setupDashboardMockApi(api, originalGet, originalPost, originalPut, originalDelete);
@@ -82,4 +120,9 @@ export const setupMockApi = (api) => {
   
   // Set up AI settings mock API
   setupAISettingsMockApi(api, originalGet, originalPost, originalPut, originalDelete);
+  
+  // Set up quick mock APIs for remaining components
+  setupQuickMockAPIs(api, hybridGet, hybridPost, hybridPut, hybridDelete);
+  
+  console.log('🎭 All Mock APIs setup completed - Demo data ready!');
 };

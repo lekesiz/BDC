@@ -143,15 +143,20 @@ const BeneficiariesPage = () => {
       <Card>
         <div className="p-4 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row gap-4">
-            <form onSubmit={handleSearch} className="flex-1">
+            <form onSubmit={handleSearch} className="flex-1" role="search">
               <div className="relative">
+                <label htmlFor="beneficiary-search" className="sr-only">
+                  Search beneficiaries by name, email or phone
+                </label>
                 <Input
+                  id="beneficiary-search"
                   type="text"
                   placeholder="Search by name, email or phone..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   leftIcon={<Search className="h-4 w-4 text-gray-400" />}
                   className="w-full"
+                  aria-label="Search beneficiaries by name, email or phone"
                 />
               </div>
             </form>
@@ -161,6 +166,9 @@ const BeneficiariesPage = () => {
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
                 leftIcon={<Filter className="h-4 w-4" />}
+                aria-expanded={showFilters}
+                aria-controls="filter-section"
+                aria-label={showFilters ? 'Hide filters' : 'Show filters'}
               >
                 Filters
               </Button>
@@ -176,7 +184,12 @@ const BeneficiariesPage = () => {
           </div>
           
           {showFilters && (
-            <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div 
+              id="filter-section" 
+              className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+              role="region"
+              aria-label="Beneficiary filters"
+            >
               <div>
                 <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-1">
                   Status

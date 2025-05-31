@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  backend:
+  server:
     image: ghcr.io/${GITHUB_REPOSITORY}/bdc-server:${TAG:-latest}
-    container_name: bdc-backend-prod
+    container_name: bdc-server-prod
     environment:
       - FLASK_ENV=production
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/bdc_production
@@ -117,7 +117,7 @@ services:
       - ./ssl/prod:/etc/nginx/ssl:ro
       - ./static:/usr/share/nginx/static:ro
     depends_on:
-      - backend
+      - server
       - frontend
     restart: always
     networks:

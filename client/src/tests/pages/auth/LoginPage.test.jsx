@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import LoginPage from '../../../pages/auth/LoginPage'
-import { render } from '../../../test/test-utils'
-import * as authService from '../../../services/auth.service'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import LoginPage from '../../../pages/auth/LoginPage';
+import { render } from '../../../test/test-utils';
+import * as authService from '../../../services/auth.service';
 
 // Mock auth service
 vi.mock('../../../services/auth.service', () => ({

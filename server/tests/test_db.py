@@ -1,47 +1,25 @@
 #!/usr/bin/env python3
-"""Test database models and relationships."""
+"""Manual DB inspection script (skipped in automated tests)."""
 
-import sys
-sys.path.insert(0, '/Users/mikail/Desktop/BDC/server')
+import pytest
 
-from app.extensions import db
-from app import create_app
-from app.models.beneficiary import Beneficiary, Note, BeneficiaryDocument
-from app.models.document import Document
-from app.models.evaluation import Evaluation
+# Skip during pytest collection
+pytest.skip("Diagnostic DB script – skip during automated unit tests", allow_module_level=True)
 
-# Create app with test config
-app = create_app()
+# Original diagnostic code retained below for on-demand manual runs.
 
-with app.app_context():
-    # Try to create tables
-    try:
-        db.create_all()
-        print("✓ Database tables created successfully")
-    except Exception as e:
-        print(f"✗ Error creating tables: {e}")
-        
-    # Test model relationships
-    try:
-        # Test Beneficiary relationships
-        b = Beneficiary()
-        print(f"✓ Beneficiary model created")
-        
-        # Test Document relationships
-        d = Document()
-        print(f"✓ Document model created")
-        
-        # Test Evaluation relationships
-        e = Evaluation()
-        print(f"✓ Evaluation model created")
-        
-        # Test Note relationships
-        n = Note()
-        print(f"✓ Note model created")
-        
-        print("\n✓ All models and relationships are properly configured!")
-        
-    except Exception as e:
-        print(f"\n✗ Error with model relationships: {e}")
-        import traceback
-        traceback.print_exc()
+import sys  # noqa: E402
+sys.path.insert(0, '/Users/mikail/Desktop/BDC/server')  # noqa: E402
+
+from app.extensions import db  # noqa: E402
+from app import create_app  # noqa: E402
+from app.models.beneficiary import Beneficiary, Note, BeneficiaryDocument  # noqa: E402
+from app.models.document import Document  # noqa: E402
+from app.models.evaluation import Evaluation  # noqa: E402
+
+# Create app with default config (requires running DB when executed manually)
+app = create_app()  # noqa: E402
+
+with app.app_context():  # noqa: E402
+    db.create_all()
+    print("✓ Tables created successfully (manual run)")

@@ -32,12 +32,12 @@ def get_calendar_events():
         if user.role == 'trainee':
             appointments = Appointment.query.filter(
                 Appointment.beneficiary_id == user.id,
-                Appointment.datetime.between(start, end)
+                Appointment.start_time.between(start, end)
             ).all()
         else:
             appointments = Appointment.query.filter(
                 Appointment.trainer_id == user_id,
-                Appointment.datetime.between(start, end)
+                Appointment.start_time.between(start, end)
             ).all()
         
         # Format events for calendar
@@ -46,9 +46,9 @@ def get_calendar_events():
             events.append({
                 'id': appointment.id,
                 'title': appointment.title,
-                'start': appointment.datetime.isoformat(),
-                'end': (appointment.datetime + timedelta(hours=appointment.duration)).isoformat(),
-                'type': appointment.appointment_type,
+                'start': appointment.start_time.isoformat(),
+                'end': appointment.end_time.isoformat(),
+                'type': 'appointment',
                 'status': appointment.status,
                 'description': appointment.description,
                 'beneficiary': {
@@ -87,8 +87,7 @@ def get_calendar_events():
                             
                             # Check if this slot is not already booked
                             is_booked = any(
-                                appointment.datetime <= slot_start < 
-                                appointment.datetime + timedelta(hours=appointment.duration)
+                                appointment.start_time <= slot_start < appointment.end_time
                                 for appointment in appointments
                             )
                             

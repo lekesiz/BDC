@@ -1,11 +1,28 @@
-"""WSGI entry point for the application."""
+#!/usr/bin/env python3
+"""WSGI entry point for production deployment."""
 
 import os
-from app import create_app, socketio
+import sys
+from pathlib import Path
 
-app = create_app()
+# Add the server directory to Python path
+current_dir = Path(__file__).parent
+sys.path.insert(0, str(current_dir))
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5001))
-    # Use socketio.run instead of app.run for WebSocket support
-    socketio.run(app, host='0.0.0.0', port=port, debug=True)
+# Set production environment
+os.environ.setdefault('FLASK_ENV', 'production')
+
+from app import create_app
+from app.extensions import socketio
+
+# Create application instance
+application = create_app()
+
+# For Gunicorn with SocketIO support
+app = application
+
+if __name__ == "__main__":
+    # Development server with SocketIO support
+    port = int(os.environ.get('PORT', 8000))
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    socketio.run(application, host='0.0.0.0', port=port, debug=debug)

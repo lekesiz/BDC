@@ -13,13 +13,26 @@ import { cn } from "@/lib/utils";
  */
 const ToastContainer = ({ className, ...props }) => {
   return (
-    <div
-      className={cn(
-        "fixed top-0 right-0 z-50 flex flex-col p-4 space-y-4 sm:p-6",
-        className
-      )}
-      {...props}
-    />
+    <>
+      {/* Screen reader announcements */}
+      <div 
+        className="sr-only" 
+        role="region" 
+        aria-live="polite" 
+        aria-atomic="true"
+        aria-label="Notifications"
+      />
+      
+      {/* Visual toasts */}
+      <div
+        className={cn(
+          "fixed top-0 right-0 z-50 flex flex-col p-4 space-y-4 sm:p-6",
+          className
+        )}
+        aria-label="Toast notifications"
+        {...props}
+      />
+    </>
   );
 };
 
@@ -28,20 +41,24 @@ const ToastContainer = ({ className, ...props }) => {
  */
 const TOAST_TYPES = {
   success: {
-    icon: <CheckCircle className="w-5 h-5" />,
+    icon: <CheckCircle className="w-5 h-5" aria-hidden="true" />,
     className: "bg-green-50 border-green-100 text-green-800",
+    ariaLive: "polite",
   },
   error: {
-    icon: <AlertCircle className="w-5 h-5" />,
+    icon: <AlertCircle className="w-5 h-5" aria-hidden="true" />,
     className: "bg-red-50 border-red-100 text-red-800",
+    ariaLive: "assertive",
   },
   info: {
-    icon: <Info className="w-5 h-5" />,
+    icon: <Info className="w-5 h-5" aria-hidden="true" />,
     className: "bg-blue-50 border-blue-100 text-blue-800",
+    ariaLive: "polite",
   },
   warning: {
-    icon: <AlertTriangle className="w-5 h-5" />,
+    icon: <AlertTriangle className="w-5 h-5" aria-hidden="true" />,
     className: "bg-yellow-50 border-yellow-100 text-yellow-800",
+    ariaLive: "polite",
   },
 };
 
@@ -68,10 +85,24 @@ const Toast = ({
   className,
   ...props
 }) => {
-  const { icon, className: typeClassName } = TOAST_TYPES[type] || TOAST_TYPES.info;
+  const { icon, className: typeClassName, ariaLive } = TOAST_TYPES[type] || TOAST_TYPES.info;
+  const toastRef = React.useRef(null);
   
-  // Auto-close toast after duration
+  // Auto-close toast after duration and announce to screen readers
   React.useEffect(() => {
+    // Announce to screen readers
+    const announcement = document.querySelector('[role="region"][aria-live]');
+    if (announcement) {
+      const message = `${type} notification: ${title || ''} ${message || ''}`;
+      announcement.setAttribute('aria-live', ariaLive);
+      announcement.textContent = message;
+      
+      // Clear announcement after a delay
+      setTimeout(() => {
+        announcement.textContent = '';
+      }, 1000);
+    }
+    
     if (duration) {
       const timer = setTimeout(() => {
         onClose && onClose(id);
@@ -79,10 +110,14 @@ const Toast = ({
       
       return () => clearTimeout(timer);
     }
-  }, [duration, id, onClose]);
+  }, [duration, id, onClose, type, title, message, ariaLive]);
   
   return (
     <div
+      ref={toastRef}
+      role="alert"
+      aria-live={ariaLive}
+      aria-atomic="true"
       className={cn(
         "flex w-full max-w-sm overflow-hidden rounded-lg shadow-lg border",
         "transform transition-all duration-500 ease-in-out",
@@ -113,8 +148,9 @@ const Toast = ({
             "hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-primary",
             "transition-colors"
           )}
+          aria-label="Close notification"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
     </div>

@@ -1,0 +1,30 @@
+# ConfigMap for BDC application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bdc-config
+  namespace: bdc-production
+data:
+  FLASK_ENV: "production"
+  LOG_LEVEL: "INFO"
+  LOG_FORMAT: "json"
+  CORS_ORIGINS: "https://yourdomain.com,https://www.yourdomain.com"
+  TRUSTED_HOSTS: "yourdomain.com,www.yourdomain.com"
+  CACHE_TYPE: "RedisCache"
+  CACHE_DEFAULT_TIMEOUT: "300"
+  RATELIMIT_DEFAULT: "60 per minute"
+  RATELIMIT_STRATEGY: "sliding-window"
+  MAX_CONTENT_LENGTH: "10485760"  # 10MB
+  PROMETHEUS_ENABLED: "true"
+  METRICS_PORT: "9090"
+  ENABLE_AI_FEATURES: "true"
+  ENABLE_GOOGLE_CALENDAR: "true"
+  ENABLE_FILE_UPLOADS: "true"
+  ENABLE_REALTIME_NOTIFICATIONS: "true"
+  BACKUP_SCHEDULE: "0 2 * * *"
+  HEALTH_CHECK_TIMEOUT: "30"
+  HEALTH_CHECK_INTERVAL: "60"
+  WORKER_PROCESSES: "4"
+  WORKER_CONNECTIONS: "1000"
+  WORKER_TIMEOUT: "30"
+  WORKER_KEEPALIVE: "5"

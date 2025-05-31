@@ -1,0 +1,250 @@
+groups:
+  - name: performance_alerts
+    interval: 30s
+    rules:
+      # Response Time Alerts
+      - alert: HighResponseTime
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le, method, endpoint)
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High response time on {{ $labels.endpoint }}"
+          description: "95th percentile response time is {{ $value }}s for {{ $labels.method }} {{ $labels.endpoint }}"
+
+      - alert: VeryHighResponseTime
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le, method, endpoint)
+          ) > 3
+        for: 2m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Critical response time on {{ $labels.endpoint }}"
+          description: "95th percentile response time is {{ $value }}s for {{ $labels.method }} {{ $labels.endpoint }}"
+
+      # Error Rate Alerts
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m])) by (method, endpoint)
+          /
+          sum(rate(http_requests_total[5m])) by (method, endpoint)
+          > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High error rate on {{ $labels.endpoint }}"
+          description: "Error rate is {{ $value | humanizePercentage }} for {{ $labels.method }} {{ $labels.endpoint }}"
+
+      - alert: CriticalErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m])) by (method, endpoint)
+          /
+          sum(rate(http_requests_total[5m])) by (method, endpoint)
+          > 0.1
+        for: 2m
+        labels:
+          severity: critical
+          team: backend
+          page: true
+        annotations:
+          summary: "Critical error rate on {{ $labels.endpoint }}"
+          description: "Error rate is {{ $value | humanizePercentage }} for {{ $labels.method }} {{ $labels.endpoint }}"
+
+      # Database Performance Alerts
+      - alert: SlowDatabaseQueries
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(database_query_duration_seconds_bucket[5m])) by (le, query_type)
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          team: database
+        annotations:
+          summary: "Slow database queries detected"
+          description: "95th percentile query time is {{ $value }}s for {{ $labels.query_type }} queries"
+
+      - alert: DatabaseConnectionPoolExhausted
+        expr: |
+          (database_connection_pool_size - database_connection_pool_available) 
+          / database_connection_pool_size > 0.9
+        for: 2m
+        labels:
+          severity: critical
+          team: database
+        annotations:
+          summary: "Database connection pool near exhaustion"
+          description: "{{ $value | humanizePercentage }} of connection pool is in use"
+
+      # Memory Alerts
+      - alert: HighMemoryUsage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value | humanizePercentage }}"
+
+      - alert: OutOfMemory
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.95
+        for: 2m
+        labels:
+          severity: critical
+          team: infrastructure
+          page: true
+        annotations:
+          summary: "Critical memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value | humanizePercentage }}, OOM killer may activate"
+
+      # CPU Alerts
+      - alert: HighCPUUsage
+        expr: |
+          100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}%"
+
+      - alert: CriticalCPUUsage
+        expr: |
+          100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "Critical CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}%"
+
+      # Cache Performance Alerts
+      - alert: LowCacheHitRate
+        expr: |
+          sum(rate(cache_hits_total[5m])) by (cache_name)
+          /
+          (sum(rate(cache_hits_total[5m])) by (cache_name) + sum(rate(cache_misses_total[5m])) by (cache_name))
+          < 0.5
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Low cache hit rate for {{ $labels.cache_name }}"
+          description: "Cache hit rate is {{ $value | humanizePercentage }}"
+
+      # Request Rate Alerts
+      - alert: HighRequestRate
+        expr: |
+          sum(rate(http_requests_total[1m])) > 10000
+        for: 5m
+        labels:
+          severity: info
+          team: infrastructure
+        annotations:
+          summary: "High request rate detected"
+          description: "Request rate is {{ $value }} req/s"
+
+      - alert: RequestRateAnomaly
+        expr: |
+          abs(
+            sum(rate(http_requests_total[5m])) - 
+            sum(rate(http_requests_total[5m] offset 1h))
+          ) / sum(rate(http_requests_total[5m] offset 1h)) > 2
+        for: 10m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "Unusual request rate pattern detected"
+          description: "Request rate changed by {{ $value | humanizePercentage }} compared to 1 hour ago"
+
+      # Latency Alerts
+      - alert: HighP99Latency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le)
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High P99 latency"
+          description: "99th percentile latency is {{ $value }}s"
+
+      # Frontend Performance Alerts
+      - alert: SlowPageLoad
+        expr: |
+          avg(frontend_page_load_time_seconds) > 3
+        for: 5m
+        labels:
+          severity: warning
+          team: frontend
+        annotations:
+          summary: "Slow page load times"
+          description: "Average page load time is {{ $value }}s"
+
+      - alert: HighJavaScriptErrors
+        expr: |
+          sum(rate(frontend_javascript_errors_total[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          team: frontend
+        annotations:
+          summary: "High JavaScript error rate"
+          description: "{{ $value }} JavaScript errors per second"
+
+      # Service Availability
+      - alert: ServiceDown
+        expr: |
+          up == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: infrastructure
+          page: true
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute"
+
+      # Disk Space Alerts
+      - alert: DiskSpaceLow
+        expr: |
+          (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"} / 
+           node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) < 0.15
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Only {{ $value | humanizePercentage }} of disk space available on {{ $labels.mountpoint }}"
+
+      - alert: DiskSpaceCritical
+        expr: |
+          (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"} / 
+           node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) < 0.05
+        for: 2m
+        labels:
+          severity: critical
+          team: infrastructure
+          page: true
+        annotations:
+          summary: "Critical disk space on {{ $labels.instance }}"
+          description: "Only {{ $value | humanizePercentage }} of disk space available on {{ $labels.mountpoint }}"
