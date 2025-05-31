@@ -4,7 +4,7 @@ import { BrowserRouter, createBrowserRouter, RouterProvider } from 'react-router
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
-import { reportWebVitals } from './utils/performanceOptimization';
+import { reportWebVitals, startPerformanceMonitoring } from './utils/performance.js';
 import './i18n/config'; // Initialize i18n
 import './index.css';
 
@@ -35,7 +35,20 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>,
 );
 
-// Report web vitals
+// Initialize performance monitoring
 if (process.env.NODE_ENV === 'production') {
-  reportWebVitals(console.log);
+  startPerformanceMonitoring();
+  
+  // Report web vitals to analytics
+  reportWebVitals((metric) => {
+    if (window.gtag) {
+      window.gtag('event', metric.name, {
+        value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
+        metric_id: metric.id,
+        metric_value: metric.value,
+        metric_delta: metric.delta,
+        custom_parameter: metric.navigationType,
+      });
+    }
+  });
 }

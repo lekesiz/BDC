@@ -90,37 +90,31 @@ const BeneficiaryDetailPage = () => {
     
     const fetchTabData = async () => {
       setIsLoadingTab(true);
-      console.log(`Fetching data for tab: ${activeTab}`);
       
       try {
         switch (activeTab) {
           case 'evaluations':
             const evaluationsResponse = await api.get(`/api/beneficiaries/${id}/evaluations`);
-            console.log('Evaluations data:', evaluationsResponse.data);
             setEvaluations(evaluationsResponse.data.evaluations || []);
             break;
             
           case 'sessions':
             const sessionsResponse = await api.get(`/api/beneficiaries/${id}/sessions`);
-            console.log('Sessions data:', sessionsResponse.data);
             setSessions(sessionsResponse.data.sessions || []);
             break;
             
           case 'trainers':
             const trainersResponse = await api.get(`/api/beneficiaries/${id}/trainers`);
-            console.log('Trainers data:', trainersResponse.data);
             setTrainers(trainersResponse.data);
             break;
             
           case 'progress':
             const progressResponse = await api.get(`/api/beneficiaries/${id}/progress`);
-            console.log('Progress data:', progressResponse.data);
             setProgress(progressResponse.data);
             break;
             
           case 'documents':
             const documentsResponse = await api.get(`/api/beneficiaries/${id}/documents`);
-            console.log('Documents data:', documentsResponse.data);
             setDocuments(documentsResponse.data.documents || []);
             break;
             

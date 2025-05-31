@@ -67,7 +67,6 @@ export const NotificationProviderV2 = ({ children }) => {
       });
 
       websocket.on('connect', () => {
-        console.log('Notification WebSocket connected');
         setIsConnected(true);
       });
 
@@ -81,7 +80,6 @@ export const NotificationProviderV2 = ({ children }) => {
       });
 
       websocket.on('disconnect', () => {
-        console.log('WebSocket disconnected');
         setIsConnected(false);
         // Reconnect after 5 seconds
         setTimeout(connectWebSocket, 5000);
@@ -121,7 +119,6 @@ export const NotificationProviderV2 = ({ children }) => {
         break;
       
       default:
-        console.log('Unknown notification message type:', data.type);
     }
   };
 

@@ -17,7 +17,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
   api.get = function(url, ...args) {
     // General analytics endpoint
     if (url === '/api/analytics' || url === '/api/analytics/overview') {
-      console.log('Mock API: Analytics overview request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const analyticsData = generateAnalyticsData(userRole);
       
@@ -29,7 +28,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // User analytics endpoint
     if (url === '/api/analytics/users' || url.startsWith('/api/analytics/users?')) {
-      console.log('Mock API: User analytics request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const analyticsData = generateAnalyticsData(userRole);
       
@@ -41,7 +39,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Course analytics endpoint
     if (url === '/api/analytics/courses' || url.startsWith('/api/analytics/courses?')) {
-      console.log('Mock API: Course analytics request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const analyticsData = generateAnalyticsData(userRole);
       
@@ -53,7 +50,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Revenue analytics endpoint
     if (url === '/api/analytics/revenue' || url.startsWith('/api/analytics/revenue?')) {
-      console.log('Mock API: Revenue analytics request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const analyticsData = generateAnalyticsData(userRole);
       
@@ -65,7 +61,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Performance analytics endpoint
     if (url === '/api/analytics/performance' || url.startsWith('/api/analytics/performance?')) {
-      console.log('Mock API: Performance analytics request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const analyticsData = generateAnalyticsData(userRole);
       
@@ -77,7 +72,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Learning analytics endpoint
     if (url === '/api/analytics/learning' || url.startsWith('/api/analytics/learning?')) {
-      console.log('Mock API: Learning analytics request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const analyticsData = generateAnalyticsData(userRole);
       
@@ -89,7 +83,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Trainer-specific analytics
     if (url === '/api/analytics/trainer' || url.startsWith('/api/analytics/trainer?')) {
-      console.log('Mock API: Trainer analytics request');
       const userRole = localStorage.getItem('userRole');
       if (userRole === 'trainer') {
         const analyticsData = generateAnalyticsData(userRole);
@@ -106,7 +99,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Student-specific analytics
     if (url === '/api/analytics/student' || url.startsWith('/api/analytics/student?')) {
-      console.log('Mock API: Student analytics request');
       const userRole = localStorage.getItem('userRole');
       if (userRole === 'student') {
         const analyticsData = generateAnalyticsData(userRole);
@@ -123,7 +115,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Analytics reports endpoint
     if (url === '/api/analytics/reports') {
-      console.log('Mock API: Analytics reports request');
       const reports = generateAnalyticsReports();
       
       return Promise.resolve({
@@ -137,7 +128,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Analytics filters endpoint
     if (url === '/api/analytics/filters') {
-      console.log('Mock API: Analytics filters request');
       const filters = generateAnalyticsFilters();
       
       return Promise.resolve({
@@ -148,7 +138,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Real-time analytics endpoint
     if (url === '/api/analytics/real-time') {
-      console.log('Mock API: Real-time analytics request');
       const realTimeData = generateRealTimeAnalytics();
       
       return Promise.resolve({
@@ -159,7 +148,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Custom analytics query endpoint
     if (url === '/api/analytics/query' || url.startsWith('/api/analytics/query?')) {
-      console.log('Mock API: Custom analytics query');
       
       // Parse query parameters
       const urlObj = new URL(url, 'http://localhost');
@@ -193,7 +181,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Analytics export endpoint
     if (url === '/api/analytics/export' || url.startsWith('/api/analytics/export?')) {
-      console.log('Mock API: Analytics export request');
       
       const urlObj = new URL(url, 'http://localhost');
       const format = urlObj.searchParams.get('format') || 'csv';
@@ -216,7 +203,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
   api.post = function(url, data, ...args) {
     // Generate analytics report
     if (url === '/api/analytics/reports/generate') {
-      console.log('Mock API: Generate analytics report', data);
       
       const report = {
         id: Date.now(),
@@ -236,7 +222,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Save analytics dashboard
     if (url === '/api/analytics/dashboards') {
-      console.log('Mock API: Save analytics dashboard', data);
       
       const dashboard = {
         id: Date.now(),
@@ -255,7 +240,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Track custom event
     if (url === '/api/analytics/events') {
-      console.log('Mock API: Track custom event', data);
       
       return Promise.resolve({
         status: 200,
@@ -269,7 +253,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Create analytics alert
     if (url === '/api/analytics/alerts') {
-      console.log('Mock API: Create analytics alert', data);
       
       const alert = {
         id: Date.now(),
@@ -294,7 +277,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
   api.put = function(url, data, ...args) {
     // Update dashboard
     if (url.match(/^\/api\/analytics\/dashboards\/\d+$/)) {
-      console.log('Mock API: Update analytics dashboard', data);
       const dashboardId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -309,7 +291,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Update alert
     if (url.match(/^\/api\/analytics\/alerts\/\d+$/)) {
-      console.log('Mock API: Update analytics alert', data);
       const alertId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -324,7 +305,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Update analytics settings
     if (url === '/api/analytics/settings') {
-      console.log('Mock API: Update analytics settings', data);
       
       return Promise.resolve({
         status: 200,
@@ -342,7 +322,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
   api.delete = function(url, ...args) {
     // Delete dashboard
     if (url.match(/^\/api\/analytics\/dashboards\/\d+$/)) {
-      console.log('Mock API: Delete analytics dashboard');
       const dashboardId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -356,7 +335,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Delete alert
     if (url.match(/^\/api\/analytics\/alerts\/\d+$/)) {
-      console.log('Mock API: Delete analytics alert');
       const alertId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -370,7 +348,6 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     
     // Clear analytics cache
     if (url === '/api/analytics/cache') {
-      console.log('Mock API: Clear analytics cache');
       
       return Promise.resolve({
         status: 200,

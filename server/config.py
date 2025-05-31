@@ -43,8 +43,8 @@ class Config:
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
     LOG_FORMAT = os.getenv('LOG_FORMAT', 'json')
 
-    # CORS
-    CORS_ORIGINS = ['*']  # Allow all origins in development
+    # CORS - Restrictive by default
+    CORS_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
 
     # Security
     SESSION_COOKIE_SECURE = True

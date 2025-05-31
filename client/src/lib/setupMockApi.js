@@ -124,5 +124,4 @@ export const setupMockApi = (api) => {
   // Set up quick mock APIs for remaining components
   setupQuickMockAPIs(api, hybridGet, hybridPost, hybridPut, hybridDelete);
   
-  console.log('🎭 All Mock APIs setup completed - Demo data ready!');
 };

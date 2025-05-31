@@ -17,7 +17,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
   api.get = function(url, ...args) {
     // List notifications
     if (url === '/api/notifications' || url.startsWith('/api/notifications?')) {
-      console.log('Mock API: List notifications request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
       
@@ -63,7 +62,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Unread notifications count
     if (url === '/api/notifications/unread-count') {
-      console.log('Mock API: Unread notifications count');
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
       const unreadCount = notifications.filter(n => !n.read).length;
@@ -86,7 +84,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Specific notification
     if (url.match(/^\/api\/notifications\/\d+$/)) {
-      console.log('Mock API: Get specific notification');
       const notificationId = parseInt(url.split('/').pop());
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
@@ -107,7 +104,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Notification preferences
     if (url === '/api/notifications/preferences') {
-      console.log('Mock API: Get notification preferences');
       const preferences = generateNotificationPreferences();
       
       return Promise.resolve({
@@ -118,7 +114,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Notification statistics
     if (url === '/api/notifications/statistics') {
-      console.log('Mock API: Get notification statistics');
       const stats = generateNotificationStats();
       
       return Promise.resolve({
@@ -129,7 +124,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Notification templates
     if (url === '/api/notifications/templates') {
-      console.log('Mock API: Get notification templates');
       const templates = generateNotificationTemplates();
       
       return Promise.resolve({
@@ -143,7 +137,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Notification history
     if (url === '/api/notifications/history') {
-      console.log('Mock API: Get notification history');
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
       
@@ -165,7 +158,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Notification categories
     if (url === '/api/notifications/categories') {
-      console.log('Mock API: Get notification categories');
       
       const categories = [
         { id: 'academic', name: 'Academic', icon: 'graduation-cap', color: 'blue' },
@@ -190,7 +182,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
   api.post = function(url, data, ...args) {
     // Mark notification as read
     if (url.match(/^\/api\/notifications\/\d+\/read$/)) {
-      console.log('Mock API: Mark notification as read');
       const notificationId = parseInt(url.split('/')[3]);
       
       return Promise.resolve({
@@ -205,7 +196,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Mark all notifications as read
     if (url === '/api/notifications/mark-all-read') {
-      console.log('Mock API: Mark all notifications as read');
       
       return Promise.resolve({
         status: 200,
@@ -218,7 +208,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Snooze notification
     if (url.match(/^\/api\/notifications\/\d+\/snooze$/)) {
-      console.log('Mock API: Snooze notification', data);
       const notificationId = parseInt(url.split('/')[3]);
       
       return Promise.resolve({
@@ -232,7 +221,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Execute notification action
     if (url.match(/^\/api\/notifications\/\d+\/action$/)) {
-      console.log('Mock API: Execute notification action', data);
       const notificationId = parseInt(url.split('/')[3]);
       
       return Promise.resolve({
@@ -248,7 +236,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Create notification (admin)
     if (url === '/api/notifications/send') {
-      console.log('Mock API: Send notification', data);
       
       const newNotification = {
         id: Date.now(),
@@ -266,7 +253,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Subscribe to notifications
     if (url === '/api/notifications/subscribe') {
-      console.log('Mock API: Subscribe to push notifications', data);
       
       return Promise.resolve({
         status: 200,
@@ -280,7 +266,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Test notification
     if (url === '/api/notifications/test') {
-      console.log('Mock API: Send test notification', data);
       
       return Promise.resolve({
         status: 200,
@@ -299,7 +284,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
   api.put = function(url, data, ...args) {
     // Update notification preferences
     if (url === '/api/notifications/preferences') {
-      console.log('Mock API: Update notification preferences', data);
       
       return Promise.resolve({
         status: 200,
@@ -313,7 +297,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Update notification template
     if (url.match(/^\/api\/notifications\/templates\/\d+$/)) {
-      console.log('Mock API: Update notification template', data);
       const templateId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -328,7 +311,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Update notification settings
     if (url === '/api/notifications/settings') {
-      console.log('Mock API: Update notification settings', data);
       
       return Promise.resolve({
         status: 200,
@@ -342,7 +324,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Batch update notifications
     if (url === '/api/notifications/batch-update') {
-      console.log('Mock API: Batch update notifications', data);
       
       return Promise.resolve({
         status: 200,
@@ -361,7 +342,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
   api.delete = function(url, ...args) {
     // Delete notification
     if (url.match(/^\/api\/notifications\/\d+$/)) {
-      console.log('Mock API: Delete notification');
       const notificationId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -375,7 +355,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Delete old notifications
     if (url === '/api/notifications/old') {
-      console.log('Mock API: Delete old notifications');
       
       return Promise.resolve({
         status: 200,
@@ -388,7 +367,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Unsubscribe from notifications
     if (url === '/api/notifications/unsubscribe') {
-      console.log('Mock API: Unsubscribe from notifications');
       
       return Promise.resolve({
         status: 200,
@@ -401,7 +379,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Delete notification template
     if (url.match(/^\/api\/notifications\/templates\/\d+$/)) {
-      console.log('Mock API: Delete notification template');
       const templateId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -415,7 +392,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     
     // Clear all notifications
     if (url === '/api/notifications/clear-all') {
-      console.log('Mock API: Clear all notifications');
       
       return Promise.resolve({
         status: 200,

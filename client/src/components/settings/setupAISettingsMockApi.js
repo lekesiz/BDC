@@ -50,7 +50,6 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
   api.get = function(url, ...args) {
     // Get AI settings
     if (url === '/api/settings/ai') {
-      console.log('Mock API: Get AI settings');
       return Promise.resolve({
         status: 200,
         data: mockAISettings
@@ -65,7 +64,6 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
   api.put = function(url, data, ...args) {
     // Update AI settings
     if (url === '/api/settings/ai') {
-      console.log('Mock API: Update AI settings', data);
       
       // Update mock data
       if (data.providers) {
@@ -95,7 +93,6 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
   api.post = function(url, data, ...args) {
     // Test AI provider connection
     if (url === '/api/settings/ai/test') {
-      console.log('Mock API: Test AI provider connection', data);
       
       const { provider, config } = data;
       

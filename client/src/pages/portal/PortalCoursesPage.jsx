@@ -46,7 +46,6 @@ const PortalCoursesPage = () => {
           ? response.data 
           : response.data.courses || response.data.enrollments || [];
           
-        console.log('Fetched courses data:', coursesData);
         
         setCourses(coursesData);
         setFilteredCourses(coursesData);

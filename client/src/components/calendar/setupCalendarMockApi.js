@@ -16,7 +16,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
   // Calendar events endpoint
   api.get = function(url, ...args) {
     if (url === '/api/calendar/events' || url.startsWith('/api/calendar/events?')) {
-      console.log('Mock API: Calendar events request', url);
       
       try {
         const userRole = localStorage.getItem('userRole') || 'student';
@@ -54,7 +53,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     
     // Available slots endpoint
     if (url === '/api/calendar/available-slots' || url.startsWith('/api/calendar/available-slots?')) {
-      console.log('Mock API: Available slots request');
       const slots = generateAvailableSlots();
       
       return Promise.resolve({
@@ -68,7 +66,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     
     // Availability endpoint (enhanced version)
     if (url === '/api/calendar/availability') {
-      console.log('Mock API: Availability request');
       
       return Promise.resolve({
         status: 200,
@@ -123,7 +120,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     
     // Appointment types endpoint
     if (url === '/api/calendar/appointment-types') {
-      console.log('Mock API: Appointment types request');
       const types = generateAppointmentTypes();
       
       return Promise.resolve({
@@ -136,7 +132,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     
     // Teaching schedule endpoint
     if (url === '/api/calendar/teaching-schedule') {
-      console.log('Mock API: Teaching schedule request');
       const schedule = generateTeachingSchedule();
       
       return Promise.resolve({
@@ -149,7 +144,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     
     // Specific event endpoint
     if (url.match(/^\/api\/calendar\/events\/\d+$/)) {
-      console.log('Mock API: Specific event request');
       const eventId = parseInt(url.split('/').pop());
       const userRole = localStorage.getItem('userRole') || 'student';
       const calendarData = generateCalendarData(userRole);
@@ -180,7 +174,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
   // Create appointment endpoint
   api.post = function(url, data, ...args) {
     if (url === '/api/calendar/appointments') {
-      console.log('Mock API: Create appointment', data);
       
       const newAppointment = {
         id: Date.now(),
@@ -198,7 +191,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     
     // Update availability endpoint
     if (url === '/api/calendar/availability') {
-      console.log('Mock API: Update availability', data);
       
       return Promise.resolve({
         status: 200,
@@ -216,7 +208,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
   // Update appointment endpoint
   api.put = function(url, data, ...args) {
     if (url.match(/^\/api\/calendar\/appointments\/\d+$/)) {
-      console.log('Mock API: Update appointment', data);
       
       const appointmentId = parseInt(url.split('/').pop());
       const updatedAppointment = {
@@ -238,7 +229,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
   // Delete appointment endpoint
   api.delete = function(url, ...args) {
     if (url.match(/^\/api\/calendar\/appointments\/\d+$/)) {
-      console.log('Mock API: Delete appointment');
       
       return Promise.resolve({
         status: 200,
@@ -250,7 +240,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     
     // Delete availability slot endpoint
     if (url.match(/^\/api\/calendar\/availability\/slots\/\d+$/)) {
-      console.log('Mock API: Delete availability slot');
       
       return Promise.resolve({
         status: 200,

@@ -133,7 +133,9 @@ export const measurePerformance = async (name, fn) => {
     performance.measure(measureName, startMark, endMark);
     
     const measure = performance.getEntriesByName(measureName)[0];
-    console.log(`${name} took ${measure.duration.toFixed(2)}ms`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`${name} took ${measure.duration.toFixed(2)}ms`);
+    }
     
     // Clean up
     performance.clearMarks(startMark);

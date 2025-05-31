@@ -79,12 +79,8 @@ api.interceptors.response.use(
 );
 
 // Enable mock API for demo data
-console.log('🚀 API backend at:', api.defaults.baseURL);
 if (import.meta.env.VITE_USE_MOCK_API === 'true') {
-  console.log('🔧 Mock API enabled for demo data');
   setupMockApi(api);
-} else {
-  console.log('🔧 Using real backend');
 }
 
 export default api;

@@ -16,7 +16,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
   api.get = function(url, ...args) {
     // Audit logs endpoint
     if (url === '/api/compliance/audit-logs' || url.startsWith('/api/compliance/audit-logs?')) {
-      console.log('Mock API: Audit logs request');
       const complianceData = generateComplianceData();
       
       // Parse query parameters
@@ -75,7 +74,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // GDPR compliance endpoint
     if (url === '/api/compliance/gdpr') {
-      console.log('Mock API: GDPR compliance request');
       const complianceData = generateComplianceData();
       
       return Promise.resolve({
@@ -86,7 +84,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Security headers endpoint
     if (url === '/api/compliance/security-headers') {
-      console.log('Mock API: Security headers request');
       const complianceData = generateComplianceData();
       
       return Promise.resolve({
@@ -97,7 +94,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Data backup endpoint
     if (url === '/api/compliance/backups') {
-      console.log('Mock API: Data backups request');
       const complianceData = generateComplianceData();
       
       return Promise.resolve({
@@ -108,7 +104,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Input validation endpoint
     if (url === '/api/compliance/input-validation') {
-      console.log('Mock API: Input validation request');
       const complianceData = generateComplianceData();
       
       return Promise.resolve({
@@ -119,7 +114,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Regulatory compliance endpoint
     if (url === '/api/compliance/regulatory') {
-      console.log('Mock API: Regulatory compliance request');
       const complianceData = generateComplianceData();
       
       return Promise.resolve({
@@ -130,7 +124,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Risk assessment endpoint
     if (url === '/api/compliance/risk-assessment') {
-      console.log('Mock API: Risk assessment request');
       const complianceData = generateComplianceData();
       
       return Promise.resolve({
@@ -141,7 +134,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Compliance metrics endpoint
     if (url === '/api/compliance/metrics') {
-      console.log('Mock API: Compliance metrics request');
       const metrics = generateComplianceMetrics();
       
       return Promise.resolve({
@@ -152,7 +144,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Compliance reports endpoint
     if (url === '/api/compliance/reports') {
-      console.log('Mock API: Compliance reports request');
       const reports = generateComplianceReports();
       
       return Promise.resolve({
@@ -166,7 +157,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Specific backup details
     if (url.match(/^\/api\/compliance\/backups\/\d+$/)) {
-      console.log('Mock API: Specific backup details');
       const backupId = parseInt(url.split('/').pop());
       const complianceData = generateComplianceData();
       const backup = complianceData.dataBackup.backups.find(b => b.id === backupId);
@@ -186,7 +176,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Compliance policies
     if (url === '/api/compliance/policies') {
-      console.log('Mock API: Compliance policies request');
       
       const policies = [
         {
@@ -244,7 +233,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
   api.post = function(url, data, ...args) {
     // Create audit log entry
     if (url === '/api/compliance/audit-logs') {
-      console.log('Mock API: Create audit log', data);
       
       const newLog = {
         id: Date.now(),
@@ -261,7 +249,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Initiate backup
     if (url === '/api/compliance/backups/initiate') {
-      console.log('Mock API: Initiate backup', data);
       
       const backup = {
         id: Date.now(),
@@ -281,7 +268,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Generate compliance report
     if (url === '/api/compliance/reports/generate') {
-      console.log('Mock API: Generate compliance report', data);
       
       const report = {
         id: Date.now(),
@@ -300,7 +286,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Perform security scan
     if (url === '/api/compliance/security/scan') {
-      console.log('Mock API: Perform security scan', data);
       
       return Promise.resolve({
         status: 202,
@@ -316,7 +301,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Submit compliance assessment
     if (url === '/api/compliance/assessments') {
-      console.log('Mock API: Submit compliance assessment', data);
       
       const assessment = {
         id: Date.now(),
@@ -335,7 +319,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Export compliance data
     if (url === '/api/compliance/export') {
-      console.log('Mock API: Export compliance data', data);
       
       return Promise.resolve({
         status: 200,
@@ -355,7 +338,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
   api.put = function(url, data, ...args) {
     // Update compliance settings
     if (url === '/api/compliance/settings') {
-      console.log('Mock API: Update compliance settings', data);
       
       return Promise.resolve({
         status: 200,
@@ -369,7 +351,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Update security headers
     if (url === '/api/compliance/security-headers') {
-      console.log('Mock API: Update security headers', data);
       
       return Promise.resolve({
         status: 200,
@@ -383,7 +364,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Update backup schedule
     if (url === '/api/compliance/backups/schedule') {
-      console.log('Mock API: Update backup schedule', data);
       
       return Promise.resolve({
         status: 200,
@@ -397,7 +377,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Update validation rules
     if (url === '/api/compliance/validation-rules') {
-      console.log('Mock API: Update validation rules', data);
       
       return Promise.resolve({
         status: 200,
@@ -411,7 +390,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Update policy
     if (url.match(/^\/api\/compliance\/policies\/\d+$/)) {
-      console.log('Mock API: Update policy', data);
       const policyId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -426,7 +404,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Mark assessment as reviewed
     if (url.match(/^\/api\/compliance\/assessments\/\d+\/review$/)) {
-      console.log('Mock API: Mark assessment as reviewed');
       const assessmentId = parseInt(url.split('/')[3]);
       
       return Promise.resolve({
@@ -447,7 +424,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
   api.delete = function(url, ...args) {
     // Delete old audit logs
     if (url === '/api/compliance/audit-logs/old') {
-      console.log('Mock API: Delete old audit logs');
       
       return Promise.resolve({
         status: 200,
@@ -460,7 +436,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Delete backup
     if (url.match(/^\/api\/compliance\/backups\/\d+$/)) {
-      console.log('Mock API: Delete backup');
       const backupId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -475,7 +450,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Remove validation rule
     if (url.match(/^\/api\/compliance\/validation-rules\/\d+$/)) {
-      console.log('Mock API: Remove validation rule');
       const ruleId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -490,7 +464,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     
     // Archive policy
     if (url.match(/^\/api\/compliance\/policies\/\d+$/)) {
-      console.log('Mock API: Archive policy');
       const policyId = parseInt(url.split('/').pop());
       
       return Promise.resolve({

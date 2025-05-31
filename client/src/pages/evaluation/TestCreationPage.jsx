@@ -172,7 +172,6 @@ const TestCreationPage = () => {
           return baseQuestion;
         })
       };
-      console.log('Sending evaluation data:', evaluationData);
       const response = await api.post(API_ENDPOINTS.EVALUATIONS.BASE, evaluationData);
       addToast({
         title: 'Success',

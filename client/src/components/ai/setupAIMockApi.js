@@ -17,7 +17,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
   api.get = function(url, ...args) {
     // AI recommendations endpoint
     if (url === '/api/ai/recommendations' || url.startsWith('/api/ai/recommendations?')) {
-      console.log('Mock API: AI recommendations request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const aiData = generateAIData(userRole);
       
@@ -40,7 +39,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // AI insights endpoint
     if (url === '/api/ai/insights') {
-      console.log('Mock API: AI insights request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const aiData = generateAIData(userRole);
       
@@ -52,7 +50,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // AI content generation endpoint
     if (url === '/api/ai/content-generation') {
-      console.log('Mock API: AI content generation request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const aiData = generateAIData(userRole);
       
@@ -64,7 +61,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // AI chatbot history endpoint
     if (url === '/api/ai/chatbot/history') {
-      console.log('Mock API: AI chatbot history request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const aiData = generateAIData(userRole);
       
@@ -79,7 +75,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // AI feedback endpoint
     if (url === '/api/ai/feedback') {
-      console.log('Mock API: AI feedback request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const aiData = generateAIData(userRole);
       
@@ -91,7 +86,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // AI teaching assistant (trainer only)
     if (url === '/api/ai/teaching-assistant') {
-      console.log('Mock API: AI teaching assistant request');
       const userRole = localStorage.getItem('userRole');
       if (userRole === 'trainer') {
         const aiData = generateAIData(userRole);
@@ -108,7 +102,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // AI performance predictions (admin only)
     if (url === '/api/ai/predictions') {
-      console.log('Mock API: AI predictions request');
       const userRole = localStorage.getItem('userRole');
       if (userRole === 'admin' || userRole === 'tenant_admin') {
         const aiData = generateAIData(userRole);
@@ -125,7 +118,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // AI model metrics endpoint
     if (url === '/api/ai/models/metrics') {
-      console.log('Mock API: AI model metrics request');
       const metrics = generateAIModelMetrics();
       
       return Promise.resolve({
@@ -136,7 +128,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // AI training history endpoint
     if (url === '/api/ai/training/history') {
-      console.log('Mock API: AI training history request');
       const history = generateAITrainingHistory();
       
       return Promise.resolve({
@@ -150,7 +141,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // AI configuration endpoint
     if (url === '/api/ai/config') {
-      console.log('Mock API: AI configuration request');
       const config = generateAIConfigOptions();
       
       return Promise.resolve({
@@ -161,7 +151,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // AI learning path details
     if (url.match(/^\/api\/ai\/learning-paths\/\d+$/)) {
-      console.log('Mock API: AI learning path details request');
       const pathId = parseInt(url.split('/').pop());
       
       const pathDetails = {
@@ -197,7 +186,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
   api.post = function(url, data, ...args) {
     // AI chatbot message endpoint
     if (url === '/api/ai/chatbot/message') {
-      console.log('Mock API: AI chatbot message', data);
       
       const response = {
         id: Date.now(),
@@ -222,7 +210,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // Generate AI content endpoint
     if (url === '/api/ai/content/generate') {
-      console.log('Mock API: Generate AI content', data);
       
       let generatedContent;
       
@@ -281,7 +268,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // Request AI feedback endpoint
     if (url === '/api/ai/feedback/request') {
-      console.log('Mock API: Request AI feedback', data);
       
       const feedback = {
         id: Date.now(),
@@ -309,7 +295,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // Train AI model endpoint (admin only)
     if (url === '/api/ai/models/train') {
-      console.log('Mock API: Train AI model', data);
       
       return Promise.resolve({
         status: 202,
@@ -325,7 +310,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // Generate AI report endpoint
     if (url === '/api/ai/reports/generate') {
-      console.log('Mock API: Generate AI report', data);
       
       return Promise.resolve({
         status: 202,
@@ -346,7 +330,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
   api.put = function(url, data, ...args) {
     // Update AI configuration
     if (url === '/api/ai/config') {
-      console.log('Mock API: Update AI configuration', data);
       
       return Promise.resolve({
         status: 200,
@@ -360,7 +343,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // Update AI model
     if (url.match(/^\/api\/ai\/models\/\d+$/)) {
-      console.log('Mock API: Update AI model', data);
       const modelId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -375,7 +357,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // Update learning path progress
     if (url.match(/^\/api\/ai\/learning-paths\/\d+\/progress$/)) {
-      console.log('Mock API: Update learning path progress', data);
       
       return Promise.resolve({
         status: 200,
@@ -394,7 +375,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
   api.delete = function(url, ...args) {
     // Delete AI conversation
     if (url.match(/^\/api\/ai\/chatbot\/conversations\/\d+$/)) {
-      console.log('Mock API: Delete AI conversation');
       
       return Promise.resolve({
         status: 200,
@@ -406,7 +386,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // Remove AI training data
     if (url.match(/^\/api\/ai\/training\/data\/\d+$/)) {
-      console.log('Mock API: Remove AI training data');
       
       return Promise.resolve({
         status: 200,
@@ -418,7 +397,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     
     // Cancel AI job
     if (url.match(/^\/api\/ai\/jobs\/\d+$/)) {
-      console.log('Mock API: Cancel AI job');
       
       return Promise.resolve({
         status: 200,

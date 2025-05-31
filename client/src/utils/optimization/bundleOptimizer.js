@@ -363,7 +363,6 @@ export const performanceMonitoring = {
   reportMetrics: (metrics) => {
     if (process.env.NODE_ENV === 'production') {
       // Send to analytics service
-      console.log('Performance metrics:', metrics);
     }
   }
 };
@@ -403,7 +402,6 @@ export const developmentUtils = {
    */
   generateReport: () => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('Generate bundle report with: npm run build -- --analyze');
     }
   }
 };

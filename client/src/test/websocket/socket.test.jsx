@@ -33,7 +33,6 @@ describe('WebSocket Basic Test', () => {
   it('should register socket event handlers', () => {
     // Register a handler
     const cleanup = mockSocket.on('test_event', (data) => {
-      console.log('Event received:', data);
     });
 
     // Check that the handler was registered

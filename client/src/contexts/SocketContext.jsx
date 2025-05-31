@@ -38,12 +38,10 @@ export const SocketProvider = ({ children }) => {
 
       // Connection handlers
       newSocket.on('connect', () => {
-        console.log('Connected to server');
         setConnected(true);
       });
 
       newSocket.on('disconnect', () => {
-        console.log('Disconnected from server');
         setConnected(false);
       });
 
@@ -54,46 +52,39 @@ export const SocketProvider = ({ children }) => {
 
       // Global event handlers
       newSocket.on('notification', (data) => {
-        console.log('Notification received:', data);
         toast.info(data.message);
       });
 
       newSocket.on('user_joined', (data) => {
-        console.log('User joined:', data);
         if (data.users) {
           setOnlineUsers(data.users);
         }
       });
 
       newSocket.on('user_left', (data) => {
-        console.log('User left:', data);
         if (data.users) {
           setOnlineUsers(data.users);
         }
       });
 
       newSocket.on('message', (data) => {
-        console.log('Message received:', data);
         // Handle chat messages
       });
 
       // Program real-time events
       newSocket.on('program_created', (data) => {
-        console.log('Program created:', data);
         toast.success(`New program created: ${data.program?.name}`);
         // Trigger program list refresh
         window.dispatchEvent(new CustomEvent('programCreated', { detail: data.program }));
       });
 
       newSocket.on('program_updated', (data) => {
-        console.log('Program updated:', data);
         toast.info(`Program updated: ${data.program?.name}`);
         // Trigger program list/detail refresh
         window.dispatchEvent(new CustomEvent('programUpdated', { detail: data.program }));
       });
 
       newSocket.on('program_deleted', (data) => {
-        console.log('Program deleted:', data);
         toast.warning(`Program deleted: ${data.program?.name}`);
         // Trigger program list refresh
         window.dispatchEvent(new CustomEvent('programDeleted', { detail: data.program }));
@@ -125,14 +116,12 @@ export const SocketProvider = ({ children }) => {
   // Emit event helper
   const emit = (event, data, callback) => {
     if (socketRef.current && connected) {
-      console.log('Emitting event:', event, data);
-      if (callback) {
+        if (callback) {
         socketRef.current.emit(event, data, callback);
       } else {
         socketRef.current.emit(event, data);
       }
     } else {
-      console.warn('Socket not connected. Cannot emit event:', event);
     }
   };
 

@@ -11,7 +11,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
   // Dashboard overview endpoint
   api.get = function(url, ...args) {
     if (url === '/api/dashboard' || url === '/api/dashboard/overview') {
-      console.log('Mock API: Dashboard overview request');
       // Get user role from context or default to student
       const userRole = localStorage.getItem('userRole') || 'student';
       const dashboardData = generateDashboardData(userRole);
@@ -24,7 +23,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     
     // Dashboard metrics endpoint
     if (url === '/api/dashboard/metrics') {
-      console.log('Mock API: Dashboard metrics request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const data = generateDashboardData(userRole);
       
@@ -40,7 +38,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     
     // Dashboard activity endpoint
     if (url === '/api/dashboard/activity') {
-      console.log('Mock API: Dashboard activity request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const data = generateDashboardData(userRole);
       
@@ -54,7 +51,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     
     // Dashboard notifications endpoint
     if (url === '/api/dashboard/notifications') {
-      console.log('Mock API: Dashboard notifications request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateDashboardNotifications(userRole);
       
@@ -69,7 +65,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     
     // Dashboard quick actions endpoint
     if (url === '/api/dashboard/quick-actions') {
-      console.log('Mock API: Dashboard quick actions request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const actions = generateQuickActions(userRole);
       
@@ -83,7 +78,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     
     // Tenant dashboard endpoint (for admin/tenant_admin)
     if (url === '/api/dashboard/tenant') {
-      console.log('Mock API: Tenant dashboard request');
       const userRole = localStorage.getItem('userRole') || 'admin';
       const data = generateDashboardData(userRole);
       
@@ -99,7 +93,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     
     // Trainer dashboard endpoint
     if (url === '/api/dashboard/trainer') {
-      console.log('Mock API: Trainer dashboard request');
       const data = generateDashboardData('trainer');
       
       return Promise.resolve({
@@ -114,7 +107,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     
     // Student dashboard endpoint
     if (url === '/api/dashboard/student') {
-      console.log('Mock API: Student dashboard request');
       const data = generateDashboardData('student');
       
       return Promise.resolve({
@@ -129,7 +121,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     
     // Dashboard widgets configuration
     if (url === '/api/dashboard/widgets') {
-      console.log('Mock API: Dashboard widgets request');
       
       return Promise.resolve({
         status: 200,
@@ -152,7 +143,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
   // Widget configuration update
   api.put = function(url, data, ...args) {
     if (url === '/api/dashboard/widgets') {
-      console.log('Mock API: Update dashboard widgets', data);
       return Promise.resolve({
         status: 200,
         data: {

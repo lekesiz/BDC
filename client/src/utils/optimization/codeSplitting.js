@@ -320,7 +320,7 @@ export const performanceHelpers = {
     const loadTime = endTime - startTime;
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`${componentName} loaded in ${loadTime.toFixed(2)}ms`);
+      // Component loaded
     }
     
     // Report to analytics
@@ -369,13 +369,11 @@ export const performanceHelpers = {
             .then(content => {
               const size = new Blob([content]).size;
               totalSize += size;
-              console.log(`${script.src}: ${(size / 1024).toFixed(2)}KB`);
             });
         }
       });
       
       setTimeout(() => {
-        console.log(`Total bundle size: ${(totalSize / 1024).toFixed(2)}KB`);
       }, 2000);
     }
   }

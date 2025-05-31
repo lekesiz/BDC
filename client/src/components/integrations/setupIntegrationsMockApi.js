@@ -17,7 +17,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
   api.get = function(url, ...args) {
     // List all integrations
     if (url === '/api/integrations') {
-      console.log('Mock API: List integrations request');
       const integrationsData = generateIntegrationsData();
       
       return Promise.resolve({
@@ -31,7 +30,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Get specific integration
     if (url.match(/^\/api\/integrations\/[\w-]+$/)) {
-      console.log('Mock API: Get specific integration');
       const integrationId = url.split('/').pop();
       const integrationsData = generateIntegrationsData();
       const integration = integrationsData.available.find(i => i.id === integrationId);
@@ -51,7 +49,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Integration activity
     if (url === '/api/integrations/activity') {
-      console.log('Mock API: Integration activity request');
       const activity = generateIntegrationActivity();
       
       return Promise.resolve({
@@ -65,7 +62,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Integration statistics
     if (url === '/api/integrations/statistics') {
-      console.log('Mock API: Integration statistics request');
       const stats = generateIntegrationStats();
       
       return Promise.resolve({
@@ -76,7 +72,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Webhooks list
     if (url === '/api/integrations/webhooks') {
-      console.log('Mock API: Webhooks list request');
       const integrationsData = generateIntegrationsData();
       
       return Promise.resolve({
@@ -90,7 +85,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Specific webhook
     if (url.match(/^\/api\/integrations\/webhooks\/\d+$/)) {
-      console.log('Mock API: Get specific webhook');
       const webhookId = parseInt(url.split('/').pop());
       const integrationsData = generateIntegrationsData();
       const webhook = integrationsData.webhooks.find(w => w.id === webhookId);
@@ -110,7 +104,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // API keys list
     if (url === '/api/integrations/api-keys') {
-      console.log('Mock API: API keys list request');
       const integrationsData = generateIntegrationsData();
       
       return Promise.resolve({
@@ -124,7 +117,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // OAuth configurations
     if (url === '/api/integrations/oauth-configs') {
-      console.log('Mock API: OAuth configurations request');
       const configs = generateOAuthConfigs();
       
       return Promise.resolve({
@@ -135,7 +127,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Integration settings
     if (url.match(/^\/api\/integrations\/[\w-]+\/settings$/)) {
-      console.log('Mock API: Get integration settings');
       const integrationId = url.split('/')[3];
       const integrationsData = generateIntegrationsData();
       const integration = integrationsData.available.find(i => i.id === integrationId);
@@ -155,7 +146,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Webhook events
     if (url === '/api/integrations/webhook-events') {
-      console.log('Mock API: List webhook events');
       
       const events = [
         { category: "Enrollment", events: ["enrollment.created", "enrollment.updated", "enrollment.deleted"] },
@@ -179,7 +169,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
   api.post = function(url, data, ...args) {
     // Connect integration
     if (url.match(/^\/api\/integrations\/[\w-]+\/connect$/)) {
-      console.log('Mock API: Connect integration', data);
       const integrationId = url.split('/')[3];
       
       // Simulate OAuth flow
@@ -194,7 +183,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // OAuth callback
     if (url.match(/^\/api\/integrations\/[\w-]+\/callback$/)) {
-      console.log('Mock API: OAuth callback', data);
       const integrationId = url.split('/')[3];
       
       return Promise.resolve({
@@ -210,7 +198,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Create webhook
     if (url === '/api/integrations/webhooks') {
-      console.log('Mock API: Create webhook', data);
       
       const newWebhook = {
         id: Date.now(),
@@ -229,7 +216,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Create API key
     if (url === '/api/integrations/api-keys') {
-      console.log('Mock API: Create API key', data);
       
       const newApiKey = {
         id: Date.now(),
@@ -250,7 +236,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Test webhook
     if (url.match(/^\/api\/integrations\/webhooks\/\d+\/test$/)) {
-      console.log('Mock API: Test webhook');
       const webhookId = parseInt(url.split('/')[3]);
       
       return Promise.resolve({
@@ -270,7 +255,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Sync integration data
     if (url.match(/^\/api\/integrations\/[\w-]+\/sync$/)) {
-      console.log('Mock API: Sync integration data');
       const integrationId = url.split('/')[3];
       
       return Promise.resolve({
@@ -291,7 +275,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
   api.put = function(url, data, ...args) {
     // Update integration settings
     if (url.match(/^\/api\/integrations\/[\w-]+\/settings$/)) {
-      console.log('Mock API: Update integration settings', data);
       const integrationId = url.split('/')[3];
       
       return Promise.resolve({
@@ -306,7 +289,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Update webhook
     if (url.match(/^\/api\/integrations\/webhooks\/\d+$/)) {
-      console.log('Mock API: Update webhook', data);
       const webhookId = parseInt(url.split('/').pop());
       
       const updatedWebhook = {
@@ -323,7 +305,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Toggle webhook status
     if (url.match(/^\/api\/integrations\/webhooks\/\d+\/toggle$/)) {
-      console.log('Mock API: Toggle webhook status');
       const webhookId = parseInt(url.split('/')[3]);
       
       return Promise.resolve({
@@ -338,7 +319,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Update API key
     if (url.match(/^\/api\/integrations\/api-keys\/\d+$/)) {
-      console.log('Mock API: Update API key', data);
       const keyId = parseInt(url.split('/').pop());
       
       const updatedKey = {
@@ -355,7 +335,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Rotate API key
     if (url.match(/^\/api\/integrations\/api-keys\/\d+\/rotate$/)) {
-      console.log('Mock API: Rotate API key');
       const keyId = parseInt(url.split('/')[3]);
       
       return Promise.resolve({
@@ -375,7 +354,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
   api.delete = function(url, ...args) {
     // Disconnect integration
     if (url.match(/^\/api\/integrations\/[\w-]+\/disconnect$/)) {
-      console.log('Mock API: Disconnect integration');
       const integrationId = url.split('/')[3];
       
       return Promise.resolve({
@@ -390,7 +368,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Delete webhook
     if (url.match(/^\/api\/integrations\/webhooks\/\d+$/)) {
-      console.log('Mock API: Delete webhook');
       const webhookId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -404,7 +381,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Delete API key
     if (url.match(/^\/api\/integrations\/api-keys\/\d+$/)) {
-      console.log('Mock API: Delete API key');
       const keyId = parseInt(url.split('/').pop());
       
       return Promise.resolve({
@@ -418,7 +394,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     
     // Clear integration cache
     if (url.match(/^\/api\/integrations\/[\w-]+\/cache$/)) {
-      console.log('Mock API: Clear integration cache');
       const integrationId = url.split('/')[3];
       
       return Promise.resolve({

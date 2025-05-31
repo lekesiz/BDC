@@ -222,7 +222,6 @@ export const setupPerformanceObserver = () => {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
-        console.log('LCP:', lastEntry.renderTime || lastEntry.loadTime);
       });
       observer.observe({ entryTypes: ['largest-contentful-paint'] });
     } catch (e) {
@@ -236,12 +235,15 @@ export const measureComponentPerformance = (componentName) => {
   if (process.env.NODE_ENV === 'development') {
     return {
       onRender: (id, phase, actualDuration, baseDuration, startTime, commitTime) => {
-        console.log(`${componentName} (${phase}):`, {
-          actualDuration,
-          baseDuration,
-          startTime,
-          commitTime,
-        });
+        // Performance timing for development
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`${componentName} (${phase}):`, {
+            actualDuration,
+            baseDuration,
+            startTime,
+            commitTime,
+          });
+        }
       },
     };
   }

@@ -16,7 +16,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
   api.get = function(url, ...args) {
     // General settings endpoint
     if (url === '/api/settings' || url === '/api/settings/general') {
-      console.log('Mock API: General settings request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const settingsData = generateSettingsData(userRole);
       
@@ -28,7 +27,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Profile settings endpoint
     if (url === '/api/settings/profile') {
-      console.log('Mock API: Profile settings request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const settingsData = generateSettingsData(userRole);
       
@@ -40,7 +38,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Notification settings endpoint
     if (url === '/api/settings/notifications') {
-      console.log('Mock API: Notification settings request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const settingsData = generateSettingsData(userRole);
       
@@ -52,7 +49,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Privacy settings endpoint
     if (url === '/api/settings/privacy') {
-      console.log('Mock API: Privacy settings request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const settingsData = generateSettingsData(userRole);
       
@@ -64,7 +60,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Security settings endpoint
     if (url === '/api/settings/security') {
-      console.log('Mock API: Security settings request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const settingsData = generateSettingsData(userRole);
       
@@ -76,7 +71,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Appearance settings endpoint
     if (url === '/api/settings/appearance' || url === '/api/settings/theme') {
-      console.log('Mock API: Appearance settings request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const settingsData = generateSettingsData(userRole);
       
@@ -88,7 +82,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Integration settings endpoint
     if (url === '/api/settings/integrations') {
-      console.log('Mock API: Integration settings request');
       const userRole = localStorage.getItem('userRole') || 'student';
       const settingsData = generateSettingsData(userRole);
       
@@ -100,7 +93,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Organization settings (admin/tenant_admin only)
     if (url === '/api/settings/organization') {
-      console.log('Mock API: Organization settings request');
       const userRole = localStorage.getItem('userRole');
       if (userRole === 'admin' || userRole === 'tenant_admin') {
         const settingsData = generateSettingsData(userRole);
@@ -117,7 +109,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Billing settings (admin/tenant_admin only)
     if (url === '/api/settings/billing') {
-      console.log('Mock API: Billing settings request');
       const userRole = localStorage.getItem('userRole');
       if (userRole === 'admin' || userRole === 'tenant_admin') {
         const settingsData = generateSettingsData(userRole);
@@ -134,7 +125,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Teaching settings (trainer only)
     if (url === '/api/settings/teaching') {
-      console.log('Mock API: Teaching settings request');
       const userRole = localStorage.getItem('userRole');
       if (userRole === 'trainer') {
         const settingsData = generateSettingsData(userRole);
@@ -151,7 +141,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Learning settings (student only)
     if (url === '/api/settings/learning') {
-      console.log('Mock API: Learning settings request');
       const userRole = localStorage.getItem('userRole');
       if (userRole === 'student') {
         const settingsData = generateSettingsData(userRole);
@@ -168,7 +157,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Settings options endpoint
     if (url === '/api/settings/options') {
-      console.log('Mock API: Settings options request');
       const options = generateSettingsOptions();
       
       return Promise.resolve({
@@ -179,7 +167,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Data export options endpoint
     if (url === '/api/settings/export-options') {
-      console.log('Mock API: Data export options request');
       const exportOptions = generateDataExportOptions();
       
       return Promise.resolve({
@@ -190,7 +177,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Password requirements endpoint
     if (url === '/api/settings/password-requirements') {
-      console.log('Mock API: Password requirements request');
       
       return Promise.resolve({
         status: 200,
@@ -214,7 +200,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
   api.put = function(url, data, ...args) {
     // Update general settings
     if (url === '/api/settings' || url === '/api/settings/general') {
-      console.log('Mock API: Update general settings', data);
       
       return Promise.resolve({
         status: 200,
@@ -235,7 +220,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     for (const section of settingsSections) {
       if (url === `/api/settings/${section}`) {
-        console.log(`Mock API: Update ${section} settings`, data);
         
         return Promise.resolve({
           status: 200,
@@ -250,7 +234,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Update password
     if (url === '/api/settings/password') {
-      console.log('Mock API: Update password');
       
       // Simulate password validation
       if (!data.currentPassword || !data.newPassword) {
@@ -271,7 +254,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Update two-factor authentication
     if (url === '/api/settings/two-factor') {
-      console.log('Mock API: Update two-factor authentication', data);
       
       return Promise.resolve({
         status: 200,
@@ -294,7 +276,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
   api.post = function(url, data, ...args) {
     // Export data endpoint
     if (url === '/api/settings/export-data') {
-      console.log('Mock API: Export data request', data);
       
       return Promise.resolve({
         status: 200,
@@ -308,7 +289,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Import settings endpoint
     if (url === '/api/settings/import') {
-      console.log('Mock API: Import settings', data);
       
       return Promise.resolve({
         status: 200,
@@ -327,7 +307,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     // Connect integration endpoint
     if (url.startsWith('/api/settings/integrations/') && url.endsWith('/connect')) {
       const integration = url.split('/')[4];
-      console.log(`Mock API: Connect ${integration} integration`);
       
       return Promise.resolve({
         status: 200,
@@ -341,7 +320,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Add API key endpoint
     if (url === '/api/settings/api-keys') {
-      console.log('Mock API: Create API key', data);
       
       return Promise.resolve({
         status: 201,
@@ -358,7 +336,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     
     // Add team member (admin/tenant_admin)
     if (url === '/api/settings/team/invite') {
-      console.log('Mock API: Invite team member', data);
       
       return Promise.resolve({
         status: 200,
@@ -379,7 +356,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
   api.delete = function(url, ...args) {
     // Delete account endpoint
     if (url === '/api/settings/account') {
-      console.log('Mock API: Delete account request');
       
       return Promise.resolve({
         status: 200,
@@ -393,7 +369,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     // Disconnect integration endpoint
     if (url.startsWith('/api/settings/integrations/') && url.endsWith('/disconnect')) {
       const integration = url.split('/')[4];
-      console.log(`Mock API: Disconnect ${integration} integration`);
       
       return Promise.resolve({
         status: 200,
@@ -408,7 +383,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     // Revoke session endpoint
     if (url.match(/^\/api\/settings\/sessions\/\d+$/)) {
       const sessionId = url.split('/').pop();
-      console.log(`Mock API: Revoke session ${sessionId}`);
       
       return Promise.resolve({
         status: 200,
@@ -423,7 +397,6 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     // Delete API key endpoint
     if (url.match(/^\/api\/settings\/api-keys\/\d+$/)) {
       const keyId = url.split('/').pop();
-      console.log(`Mock API: Delete API key ${keyId}`);
       
       return Promise.resolve({
         status: 200,
