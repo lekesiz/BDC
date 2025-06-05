@@ -1,7 +1,6 @@
 /**
  * Mock data for beneficiary analytics
  */
-
 // Sample beneficiaries for analytics
 export const beneficiaries = [
   {
@@ -85,7 +84,6 @@ export const beneficiaries = [
     status: "Active"
   }
 ];
-
 // Detailed beneficiary analytics data
 export const beneficiaryAnalytics = {
   1: { // John Smith
@@ -721,31 +719,24 @@ export const beneficiaryAnalytics = {
   }
   // You could add more detailed analytics for other beneficiaries as needed
 };
-
 // Mock API function to get all beneficiaries
 export const getBeneficiariesList = () => {
   return Promise.resolve(beneficiaries);
 };
-
 // Mock API function to get beneficiary analytics by ID
 export const getBeneficiaryAnalytics = (id, dateRange = 'last30days') => {
   const analytics = beneficiaryAnalytics[id];
-  
   if (!analytics) {
     return Promise.reject(new Error('Beneficiary analytics not found'));
   }
-  
   // In a real scenario, you might filter data based on dateRange
   // For mock data, we'll just return the full analytics
-  
   return Promise.resolve(analytics);
 };
-
 // Mock API function to export beneficiary analytics
 export const exportBeneficiaryAnalytics = (id, format, dateRange = 'last30days') => {
   // In a real scenario, this would generate a file for download
   // For mock data, we'll just return a successful response
-  
   return Promise.resolve({
     success: true,
     message: `Beneficiary analytics for beneficiary ${id} exported as ${format}`

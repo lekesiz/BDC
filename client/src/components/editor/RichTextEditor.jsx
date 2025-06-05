@@ -31,22 +31,17 @@ import css from 'highlight.js/lib/languages/css';
 import xml from 'highlight.js/lib/languages/xml';
 import sql from 'highlight.js/lib/languages/sql';
 import bash from 'highlight.js/lib/languages/bash';
-
 // Custom extensions
 import { QuestionHint } from './extensions/QuestionHint';
 import { CorrectAnswer } from './extensions/CorrectAnswer';
 import { ExplanationBlock } from './extensions/ExplanationBlock';
 import { Mathematics } from './extensions/Mathematics';
-
 // Toolbar component
 import EditorToolbar from './EditorToolbar';
-
 // Styles
 import './RichTextEditor.css';
-
 // Utils
 import { htmlToMarkdown } from './utils/markdownConverter';
-
 // Register languages for syntax highlighting
 lowlight.registerLanguage('javascript', javascript);
 lowlight.registerLanguage('python', python);
@@ -56,7 +51,6 @@ lowlight.registerLanguage('css', css);
 lowlight.registerLanguage('html', xml);
 lowlight.registerLanguage('sql', sql);
 lowlight.registerLanguage('bash', bash);
-
 const RichTextEditor = ({
   content = '',
   onChange,
@@ -75,7 +69,6 @@ const RichTextEditor = ({
 }) => {
   const [isPreviewMode, setIsPreviewMode] = useState(showPreview);
   const [isFocused, setIsFocused] = useState(false);
-
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -162,7 +155,6 @@ const RichTextEditor = ({
       },
     },
   });
-
   // Handle image upload
   const handleImageUpload = useCallback(
     async (file) => {
@@ -175,7 +167,6 @@ const RichTextEditor = ({
         reader.readAsDataURL(file);
         return;
       }
-
       try {
         const url = await onImageUpload(file);
         editor?.chain().focus().setImage({ src: url }).run();
@@ -185,15 +176,12 @@ const RichTextEditor = ({
     },
     [editor, onImageUpload]
   );
-
   // Handle paste events for images
   useEffect(() => {
     if (!editor) return;
-
     const handlePaste = (view, event) => {
       const items = Array.from(event.clipboardData?.items || []);
       const imageItem = items.find((item) => item.type.indexOf('image') === 0);
-
       if (imageItem) {
         event.preventDefault();
         const file = imageItem.getAsFile();
@@ -204,21 +192,17 @@ const RichTextEditor = ({
       }
       return false;
     };
-
     editor.view.dom.addEventListener('paste', handlePaste);
     return () => {
       editor.view.dom.removeEventListener('paste', handlePaste);
     };
   }, [editor, handleImageUpload]);
-
   // Handle drop events for images
   useEffect(() => {
     if (!editor) return;
-
     const handleDrop = (event) => {
       const files = Array.from(event.dataTransfer?.files || []);
       const imageFile = files.find((file) => file.type.startsWith('image/'));
-
       if (imageFile) {
         event.preventDefault();
         handleImageUpload(imageFile);
@@ -226,18 +210,15 @@ const RichTextEditor = ({
       }
       return false;
     };
-
     editor.view.dom.addEventListener('drop', handleDrop);
     return () => {
       editor.view.dom.removeEventListener('drop', handleDrop);
     };
   }, [editor, handleImageUpload]);
-
   // Export functionality
   const handleExport = useCallback(
     (format) => {
       if (!editor || !onExport) return;
-
       let content;
       switch (format) {
         case 'html':
@@ -252,19 +233,16 @@ const RichTextEditor = ({
         default:
           content = editor.getText();
       }
-
       onExport(format, content);
     },
     [editor, onExport]
   );
-
   // Update editor content when prop changes
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
       editor.commands.setContent(content);
     }
   }, [content, editor]);
-
   // Toggle preview mode
   const togglePreview = useCallback(() => {
     setIsPreviewMode((prev) => !prev);
@@ -272,7 +250,6 @@ const RichTextEditor = ({
       editor.setEditable(!isPreviewMode);
     }
   }, [editor, isPreviewMode]);
-
   if (!editor) {
     return (
       <div className="rich-text-editor-loading">
@@ -280,7 +257,6 @@ const RichTextEditor = ({
       </div>
     );
   }
-
   return (
     <div
       className={`rich-text-editor ${darkMode ? 'dark' : ''} ${
@@ -297,19 +273,16 @@ const RichTextEditor = ({
           darkMode={darkMode}
         />
       )}
-      
       <div className="rich-text-editor-wrapper">
         <EditorContent
           editor={editor}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        
         {!content && !isFocused && editable && (
           <div className="rich-text-editor-placeholder">{placeholder}</div>
         )}
       </div>
-
       {isPreviewMode && (
         <div className="rich-text-editor-preview-banner">
           <span>Preview Mode</span>
@@ -321,5 +294,4 @@ const RichTextEditor = ({
     </div>
   );
 };
-
 export default RichTextEditor;

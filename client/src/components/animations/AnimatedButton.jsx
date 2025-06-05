@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { buttonHover } from '@/lib/animations';
-
 export const AnimatedButton = ({ 
   children, 
   className, 

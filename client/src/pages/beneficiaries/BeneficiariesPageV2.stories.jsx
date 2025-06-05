@@ -1,7 +1,6 @@
 import BeneficiariesPageV2 from './BeneficiariesPageV2';
 import { BrowserRouter } from 'react-router-dom';
 import { ToastProvider } from '@/components/ui/toast';
-
 export default {
   title: 'Pages/BeneficiariesPageV2',
   component: BeneficiariesPageV2,
@@ -20,7 +19,6 @@ export default {
     layout: 'fullscreen',
   },
 };
-
 // Mock data for different scenarios
 const mockBeneficiaries = [
   {
@@ -79,7 +77,6 @@ const mockBeneficiaries = [
     completed_evaluation_count: 3
   }
 ];
-
 // Mock API responses
 const mockApiSuccess = () => ({
   get: () => Promise.resolve({
@@ -91,15 +88,12 @@ const mockApiSuccess = () => ({
     }
   })
 });
-
 const mockApiLoading = () => ({
   get: () => new Promise(() => {}) // Never resolves to show loading state
 });
-
 const mockApiError = () => ({
   get: () => Promise.reject(new Error('Failed to fetch beneficiaries'))
 });
-
 const mockApiEmpty = () => ({
   get: () => Promise.resolve({
     data: {
@@ -110,7 +104,6 @@ const mockApiEmpty = () => ({
     }
   })
 });
-
 // Default story
 export const Default = {
   name: 'Default View',
@@ -120,7 +113,6 @@ export const Default = {
     }
   }
 };
-
 // Loading state
 export const Loading = {
   name: 'Loading State',
@@ -130,7 +122,6 @@ export const Loading = {
     }
   }
 };
-
 // Error state
 export const Error = {
   name: 'Error State',
@@ -140,7 +131,6 @@ export const Error = {
     }
   }
 };
-
 // Empty state
 export const Empty = {
   name: 'Empty State',
@@ -150,7 +140,6 @@ export const Empty = {
     }
   }
 };
-
 // With pagination
 export const WithPagination = {
   name: 'With Pagination',
@@ -169,7 +158,6 @@ export const WithPagination = {
     }
   }
 };
-
 // Filtered results
 export const FilteredResults = {
   name: 'Filtered Results',
@@ -188,7 +176,6 @@ export const FilteredResults = {
     }
   }
 };
-
 // Search results
 export const SearchResults = {
   name: 'Search Results',
@@ -207,7 +194,6 @@ export const SearchResults = {
     }
   }
 };
-
 // Mobile view
 export const Mobile = {
   name: 'Mobile View',
@@ -220,7 +206,6 @@ export const Mobile = {
     }
   }
 };
-
 // Dark mode (if supported)
 export const DarkMode = {
   name: 'Dark Mode',

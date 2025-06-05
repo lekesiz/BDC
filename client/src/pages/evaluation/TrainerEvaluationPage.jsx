@@ -11,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-
 /**
  * TrainerEvaluationPage allows trainers to manually evaluate beneficiaries
  */
@@ -27,7 +26,6 @@ const TrainerEvaluationPage = () => {
   const [session, setSession] = useState(null);
   const [evaluations, setEvaluations] = useState([]);
   const [activeTab, setActiveTab] = useState('manual');
-  
   // Define validation schema for evaluation form
   const evaluationSchema = z.object({
     title: z.string().min(3, { message: 'Title must be at least 3 characters' }),
@@ -51,7 +49,6 @@ const TrainerEvaluationPage = () => {
     ).min(1, { message: 'At least one goal is required' }),
     overall_feedback: z.string().min(20, { message: 'Overall feedback must be at least 20 characters' }),
   });
-  
   // Initialize form with default values
   const {
     register,
@@ -85,29 +82,24 @@ const TrainerEvaluationPage = () => {
       overall_feedback: '',
     }
   });
-  
   // Watch form values for dynamic UI
   const watchedCompetencies = watch('competencies');
   const watchedStrengths = watch('strengths');
   const watchedAreasForImprovement = watch('areas_for_improvement');
   const watchedGoals = watch('goals');
-  
   // Fetch beneficiary data, session data if available, and past evaluations
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
         // Fetch beneficiary data
         const beneficiaryResponse = await api.get(API_ENDPOINTS.BENEFICIARIES.BASE + '/' + id);
         setBeneficiary(beneficiaryResponse.data);
-        
         // Fetch session data if a session ID is provided
         if (sessionId) {
           try {
             const sessionResponse = await api.get(API_ENDPOINTS.EVALUATIONS.SESSION(sessionId));
             setSession(sessionResponse.data);
-            
             // Pre-fill form with session-related data if available
             if (sessionResponse.data.test) {
               setValue('title', `Evaluation following ${sessionResponse.data.test.title}`);
@@ -117,11 +109,9 @@ const TrainerEvaluationPage = () => {
             console.error('Error fetching session:', error);
           }
         }
-        
         // Fetch past evaluations
         const evaluationsResponse = await api.get(`/api/beneficiaries/${id}/evaluations`);
         setEvaluations(evaluationsResponse.data);
-        
       } catch (error) {
         console.error('Error fetching data:', error);
         toast({
@@ -133,10 +123,8 @@ const TrainerEvaluationPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchData();
   }, [id, sessionId, toast, setValue]);
-  
   // Handle adding a new competency
   const handleAddCompetency = () => {
     const currentCompetencies = watch('competencies') || [];
@@ -145,43 +133,34 @@ const TrainerEvaluationPage = () => {
       { name: '', score: 3, notes: '' }
     ]);
   };
-  
   // Handle removing a competency
   const handleRemoveCompetency = (index) => {
     const currentCompetencies = watch('competencies') || [];
     if (currentCompetencies.length <= 1) return;
-    
     setValue('competencies', currentCompetencies.filter((_, i) => i !== index));
   };
-  
   // Handle adding a new strength
   const handleAddStrength = () => {
     const currentStrengths = watch('strengths') || [];
     setValue('strengths', [...currentStrengths, '']);
   };
-  
   // Handle removing a strength
   const handleRemoveStrength = (index) => {
     const currentStrengths = watch('strengths') || [];
     if (currentStrengths.length <= 1) return;
-    
     setValue('strengths', currentStrengths.filter((_, i) => i !== index));
   };
-  
   // Handle adding a new area for improvement
   const handleAddAreaForImprovement = () => {
     const current = watch('areas_for_improvement') || [];
     setValue('areas_for_improvement', [...current, '']);
   };
-  
   // Handle removing an area for improvement
   const handleRemoveAreaForImprovement = (index) => {
     const current = watch('areas_for_improvement') || [];
     if (current.length <= 1) return;
-    
     setValue('areas_for_improvement', current.filter((_, i) => i !== index));
   };
-  
   // Handle adding a new goal
   const handleAddGoal = () => {
     const currentGoals = watch('goals') || [];
@@ -194,42 +173,34 @@ const TrainerEvaluationPage = () => {
       }
     ]);
   };
-  
   // Handle removing a goal
   const handleRemoveGoal = (index) => {
     const currentGoals = watch('goals') || [];
     if (currentGoals.length <= 1) return;
-    
     setValue('goals', currentGoals.filter((_, i) => i !== index));
   };
-  
   // Handle form submission
   const onSubmit = async (data) => {
     try {
       setIsSaving(true);
-      
       const payload = {
         ...data,
         beneficiary_id: id,
         session_id: sessionId || null,
         evaluation_date: new Date().toISOString(),
       };
-      
       const response = await api.post('/api/trainer-evaluations', payload);
-      
       toast({
         title: 'Success',
         description: 'Evaluation has been saved successfully',
         type: 'success',
       });
-      
       // If session ID was provided, mark it as trainer-evaluated
       if (sessionId) {
         await api.put(`/api/evaluations/sessions/${sessionId}/mark-evaluated`, {
           trainer_evaluated: true,
         });
       }
-      
       navigate(`/beneficiaries/${id}`);
     } catch (error) {
       console.error('Error submitting evaluation:', error);
@@ -242,19 +213,15 @@ const TrainerEvaluationPage = () => {
       setIsSaving(false);
     }
   };
-  
   // Generate a template evaluation based on session data
   const generateTemplateFromSession = () => {
     if (!session) return;
-    
     const testTitle = session.test?.title || 'recent test';
     const score = session.score || 0;
     const testSkills = session.test?.skills || [];
-    
     // Set default values based on session data
     setValue('title', `Evaluation following ${testTitle}`);
     setValue('description', `Evaluation based on ${testTitle} where the beneficiary scored ${score}%. This evaluation covers observed performance and future development areas.`);
-    
     // Set competencies based on test skills if available
     if (testSkills.length > 0) {
       const competencies = testSkills.map(skill => ({
@@ -262,25 +229,20 @@ const TrainerEvaluationPage = () => {
         score: Math.min(5, Math.max(1, Math.round(session.score / 20))), // Convert percentage to 1-5 scale
         notes: `Based on ${testTitle} performance`,
       }));
-      
       setValue('competencies', competencies);
     }
-    
     // Set default strengths based on successful areas
     if (session.strengths && session.strengths.length > 0) {
       setValue('strengths', session.strengths);
     }
-    
     // Set default areas for improvement
     if (session.areas_for_improvement && session.areas_for_improvement.length > 0) {
       setValue('areas_for_improvement', session.areas_for_improvement);
     }
-    
     // Set a default action plan
     setValue('action_plan', `Based on the ${testTitle} results, we recommend focusing on ${
       session.areas_for_improvement?.[0] || 'key development areas'
     } through targeted exercises and regular check-ins. We will reassess progress in 4 weeks.`);
-    
     // Set default goals
     setValue('goals', [
       {
@@ -289,7 +251,6 @@ const TrainerEvaluationPage = () => {
         success_criteria: 'Demonstrating improvement through practical application and follow-up assessment',
       }
     ]);
-    
     // Set default overall feedback
     setValue('overall_feedback', `Overall, the beneficiary has demonstrated ${
       session.score >= 80 ? 'excellent' : 
@@ -297,7 +258,6 @@ const TrainerEvaluationPage = () => {
       session.score >= 40 ? 'satisfactory' : 'developing'
     } performance in ${testTitle}. We have identified clear strengths and areas for development which will be the focus of upcoming training sessions.`);
   };
-
   // Render loading state
   if (isLoading) {
     return (
@@ -306,7 +266,6 @@ const TrainerEvaluationPage = () => {
       </div>
     );
   }
-
   // Render empty state if no beneficiary data
   if (!beneficiary) {
     return (
@@ -320,7 +279,6 @@ const TrainerEvaluationPage = () => {
       </div>
     );
   }
-
   return (
     <div className="container mx-auto py-6 max-w-5xl">
       <div className="flex items-center justify-between mb-6">
@@ -335,7 +293,6 @@ const TrainerEvaluationPage = () => {
           </Button>
           <h1 className="text-2xl font-bold">Trainer Evaluation</h1>
         </div>
-        
         {session && (
           <Button
             variant="outline"
@@ -347,7 +304,6 @@ const TrainerEvaluationPage = () => {
           </Button>
         )}
       </div>
-      
       {/* Beneficiary info card */}
       <Card className="mb-6 p-4">
         <div className="flex items-center">
@@ -366,7 +322,6 @@ const TrainerEvaluationPage = () => {
           )}
         </div>
       </Card>
-      
       {/* Evaluation tabs */}
       <Tabs 
         value={activeTab} 
@@ -387,7 +342,6 @@ const TrainerEvaluationPage = () => {
             Templates
           </Tabs.TabTrigger>
         </Tabs.TabsList>
-        
         {/* Manual evaluation tab */}
         <Tabs.TabContent value="manual">
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -404,7 +358,6 @@ const TrainerEvaluationPage = () => {
                     error={errors.title?.message}
                   />
                 </div>
-                
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Date
@@ -417,7 +370,6 @@ const TrainerEvaluationPage = () => {
                   />
                 </div>
               </div>
-              
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description*
@@ -432,7 +384,6 @@ const TrainerEvaluationPage = () => {
                 )}
               </div>
             </Card>
-            
             {/* Competencies */}
             <Card className="mb-6 p-6">
               <div className="flex justify-between items-center mb-4">
@@ -448,7 +399,6 @@ const TrainerEvaluationPage = () => {
                   Add Competency
                 </Button>
               </div>
-              
               <div className="space-y-4">
                 {watchedCompetencies.map((competency, index) => (
                   <div key={index} className="p-4 border border-gray-200 rounded-lg">
@@ -492,7 +442,6 @@ const TrainerEvaluationPage = () => {
                             </Button>
                           </div>
                         </div>
-                        
                         <div className="mt-3">
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Notes
@@ -509,7 +458,6 @@ const TrainerEvaluationPage = () => {
                 ))}
               </div>
             </Card>
-            
             {/* Strengths & Areas for Improvement */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* Strengths */}
@@ -527,7 +475,6 @@ const TrainerEvaluationPage = () => {
                     Add
                   </Button>
                 </div>
-                
                 <div className="space-y-3">
                   {watchedStrengths.map((strength, index) => (
                     <div key={index} className="flex items-center space-x-2">
@@ -552,7 +499,6 @@ const TrainerEvaluationPage = () => {
                   <p className="mt-1 text-sm text-red-600">{errors.strengths.message}</p>
                 )}
               </Card>
-              
               {/* Areas for Improvement */}
               <Card className="p-6">
                 <div className="flex justify-between items-center mb-4">
@@ -568,7 +514,6 @@ const TrainerEvaluationPage = () => {
                     Add
                   </Button>
                 </div>
-                
                 <div className="space-y-3">
                   {watchedAreasForImprovement.map((area, index) => (
                     <div key={index} className="flex items-center space-x-2">
@@ -594,14 +539,12 @@ const TrainerEvaluationPage = () => {
                 )}
               </Card>
             </div>
-            
             {/* Action Plan */}
             <Card className="mb-6 p-6">
               <h2 className="text-xl font-semibold mb-4">Action Plan</h2>
               <p className="text-gray-600 mb-4">
                 Outline the specific actions that will be taken to address areas for improvement and build on strengths.
               </p>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Action Plan Details*
@@ -616,7 +559,6 @@ const TrainerEvaluationPage = () => {
                 )}
               </div>
             </Card>
-            
             {/* Goals */}
             <Card className="mb-6 p-6">
               <div className="flex justify-between items-center mb-4">
@@ -632,7 +574,6 @@ const TrainerEvaluationPage = () => {
                   Add Goal
                 </Button>
               </div>
-              
               <div className="space-y-6">
                 {watchedGoals.map((goal, index) => (
                   <div key={index} className="p-4 border border-gray-200 rounded-lg">
@@ -649,7 +590,6 @@ const TrainerEvaluationPage = () => {
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
-                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -660,7 +600,6 @@ const TrainerEvaluationPage = () => {
                           placeholder="What should be achieved?"
                         />
                       </div>
-                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Timeline
@@ -671,7 +610,6 @@ const TrainerEvaluationPage = () => {
                         />
                       </div>
                     </div>
-                    
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Success Criteria
@@ -688,11 +626,9 @@ const TrainerEvaluationPage = () => {
                 <p className="mt-1 text-sm text-red-600">{errors.goals.message}</p>
               )}
             </Card>
-            
             {/* Overall Feedback */}
             <Card className="mb-6 p-6">
               <h2 className="text-xl font-semibold mb-4">Overall Feedback</h2>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Summary and Additional Observations*
@@ -707,7 +643,6 @@ const TrainerEvaluationPage = () => {
                 )}
               </div>
             </Card>
-            
             {/* Form actions */}
             <div className="flex justify-end space-x-3">
               <Button
@@ -717,7 +652,6 @@ const TrainerEvaluationPage = () => {
               >
                 Cancel
               </Button>
-              
               <Button
                 type="submit"
                 disabled={isSaving}
@@ -738,7 +672,6 @@ const TrainerEvaluationPage = () => {
             </div>
           </form>
         </Tabs.TabContent>
-        
         {/* Evaluation history tab */}
         <Tabs.TabContent value="history">
           {evaluations.length === 0 ? (
@@ -768,11 +701,9 @@ const TrainerEvaluationPage = () => {
                       View Details
                     </Button>
                   </div>
-                  
                   <div className="mb-4">
                     <p className="text-gray-700">{evaluation.description}</p>
                   </div>
-                  
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-green-50 p-3 rounded-lg">
                       <h4 className="font-medium text-green-800 mb-1 flex items-center">
@@ -785,7 +716,6 @@ const TrainerEvaluationPage = () => {
                         ))}
                       </ul>
                     </div>
-                    
                     <div className="bg-amber-50 p-3 rounded-lg">
                       <h4 className="font-medium text-amber-800 mb-1 flex items-center">
                         <AlertTriangle className="w-4 h-4 mr-1" />
@@ -797,7 +727,6 @@ const TrainerEvaluationPage = () => {
                         ))}
                       </ul>
                     </div>
-                    
                     <div className="bg-blue-50 p-3 rounded-lg">
                       <h4 className="font-medium text-blue-800 mb-1 flex items-center">
                         <Award className="w-4 h-4 mr-1" />
@@ -815,7 +744,6 @@ const TrainerEvaluationPage = () => {
             </div>
           )}
         </Tabs.TabContent>
-        
         {/* Templates tab */}
         <Tabs.TabContent value="template">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -839,7 +767,6 @@ const TrainerEvaluationPage = () => {
               </p>
               <Button className="mt-4 w-full">Use Template</Button>
             </Card>
-            
             <Card className="p-6 hover:border-primary cursor-pointer transition-colors" onClick={() => {
               setValue('title', 'Quarterly Comprehensive Evaluation');
               setValue('description', 'In-depth quarterly assessment covering all development areas, measuring progress against established goals, and setting new objectives for the next quarter.');
@@ -860,7 +787,6 @@ const TrainerEvaluationPage = () => {
               </p>
               <Button className="mt-4 w-full">Use Template</Button>
             </Card>
-            
             <Card className="p-6 hover:border-primary cursor-pointer transition-colors" onClick={() => {
               setValue('title', 'Technical Skills Assessment');
               setValue('description', 'Focused evaluation of technical competencies related to the beneficiary\'s field of study or career path.');
@@ -888,7 +814,6 @@ const TrainerEvaluationPage = () => {
               </p>
               <Button className="mt-4 w-full">Use Template</Button>
             </Card>
-            
             <Card className="p-6 hover:border-primary cursor-pointer transition-colors" onClick={() => {
               setValue('title', 'Soft Skills Development Evaluation');
               setValue('description', 'Assessment focused on communication, teamwork, leadership, and other interpersonal skills critical for professional success.');
@@ -922,5 +847,4 @@ const TrainerEvaluationPage = () => {
     </div>
   );
 };
-
 export default TrainerEvaluationPage;

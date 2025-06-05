@@ -8,7 +8,6 @@ import { Card } from '../../../components/ui/card';
 import { Alert } from '../../../components/ui/alert';
 import { Badge } from '../../../components/ui/badge';
 import { Tabs } from '../../../components/ui/tabs';
-
 const PortalAssessmentSubmissionPage = () => {
   const { assessmentId, assignmentId } = useParams();
   const navigate = useNavigate();
@@ -20,25 +19,20 @@ const PortalAssessmentSubmissionPage = () => {
   const [notes, setNotes] = useState('');
   const [selectedRequirement, setSelectedRequirement] = useState(0);
   const [requirementStatus, setRequirementStatus] = useState({});
-
   useEffect(() => {
     fetchAssessmentAndSubmission();
   }, [assessmentId, assignmentId]);
-
   const fetchAssessmentAndSubmission = async () => {
     try {
       const [assessmentRes, submissionRes] = await Promise.all([
         axios.get(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}`),
         axios.get(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}/submission`)
       ]);
-
       setAssessment(assessmentRes.data);
-      
       if (submissionRes.data) {
         setSubmission(submissionRes.data);
         setFiles(submissionRes.data.files || []);
         setNotes(submissionRes.data.notes || '');
-        
         // Initialize requirement status from existing submission
         const status = {};
         submissionRes.data.requirements?.forEach(req => {
@@ -64,7 +58,6 @@ const PortalAssessmentSubmissionPage = () => {
       setLoading(false);
     }
   };
-
   const handleFileUpload = (event) => {
     const uploadedFiles = Array.from(event.target.files);
     const newFiles = uploadedFiles.map(file => ({
@@ -77,24 +70,20 @@ const PortalAssessmentSubmissionPage = () => {
     }));
     setFiles([...files, ...newFiles]);
   };
-
   const removeFile = (fileId) => {
     setFiles(files.filter(f => f.id !== fileId));
   };
-
   const toggleRequirement = (requirementId) => {
     setRequirementStatus(prev => ({
       ...prev,
       [requirementId]: !prev[requirementId]
     }));
   };
-
   const calculateProgress = () => {
     const totalRequirements = assessment?.requirements?.length || 0;
     const completedRequirements = Object.values(requirementStatus).filter(Boolean).length;
     return totalRequirements > 0 ? (completedRequirements / totalRequirements) * 100 : 0;
   };
-
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
@@ -116,15 +105,12 @@ const PortalAssessmentSubmissionPage = () => {
         })),
         submittedAt: new Date().toISOString()
       };
-
       await axios.post(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}/submit`, submissionData);
-      
       toast({
         title: 'Success',
         description: 'Your assessment has been submitted successfully',
         variant: 'success'
       });
-
       navigate(`/portal/assessments/results/${assessmentId}/${assignmentId}`);
     } catch (error) {
       console.error('Error submitting assessment:', error);
@@ -137,7 +123,6 @@ const PortalAssessmentSubmissionPage = () => {
       setSubmitting(false);
     }
   };
-
   const handleSaveDraft = async () => {
     try {
       const draftData = {
@@ -149,9 +134,7 @@ const PortalAssessmentSubmissionPage = () => {
         })),
         savedAt: new Date().toISOString()
       };
-
       await axios.post(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}/save-draft`, draftData);
-      
       toast({
         title: 'Draft Saved',
         description: 'Your progress has been saved',
@@ -166,7 +149,6 @@ const PortalAssessmentSubmissionPage = () => {
       });
     }
   };
-
   const getFileIcon = (type) => {
     if (type.startsWith('image/')) return <Image className="h-5 w-5" />;
     if (type.includes('pdf') || type.includes('document')) return <FileText className="h-5 w-5" />;
@@ -174,7 +156,6 @@ const PortalAssessmentSubmissionPage = () => {
     if (type.includes('zip') || type.includes('archive')) return <Archive className="h-5 w-5" />;
     return <File className="h-5 w-5" />;
   };
-
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -182,7 +163,6 @@ const PortalAssessmentSubmissionPage = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
-
   if (loading) {
     return (
       <div className="p-6">
@@ -193,7 +173,6 @@ const PortalAssessmentSubmissionPage = () => {
       </div>
     );
   }
-
   if (!assessment) {
     return (
       <div className="p-6">
@@ -207,11 +186,9 @@ const PortalAssessmentSubmissionPage = () => {
       </div>
     );
   }
-
   const progress = calculateProgress();
   const currentRequirement = assessment.requirements[selectedRequirement];
   const isOverdue = new Date(assessment.dueDate) < new Date();
-
   return (
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
@@ -247,7 +224,6 @@ const PortalAssessmentSubmissionPage = () => {
             </Button>
           </div>
         </div>
-
         {/* Progress Bar */}
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
@@ -262,7 +238,6 @@ const PortalAssessmentSubmissionPage = () => {
           </div>
         </div>
       </div>
-
       {/* Main Content */}
       <div className="grid grid-cols-3 gap-6">
         {/* Requirements Panel */}
@@ -303,7 +278,6 @@ const PortalAssessmentSubmissionPage = () => {
             </div>
           </Card>
         </div>
-
         {/* Work Area */}
         <div className="col-span-2 space-y-6">
           {/* Requirement Details */}
@@ -333,10 +307,8 @@ const PortalAssessmentSubmissionPage = () => {
                   </Button>
                 </div>
               </div>
-              
               <div className="prose max-w-none">
                 <p className="text-gray-700 mb-4">{currentRequirement.description}</p>
-                
                 {currentRequirement.rubric && (
                   <div className="bg-gray-50 rounded-lg p-4 mt-4">
                     <h4 className="font-medium text-gray-900 mb-2">Grading Criteria</h4>
@@ -352,12 +324,10 @@ const PortalAssessmentSubmissionPage = () => {
               </div>
             </div>
           </Card>
-
           {/* File Upload */}
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Files</h3>
-              
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Upload Files
@@ -380,7 +350,6 @@ const PortalAssessmentSubmissionPage = () => {
                   </label>
                 </div>
               </div>
-
               {files.length > 0 && (
                 <div className="space-y-2">
                   <h4 className="font-medium text-gray-900">Uploaded Files</h4>
@@ -408,7 +377,6 @@ const PortalAssessmentSubmissionPage = () => {
               )}
             </div>
           </Card>
-
           {/* Notes */}
           <Card>
             <div className="p-6">
@@ -424,7 +392,6 @@ const PortalAssessmentSubmissionPage = () => {
           </Card>
         </div>
       </div>
-
       {/* Submission Alert */}
       {progress === 100 && (
         <Alert className="mt-6" variant="success">
@@ -438,5 +405,4 @@ const PortalAssessmentSubmissionPage = () => {
     </div>
   );
 };
-
 export default PortalAssessmentSubmissionPage;

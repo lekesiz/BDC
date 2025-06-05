@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '../../lib/utils';
-
 /**
  * Optimized Image Component with lazy loading and progressive enhancement
  */
@@ -23,14 +22,12 @@ export const OptimizedImage = ({
   const [isInView, setIsInView] = useState(false);
   const [hasError, setHasError] = useState(false);
   const imgRef = useRef(null);
-
   // Use Intersection Observer for lazy loading
   useEffect(() => {
     if (priority || !imgRef.current) {
       setIsInView(true);
       return;
     }
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -43,24 +40,19 @@ export const OptimizedImage = ({
         rootMargin: '50px',
       }
     );
-
     observer.observe(imgRef.current);
-
     return () => {
       observer.disconnect();
     };
   }, [priority]);
-
   const handleLoad = (e) => {
     setIsLoaded(true);
     onLoad?.(e);
   };
-
   const handleError = (e) => {
     setHasError(true);
     onError?.(e);
   };
-
   // Generate blur placeholder if not provided
   const getPlaceholder = () => {
     if (placeholder === 'blur' && blurDataURL) {
@@ -69,7 +61,6 @@ export const OptimizedImage = ({
     // Default gray placeholder
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNlNWU3ZWIiLz48L3N2Zz4=';
   };
-
   if (hasError) {
     return (
       <div
@@ -93,7 +84,6 @@ export const OptimizedImage = ({
       </div>
     );
   }
-
   return (
     <div
       ref={imgRef}
@@ -109,7 +99,6 @@ export const OptimizedImage = ({
           aria-hidden="true"
         />
       )}
-
       {/* Main Image */}
       {isInView && (
         <img
@@ -131,7 +120,6 @@ export const OptimizedImage = ({
           {...props}
         />
       )}
-
       {/* Loading Skeleton */}
       {!isLoaded && !hasError && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse" />
@@ -139,7 +127,6 @@ export const OptimizedImage = ({
     </div>
   );
 };
-
 /**
  * Picture component for responsive images with multiple formats
  */
@@ -155,14 +142,12 @@ export const OptimizedPicture = ({
   ...props
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-
   // Generate source URLs for different formats
   const getSrcForFormat = (format) => {
     const lastDot = src.lastIndexOf('.');
     if (lastDot === -1) return src;
     return `${src.substring(0, lastDot)}.${format}`;
   };
-
   return (
     <picture className={className}>
       {/* WebP and other modern formats */}
@@ -174,7 +159,6 @@ export const OptimizedPicture = ({
           sizes={sizes}
         />
       ))}
-
       {/* Fallback image */}
       <OptimizedImage
         src={src}
@@ -189,7 +173,6 @@ export const OptimizedPicture = ({
     </picture>
   );
 };
-
 /**
  * Background image component with lazy loading
  */
@@ -204,10 +187,8 @@ export const OptimizedBackgroundImage = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const containerRef = useRef(null);
-
   useEffect(() => {
     if (!containerRef.current) return;
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -220,22 +201,17 @@ export const OptimizedBackgroundImage = ({
         rootMargin: '50px',
       }
     );
-
     observer.observe(containerRef.current);
-
     return () => {
       observer.disconnect();
     };
   }, []);
-
   useEffect(() => {
     if (!isInView) return;
-
     const img = new Image();
     img.src = src;
     img.onload = () => setIsLoaded(true);
   }, [isInView, src]);
-
   return (
     <div
       ref={containerRef}
@@ -252,7 +228,6 @@ export const OptimizedBackgroundImage = ({
           style={{ backgroundImage: `url(${src})` }}
         />
       )}
-
       {/* Overlay */}
       {overlay && (
         <div
@@ -260,18 +235,15 @@ export const OptimizedBackgroundImage = ({
           style={{ opacity: overlayOpacity }}
         />
       )}
-
       {/* Loading placeholder */}
       {!isLoaded && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse" />
       )}
-
       {/* Content */}
       <div className="relative z-10">{children}</div>
     </div>
   );
 };
-
 /**
  * Avatar component with optimized loading
  */
@@ -284,7 +256,6 @@ export const OptimizedAvatar = ({
   ...props
 }) => {
   const [hasError, setHasError] = useState(false);
-
   const sizeClasses = {
     xs: 'w-6 h-6',
     sm: 'w-8 h-8',
@@ -292,7 +263,6 @@ export const OptimizedAvatar = ({
     lg: 'w-12 h-12',
     xl: 'w-16 h-16',
   };
-
   const getFallbackContent = () => {
     if (fallback) return fallback;
     if (alt) {
@@ -306,7 +276,6 @@ export const OptimizedAvatar = ({
     }
     return '?';
   };
-
   if (hasError || !src) {
     return (
       <div
@@ -321,7 +290,6 @@ export const OptimizedAvatar = ({
       </div>
     );
   }
-
   return (
     <OptimizedImage
       src={src}
@@ -333,7 +301,6 @@ export const OptimizedAvatar = ({
     />
   );
 };
-
 /**
  * Image gallery with virtualization for large collections
  */
@@ -345,11 +312,9 @@ export const OptimizedImageGallery = ({
   onImageClick,
 }) => {
   const [loadedImages, setLoadedImages] = useState(new Set());
-
   const handleImageLoad = (index) => {
     setLoadedImages((prev) => new Set(prev).add(index));
   };
-
   return (
     <div
       className={cn(
@@ -371,7 +336,6 @@ export const OptimizedImageGallery = ({
             className="w-full h-full object-cover rounded-lg group-hover:opacity-90 transition-opacity"
             onLoad={() => handleImageLoad(index)}
           />
-          
           {/* Overlay on hover */}
           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg" />
         </div>
@@ -379,7 +343,6 @@ export const OptimizedImageGallery = ({
     </div>
   );
 };
-
 // Utility function to generate responsive image sizes
 export const generateImageSizes = (maxWidth = 1200) => {
   const breakpoints = [640, 768, 1024, 1280, 1536];
@@ -387,10 +350,8 @@ export const generateImageSizes = (maxWidth = 1200) => {
     .filter((bp) => bp <= maxWidth)
     .map((bp) => `(max-width: ${bp}px) ${bp}px`)
     .join(', ');
-  
   return `${sizes}, ${maxWidth}px`;
 };
-
 // Utility function to generate srcSet for responsive images
 export const generateSrcSet = (baseUrl, widths = [320, 640, 960, 1280, 1920]) => {
   return widths

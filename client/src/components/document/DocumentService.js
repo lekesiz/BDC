@@ -3,7 +3,6 @@
  */
 import axios from 'axios';
 import { toast } from 'react-toastify';
-
 /**
  * Supported document types and their corresponding mime types
  */
@@ -15,7 +14,6 @@ export const SUPPORTED_DOCUMENT_TYPES = {
     preview: true,
     extensions: ['.pdf']
   },
-  
   // Images
   image: {
     mimeTypes: [
@@ -29,7 +27,6 @@ export const SUPPORTED_DOCUMENT_TYPES = {
     preview: true,
     extensions: ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp']
   },
-  
   // Microsoft Office documents
   office: {
     mimeTypes: [
@@ -44,7 +41,6 @@ export const SUPPORTED_DOCUMENT_TYPES = {
     preview: true,
     extensions: ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx']
   },
-  
   // Text files
   text: {
     mimeTypes: ['text/plain', 'text/csv', 'text/html', 'text/css', 'text/javascript'],
@@ -52,7 +48,6 @@ export const SUPPORTED_DOCUMENT_TYPES = {
     preview: true,
     extensions: ['.txt', '.csv', '.html', '.css', '.js']
   },
-  
   // Archives
   archive: {
     mimeTypes: [
@@ -66,7 +61,6 @@ export const SUPPORTED_DOCUMENT_TYPES = {
     extensions: ['.zip', '.rar', '.7z', '.gz', '.tar.gz']
   }
 };
-
 /**
  * Gets the document type based on the file extension or mime type
  * @param {string} filename - The file name
@@ -75,24 +69,20 @@ export const SUPPORTED_DOCUMENT_TYPES = {
  */
 export const getDocumentType = (filename, mimeType) => {
   const extension = '.' + filename.split('.').pop().toLowerCase();
-  
   // Check by extension first
   for (const [type, info] of Object.entries(SUPPORTED_DOCUMENT_TYPES)) {
     if (info.extensions.includes(extension)) {
       return type;
     }
   }
-  
   // Then check by mime type
   for (const [type, info] of Object.entries(SUPPORTED_DOCUMENT_TYPES)) {
     if (info.mimeTypes.includes(mimeType)) {
       return type;
     }
   }
-  
   return 'unknown';
 };
-
 /**
  * Checks if file is supported for preview
  * @param {string} filename - The file name
@@ -104,7 +94,6 @@ export const isPreviewSupported = (filename, mimeType) => {
   return documentType !== 'unknown' && 
          SUPPORTED_DOCUMENT_TYPES[documentType]?.preview === true;
 };
-
 /**
  * Formats bytes to human-readable size
  * @param {number} bytes - The size in bytes
@@ -112,14 +101,11 @@ export const isPreviewSupported = (filename, mimeType) => {
  */
 export const formatFileSize = (bytes) => {
   if (bytes === 0) return '0 Bytes';
-  
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
-
 /**
  * Validates file before upload
  * @param {File} file - The file to validate
@@ -127,30 +113,25 @@ export const formatFileSize = (bytes) => {
  */
 export const validateFile = (file) => {
   const documentType = getDocumentType(file.name, file.type);
-  
   if (documentType === 'unknown') {
     return {
       valid: false,
       message: 'Desteklenmeyen dosya türü'
     };
   }
-  
   const typeInfo = SUPPORTED_DOCUMENT_TYPES[documentType];
-  
   if (file.size > typeInfo.maxSize) {
     return {
       valid: false,
       message: `Dosya boyutu çok büyük. Maksimum boyut: ${formatFileSize(typeInfo.maxSize)}`
     };
   }
-  
   return {
     valid: true,
     message: 'Dosya geçerli',
     documentType
   };
 };
-
 /**
  * Uploads a document to the server
  * @param {File} file - The file to upload
@@ -165,18 +146,15 @@ export const uploadDocument = async (file, metadata = {}, onProgress = null) => 
     toast.error(validation.message);
     return Promise.reject(new Error(validation.message));
   }
-
   // Create form data
   const formData = new FormData();
   formData.append('file', file);
-  
   // Add metadata
   Object.entries(metadata).forEach(([key, value]) => {
     if (value !== null && value !== undefined) {
       formData.append(key, value);
     }
   });
-  
   try {
     const response = await axios.post('/api/documents/upload', formData, {
       headers: {
@@ -189,7 +167,6 @@ export const uploadDocument = async (file, metadata = {}, onProgress = null) => 
         }
       }
     });
-    
     toast.success('Dosya başarıyla yüklendi');
     return response.data;
   } catch (error) {
@@ -198,7 +175,6 @@ export const uploadDocument = async (file, metadata = {}, onProgress = null) => 
     throw error;
   }
 };
-
 /**
  * Downloads a document
  * @param {string|number} documentId - The document ID to download
@@ -219,7 +195,6 @@ export const downloadDocument = async (documentId, filename = null, onProgress =
         }
       }
     });
-    
     // Create download link
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
@@ -228,14 +203,12 @@ export const downloadDocument = async (documentId, filename = null, onProgress =
     document.body.appendChild(link);
     link.click();
     link.remove();
-    
     toast.success('Dosya indirildi');
   } catch (error) {
     toast.error('Dosya indirilirken bir hata oluştu');
     throw error;
   }
 };
-
 /**
  * Deletes a document
  * @param {string|number} documentId - The document ID to delete
@@ -251,7 +224,6 @@ export const deleteDocument = async (documentId) => {
     throw error;
   }
 };
-
 /**
  * Updates document metadata
  * @param {string|number} documentId - The document ID
@@ -268,7 +240,6 @@ export const updateDocumentMetadata = async (documentId, metadata) => {
     throw error;
   }
 };
-
 /**
  * Shares a document with other users
  * @param {string|number} documentId - The document ID
@@ -282,7 +253,6 @@ export const shareDocument = async (documentId, users, permission = 'view') => {
       users,
       permission
     });
-    
     toast.success('Doküman paylaşıldı');
     return response.data;
   } catch (error) {
@@ -290,7 +260,6 @@ export const shareDocument = async (documentId, users, permission = 'view') => {
     throw error;
   }
 };
-
 export default {
   uploadDocument,
   downloadDocument,

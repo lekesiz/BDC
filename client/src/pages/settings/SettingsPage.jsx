@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Shield, Globe, Moon, Sun, Monitor, Brain } from 'lucide-react';
+import { Bell, Shield, Globe, Moon, Sun, Monitor, Brain, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/toast';
 import { AnimatedButton, AnimatedCard, AnimatedPage } from '@/components/animations';
@@ -9,11 +8,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Tabs, TabsList, TabTrigger, TabContent } from '@/components/ui/tabs';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import api from '@/lib/api';
 import AISettingsContent from './AISettingsContent';
 import { motion } from 'framer-motion';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/animations';
-
 /**
  * Settings page component
  */
@@ -21,13 +21,11 @@ const SettingsPage = () => {
   const { user, refreshToken } = useAuth();
   const { addToast } = useToast();
   const { t, i18n } = useTranslation();
-  
   // State management
   const [activeTab, setActiveTab] = useState('notifications');
   const [isLoading, setIsLoading] = useState(false);
   const [theme, setTheme] = useState('system');
   const [language, setLanguage] = useState(i18n.language || 'en');
-  
   // Notification settings state
   const [notificationSettings, setNotificationSettings] = useState({
     email_notifications: true,
@@ -39,7 +37,6 @@ const SettingsPage = () => {
     system_updates: true,
     evaluation_results: true,
   });
-  
   // Privacy settings state
   const [privacySettings, setPrivacySettings] = useState({
     profile_visibility: 'all',
@@ -47,7 +44,6 @@ const SettingsPage = () => {
     share_activity: true,
     allow_data_collection: true,
   });
-  
   // Handle notification toggle
   const handleNotificationToggle = (key) => {
     setNotificationSettings(prev => ({
@@ -55,7 +51,10 @@ const SettingsPage = () => {
       [key]: !prev[key]
     }));
   };
-  
+  // Access control based on user roles
+  const canAccessPrivacySettings = user?.role === 'super_admin' || user?.role === 'admin' || user?.role === 'trainer';
+  const canAccessAISettings = user?.role === 'super_admin' || user?.role === 'admin' || user?.role === 'trainer';
+  const canAccessIntegrations = user?.role === 'super_admin' || user?.role === 'admin';
   // Handle privacy setting change
   const handlePrivacyChange = (key, value) => {
     setPrivacySettings(prev => ({
@@ -63,7 +62,6 @@ const SettingsPage = () => {
       [key]: value
     }));
   };
-  
   // Fetch notification settings on mount
   useEffect(() => {
     const fetchNotificationSettings = async () => {
@@ -77,10 +75,8 @@ const SettingsPage = () => {
         console.error('Failed to fetch notification settings:', err);
       }
     };
-    
     fetchNotificationSettings();
   }, []);
-  
   // Fetch privacy settings on mount
   useEffect(() => {
     const fetchPrivacySettings = async () => {
@@ -94,14 +90,11 @@ const SettingsPage = () => {
         console.error('Failed to fetch privacy settings:', err);
       }
     };
-    
     fetchPrivacySettings();
   }, []);
-  
   // Handle theme change
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
-    
     // In a real app, this would update the theme in the DOM
     // and possibly store the preference
     document.documentElement.classList.remove('light', 'dark');
@@ -118,7 +111,6 @@ const SettingsPage = () => {
       }
     }
   };
-  
   // Handle language change
   const handleLanguageChange = (e) => {
     const newLanguage = e.target.value;
@@ -126,15 +118,12 @@ const SettingsPage = () => {
     i18n.changeLanguage(newLanguage);
     localStorage.setItem('language', newLanguage);
   };
-  
   // Handle notification settings save
   const handleSaveNotifications = async () => {
     try {
       setIsLoading(true);
-      
       // Call API to save notification settings
       await api.put('/api/settings/notifications', notificationSettings);
-      
       addToast({
         type: 'success',
         title: 'Settings updated',
@@ -142,7 +131,6 @@ const SettingsPage = () => {
       });
     } catch (err) {
       console.error('Failed to save notification settings:', err);
-      
       addToast({
         type: 'error',
         title: 'Update failed',
@@ -152,15 +140,12 @@ const SettingsPage = () => {
       setIsLoading(false);
     }
   };
-  
   // Handle privacy settings save
   const handleSavePrivacy = async () => {
     try {
       setIsLoading(true);
-      
       // Call API to save privacy settings
       await api.put('/api/settings/privacy', privacySettings);
-      
       addToast({
         type: 'success',
         title: 'Settings updated',
@@ -168,7 +153,6 @@ const SettingsPage = () => {
       });
     } catch (err) {
       console.error('Failed to save privacy settings:', err);
-      
       addToast({
         type: 'error',
         title: 'Update failed',
@@ -178,18 +162,15 @@ const SettingsPage = () => {
       setIsLoading(false);
     }
   };
-  
   // Handle preferences save
   const handleSavePreferences = async () => {
     try {
       setIsLoading(true);
-      
       // Call API to save preferences
       await api.put('/api/users/settings/preferences', {
         theme,
         language,
       });
-      
       addToast({
         type: 'success',
         title: 'Settings updated',
@@ -197,7 +178,6 @@ const SettingsPage = () => {
       });
     } catch (err) {
       console.error('Failed to save preferences:', err);
-      
       addToast({
         type: 'error',
         title: 'Update failed',
@@ -207,7 +187,6 @@ const SettingsPage = () => {
       setIsLoading(false);
     }
   };
-  
   return (
     <AnimatedPage className="container mx-auto py-8 px-4">
       <motion.h1 
@@ -218,7 +197,6 @@ const SettingsPage = () => {
       >
         Settings
       </motion.h1>
-      
       <AnimatedCard>
         <CardHeader>
           <CardTitle>Account Settings</CardTitle>
@@ -226,7 +204,6 @@ const SettingsPage = () => {
             Manage your account preferences and settings
           </CardDescription>
         </CardHeader>
-        
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <CardContent className="pb-0">
             <TabsList className="mb-6">
@@ -246,9 +223,12 @@ const SettingsPage = () => {
                 <Brain className="h-4 w-4 mr-2" />
                 AI
               </TabTrigger>
+              <TabTrigger value="integrations">
+                <Globe className="h-4 w-4 mr-2" />
+                Integrations
+              </TabTrigger>
             </TabsList>
           </CardContent>
-          
           {/* Notifications Tab */}
           <TabContent value="notifications">
             <CardContent>
@@ -263,7 +243,6 @@ const SettingsPage = () => {
                   variants={staggerItem}
                 >
                   <h3 className="text-lg font-medium">Email Notifications</h3>
-                  
                   <div className="space-y-3">
                   {/* Email Notifications toggle */}
                   <div className="flex items-center justify-between">
@@ -280,7 +259,6 @@ const SettingsPage = () => {
                       />
                     </div>
                   </div>
-                  
                   {/* Marketing Emails toggle */}
                   <div className="flex items-center justify-between">
                     <div>
@@ -299,10 +277,8 @@ const SettingsPage = () => {
                 </div>
               </motion.div>
               </motion.div>
-              
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Push Notifications</h3>
-                
                 <div className="space-y-3">
                   {/* Push Notifications toggle */}
                   <div className="flex items-center justify-between">
@@ -319,7 +295,6 @@ const SettingsPage = () => {
                       />
                     </div>
                   </div>
-                  
                   {/* New Messages toggle */}
                   <div className="flex items-center justify-between">
                     <div>
@@ -335,7 +310,6 @@ const SettingsPage = () => {
                       />
                     </div>
                   </div>
-                  
                   {/* Session Reminders toggle */}
                   <div className="flex items-center justify-between">
                     <div>
@@ -351,7 +325,6 @@ const SettingsPage = () => {
                       />
                     </div>
                   </div>
-                  
                   {/* Evaluation Results toggle */}
                   <div className="flex items-center justify-between">
                     <div>
@@ -369,10 +342,8 @@ const SettingsPage = () => {
                   </div>
                 </div>
               </div>
-              
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">SMS Notifications</h3>
-                
                 <div className="space-y-3">
                   {/* SMS Notifications toggle */}
                   <div className="flex items-center justify-between">
@@ -392,7 +363,6 @@ const SettingsPage = () => {
                 </div>
               </div>
             </CardContent>
-            
             <CardFooter className="border-t pt-6">
               <Button
                 onClick={handleSaveNotifications}
@@ -404,19 +374,17 @@ const SettingsPage = () => {
               </Button>
             </CardFooter>
           </TabContent>
-          
           {/* Privacy Tab */}
-          <TabContent value="privacy">
+          {canAccessPrivacySettings ? (
+            <TabContent value="privacy">
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Privacy Settings</h3>
-                
                 <div className="space-y-3">
                   {/* Profile Visibility */}
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium">Profile Visibility</h4>
                     <p className="text-sm text-muted-foreground">Control who can see your profile information</p>
-                    
                     <div className="flex flex-col space-y-1 mt-2">
                       <div className="flex items-center">
                         <input 
@@ -431,7 +399,6 @@ const SettingsPage = () => {
                           Everyone
                         </label>
                       </div>
-                      
                       <div className="flex items-center">
                         <input 
                           type="radio" 
@@ -445,7 +412,6 @@ const SettingsPage = () => {
                           Only connections
                         </label>
                       </div>
-                      
                       <div className="flex items-center">
                         <input 
                           type="radio" 
@@ -461,7 +427,6 @@ const SettingsPage = () => {
                       </div>
                     </div>
                   </div>
-                  
                   {/* Online Status toggle */}
                   <div className="flex items-center justify-between">
                     <div>
@@ -477,7 +442,6 @@ const SettingsPage = () => {
                       />
                     </div>
                   </div>
-                  
                   {/* Activity Sharing toggle */}
                   <div className="flex items-center justify-between">
                     <div>
@@ -495,10 +459,8 @@ const SettingsPage = () => {
                   </div>
                 </div>
               </div>
-              
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Data Collection</h3>
-                
                 <div className="space-y-3">
                   {/* Data Collection toggle */}
                   <div className="flex items-center justify-between">
@@ -517,13 +479,11 @@ const SettingsPage = () => {
                   </div>
                 </div>
               </div>
-              
               <Alert type="info" title="Data Privacy">
                 Your data is always protected and never shared with third parties without your consent.
                 View our <a href="/privacy-policy" className="text-primary underline">Privacy Policy</a> for more information.
               </Alert>
             </CardContent>
-            
             <CardFooter className="border-t pt-6">
               <Button
                 onClick={handleSavePrivacy}
@@ -534,20 +494,35 @@ const SettingsPage = () => {
                 Save Privacy Settings
               </Button>
             </CardFooter>
-          </TabContent>
-          
+            </TabContent>
+          ) : (
+            <TabContent value="privacy">
+              <CardContent>
+                <div className="flex items-center justify-center min-h-[300px]">
+                  <div className="text-center">
+                    <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Restricted</h3>
+                    <p className="text-gray-600 mb-4">
+                      Advanced privacy settings are only available to administrators and trainers.
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Current role: <Badge variant="secondary">{user?.role}</Badge>
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </TabContent>
+          )}
           {/* Preferences Tab */}
           <TabContent value="preferences">
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Appearance</h3>
-                
                 <div className="space-y-3">
                   {/* Theme Selection */}
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium">Theme</h4>
                     <p className="text-sm text-muted-foreground">Choose your preferred theme</p>
-                    
                     <div className="grid grid-cols-3 gap-2 mt-2">
                       <button
                         type="button"
@@ -557,7 +532,6 @@ const SettingsPage = () => {
                         <Sun className="h-5 w-5 mb-1" />
                         <span className="text-sm font-medium">Light</span>
                       </button>
-                      
                       <button
                         type="button"
                         className={`flex flex-col items-center justify-center p-3 border rounded-md ${theme === 'dark' ? 'border-primary' : 'border-gray-200'}`}
@@ -566,7 +540,6 @@ const SettingsPage = () => {
                         <Moon className="h-5 w-5 mb-1" />
                         <span className="text-sm font-medium">Dark</span>
                       </button>
-                      
                       <button
                         type="button"
                         className={`flex flex-col items-center justify-center p-3 border rounded-md ${theme === 'system' ? 'border-primary' : 'border-gray-200'}`}
@@ -579,16 +552,13 @@ const SettingsPage = () => {
                   </div>
                 </div>
               </div>
-              
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Language</h3>
-                
                 <div className="space-y-3">
                   {/* Language Selection */}
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium">Display Language</h4>
                     <p className="text-sm text-muted-foreground">Choose your preferred language for the interface</p>
-                    
                     <div className="mt-2">
                       <select
                         value={language}
@@ -605,12 +575,10 @@ const SettingsPage = () => {
                   </div>
                 </div>
               </div>
-              
               <Alert type="warning" title="Theme Support">
                 Theme settings are currently in beta and may not apply to all parts of the application.
               </Alert>
             </CardContent>
-            
             <CardFooter className="border-t pt-6">
               <AnimatedButton
                 onClick={handleSavePreferences}
@@ -622,15 +590,264 @@ const SettingsPage = () => {
               </AnimatedButton>
             </CardFooter>
           </TabContent>
-          
           {/* AI Tab */}
-          <TabContent value="ai">
-            <AISettingsContent />
-          </TabContent>
+          {canAccessAISettings ? (
+            <TabContent value="ai">
+              <AISettingsContent />
+            </TabContent>
+          ) : (
+            <TabContent value="ai">
+              <CardContent>
+                <div className="flex items-center justify-center min-h-[300px]">
+                  <div className="text-center">
+                    <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Restricted</h3>
+                    <p className="text-gray-600 mb-4">
+                      AI settings are only available to administrators and trainers.
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Current role: <Badge variant="secondary">{user?.role}</Badge>
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </TabContent>
+          )}
+          {/* Integrations Tab */}
+          {canAccessIntegrations ? (
+            <TabContent value="integrations">
+              <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">External Service Integrations</h3>
+                <p className="text-sm text-muted-foreground">
+                  Configure connections to external services and APIs
+                </p>
+                {/* Wedof Integration */}
+                <Card>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <Globe className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium">Wedof API</h4>
+                          <p className="text-sm text-muted-foreground">Sync beneficiary and program data</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open('/integrations/wedof', '_blank')}
+                        >
+                          Configure
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+                {/* Google Workspace */}
+                <Card>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-red-100 rounded-lg">
+                          <Globe className="h-5 w-5 text-red-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium">Google Workspace</h4>
+                          <p className="text-sm text-muted-foreground">Calendar, Drive, and Gmail integration</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 border rounded">
+                        <div>
+                          <p className="font-medium text-sm">Google Calendar</p>
+                          <p className="text-xs text-muted-foreground">Sync appointments and sessions</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open('/calendar/google-integration', '_blank')}
+                        >
+                          Setup
+                        </Button>
+                      </div>
+                      <div className="flex items-center justify-between p-3 border rounded">
+                        <div>
+                          <p className="font-medium text-sm">Google Drive</p>
+                          <p className="text-xs text-muted-foreground">Store and share documents</p>
+                        </div>
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Client ID
+                            </label>
+                            <Input
+                              type="text"
+                              placeholder="Google OAuth Client ID"
+                              className="text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Client Secret
+                            </label>
+                            <Input
+                              type="password"
+                              placeholder="Google OAuth Client Secret"
+                              className="text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 border rounded">
+                        <div>
+                          <p className="font-medium text-sm">Gmail Integration</p>
+                          <p className="text-xs text-muted-foreground">Send automated emails and notifications</p>
+                        </div>
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              SMTP Settings
+                            </label>
+                            <Input
+                              type="email"
+                              placeholder="smtp-username@gmail.com"
+                              className="text-xs mb-1"
+                            />
+                            <Input
+                              type="password"
+                              placeholder="App Password"
+                              className="text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+                {/* Other Integrations */}
+                <Card>
+                  <div className="p-4">
+                    <h4 className="font-medium mb-3">Other Integrations</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 border rounded">
+                        <div>
+                          <p className="font-medium text-sm">Pennylane</p>
+                          <p className="text-xs text-muted-foreground">Financial management integration</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open('/integrations/pennylane', '_blank')}
+                        >
+                          Configure
+                        </Button>
+                      </div>
+                      <div className="flex items-center justify-between p-3 border rounded">
+                        <div>
+                          <p className="font-medium text-sm">SMS Service</p>
+                          <p className="text-xs text-muted-foreground">Send SMS notifications</p>
+                        </div>
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Provider
+                            </label>
+                            <select className="w-full text-xs border rounded px-2 py-1">
+                              <option>Select SMS Provider</option>
+                              <option>Twilio</option>
+                              <option>MessageBird</option>
+                              <option>Orange SMS</option>
+                            </select>
+                          </div>
+                          <div>
+                            <Input
+                              type="text"
+                              placeholder="API Key"
+                              className="text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 border rounded">
+                        <div>
+                          <p className="font-medium text-sm">Webhook URLs</p>
+                          <p className="text-xs text-muted-foreground">Configure external service notifications</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open('/integrations/webhooks', '_blank')}
+                        >
+                          Manage
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+                {/* Integration Status */}
+                <Card>
+                  <div className="p-4">
+                    <h4 className="font-medium mb-3">Integration Health</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span>Wedof API</span>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Connected</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span>Google Calendar</span>
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">Partial</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span>AI Services</span>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Active</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span>SMS Service</span>
+                        <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">Not Configured</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+              <div className="flex justify-end pt-6 border-t">
+                <Button onClick={() => {
+                  addToast({
+                    type: 'success',
+                    title: 'Settings saved',
+                    message: 'Integration settings have been saved.',
+                  });
+                }}>
+                  Save Integration Settings
+                </Button>
+              </div>
+            </CardContent>
+            </TabContent>
+          ) : (
+            <TabContent value="integrations">
+              <CardContent>
+                <div className="flex items-center justify-center min-h-[300px]">
+                  <div className="text-center">
+                    <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Restricted</h3>
+                    <p className="text-gray-600 mb-4">
+                      Integration settings are only available to administrators.
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Current role: <Badge variant="secondary">{user?.role}</Badge>
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </TabContent>
+          )}
         </Tabs>
       </AnimatedCard>
     </AnimatedPage>
   );
 };
-
 export default SettingsPage;

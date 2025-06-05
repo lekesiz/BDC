@@ -1,6 +1,4 @@
 // Simple validation script to check if our code is syntactically correct
-console.log('Validation script running...');
-
 // Test WebSocket functionality
 function mockSocket() {
   const handlers = {};
@@ -9,9 +7,7 @@ function mockSocket() {
       handlers[event] = handler;
       return () => { delete handlers[event]; };
     },
-    emit: (event, data) => {
-      console.log(`Emitting ${event} with data:`, data);
-    },
+    emit: (event, data) => {},
     triggerEvent: (event, data) => {
       if (handlers[event]) {
         handlers[event](data);
@@ -21,19 +17,11 @@ function mockSocket() {
     }
   };
 }
-
 // Create a mock socket
 const socket = mockSocket();
-
 // Register some handlers
-const cleanupCreated = socket.on('program_created', (data) => {
-  console.log('Program created:', data);
-});
-
-const cleanupUpdated = socket.on('program_updated', (data) => {
-  console.log('Program updated:', data);
-});
-
+const cleanupCreated = socket.on('program_created', (data) => {});
+const cleanupUpdated = socket.on('program_updated', (data) => {});
 // Trigger an event
 socket.triggerEvent('program_created', { 
   program: { 
@@ -41,9 +29,6 @@ socket.triggerEvent('program_created', {
     name: 'Test Program' 
   } 
 });
-
 // Cleanup
 cleanupCreated();
 cleanupUpdated();
-
-console.log('Validation complete!');

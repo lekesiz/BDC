@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 import { 
   MessageSquare, 
   Link, 
@@ -23,7 +23,6 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { LineChart, Line, BarChart as RechartsBarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 const SMSIntegrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -34,7 +33,6 @@ const SMSIntegrationPage = () => {
     authToken: '',
     phoneNumber: ''
   });
-
   const smsStats = {
     totalSent: 45678,
     delivered: 44234,
@@ -45,7 +43,6 @@ const SMSIntegrationPage = () => {
     totalCost: 2055.51,
     activeNumbers: 3
   };
-
   const smsActivity = [
     { day: 'Mon', sent: 6543, delivered: 6321, failed: 45 },
     { day: 'Tue', sent: 6234, delivered: 6089, failed: 38 },
@@ -55,7 +52,6 @@ const SMSIntegrationPage = () => {
     { day: 'Sat', sent: 5234, delivered: 5089, failed: 35 },
     { day: 'Sun', sent: 5789, delivered: 5623, failed: 39 }
   ];
-
   const messageTypes = [
     { type: 'Appointment Reminders', count: 12345, percentage: 35 },
     { type: 'Course Notifications', count: 8967, percentage: 25 },
@@ -63,27 +59,23 @@ const SMSIntegrationPage = () => {
     { type: 'Payment Alerts', count: 5432, percentage: 15 },
     { type: 'General Updates', count: 1789, percentage: 5 }
   ];
-
   const phoneNumbers = [
     { id: 1, number: '+1 (555) 123-4567', country: 'US', type: 'Toll-free', status: 'active' },
     { id: 2, number: '+44 20 7123 4567', country: 'UK', type: 'Local', status: 'active' },
     { id: 3, number: '+33 1 23 45 67 89', country: 'FR', type: 'Local', status: 'active' }
   ];
-
   const automations = [
     { id: 1, name: 'Appointment Reminder', trigger: '24 hours before', status: 'active', sent: 3456 },
     { id: 2, name: 'Payment Due', trigger: '3 days before due', status: 'active', sent: 1234 },
     { id: 3, name: 'Course Start', trigger: '1 hour before', status: 'active', sent: 2345 },
     { id: 4, name: 'Birthday Wishes', trigger: 'On birthday', status: 'paused', sent: 567 }
   ];
-
   const campaigns = [
     { id: 1, name: 'New Course Launch', date: '2024-11-15', recipients: 1234, status: 'completed' },
     { id: 2, name: 'Holiday Greetings', date: '2024-11-10', recipients: 2456, status: 'completed' },
     { id: 3, name: 'System Maintenance', date: '2024-11-20', recipients: 3567, status: 'scheduled' },
     { id: 4, name: 'Early Bird Offer', date: '2024-11-08', recipients: 1876, status: 'draft' }
   ];
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: MessageSquare },
     { id: 'messages', label: 'Messages', icon: MessageCircle },
@@ -92,14 +84,12 @@ const SMSIntegrationPage = () => {
     { id: 'numbers', label: 'Phone Numbers', icon: Phone },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
-
   const smsProviders = [
     { value: 'twilio', label: 'Twilio', icon: MessageSquare },
     { value: 'nexmo', label: 'Nexmo/Vonage', icon: MessageSquare },
     { value: 'sns', label: 'Amazon SNS', icon: MessageSquare },
     { value: 'messagebird', label: 'MessageBird', icon: MessageSquare }
   ];
-
   const handleConnect = () => {
     if (smsConfig.accountSid && smsConfig.authToken) {
       setLoading(true);
@@ -109,9 +99,7 @@ const SMSIntegrationPage = () => {
       }, 2000);
     }
   };
-
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -134,7 +122,6 @@ const SMSIntegrationPage = () => {
           </Button>
         )}
       </div>
-
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -158,7 +145,6 @@ const SMSIntegrationPage = () => {
           })}
         </nav>
       </div>
-
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <Card>
@@ -188,7 +174,6 @@ const SMSIntegrationPage = () => {
                   </div>
                 )}
               </div>
-
               {!isConnected && (
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-3">
@@ -236,7 +221,6 @@ const SMSIntegrationPage = () => {
                   </div>
                 </div>
               )}
-
               {isConnected && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -263,7 +247,6 @@ const SMSIntegrationPage = () => {
               )}
             </div>
           </Card>
-
           {isConnected && (
             <>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -286,7 +269,6 @@ const SMSIntegrationPage = () => {
                     </div>
                   </div>
                 </Card>
-
                 <Card>
                   <div className="p-6">
                     <h3 className="text-lg font-semibold mb-4">Message Categories</h3>
@@ -314,7 +296,6 @@ const SMSIntegrationPage = () => {
                   </div>
                 </Card>
               </div>
-
               <Card>
                 <div className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
@@ -354,7 +335,6 @@ const SMSIntegrationPage = () => {
           )}
         </div>
       )}
-
       {activeTab === 'messages' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -422,7 +402,6 @@ const SMSIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Message Templates</h3>
@@ -472,7 +451,6 @@ const SMSIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'campaigns' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -532,7 +510,6 @@ const SMSIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'automation' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -584,7 +561,6 @@ const SMSIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'numbers' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -645,7 +621,6 @@ const SMSIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Number Configuration</h3>
@@ -674,7 +649,6 @@ const SMSIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'settings' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -697,7 +671,6 @@ const SMSIntegrationPage = () => {
                     ))}
                   </select>
                 </div>
-
                 {smsConfig.provider === 'twilio' && (
                   <>
                     <div>
@@ -714,7 +687,6 @@ const SMSIntegrationPage = () => {
                         <Button variant="secondary">Update</Button>
                       </div>
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Auth Token
@@ -727,7 +699,6 @@ const SMSIntegrationPage = () => {
                     </div>
                   </>
                 )}
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Default Country Code
@@ -742,7 +713,6 @@ const SMSIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">SMS Preferences</h3>
@@ -756,7 +726,6 @@ const SMSIntegrationPage = () => {
                     Receive confirmation when messages are delivered
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -766,7 +735,6 @@ const SMSIntegrationPage = () => {
                     Support for special characters and emojis
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" />
@@ -776,21 +744,18 @@ const SMSIntegrationPage = () => {
                     Automatically split and join messages over 160 characters
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Message Retry Attempts
                   </label>
                   <Input type="number" defaultValue="3" min="1" max="5" />
                 </div>
-
                 <div className="pt-4">
                   <Button variant="primary">Save Settings</Button>
                 </div>
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Compliance & Opt-out</h3>
@@ -806,7 +771,6 @@ const SMSIntegrationPage = () => {
                     </div>
                   </div>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -816,7 +780,6 @@ const SMSIntegrationPage = () => {
                     Automatically handle STOP, UNSUBSCRIBE, and other opt-out keywords
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Opt-out Response Message
@@ -834,5 +797,4 @@ const SMSIntegrationPage = () => {
     </div>
   );
 };
-
 export default SMSIntegrationPage;

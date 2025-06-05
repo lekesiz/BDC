@@ -4,7 +4,6 @@ import { FaEnvelope, FaLink, FaCopy, FaCheck, FaTimes, FaCalendarAlt, FaLock, Fa
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import DocumentService from './DocumentService';
-
 /**
  * DocumentShare - Component for sharing documents with other users
  */
@@ -28,14 +27,12 @@ const DocumentShare = ({
   const [publicLinkExpiration, setPublicLinkExpiration] = useState('');
   const [linkCopied, setLinkCopied] = useState(false);
   const [enablePublicLink, setEnablePublicLink] = useState(false);
-
   // Fetch document details
   useEffect(() => {
     const fetchDocument = async () => {
       try {
         const response = await axios.get(`/api/documents/${documentId}`);
         setDocument(response.data);
-        
         // Check if public link exists
         if (response.data.public_link) {
           setPublicLink(response.data.public_link);
@@ -47,7 +44,6 @@ const DocumentShare = ({
         toast.error('Doküman bilgileri yüklenemedi');
       }
     };
-    
     const fetchShares = async () => {
       if (initialShares.length === 0) {
         try {
@@ -58,63 +54,52 @@ const DocumentShare = ({
         }
       }
     };
-    
     fetchDocument();
     fetchShares();
   }, [documentId, initialShares]);
-
   // Search users
   const searchUsers = async (query) => {
     if (!query || query.length < 2) {
       setSearchResults([]);
       return;
     }
-    
     try {
       const response = await axios.get(`/api/users/search?q=${query}`);
-      
       // Filter out users who already have access
       const existingUserIds = shares.map(share => share.user_id);
       const filteredResults = response.data.filter(user => 
         !existingUserIds.includes(user.id) && 
         !selectedUsers.some(selectedUser => selectedUser.id === user.id)
       );
-      
       setSearchResults(filteredResults);
     } catch (error) {
       console.error('User search failed:', error);
     }
   };
-
   // Handle search input change
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
     searchUsers(value);
   };
-
   // Select a user from search results
   const selectUser = (user) => {
     setSelectedUsers([...selectedUsers, user]);
     setSearchResults(searchResults.filter(u => u.id !== user.id));
     setSearchTerm('');
   };
-
   // Remove a selected user
   const removeSelectedUser = (userId) => {
     setSelectedUsers(selectedUsers.filter(user => user.id !== userId));
   };
-
   // Create public link
   const generatePublicLink = async () => {
     setLoading(true);
-    
     try {
       const response = await axios.post(`/api/documents/${documentId}/public-link`, {
         permission: publicLinkPermission,
         expiration_date: publicLinkExpiration || null
       });
-      
       setPublicLink(response.data.link);
       setEnablePublicLink(true);
       toast.success('Paylaşım linki oluşturuldu');
@@ -124,11 +109,9 @@ const DocumentShare = ({
       setLoading(false);
     }
   };
-
   // Remove public link
   const removePublicLink = async () => {
     setLoading(true);
-    
     try {
       await axios.delete(`/api/documents/${documentId}/public-link`);
       setPublicLink('');
@@ -140,50 +123,39 @@ const DocumentShare = ({
       setLoading(false);
     }
   };
-
   // Copy link to clipboard
   const copyLinkToClipboard = () => {
     if (!publicLink) return;
-    
     navigator.clipboard.writeText(publicLink);
     setLinkCopied(true);
     toast.success('Link panoya kopyalandı');
-    
     // Reset copied state after 3 seconds
     setTimeout(() => {
       setLinkCopied(false);
     }, 3000);
   };
-
   // Share with selected users
   const shareWithUsers = async () => {
     if (selectedUsers.length === 0) return;
-    
     setLoading(true);
-    
     try {
       // Extract user IDs
       const userIds = selectedUsers.map(user => user.id);
-      
       // Share document
       await DocumentService.shareDocument(
         documentId,
         userIds,
         permission
       );
-      
       // Fetch updated shares
       const response = await axios.get(`/api/documents/${documentId}/shares`);
       setShares(response.data);
-      
       // Clear selected users
       setSelectedUsers([]);
-      
       // Callback
       if (onShareComplete) {
         onShareComplete(response.data);
       }
-      
       toast.success(`Doküman ${userIds.length} kişi ile paylaşıldı`);
     } catch (error) {
       toast.error('Paylaşım sırasında bir hata oluştu');
@@ -191,17 +163,13 @@ const DocumentShare = ({
       setLoading(false);
     }
   };
-
   // Remove an existing share
   const removeShare = async (shareId) => {
     setLoading(true);
-    
     try {
       await axios.delete(`/api/documents/shares/${shareId}`);
-      
       // Update shares list
       setShares(shares.filter(share => share.id !== shareId));
-      
       toast.success('Paylaşım kaldırıldı');
     } catch (error) {
       toast.error('Paylaşım kaldırılırken bir hata oluştu');
@@ -209,23 +177,19 @@ const DocumentShare = ({
       setLoading(false);
     }
   };
-
   // Update share permissions
   const updateSharePermission = async (shareId, newPermission) => {
     setLoading(true);
-    
     try {
       await axios.patch(`/api/documents/shares/${shareId}`, {
         permission: newPermission
       });
-      
       // Update shares list
       setShares(shares.map(share => 
         share.id === shareId 
           ? { ...share, permission: newPermission } 
           : share
       ));
-      
       toast.success('İzinler güncellendi');
     } catch (error) {
       toast.error('İzinler güncellenirken bir hata oluştu');
@@ -233,7 +197,6 @@ const DocumentShare = ({
       setLoading(false);
     }
   };
-
   return (
     <div className={`document-share ${className}`} data-cy="document-share">
       {/* Document info section */}
@@ -245,11 +208,9 @@ const DocumentShare = ({
           </p>
         </div>
       )}
-
       {/* Share with users section */}
       <div className="mb-6">
         <h3 className="text-md font-medium mb-2">Kullanıcılarla Paylaş</h3>
-        
         {/* User search */}
         <div className="relative mb-4">
           <div className="flex items-center border rounded-lg p-2">
@@ -279,7 +240,6 @@ const DocumentShare = ({
               data-cy="user-search-input"
             />
           </div>
-          
           {/* Search results dropdown */}
           {searchResults.length > 0 && (
             <div className="absolute z-10 w-full bg-white shadow-lg rounded-md border mt-1 max-h-48 overflow-y-auto">
@@ -310,7 +270,6 @@ const DocumentShare = ({
             </div>
           )}
         </div>
-        
         {/* Permission and expiration settings */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
@@ -345,7 +304,6 @@ const DocumentShare = ({
             </div>
           </div>
         </div>
-        
         <button
           onClick={shareWithUsers}
           disabled={selectedUsers.length === 0 || loading}
@@ -357,11 +315,9 @@ const DocumentShare = ({
           {loading ? 'Paylaşılıyor...' : 'Paylaş'}
         </button>
       </div>
-
       {/* Public link section */}
       <div className="mb-6">
         <h3 className="text-md font-medium mb-2">Paylaşım Linki</h3>
-        
         <div className="bg-gray-50 p-4 rounded-lg">
           <div className="flex items-center mb-4">
             <div className="relative inline-block w-12 mr-2 align-middle select-none">
@@ -385,7 +341,6 @@ const DocumentShare = ({
               {enablePublicLink ? 'Link paylaşımı aktif' : 'Link paylaşımı devre dışı'}
             </label>
           </div>
-          
           {enablePublicLink && (
             <>
               {/* Link settings */}
@@ -422,7 +377,6 @@ const DocumentShare = ({
                   </div>
                 </div>
               </div>
-              
               {publicLink ? (
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -458,7 +412,6 @@ const DocumentShare = ({
                   {loading ? 'Oluşturuluyor...' : 'Link Oluştur'}
                 </button>
               )}
-              
               {publicLink && (
                 <div className="flex justify-between items-center">
                   <div className="text-xs text-gray-500 flex items-center">
@@ -485,7 +438,6 @@ const DocumentShare = ({
           )}
         </div>
       </div>
-
       {/* Current shares list */}
       {shares.length > 0 && (
         <div>
@@ -545,7 +497,6 @@ const DocumentShare = ({
           </div>
         </div>
       )}
-
       {/* Close button */}
       {onClose && (
         <button
@@ -559,7 +510,6 @@ const DocumentShare = ({
     </div>
   );
 };
-
 DocumentShare.propTypes = {
   /** Document ID to share */
   documentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -572,5 +522,4 @@ DocumentShare.propTypes = {
   /** Additional CSS classes */
   className: PropTypes.string
 };
-
 export default DocumentShare;

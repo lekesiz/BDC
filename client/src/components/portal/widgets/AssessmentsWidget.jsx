@@ -11,53 +11,44 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
 /**
  * Displays upcoming and recent assessments for the student
  */
 const AssessmentsWidget = ({ data, isLoading, error }) => {
   const navigate = useNavigate();
-  
   // Format date
   const formatDate = (dateString) => {
     if (!dateString) return 'No due date';
     const date = new Date(dateString);
     const now = new Date();
-    
     // If it's today
     if (date.toDateString() === now.toDateString()) {
       return 'Today';
     }
-    
     // If it's tomorrow
     const tomorrow = new Date(now);
     tomorrow.setDate(now.getDate() + 1);
     if (date.toDateString() === tomorrow.toDateString()) {
       return 'Tomorrow';
     }
-    
     // If it's within a week
     const oneWeek = new Date(now);
     oneWeek.setDate(now.getDate() + 7);
     if (date < oneWeek) {
       return date.toLocaleDateString(undefined, { weekday: 'long' });
     }
-    
     // Otherwise, return the full date
     return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   };
-  
   // Format score with color
   const formatScore = (score, passingScore) => {
     const passed = score >= (passingScore || 0);
-    
     return (
       <span className={`font-medium ${passed ? 'text-green-600' : 'text-red-600'}`}>
         {score}%
       </span>
     );
   };
-  
   // Get icon and color for assessment type
   const getAssessmentTypeIcon = (type) => {
     switch (type) {
@@ -73,7 +64,6 @@ const AssessmentsWidget = ({ data, isLoading, error }) => {
         return <FileText className="h-5 w-5 text-gray-500" />;
     }
   };
-  
   if (isLoading) {
     return (
       <Card className="overflow-hidden h-full">
@@ -86,7 +76,6 @@ const AssessmentsWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   if (error) {
     return (
       <Card className="overflow-hidden h-full">
@@ -99,18 +88,15 @@ const AssessmentsWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   // Helper to get upcoming assessments (available and upcoming)
   const getUpcomingAssessments = () => {
     if (!data) return [];
-    
     // Combine all assessments
     const allAssessments = [
       ...(data.moduleAssessments || []),
       ...(data.programAssessments || []),
       ...(data.skillAssessments || [])
     ];
-    
     // Filter to only available or upcoming assessments
     return allAssessments
       .filter(a => a.status === 'available' || a.status === 'upcoming')
@@ -123,28 +109,23 @@ const AssessmentsWidget = ({ data, isLoading, error }) => {
       })
       .slice(0, 3); // Limit to 3 items
   };
-  
   // Helper to get recently completed assessments
   const getRecentAssessments = () => {
     if (!data) return [];
-    
     // Combine all assessments
     const allAssessments = [
       ...(data.moduleAssessments || []),
       ...(data.programAssessments || []),
       ...(data.skillAssessments || [])
     ];
-    
     // Filter to only completed assessments and sort by completion date
     return allAssessments
       .filter(a => a.status === 'completed' && a.completedDate)
       .sort((a, b) => new Date(b.completedDate) - new Date(a.completedDate))
       .slice(0, 2); // Limit to 2 items
   };
-  
   const upcomingAssessments = getUpcomingAssessments();
   const recentAssessments = getRecentAssessments();
-  
   return (
     <Card className="overflow-hidden h-full">
       <div className="p-6 flex justify-between items-center border-b">
@@ -157,7 +138,6 @@ const AssessmentsWidget = ({ data, isLoading, error }) => {
           View All
         </Button>
       </div>
-      
       <div className="p-4">
         {/* Upcoming assessments */}
         {upcomingAssessments.length > 0 && (
@@ -180,7 +160,6 @@ const AssessmentsWidget = ({ data, isLoading, error }) => {
                       <span className="text-xs text-gray-500 mr-3">
                         {assessment.duration ? `${assessment.duration} min` : 'No time limit'}
                       </span>
-                      
                       <Calendar className="h-3.5 w-3.5 text-gray-400 mr-1" />
                       <span className="text-xs text-gray-500">
                         Due: {formatDate(assessment.dueDate)}
@@ -193,7 +172,6 @@ const AssessmentsWidget = ({ data, isLoading, error }) => {
             </div>
           </div>
         )}
-        
         {/* Recent assessments */}
         {recentAssessments.length > 0 && (
           <div>
@@ -214,7 +192,6 @@ const AssessmentsWidget = ({ data, isLoading, error }) => {
                       <span className="text-xs text-gray-500 mr-2">
                         Score: {formatScore(assessment.attempts.bestScore, assessment.passingScore)}
                       </span>
-                      
                       <Calendar className="h-3.5 w-3.5 text-gray-400 mr-1" />
                       <span className="text-xs text-gray-500">
                         {formatDate(assessment.completedDate)}
@@ -227,7 +204,6 @@ const AssessmentsWidget = ({ data, isLoading, error }) => {
             </div>
           </div>
         )}
-        
         {upcomingAssessments.length === 0 && recentAssessments.length === 0 && (
           <div className="text-center py-6">
             <FileText className="h-12 w-12 text-gray-300 mx-auto mb-2" />
@@ -245,5 +221,4 @@ const AssessmentsWidget = ({ data, isLoading, error }) => {
     </Card>
   );
 };
-
 export default AssessmentsWidget;

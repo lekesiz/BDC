@@ -1,14 +1,12 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import DashboardPageEnhanced from '@/pages/dashboard/DashboardPageEnhanced';
-
 /**
  * Component that redirects users based on their role
  * Students go to /portal, others see the main dashboard
  */
 const RoleBasedRedirect = () => {
   const { user, isLoading } = useAuth();
-  
   // Show loading state while checking auth
   if (isLoading) {
     return (
@@ -17,14 +15,11 @@ const RoleBasedRedirect = () => {
       </div>
     );
   }
-  
   // Redirect students to portal
   if (user?.role === 'student' || user?.role === 'trainee') {
     return <Navigate to="/portal" replace />;
   }
-  
   // Show dashboard for other roles
   return <DashboardPageEnhanced />;
 };
-
 export default RoleBasedRedirect;

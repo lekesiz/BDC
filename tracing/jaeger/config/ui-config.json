@@ -1,0 +1,65 @@
+{
+  "menu": [
+    {
+      "label": "BDC Documentation",
+      "url": "https://github.com/your-org/bdc-docs",
+      "newTab": true
+    },
+    {
+      "label": "Grafana Dashboards",
+      "url": "http://localhost:3000/dashboards",
+      "newTab": true
+    },
+    {
+      "label": "Kibana Logs",
+      "url": "http://localhost:5601",
+      "newTab": true
+    }
+  ],
+  "search": {
+    "maxLookback": "1h",
+    "maxLimit": 1500
+  },
+  "dependencies": {
+    "menuEnabled": true,
+    "dagMaxServicesLen": 200
+  },
+  "archiveEnabled": true,
+  "tracking": {
+    "trackingID": "UA-000000-2"
+  },
+  "qualityMetrics": {
+    "menuEnabled": true
+  },
+  "deepDependencies": {
+    "menuEnabled": true
+  },
+  "criticalPath": {
+    "menuEnabled": true
+  },
+  "pathAgnosticOperations": true,
+  "linkPatterns": [
+    {
+      "type": "logs",
+      "key": "logsLink",
+      "url": "http://localhost:5601/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:'{{startTime}}',to:'{{endTime}}'))&_a=(columns:!(message,level),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'logstash-*',key:correlation_id,negate:!f,params:(query:'{{correlation_id}}'),type:phrase),query:(match_phrase:(correlation_id:'{{correlation_id}}')))),index:'logstash-*',interval:auto,query:(language:kuery,query:''),sort:!())",
+      "text": "View Logs in Kibana"
+    },
+    {
+      "type": "metrics",
+      "key": "metricsLink", 
+      "url": "http://localhost:3000/d/bdc-service-metrics/bdc-service-metrics?var-service={{service}}&from={{startTime}}&to={{endTime}}",
+      "text": "View Metrics in Grafana"
+    },
+    {
+      "type": "tags",
+      "key": "user_id",
+      "url": "http://localhost:5601/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:'{{startTime}}',to:'{{endTime}}'))&_a=(columns:!(message,level),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'logstash-*',key:user_id,negate:!f,params:(query:'{{value}}'),type:phrase),query:(match_phrase:(user_id:'{{value}}')))),index:'logstash-*',interval:auto,query:(language:kuery,query:''),sort:!())",
+      "text": "View User Activity"
+    }
+  ],
+  "monitor": {
+    "menuEnabled": true,
+    "docsLink": "https://github.com/your-org/bdc-docs/blob/main/monitoring.md"
+  }
+}

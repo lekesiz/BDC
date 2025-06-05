@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { Checkbox } from '@/components/ui/checkbox';
-
 export const AnimatedCheckbox = ({ 
   checked,
   onChange,
@@ -26,7 +25,6 @@ export const AnimatedCheckbox = ({
           {...props}
         />
       </motion.div>
-      
       {label && (
         <motion.span 
           className="ml-2 select-none"

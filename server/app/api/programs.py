@@ -8,6 +8,8 @@ from app.models.user import User
 from app.models.program import Program, ProgramModule, ProgramEnrollment, TrainingSession, SessionAttendance
 from app.models.beneficiary import Beneficiary
 
+from app.utils.logging import logger
+
 programs_bp = Blueprint('programs', __name__)
 
 @programs_bp.route('/programs', methods=['GET'])

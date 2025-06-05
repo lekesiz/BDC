@@ -3,12 +3,13 @@ Flask==3.0.0
 flask-sqlalchemy==3.1.1
 flask-migrate==4.0.5
 flask-jwt-extended==4.6.0
-flask-marshmallow==1.1.0
+flask-marshmallow==0.15.0
 flask-cors==6.0.0
 flask-caching==2.1.0
 flask-limiter==3.5.0
 flask-mail==0.9.1
-marshmallow-sqlalchemy==1.0.0
+marshmallow-sqlalchemy==0.29.0
+marshmallow==3.19.0
 python-dotenv==1.0.0
 gunicorn==23.0.0
 
@@ -17,8 +18,14 @@ SQLAlchemy==2.0.25
 alembic==1.13.1
 psycopg2-binary==2.9.9
 
-# Caching
+# Two-Factor Authentication
+pyotp==2.9.0
+qrcode==7.4.2
+
+# Caching and Task Queue
 redis==5.0.1
+celery==5.3.6
+# flower==2.0.1  # Removed: Unused Celery monitoring tool
 
 # Utilities
 werkzeug==3.0.6
@@ -26,7 +33,7 @@ structlog==24.1.0
 email-validator==2.1.0
 python-dateutil==2.8.2
 PyJWT==2.8.0
-pycryptodome==3.19.0
+# pycryptodome==3.19.0  # Removed: Using cryptography package instead
 reportlab==4.0.9
 Pillow>=11.0.0
 
@@ -34,6 +41,8 @@ Pillow>=11.0.0
 openai==1.51.0
 numpy==1.26.3
 pandas==2.1.4
+scikit-learn==1.3.2
+statsmodels==0.14.1
 
 # Google Calendar Integration
 google-auth==2.23.0
@@ -48,12 +57,13 @@ eventlet==0.35.2
 # Monitoring
 prometheus-flask-exporter==0.22.4
 
-# Testing
-pytest==7.4.3
-pytest-flask==1.3.0
-factory-boy==3.3.0
-coverage==7.3.2
-pytest-cov==4.1.0
+# Security and Password
+passlib==1.7.4
+
+# Excel support
+openpyxl==3.1.2
+
+# Testing dependencies moved to requirements-dev.txt
 
 # AWS
 boto3==1.34.4

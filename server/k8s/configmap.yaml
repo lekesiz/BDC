@@ -13,7 +13,7 @@ data:
   CACHE_TYPE: "RedisCache"
   CACHE_DEFAULT_TIMEOUT: "300"
   RATELIMIT_DEFAULT: "60 per minute"
-  RATELIMIT_STRATEGY: "sliding-window"
+  RATELIMIT_STRATEGY: "sliding-window-counter"
   MAX_CONTENT_LENGTH: "10485760"  # 10MB
   PROMETHEUS_ENABLED: "true"
   METRICS_PORT: "9090"

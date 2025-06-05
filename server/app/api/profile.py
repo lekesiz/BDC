@@ -9,6 +9,8 @@ from app.models.user import User
 from app.models.profile import UserProfile
 from app.schemas.profile import UserProfileSchema, UserProfileUpdateSchema
 
+from app.utils.logging import logger
+
 profile_bp = Blueprint('profile', __name__)
 profile_schema = UserProfileSchema()
 profile_update_schema = UserProfileUpdateSchema()

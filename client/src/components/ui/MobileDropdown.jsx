@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
 import { ChevronDown, Check } from 'lucide-react';
-
 /**
  * Mobile-optimized dropdown component
  * Shows as bottom sheet on mobile, regular dropdown on desktop
@@ -26,19 +25,15 @@ export const MobileDropdown = ({
   const [selectedValue, setSelectedValue] = useState(value);
   const { isMobile } = useBreakpoint();
   const triggerRef = useRef(null);
-
   useEffect(() => {
     setSelectedValue(value);
   }, [value]);
-
   const handleSelect = (optionValue) => {
     setSelectedValue(optionValue);
     onChange && onChange(optionValue);
     setIsOpen(false);
   };
-
   const selectedOption = options.find(opt => opt.value === selectedValue);
-
   // Custom trigger element
   if (trigger) {
     return (
@@ -59,7 +54,6 @@ export const MobileDropdown = ({
       </>
     );
   }
-
   // Default dropdown trigger
   return (
     <div className={cn('relative', fullWidth && 'w-full', className)}>
@@ -68,7 +62,6 @@ export const MobileDropdown = ({
           {label}
         </label>
       )}
-      
       <button
         ref={triggerRef}
         type="button"
@@ -102,7 +95,6 @@ export const MobileDropdown = ({
           isOpen && 'transform rotate-180'
         )} />
       </button>
-
       {helperText && (
         <p className={cn(
           'mt-1 text-sm',
@@ -111,7 +103,6 @@ export const MobileDropdown = ({
           {helperText}
         </p>
       )}
-
       {/* Desktop dropdown */}
       {isOpen && !isMobile && (
         <DesktopDropdown
@@ -122,7 +113,6 @@ export const MobileDropdown = ({
           triggerRef={triggerRef}
         />
       )}
-
       {/* Mobile bottom sheet */}
       {isOpen && isMobile && (
         <MobileBottomSheet
@@ -137,7 +127,6 @@ export const MobileDropdown = ({
     </div>
   );
 };
-
 /**
  * Desktop dropdown menu
  */
@@ -149,7 +138,6 @@ const DesktopDropdown = ({
   triggerRef 
 }) => {
   const dropdownRef = useRef(null);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -161,22 +149,18 @@ const DesktopDropdown = ({
         onClose();
       }
     };
-
     const handleEscape = (event) => {
       if (event.key === 'Escape') {
         onClose();
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleEscape);
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
   }, [onClose, triggerRef]);
-
   return (
     <div
       ref={dropdownRef}
@@ -208,7 +192,6 @@ const DesktopDropdown = ({
     </div>
   );
 };
-
 /**
  * Mobile bottom sheet for dropdown
  */
@@ -226,14 +209,11 @@ const MobileBottomSheet = ({
     } else {
       document.body.style.overflow = 'auto';
     }
-
     return () => {
       document.body.style.overflow = 'auto';
     };
   }, [isOpen]);
-
   if (!isOpen) return null;
-
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end">
       {/* Backdrop */}
@@ -241,21 +221,18 @@ const MobileBottomSheet = ({
         className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
         onClick={onClose}
       />
-      
       {/* Bottom sheet */}
       <div className="relative w-full bg-white dark:bg-gray-800 rounded-t-xl max-h-[80vh] animate-in slide-in-from-bottom-full duration-300">
         {/* Handle bar */}
         <div className="flex justify-center pt-3 pb-2">
           <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
         </div>
-        
         {/* Header */}
         <div className="px-4 pb-3 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
             {title}
           </h3>
         </div>
-        
         {/* Options list */}
         <div className="overflow-y-auto max-h-[60vh] pb-safe">
           {options.map((option) => (

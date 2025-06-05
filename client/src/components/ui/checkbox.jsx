@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Checkbox component
  * 
@@ -50,5 +49,4 @@ export const Checkbox = React.forwardRef(({
     </button>
   );
 });
-
 Checkbox.displayName = "Checkbox";

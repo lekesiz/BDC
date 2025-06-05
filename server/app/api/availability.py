@@ -10,6 +10,8 @@ from app.models.user import User
 from app.models.availability import AvailabilitySchedule, AvailabilitySlot, AvailabilityException
 from app.services.availability_service import AvailabilityService
 
+from app.utils.logging import logger
+
 availability_bp = Blueprint('availability', __name__)
 
 

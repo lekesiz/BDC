@@ -2,30 +2,25 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/ThemeContext';
 import { FaMoon, FaSun, FaDesktop, FaPalette, FaTextHeight, FaCheck } from 'react-icons/fa';
-
 const ThemeSettingsPage = () => {
   const navigate = useNavigate();
   const { theme, accentColor, fontSize, changeTheme, changeAccentColor, changeFontSize } = useTheme();
-
   const themeOptions = [
     { id: 'light', name: 'Açık', icon: FaSun, description: 'Açık tema' },
     { id: 'dark', name: 'Koyu', icon: FaMoon, description: 'Koyu tema' },
     { id: 'system', name: 'Sistem', icon: FaDesktop, description: 'Sistem temasını takip et' }
   ];
-
   const colorOptions = [
     { id: 'blue', name: 'Mavi', color: '#3b82f6' },
     { id: 'green', name: 'Yeşil', color: '#22c55e' },
     { id: 'purple', name: 'Mor', color: '#a855f7' },
     { id: 'red', name: 'Kırmızı', color: '#ef4444' }
   ];
-
   const fontOptions = [
     { id: 'small', name: 'Küçük', size: '14px' },
     { id: 'medium', name: 'Orta', size: '16px' },
     { id: 'large', name: 'Büyük', size: '18px' }
   ];
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-3xl mx-auto">
@@ -39,7 +34,6 @@ const ThemeSettingsPage = () => {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tema Ayarları</h1>
           <p className="text-gray-600 dark:text-gray-400">Uygulamanın görünümünü özelleştirin</p>
         </div>
-
         {/* Theme Selection */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
@@ -75,7 +69,6 @@ const ThemeSettingsPage = () => {
             ))}
           </div>
         </div>
-
         {/* Accent Color */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
@@ -109,7 +102,6 @@ const ThemeSettingsPage = () => {
             ))}
           </div>
         </div>
-
         {/* Font Size */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
@@ -147,7 +139,6 @@ const ThemeSettingsPage = () => {
             ))}
           </div>
         </div>
-
         {/* Preview */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Önizleme</h3>
@@ -172,5 +163,4 @@ const ThemeSettingsPage = () => {
     </div>
   );
 };
-
 export default ThemeSettingsPage;

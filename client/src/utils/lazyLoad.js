@@ -1,10 +1,8 @@
 import React, { lazy, Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
-
 /**
  * Lazy loading utilities for components and routes
  */
-
 /**
  * Page loading component
  */
@@ -16,7 +14,6 @@ const PageLoader = () => (
     </div>
   </div>
 );
-
 /**
  * Component loading component
  */
@@ -25,7 +22,6 @@ const ComponentLoader = () => (
     <Loader2 className="h-8 w-8 animate-spin text-primary" />
   </div>
 );
-
 /**
  * Error fallback component
  */
@@ -45,7 +41,6 @@ const ErrorFallback = ({ error, retry }) => (
     </div>
   </div>
 );
-
 /**
  * Enhanced lazy loading with retry capability
  */
@@ -64,10 +59,8 @@ export function lazyLoadWithRetry(importFunction, componentName = 'Component') {
         });
     });
   });
-
   return LazyComponent;
 }
-
 /**
  * Create a lazy loaded page component
  */
@@ -77,16 +70,13 @@ export function createLazyPage(importFunction, options = {}) {
     errorFallback = ErrorFallback,
     componentName = 'Page'
   } = options;
-
   const LazyComponent = lazyLoadWithRetry(importFunction, componentName);
-
   return (props) => (
     <Suspense fallback={fallback}>
       <LazyComponent {...props} />
     </Suspense>
   );
 }
-
 /**
  * Create a lazy loaded component
  */
@@ -96,23 +86,19 @@ export function createLazyComponent(importFunction, options = {}) {
     errorFallback = ErrorFallback,
     componentName = 'Component'
   } = options;
-
   const LazyComponent = lazyLoadWithRetry(importFunction, componentName);
-
   return (props) => (
     <Suspense fallback={fallback}>
       <LazyComponent {...props} />
     </Suspense>
   );
 }
-
 /**
  * Preload a component
  */
 export function preloadComponent(importFunction) {
   importFunction();
 }
-
 /**
  * Create lazy routes configuration
  */
@@ -129,42 +115,35 @@ export function createLazyRoutes(routeConfig) {
     return route;
   });
 }
-
 /**
  * HOC for adding lazy loading to existing components
  */
 export function withLazyLoading(importFunction, options = {}) {
   return createLazyComponent(importFunction, options);
 }
-
 /**
  * Lazy load with custom loading component
  */
 export function lazyLoadWithCustomLoader(importFunction, LoadingComponent) {
   const LazyComponent = lazy(importFunction);
-  
   return (props) => (
     <Suspense fallback={<LoadingComponent />}>
       <LazyComponent {...props} />
     </Suspense>
   );
 }
-
 /**
  * Batch lazy loading for multiple components
  */
 export function createLazyBatch(imports) {
   const lazyComponents = {};
-  
   Object.entries(imports).forEach(([name, importFunction]) => {
     lazyComponents[name] = createLazyComponent(importFunction, {
       componentName: name
     });
   });
-  
   return lazyComponents;
 }
-
 /**
  * Progressive enhancement wrapper
  */
@@ -176,7 +155,6 @@ export function withProgressiveEnhancement(
     if (typeof window === 'undefined' || !window.requestIdleCallback) {
       return <FallbackComponent {...props} />;
     }
-    
     return (
       <Suspense fallback={<FallbackComponent {...props} />}>
         <LazyEnhancedComponent {...props} />

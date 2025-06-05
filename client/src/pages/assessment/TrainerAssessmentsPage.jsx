@@ -5,7 +5,6 @@ import {
   AlertTriangle, CheckCircle, Clock, BarChart2, Users, Calendar 
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -14,7 +13,6 @@ import { Tabs } from '@/components/ui/tabs';
 import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
 import EmptyState from '@/components/common/EmptyState';
-
 /**
  * TrainerAssessmentsPage displays assessment templates and assigned assessments
  * for the trainer to manage
@@ -25,37 +23,31 @@ const TrainerAssessmentsPage = () => {
   const [activeTab, setActiveTab] = useState('templates');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   // State for templates, assigned assessments, and drafts
   const [templates, setTemplates] = useState([]);
   const [assignedAssessments, setAssignedAssessments] = useState([]);
   const [draftTemplates, setDraftTemplates] = useState([]);
-  
   // State for search and filters
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  
   // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
         // Fetch assessment templates (active)
         const templatesResponse = await fetch('/api/assessment/templates?status=active');
         if (!templatesResponse.ok) throw new Error('Failed to fetch templates');
         const templatesData = await templatesResponse.json();
         setTemplates(templatesData);
-        
         // Fetch draft templates
         const draftsResponse = await fetch('/api/assessment/templates?status=draft');
         if (!draftsResponse.ok) throw new Error('Failed to fetch draft templates');
         const draftsData = await draftsResponse.json();
         setDraftTemplates(draftsData);
-        
         // Fetch assigned assessments
         const assignedResponse = await fetch('/api/assessment/assigned');
         if (!assignedResponse.ok) throw new Error('Failed to fetch assigned assessments');
@@ -73,46 +65,36 @@ const TrainerAssessmentsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchData();
   }, [toast]);
-  
   // Filter templates
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = 
       searchTerm === '' || 
       template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       template.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
     const matchesType = 
       selectedType === 'all' || 
       template.type === selectedType;
-      
     const matchesCategory = 
       selectedCategory === 'all' || 
       (template.categories && template.categories.includes(selectedCategory));
-      
     return matchesSearch && matchesType && matchesCategory;
   });
-  
   // Filter draft templates
   const filteredDrafts = draftTemplates.filter(template => {
     const matchesSearch = 
       searchTerm === '' || 
       template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       template.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
     const matchesType = 
       selectedType === 'all' || 
       template.type === selectedType;
-      
     const matchesCategory = 
       selectedCategory === 'all' || 
       (template.categories && template.categories.includes(selectedCategory));
-      
     return matchesSearch && matchesType && matchesCategory;
   });
-  
   // Filter assigned assessments
   const filteredAssigned = assignedAssessments.filter(assessment => {
     const matchesSearch = 
@@ -120,29 +102,23 @@ const TrainerAssessmentsPage = () => {
       assessment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       assessment.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       assessment.assigned_to.name.toLowerCase().includes(searchTerm.toLowerCase());
-      
     const matchesStatus = 
       selectedStatus === 'all' || 
       assessment.status === selectedStatus;
-      
     return matchesSearch && matchesStatus;
   });
-  
   // Handle creating new assessment
   const handleCreateAssessment = () => {
     navigate('/assessment/create');
   };
-  
   // Handle editing template
   const handleEditTemplate = (templateId) => {
     navigate(`/assessment/edit/${templateId}`);
   };
-  
   // Handle viewing template
   const handleViewTemplate = (templateId) => {
     navigate(`/assessment/templates/${templateId}`);
   };
-  
   // Handle duplicating template
   const handleDuplicateTemplate = async (templateId) => {
     try {
@@ -150,7 +126,6 @@ const TrainerAssessmentsPage = () => {
       const response = await fetch(`/api/assessment/templates/${templateId}`);
       if (!response.ok) throw new Error('Failed to fetch template');
       const template = await response.json();
-      
       // Create a duplicate with a new name
       const duplicateData = {
         ...template,
@@ -160,7 +135,6 @@ const TrainerAssessmentsPage = () => {
       delete duplicateData.id;
       delete duplicateData.created_at;
       delete duplicateData.updated_at;
-      
       // Save the duplicate
       const createResponse = await fetch('/api/assessment/templates', {
         method: 'POST',
@@ -169,15 +143,12 @@ const TrainerAssessmentsPage = () => {
         },
         body: JSON.stringify(duplicateData),
       });
-      
       if (!createResponse.ok) throw new Error('Failed to duplicate template');
-      
       toast({
         title: 'Success',
         description: 'Template has been duplicated',
         type: 'success',
       });
-      
       // Refresh the data
       const draftsResponse = await fetch('/api/assessment/templates?status=draft');
       const draftsData = await draftsResponse.json();
@@ -191,7 +162,6 @@ const TrainerAssessmentsPage = () => {
       });
     }
   };
-  
   // Handle archiving template
   const handleArchiveTemplate = async (templateId) => {
     try {
@@ -202,15 +172,12 @@ const TrainerAssessmentsPage = () => {
         },
         body: JSON.stringify({ status: 'archived' }),
       });
-      
       if (!response.ok) throw new Error('Failed to archive template');
-      
       toast({
         title: 'Success',
         description: 'Template has been archived',
         type: 'success',
       });
-      
       // Refresh the templates
       const templatesResponse = await fetch('/api/assessment/templates?status=active');
       const templatesData = await templatesResponse.json();
@@ -224,22 +191,18 @@ const TrainerAssessmentsPage = () => {
       });
     }
   };
-  
   // Handle assigning assessment
   const handleAssignAssessment = (templateId) => {
     navigate(`/assessment/assign/${templateId}`);
   };
-  
   // Handle viewing assigned assessment
   const handleViewAssignment = (assignmentId) => {
     navigate(`/assessment/assigned/${assignmentId}`);
   };
-  
   // Handle viewing results
   const handleViewResults = (assignmentId) => {
     navigate(`/assessment/assigned/${assignmentId}/results`);
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -248,7 +211,6 @@ const TrainerAssessmentsPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="container mx-auto py-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
@@ -256,7 +218,6 @@ const TrainerAssessmentsPage = () => {
           <h1 className="text-2xl font-bold mb-2">Assessment Management</h1>
           <p className="text-gray-600">Create, manage, and assign assessments to track beneficiary progress</p>
         </div>
-        
         <div className="mt-4 md:mt-0 flex gap-3">
           <Button 
             variant="outline"
@@ -272,7 +233,6 @@ const TrainerAssessmentsPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Tabs */}
       <Tabs
         value={activeTab}
@@ -290,7 +250,6 @@ const TrainerAssessmentsPage = () => {
             Drafts ({draftTemplates.length})
           </Tabs.TabTrigger>
         </Tabs.TabsList>
-        
         {/* Search and filters */}
         <div className="flex flex-col md:flex-row gap-4 items-center mt-4 mb-6">
           <div className="relative flex-grow">
@@ -303,7 +262,6 @@ const TrainerAssessmentsPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
           {(activeTab === 'templates' || activeTab === 'drafts') && (
             <>
               <Select
@@ -323,7 +281,6 @@ const TrainerAssessmentsPage = () => {
                   <Select.Item value="project">Project</Select.Item>
                 </Select.Content>
               </Select>
-              
               <Select
                 value={selectedCategory}
                 onValueChange={setSelectedCategory}
@@ -346,7 +303,6 @@ const TrainerAssessmentsPage = () => {
               </Select>
             </>
           )}
-          
           {activeTab === 'assigned' && (
             <Select
               value={selectedStatus}
@@ -369,7 +325,6 @@ const TrainerAssessmentsPage = () => {
             </Select>
           )}
         </div>
-        
         {/* Templates tab content */}
         <Tabs.TabContent value="templates">
           {error && (
@@ -377,7 +332,6 @@ const TrainerAssessmentsPage = () => {
               {error}
             </div>
           )}
-          
           {filteredTemplates.length === 0 ? (
             <EmptyState
               title="No assessment templates found"
@@ -395,7 +349,6 @@ const TrainerAssessmentsPage = () => {
                   }`}>
                     {template.type}
                   </div>
-                  
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-lg font-semibold">{template.title}</h3>
@@ -403,9 +356,7 @@ const TrainerAssessmentsPage = () => {
                         {template.type}
                       </Badge>
                     </div>
-                    
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{template.description}</p>
-                    
                     <div className="flex flex-wrap gap-2 mb-4">
                       {template.skills?.slice(0, 3).map((skill, index) => (
                         <Badge key={index} variant="outline" className="bg-gray-100">
@@ -418,7 +369,6 @@ const TrainerAssessmentsPage = () => {
                         </Badge>
                       )}
                     </div>
-                    
                     <div className="space-y-2 mb-4">
                       {template.type === 'quiz' && (
                         <>
@@ -447,7 +397,6 @@ const TrainerAssessmentsPage = () => {
                         </div>
                       )}
                     </div>
-                    
                     <div className="flex flex-wrap gap-2 mt-6">
                       <Button 
                         size="sm" 
@@ -492,7 +441,6 @@ const TrainerAssessmentsPage = () => {
             </div>
           )}
         </Tabs.TabContent>
-        
         {/* Assigned tab content */}
         <Tabs.TabContent value="assigned">
           {error && (
@@ -500,7 +448,6 @@ const TrainerAssessmentsPage = () => {
               {error}
             </div>
           )}
-          
           {filteredAssigned.length === 0 ? (
             <EmptyState
               title="No assigned assessments found"
@@ -519,7 +466,6 @@ const TrainerAssessmentsPage = () => {
                   }`}>
                     {assessment.status}
                   </div>
-                  
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-lg font-semibold">{assessment.title}</h3>
@@ -536,9 +482,7 @@ const TrainerAssessmentsPage = () => {
                         </Badge>
                       </div>
                     </div>
-                    
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{assessment.description}</p>
-                    
                     <div className="p-3 bg-gray-50 rounded-lg mb-4">
                       <div className="flex items-center mb-2">
                         <Users className="w-4 h-4 text-gray-500 mr-2" />
@@ -549,7 +493,6 @@ const TrainerAssessmentsPage = () => {
                           <p className="text-sm text-gray-600">{assessment.assigned_to.name}</p>
                         </div>
                       </div>
-                      
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 text-gray-500 mr-2" />
                         <div>
@@ -564,31 +507,26 @@ const TrainerAssessmentsPage = () => {
                         </div>
                       </div>
                     </div>
-                    
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <div className="bg-blue-50 p-3 rounded-lg text-center">
                         <p className="text-sm text-gray-600">Total</p>
                         <p className="text-lg font-semibold text-blue-700">{assessment.submissions.total}</p>
                       </div>
-                      
                       <div className="bg-green-50 p-3 rounded-lg text-center">
                         <p className="text-sm text-gray-600">Completed</p>
                         <p className="text-lg font-semibold text-green-700">{assessment.submissions.completed}</p>
                       </div>
-                      
                       <div className="bg-amber-50 p-3 rounded-lg text-center">
                         <p className="text-sm text-gray-600">In Progress</p>
                         <p className="text-lg font-semibold text-amber-700">{assessment.submissions.inProgress}</p>
                       </div>
                     </div>
-                    
                     {assessment.submissions.averageScore !== null && (
                       <div className="p-3 bg-purple-50 rounded-lg mb-4 text-center">
                         <p className="text-sm text-gray-600">Average Score</p>
                         <p className="text-xl font-semibold text-purple-700">{assessment.submissions.averageScore}%</p>
                       </div>
                     )}
-                    
                     <div className="flex flex-wrap gap-2 mt-6">
                       <Button 
                         size="sm" 
@@ -599,7 +537,6 @@ const TrainerAssessmentsPage = () => {
                         <Eye className="w-4 h-4 mr-2" />
                         Details
                       </Button>
-                      
                       {assessment.submissions.completed > 0 && (
                         <Button 
                           size="sm" 
@@ -611,7 +548,6 @@ const TrainerAssessmentsPage = () => {
                           Results
                         </Button>
                       )}
-                      
                       {assessment.status === 'active' && (
                         <Button 
                           size="sm" 
@@ -629,7 +565,6 @@ const TrainerAssessmentsPage = () => {
             </div>
           )}
         </Tabs.TabContent>
-        
         {/* Drafts tab content */}
         <Tabs.TabContent value="drafts">
           {error && (
@@ -637,7 +572,6 @@ const TrainerAssessmentsPage = () => {
               {error}
             </div>
           )}
-          
           {filteredDrafts.length === 0 ? (
             <EmptyState
               title="No draft templates found"
@@ -653,7 +587,6 @@ const TrainerAssessmentsPage = () => {
                   <div className="p-2 text-xs font-medium text-white uppercase tracking-wider bg-gray-600">
                     Draft
                   </div>
-                  
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-lg font-semibold">{template.title}</h3>
@@ -661,9 +594,7 @@ const TrainerAssessmentsPage = () => {
                         {template.type}
                       </Badge>
                     </div>
-                    
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{template.description}</p>
-                    
                     <div className="flex flex-wrap gap-2 mb-4">
                       {template.skills?.slice(0, 3).map((skill, index) => (
                         <Badge key={index} variant="outline" className="bg-gray-100">
@@ -676,7 +607,6 @@ const TrainerAssessmentsPage = () => {
                         </Badge>
                       )}
                     </div>
-                    
                     <div className="space-y-2 mb-4">
                       {template.type === 'quiz' && (
                         <div className="flex justify-between text-sm">
@@ -693,7 +623,6 @@ const TrainerAssessmentsPage = () => {
                         <span className="font-medium">{template.creator_name}</span>
                       </div>
                     </div>
-                    
                     <div className="flex flex-wrap gap-2 mt-6">
                       <Button 
                         size="sm" 
@@ -733,5 +662,4 @@ const TrainerAssessmentsPage = () => {
     </div>
   );
 };
-
 export default TrainerAssessmentsPage;

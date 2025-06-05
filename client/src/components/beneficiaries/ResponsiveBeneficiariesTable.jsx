@@ -21,7 +21,6 @@ import {
 } from '@/components/ui/table';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
-
 /**
  * Mobile-responsive beneficiaries table component
  * Shows as cards on mobile, table on desktop
@@ -41,7 +40,6 @@ export const ResponsiveBeneficiariesTable = ({
 }) => {
   const navigate = useNavigate();
   const { isMobile, isTablet } = useBreakpoint();
-
   // Render status badge
   const renderStatusBadge = (status) => {
     const statusStyles = {
@@ -50,7 +48,6 @@ export const ResponsiveBeneficiariesTable = ({
       pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
       completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
     };
-    
     return (
       <span className={cn(
         'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
@@ -60,7 +57,6 @@ export const ResponsiveBeneficiariesTable = ({
       </span>
     );
   };
-
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -71,7 +67,6 @@ export const ResponsiveBeneficiariesTable = ({
       day: 'numeric' 
     });
   };
-
   // Mobile card view
   if (isMobile || isTablet) {
     return (
@@ -115,7 +110,6 @@ export const ResponsiveBeneficiariesTable = ({
                       </div>
                       {renderStatusBadge(beneficiary.status)}
                     </div>
-
                     {/* Contact info */}
                     <div className="space-y-1">
                       {beneficiary.email && (
@@ -135,7 +129,6 @@ export const ResponsiveBeneficiariesTable = ({
                         <span>Joined: {formatDate(beneficiary.created_at)}</span>
                       </div>
                     </div>
-
                     {/* Program info */}
                     {beneficiary.program && (
                       <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
@@ -146,13 +139,11 @@ export const ResponsiveBeneficiariesTable = ({
                       </div>
                     )}
                   </div>
-
                   {/* Arrow icon */}
                   <ChevronRight className="h-5 w-5 text-gray-400 ml-2 flex-shrink-0" />
                 </div>
               </Card>
             ))}
-
             {/* Pagination */}
             <div className="mt-4">
               <TablePagination
@@ -168,7 +159,6 @@ export const ResponsiveBeneficiariesTable = ({
       </div>
     );
   }
-
   // Desktop table view
   return (
     <div>
@@ -279,7 +269,6 @@ export const ResponsiveBeneficiariesTable = ({
           )}
         </TableBody>
       </Table>
-
       {/* Pagination */}
       {beneficiaries.length > 0 && (
         <div className="mt-4">

@@ -1,11 +1,8 @@
 /**
  * Mock data for trainer assessment management
  */
-
 import { subDays, addDays } from 'date-fns';
-
 const NOW = new Date();
-
 // Sample assessment templates created by trainers
 export const assessmentTemplates = {
   quizTemplates: [
@@ -303,7 +300,6 @@ export const assessmentTemplates = {
     }
   ]
 };
-
 // Sample assessments assigned to cohorts/students
 export const assignedAssessments = [
   {
@@ -443,7 +439,6 @@ export const assignedAssessments = [
     }
   }
 ];
-
 // Sample student assessment submissions
 export const assessmentSubmissions = {
   quizSubmissions: [
@@ -726,7 +721,6 @@ export const assessmentSubmissions = {
     }
   ]
 };
-
 // Sample assessment analytics
 export const assessmentAnalytics = {
   // Overall analytics
@@ -746,7 +740,6 @@ export const assessmentAnalytics = {
     top_performing_skills: ["Responsive Design", "HTML", "CSS"],
     struggling_skills: ["JavaScript"]
   },
-  
   // Analytics per assessment
   assessments: {
     "assign-1": {
@@ -884,7 +877,6 @@ export const assessmentAnalytics = {
       ]
     }
   },
-  
   // Analytics per cohort
   cohorts: {
     "cohort-1": {
@@ -941,37 +933,28 @@ export const assessmentAnalytics = {
     }
   }
 };
-
 // Mock API functions
-
 export const getAssessmentTemplates = (status = null) => {
   let templates = [
     ...assessmentTemplates.quizTemplates,
     ...assessmentTemplates.projectTemplates
   ];
-  
   if (status) {
     templates = templates.filter(template => template.status === status);
   }
-  
   return Promise.resolve(templates);
 };
-
 export const getAssessmentTemplateById = (id) => {
   const allTemplates = [
     ...assessmentTemplates.quizTemplates,
     ...assessmentTemplates.projectTemplates
   ];
-  
   const template = allTemplates.find(t => t.id === id);
-  
   if (!template) {
     return Promise.reject(new Error('Assessment template not found'));
   }
-  
   return Promise.resolve(template);
 };
-
 export const createAssessmentTemplate = (templateData) => {
   // In a real implementation, this would add the template to the database
   // For our mock, we'll just simulate a successful creation
@@ -984,52 +967,39 @@ export const createAssessmentTemplate = (templateData) => {
     status: "draft",
     ...templateData
   };
-  
   return Promise.resolve(newTemplate);
 };
-
 export const updateAssessmentTemplate = (id, templateData) => {
   const allTemplates = [
     ...assessmentTemplates.quizTemplates,
     ...assessmentTemplates.projectTemplates
   ];
-  
   const template = allTemplates.find(t => t.id === id);
-  
   if (!template) {
     return Promise.reject(new Error('Assessment template not found'));
   }
-  
   // In a real implementation, this would update the template in the database
   const updatedTemplate = {
     ...template,
     ...templateData,
     updated_at: new Date().toISOString()
   };
-  
   return Promise.resolve(updatedTemplate);
 };
-
 export const getAssignedAssessments = (status = null) => {
   let assigned = [...assignedAssessments];
-  
   if (status) {
     assigned = assigned.filter(a => a.status === status);
   }
-  
   return Promise.resolve(assigned);
 };
-
 export const getAssignedAssessmentById = (id) => {
   const assessment = assignedAssessments.find(a => a.id === id);
-  
   if (!assessment) {
     return Promise.reject(new Error('Assigned assessment not found'));
   }
-  
   return Promise.resolve(assessment);
 };
-
 export const assignAssessment = (assignmentData) => {
   // In a real implementation, this would add the assignment to the database
   const newAssignment = {
@@ -1040,51 +1010,39 @@ export const assignAssessment = (assignmentData) => {
     status: assignmentData.scheduled_date ? "scheduled" : "active",
     ...assignmentData
   };
-  
   return Promise.resolve(newAssignment);
 };
-
 export const getSubmissionsByAssessment = (assessmentId) => {
   // Combine quiz and project submissions
   const allSubmissions = [
     ...assessmentSubmissions.quizSubmissions,
     ...assessmentSubmissions.projectSubmissions
   ];
-  
   const submissions = allSubmissions.filter(s => s.assessment_id === assessmentId);
-  
   return Promise.resolve(submissions);
 };
-
 export const getSubmissionById = (submissionId) => {
   // Check both quiz and project submissions
   const allSubmissions = [
     ...assessmentSubmissions.quizSubmissions,
     ...assessmentSubmissions.projectSubmissions
   ];
-  
   const submission = allSubmissions.find(s => s.id === submissionId);
-  
   if (!submission) {
     return Promise.reject(new Error('Submission not found'));
   }
-  
   return Promise.resolve(submission);
 };
-
 export const gradeSubmission = (submissionId, gradingData) => {
   // Find the submission to update
   const allSubmissions = [
     ...assessmentSubmissions.quizSubmissions,
     ...assessmentSubmissions.projectSubmissions
   ];
-  
   const submission = allSubmissions.find(s => s.id === submissionId);
-  
   if (!submission) {
     return Promise.reject(new Error('Submission not found'));
   }
-  
   // In a real implementation, this would update the submission in the database
   const updatedSubmission = {
     ...submission,
@@ -1094,30 +1052,22 @@ export const gradeSubmission = (submissionId, gradingData) => {
     grader_name: "Sarah Johnson",
     ...gradingData
   };
-  
   return Promise.resolve(updatedSubmission);
 };
-
 export const getAssessmentAnalytics = () => {
   return Promise.resolve(assessmentAnalytics.overall);
 };
-
 export const getAssessmentAnalyticsByAssessment = (assessmentId) => {
   const analytics = assessmentAnalytics.assessments[assessmentId];
-  
   if (!analytics) {
     return Promise.reject(new Error('Assessment analytics not found'));
   }
-  
   return Promise.resolve(analytics);
 };
-
 export const getAssessmentAnalyticsByCohort = (cohortId) => {
   const analytics = assessmentAnalytics.cohorts[cohortId];
-  
   if (!analytics) {
     return Promise.reject(new Error('Cohort analytics not found'));
   }
-  
   return Promise.resolve(analytics);
 };

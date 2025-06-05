@@ -10,7 +10,6 @@ import { useToast } from '../../hooks/useToast';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import { Badge } from '../ui/badge';
 import api from '../../lib/api';
-
 const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
   const [loading, setLoading] = useState(false);
   const [topic, setTopic] = useState('');
@@ -21,7 +20,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
   const { toast } = useToast();
-
   const handleGenerateQuestions = async () => {
     if (!topic) {
       toast({
@@ -31,7 +29,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
       });
       return;
     }
-
     setLoading(true);
     try {
       const response = await api.post('/ai/generate-questions', {
@@ -42,7 +39,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
         context,
         test_id: testId
       });
-
       setGeneratedQuestions(response.data.questions || []);
       toast({
         title: "Success",
@@ -59,7 +55,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
       setLoading(false);
     }
   };
-
   const handleAddQuestion = (question) => {
     if (onQuestionsGenerated) {
       onQuestionsGenerated([question]);
@@ -69,7 +64,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
       });
     }
   };
-
   const handleAddAllQuestions = () => {
     if (onQuestionsGenerated && generatedQuestions.length > 0) {
       onQuestionsGenerated(generatedQuestions);
@@ -80,24 +74,19 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
       setGeneratedQuestions([]);
     }
   };
-
   const handleRemoveQuestion = (index) => {
     setGeneratedQuestions(prev => prev.filter((_, i) => i !== index));
   };
-
   const handleCopyQuestion = (question, index) => {
     const questionText = `${question.question}\n\nOptions:\n${question.options?.map((opt, i) => `${i + 1}. ${opt}`).join('\n') || ''}\n\nCorrect Answer: ${question.correct_answer || ''}\nExplanation: ${question.explanation || ''}`;
-    
     navigator.clipboard.writeText(questionText);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
-    
     toast({
       title: "Copied",
       description: "Question copied to clipboard"
     });
   };
-
   const questionTypeOptions = [
     { value: 'multiple_choice', label: 'Multiple Choice' },
     { value: 'true_false', label: 'True/False' },
@@ -106,13 +95,11 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
     { value: 'matching', label: 'Matching' },
     { value: 'fill_blank', label: 'Fill in the Blank' }
   ];
-
   const difficultyOptions = [
     { value: 'easy', label: 'Easy', color: 'bg-green-100 text-green-800' },
     { value: 'medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-800' },
     { value: 'hard', label: 'Hard', color: 'bg-red-100 text-red-800' }
   ];
-
   return (
     <div className="space-y-6">
       <Card>
@@ -133,7 +120,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
                 onChange={(e) => setTopic(e.target.value)}
               />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="difficulty">Difficulty Level</Label>
               <Select value={difficulty} onValueChange={setDifficulty}>
@@ -149,7 +135,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="questionType">Question Type</Label>
               <Select value={questionType} onValueChange={setQuestionType}>
@@ -165,7 +150,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="numberOfQuestions">Number of Questions</Label>
               <Input
@@ -178,7 +162,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
               />
             </div>
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="context">Additional Context (Optional)</Label>
             <Textarea
@@ -189,7 +172,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
               rows={3}
             />
           </div>
-
           <Button
             onClick={handleGenerateQuestions}
             disabled={loading || !topic}
@@ -209,7 +191,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
           </Button>
         </CardContent>
       </Card>
-
       {generatedQuestions.length > 0 && (
         <Card>
           <CardHeader>
@@ -275,7 +256,6 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
                         </Button>
                       </div>
                     </div>
-
                     {question.options && question.options.length > 0 && (
                       <div className="ml-4 space-y-1">
                         <p className="text-sm text-gray-600">Options:</p>
@@ -291,21 +271,18 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
                         </ol>
                       </div>
                     )}
-
                     {question.correct_answer && question.type !== 'multiple_choice' && (
                       <div className="ml-4">
                         <p className="text-sm text-gray-600">Correct Answer:</p>
                         <p className="text-sm font-medium text-green-700">{question.correct_answer}</p>
                       </div>
                     )}
-
                     {question.explanation && (
                       <div className="ml-4">
                         <p className="text-sm text-gray-600">Explanation:</p>
                         <p className="text-sm text-gray-700">{question.explanation}</p>
                       </div>
                     )}
-
                     {question.points && (
                       <div className="ml-4">
                         <p className="text-sm text-gray-600">
@@ -323,5 +300,4 @@ const AIQuestionGenerator = ({ onQuestionsGenerated, testId }) => {
     </div>
   );
 };
-
 export default AIQuestionGenerator;

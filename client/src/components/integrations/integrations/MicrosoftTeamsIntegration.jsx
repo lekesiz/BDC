@@ -14,21 +14,18 @@ import {
   Settings,
   Activity
 } from 'lucide-react';
-
 const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
   const [teams, setTeams] = useState([
     { id: '1', name: 'BDC Training Team', members: 45, channels: 8, active: true },
     { id: '2', name: 'Program Coordinators', members: 12, channels: 4, active: true },
     { id: '3', name: 'Beneficiary Support', members: 23, channels: 6, active: false }
   ]);
-
   const [channels, setChannels] = useState([
     { id: '1', name: 'general', team: 'BDC Training Team', notifications: true },
     { id: '2', name: 'announcements', team: 'BDC Training Team', notifications: true },
     { id: '3', name: 'python-programming', team: 'BDC Training Team', notifications: false },
     { id: '4', name: 'web-development', team: 'BDC Training Team', notifications: false }
   ]);
-
   const configFields = [
     {
       name: 'tenantId',
@@ -73,7 +70,6 @@ const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
       description: 'Automatically create Teams meetings for appointments'
     }
   ];
-
   const oauthConfig = {
     authUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
     tokenUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
@@ -87,7 +83,6 @@ const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
       'OnlineMeetings.ReadWrite'
     ]
   };
-
   const webhookEvents = [
     'teams.message.created',
     'teams.meeting.created',
@@ -96,7 +91,6 @@ const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
     'teams.member.removed',
     'teams.channel.created'
   ];
-
   const apiEndpoints = [
     {
       method: 'GET',
@@ -119,7 +113,6 @@ const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
       description: 'Create a Teams meeting'
     }
   ];
-
   const customOverview = (
     <>
       {/* Statistics */}
@@ -173,7 +166,6 @@ const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
           </div>
         </Card>
       </div>
-
       {/* Teams Overview */}
       <Card>
         <div className="p-6">
@@ -207,7 +199,6 @@ const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Channel Configuration */}
       <Card>
         <div className="p-6">
@@ -240,7 +231,6 @@ const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Quick Actions */}
       <Card>
         <div className="p-6">
@@ -277,7 +267,6 @@ const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Recent Activity */}
       <Card>
         <div className="p-6">
@@ -310,7 +299,6 @@ const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
       </Card>
     </>
   );
-
   return (
     <BaseIntegration
       integration={integration}
@@ -324,5 +312,4 @@ const MicrosoftTeamsIntegration = ({ integration, onBack }) => {
     </BaseIntegration>
   );
 };
-
 export default MicrosoftTeamsIntegration;

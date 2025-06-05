@@ -26,7 +26,6 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
 import { mockReports } from './mockReportsData';
-
 /**
  * ReportCreationPage allows users to create custom reports
  */
@@ -54,20 +53,17 @@ const ReportCreationPage = () => {
   const [availableFilters, setAvailableFilters] = useState([]);
   const [reportPreview, setReportPreview] = useState(null);
   const [editMode, setEditMode] = useState(false);
-
   // Fetch data for report creation or editing
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
         // If ID is provided, fetch the report for editing
         if (id) {
           const reportResponse = await api.get(`/api/reports/${id}`);
           setReportData(reportResponse.data);
           setEditMode(true);
         }
-        
       } catch (error) {
         console.error('Error fetching report data:', error);
         toast({
@@ -79,15 +75,12 @@ const ReportCreationPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchData();
   }, [id, toast]);
-  
   // Load available fields when report type changes
   useEffect(() => {
     const fetchAvailableFields = async () => {
       if (!reportData.type) return;
-      
       try {
         // Use mock data for development
         if (process.env.NODE_ENV === 'development') {
@@ -96,7 +89,6 @@ const ReportCreationPage = () => {
         } else {
           const fieldsResponse = await api.get(`/api/reports/fields/${reportData.type}`);
           setAvailableFields(fieldsResponse.data);
-          
           const filtersResponse = await api.get(`/api/reports/filters/${reportData.type}`);
           setAvailableFilters(filtersResponse.data);
         }
@@ -109,15 +101,12 @@ const ReportCreationPage = () => {
         });
       }
     };
-    
     fetchAvailableFields();
   }, [reportData.type, toast]);
-  
   // Generate report preview
   const generatePreview = async () => {
     try {
       setIsGenerating(true);
-      
       // Use mock data for development
       if (process.env.NODE_ENV === 'development') {
         setTimeout(() => {
@@ -131,7 +120,6 @@ const ReportCreationPage = () => {
         setStep(4); // Move to preview step
         setIsGenerating(false);
       }
-      
     } catch (error) {
       console.error('Error generating report preview:', error);
       toast({
@@ -142,28 +130,23 @@ const ReportCreationPage = () => {
       setIsGenerating(false);
     }
   };
-  
   // Save report
   const saveReport = async () => {
     try {
       setIsSaving(true);
-      
       let response;
       if (editMode) {
         response = await api.put(`/api/reports/${id}`, reportData);
       } else {
         response = await api.post('/api/reports', reportData);
       }
-      
       toast({
         title: 'Success',
         description: editMode ? 'Report updated successfully' : 'Report created successfully',
         type: 'success',
       });
-      
       // Navigate to the report details page
       navigate(`/reports/${response.data.id}`);
-      
     } catch (error) {
       console.error('Error saving report:', error);
       toast({
@@ -175,19 +158,16 @@ const ReportCreationPage = () => {
       setIsSaving(false);
     }
   };
-  
   // Download report
   const downloadReport = async (format = 'pdf') => {
     try {
       setIsGenerating(true);
-      
       const response = await api.post('/api/reports/generate', {
         ...reportData,
         format
       }, {
         responseType: 'blob'
       });
-      
       // Create a URL for the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -196,13 +176,11 @@ const ReportCreationPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      
       toast({
         title: 'Success',
         description: `Report downloaded as ${format.toUpperCase()}`,
         type: 'success',
       });
-      
     } catch (error) {
       console.error('Error downloading report:', error);
       toast({
@@ -214,7 +192,6 @@ const ReportCreationPage = () => {
       setIsGenerating(false);
     }
   };
-  
   // Schedule report
   const scheduleReport = () => {
     // Save the report first
@@ -222,7 +199,6 @@ const ReportCreationPage = () => {
       navigate(`/reports/schedules/create?reportId=${id || 'new'}`);
     });
   };
-  
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -231,11 +207,9 @@ const ReportCreationPage = () => {
       [name]: value
     });
   };
-  
   // Toggle field selection
   const toggleField = (field) => {
     const isSelected = reportData.fields.includes(field.id);
-    
     if (isSelected) {
       setReportData({
         ...reportData,
@@ -248,7 +222,6 @@ const ReportCreationPage = () => {
       });
     }
   };
-  
   // Handle filter changes
   const handleFilterChange = (filterId, value) => {
     setReportData({
@@ -259,7 +232,6 @@ const ReportCreationPage = () => {
       }
     });
   };
-  
   // Add a groupBy field
   const addGroupBy = (field) => {
     if (!reportData.groupBy.includes(field.id)) {
@@ -269,7 +241,6 @@ const ReportCreationPage = () => {
       });
     }
   };
-  
   // Remove a groupBy field
   const removeGroupBy = (fieldId) => {
     setReportData({
@@ -277,11 +248,9 @@ const ReportCreationPage = () => {
       groupBy: reportData.groupBy.filter(id => id !== fieldId)
     });
   };
-  
   // Add a sortBy field
   const addSortBy = (field, direction = 'asc') => {
     const existingIndex = reportData.sortBy.findIndex(sort => sort.field === field.id);
-    
     if (existingIndex >= 0) {
       // Update the existing sort
       const updatedSortBy = [...reportData.sortBy];
@@ -298,7 +267,6 @@ const ReportCreationPage = () => {
       });
     }
   };
-  
   // Remove a sortBy field
   const removeSortBy = (fieldId) => {
     setReportData({
@@ -306,19 +274,16 @@ const ReportCreationPage = () => {
       sortBy: reportData.sortBy.filter(sort => sort.field !== fieldId)
     });
   };
-  
   // Get field name by ID
   const getFieldName = (fieldId) => {
     const field = availableFields.find(f => f.id === fieldId);
     return field ? field.name : fieldId;
   };
-  
   // Get filter name by ID
   const getFilterName = (filterId) => {
     const filter = availableFilters.find(f => f.id === filterId);
     return filter ? filter.name : filterId;
   };
-  
   // Render report type icon
   const getReportTypeIcon = (type) => {
     switch(type) {
@@ -336,7 +301,6 @@ const ReportCreationPage = () => {
         return <FileText className="w-6 h-6 text-gray-500" />;
     }
   };
-  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -344,13 +308,11 @@ const ReportCreationPage = () => {
       </div>
     );
   }
-  
   // Render step 1: Report Type and Basic Info
   const renderStep1 = () => (
     <div className="space-y-6">
       <div className="space-y-4">
         <h2 className="text-lg font-medium">Report Information</h2>
-        
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Report Name</label>
           <Input
@@ -362,7 +324,6 @@ const ReportCreationPage = () => {
             className="w-full"
           />
         </div>
-        
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
           <textarea
@@ -375,11 +336,9 @@ const ReportCreationPage = () => {
           />
         </div>
       </div>
-      
       <div className="space-y-4">
         <h2 className="text-lg font-medium">Report Type</h2>
         <p className="text-sm text-gray-500">Select the type of report you want to create</p>
-        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card 
             className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${reportData.type === 'beneficiary' ? 'border-primary border-2' : ''}`}
@@ -393,7 +352,6 @@ const ReportCreationPage = () => {
               <p className="text-sm text-gray-500 text-center mt-2">Information about beneficiaries and their progress</p>
             </div>
           </Card>
-          
           <Card 
             className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${reportData.type === 'program' ? 'border-primary border-2' : ''}`}
             onClick={() => setReportData({ ...reportData, type: 'program' })}
@@ -406,7 +364,6 @@ const ReportCreationPage = () => {
               <p className="text-sm text-gray-500 text-center mt-2">Information about training programs and their metrics</p>
             </div>
           </Card>
-          
           <Card 
             className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${reportData.type === 'trainer' ? 'border-primary border-2' : ''}`}
             onClick={() => setReportData({ ...reportData, type: 'trainer' })}
@@ -419,7 +376,6 @@ const ReportCreationPage = () => {
               <p className="text-sm text-gray-500 text-center mt-2">Information about trainers and their performance</p>
             </div>
           </Card>
-          
           <Card 
             className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${reportData.type === 'analytics' ? 'border-primary border-2' : ''}`}
             onClick={() => setReportData({ ...reportData, type: 'analytics' })}
@@ -432,7 +388,6 @@ const ReportCreationPage = () => {
               <p className="text-sm text-gray-500 text-center mt-2">Statistical analysis and visualizations</p>
             </div>
           </Card>
-          
           <Card 
             className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${reportData.type === 'performance' ? 'border-primary border-2' : ''}`}
             onClick={() => setReportData({ ...reportData, type: 'performance' })}
@@ -447,10 +402,8 @@ const ReportCreationPage = () => {
           </Card>
         </div>
       </div>
-      
       <div className="space-y-4">
         <h2 className="text-lg font-medium">Report Format</h2>
-        
         <div className="flex space-x-4">
           <div className="flex items-center">
             <input
@@ -466,7 +419,6 @@ const ReportCreationPage = () => {
               PDF
             </label>
           </div>
-          
           <div className="flex items-center">
             <input
               type="radio"
@@ -481,7 +433,6 @@ const ReportCreationPage = () => {
               Excel (XLSX)
             </label>
           </div>
-          
           <div className="flex items-center">
             <input
               type="radio"
@@ -498,10 +449,8 @@ const ReportCreationPage = () => {
           </div>
         </div>
       </div>
-      
       <div className="space-y-4">
         <h2 className="text-lg font-medium">Time Period</h2>
-        
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="flex items-center">
             <input
@@ -517,7 +466,6 @@ const ReportCreationPage = () => {
               Last 7 Days
             </label>
           </div>
-          
           <div className="flex items-center">
             <input
               type="radio"
@@ -532,7 +480,6 @@ const ReportCreationPage = () => {
               Last 30 Days
             </label>
           </div>
-          
           <div className="flex items-center">
             <input
               type="radio"
@@ -547,7 +494,6 @@ const ReportCreationPage = () => {
               Last 90 Days
             </label>
           </div>
-          
           <div className="flex items-center">
             <input
               type="radio"
@@ -562,7 +508,6 @@ const ReportCreationPage = () => {
               This Year
             </label>
           </div>
-          
           <div className="flex items-center">
             <input
               type="radio"
@@ -577,7 +522,6 @@ const ReportCreationPage = () => {
               All Time
             </label>
           </div>
-          
           <div className="flex items-center">
             <input
               type="radio"
@@ -593,7 +537,6 @@ const ReportCreationPage = () => {
             </label>
           </div>
         </div>
-        
         {reportData.dateRange === 'custom' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
             <div>
@@ -606,7 +549,6 @@ const ReportCreationPage = () => {
                 className="w-full"
               />
             </div>
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
               <Input
@@ -622,7 +564,6 @@ const ReportCreationPage = () => {
       </div>
     </div>
   );
-  
   // Render step 2: Select Fields
   const renderStep2 = () => (
     <div className="space-y-6">
@@ -630,7 +571,6 @@ const ReportCreationPage = () => {
         <h2 className="text-lg font-medium">Select Fields</h2>
         <p className="text-sm text-gray-500 mt-1">Choose the fields to include in your report</p>
       </div>
-      
       {availableFields.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {availableFields.map(field => (
@@ -654,7 +594,6 @@ const ReportCreationPage = () => {
           <p className="text-gray-500">Please select a report type to view available fields</p>
         </div>
       )}
-      
       {reportData.fields.length > 0 && (
         <div className="mt-6 p-4 bg-gray-50 rounded-md">
           <h3 className="text-sm font-medium mb-2">Selected Fields ({reportData.fields.length})</h3>
@@ -676,7 +615,6 @@ const ReportCreationPage = () => {
       )}
     </div>
   );
-  
   // Render step 3: Filters and Options
   const renderStep3 = () => (
     <div className="space-y-6">
@@ -684,13 +622,11 @@ const ReportCreationPage = () => {
         <h2 className="text-lg font-medium">Filters</h2>
         <p className="text-sm text-gray-500 mt-1">Apply filters to refine your report results</p>
       </div>
-      
       {availableFilters.length > 0 ? (
         <div className="space-y-4">
           {availableFilters.map(filter => (
             <div key={filter.id} className="p-4 border rounded-md">
               <h3 className="text-sm font-medium mb-2">{filter.name}</h3>
-              
               {filter.type === 'select' && (
                 <select
                   value={reportData.filters[filter.id] || ''}
@@ -705,7 +641,6 @@ const ReportCreationPage = () => {
                   ))}
                 </select>
               )}
-              
               {filter.type === 'multiselect' && (
                 <div className="space-y-2">
                   {filter.options.map(option => (
@@ -731,7 +666,6 @@ const ReportCreationPage = () => {
                   ))}
                 </div>
               )}
-              
               {filter.type === 'range' && (
                 <div className="flex space-x-4">
                   <div className="flex-1">
@@ -760,7 +694,6 @@ const ReportCreationPage = () => {
                   </div>
                 </div>
               )}
-              
               {filter.type === 'text' && (
                 <Input
                   type="text"
@@ -770,7 +703,6 @@ const ReportCreationPage = () => {
                   className="w-full"
                 />
               )}
-              
               {filter.type === 'date' && (
                 <div className="flex space-x-4">
                   <div className="flex-1">
@@ -807,15 +739,12 @@ const ReportCreationPage = () => {
           <p className="text-gray-500">No filters available for this report type</p>
         </div>
       )}
-      
       <div className="mt-8">
         <h2 className="text-lg font-medium mb-4">Group and Sort Options</h2>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <h3 className="text-sm font-medium">Group By</h3>
             <p className="text-xs text-gray-500">Organize your data by grouping on specific fields</p>
-            
             <div className="p-3 border rounded-md bg-gray-50">
               <select
                 value=""
@@ -839,7 +768,6 @@ const ReportCreationPage = () => {
                     </option>
                   ))}
               </select>
-              
               {reportData.groupBy.length > 0 && (
                 <div className="mt-3 space-y-2">
                   {reportData.groupBy.map((fieldId, index) => (
@@ -863,11 +791,9 @@ const ReportCreationPage = () => {
               )}
             </div>
           </div>
-          
           <div className="space-y-4">
             <h3 className="text-sm font-medium">Sort By</h3>
             <p className="text-xs text-gray-500">Define how your data should be ordered</p>
-            
             <div className="p-3 border rounded-md bg-gray-50">
               <div className="flex space-x-2">
                 <select
@@ -893,7 +819,6 @@ const ReportCreationPage = () => {
                     ))}
                 </select>
               </div>
-              
               {reportData.sortBy.length > 0 && (
                 <div className="mt-3 space-y-2">
                   {reportData.sortBy.map((sort, index) => (
@@ -934,13 +859,11 @@ const ReportCreationPage = () => {
       </div>
     </div>
   );
-  
   // Render step 4: Preview
   const renderStep4 = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-medium">Report Preview</h2>
-        
         <div className="flex space-x-2">
           <Button
             variant="outline"
@@ -950,7 +873,6 @@ const ReportCreationPage = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Edit Report
           </Button>
-          
           <div className="relative inline-block group">
             <Button
               variant="outline"
@@ -960,7 +882,6 @@ const ReportCreationPage = () => {
               Download
               <ChevronDown className="w-4 h-4 ml-1" />
             </Button>
-            
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border p-1 hidden group-hover:block">
               <button
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded"
@@ -982,7 +903,6 @@ const ReportCreationPage = () => {
               </button>
             </div>
           </div>
-          
           <Button
             variant="default"
             onClick={saveReport}
@@ -1003,7 +923,6 @@ const ReportCreationPage = () => {
           </Button>
         </div>
       </div>
-      
       <div className="bg-white border rounded-md overflow-hidden">
         <div className="p-4 border-b bg-gray-50">
           <div className="flex justify-between items-center">
@@ -1016,7 +935,6 @@ const ReportCreationPage = () => {
                 <p className="text-sm text-gray-500">{reportData.description}</p>
               </div>
             </div>
-            
             <div className="flex flex-col items-end text-sm text-gray-500">
               <div className="flex items-center">
                 <Calendar className="w-4 h-4 mr-1" />
@@ -1042,7 +960,6 @@ const ReportCreationPage = () => {
             </div>
           </div>
         </div>
-        
         {isGenerating ? (
           <div className="flex flex-col items-center justify-center p-16">
             <Loader className="w-12 h-12 text-primary animate-spin mb-4" />
@@ -1053,7 +970,6 @@ const ReportCreationPage = () => {
             {reportPreview.sections.map((section, index) => (
               <div key={index} className="mb-8">
                 <h3 className="text-lg font-medium mb-4">{section.title}</h3>
-                
                 {section.type === 'table' && (
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -1080,13 +996,11 @@ const ReportCreationPage = () => {
                     </table>
                   </div>
                 )}
-                
                 {section.type === 'chart' && (
                   <div className="bg-gray-100 p-8 rounded-md text-center">
                     <p className="text-gray-500">[Chart Visualization: {section.chartType}]</p>
                   </div>
                 )}
-                
                 {section.type === 'summary' && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {section.metrics.map(metric => (
@@ -1132,7 +1046,6 @@ const ReportCreationPage = () => {
           </div>
         )}
       </div>
-      
       <div className="flex justify-between items-center pt-6">
         <div className="flex items-center">
           <div className="p-2 rounded-full bg-primary/10 mr-3">
@@ -1143,7 +1056,6 @@ const ReportCreationPage = () => {
             <p className="text-sm text-gray-500">Set up automatic generation and delivery</p>
           </div>
         </div>
-        
         <Button
           variant="outline"
           onClick={scheduleReport}
@@ -1155,7 +1067,6 @@ const ReportCreationPage = () => {
       </div>
     </div>
   );
-  
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center mb-6">
@@ -1165,7 +1076,6 @@ const ReportCreationPage = () => {
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        
         <div>
           <h1 className="text-2xl font-bold">
             {editMode ? 'Edit Report' : 'Create New Report'}
@@ -1178,7 +1088,6 @@ const ReportCreationPage = () => {
           </p>
         </div>
       </div>
-      
       <div className="grid grid-cols-12 gap-6">
         {/* Step Sidebar */}
         <div className="col-span-12 md:col-span-3">
@@ -1195,7 +1104,6 @@ const ReportCreationPage = () => {
                 <p className="text-xs text-gray-500">Basic information and format</p>
               </div>
             </div>
-            
             <div 
               className={`p-4 flex items-center cursor-pointer hover:bg-gray-50 ${step === 2 ? 'bg-primary/10 border-l-4 border-primary' : ''}`}
               onClick={() => (step > 2 || reportData.type) && setStep(2)}
@@ -1214,7 +1122,6 @@ const ReportCreationPage = () => {
                 <p className="text-xs text-gray-500">Choose data to include</p>
               </div>
             </div>
-            
             <div 
               className={`p-4 flex items-center cursor-pointer hover:bg-gray-50 ${step === 3 ? 'bg-primary/10 border-l-4 border-primary' : ''}`}
               onClick={() => (step > 3 || (reportData.type && reportData.fields.length > 0)) && setStep(3)}
@@ -1233,7 +1140,6 @@ const ReportCreationPage = () => {
                 <p className="text-xs text-gray-500">Refine and organize data</p>
               </div>
             </div>
-            
             <div 
               className={`p-4 flex items-center cursor-pointer hover:bg-gray-50 ${step === 4 ? 'bg-primary/10 border-l-4 border-primary' : ''}`}
               onClick={() => reportPreview && setStep(4)}
@@ -1247,7 +1153,6 @@ const ReportCreationPage = () => {
               </div>
             </div>
           </Card>
-          
           <div className="mt-6">
             <Button
               variant="outline"
@@ -1258,7 +1163,6 @@ const ReportCreationPage = () => {
             </Button>
           </div>
         </div>
-        
         {/* Main Content */}
         <div className="col-span-12 md:col-span-9">
           <Card className="p-6">
@@ -1266,7 +1170,6 @@ const ReportCreationPage = () => {
             {step === 2 && renderStep2()}
             {step === 3 && renderStep3()}
             {step === 4 && renderStep4()}
-            
             {step < 4 && (
               <div className="mt-8 flex justify-between">
                 {step > 1 ? (
@@ -1281,7 +1184,6 @@ const ReportCreationPage = () => {
                 ) : (
                   <div></div>
                 )}
-                
                 <Button
                   variant="default"
                   onClick={() => {
@@ -1293,7 +1195,6 @@ const ReportCreationPage = () => {
                       });
                       return;
                     }
-                    
                     if (step === 2 && reportData.fields.length === 0) {
                       toast({
                         title: 'Error',
@@ -1302,7 +1203,6 @@ const ReportCreationPage = () => {
                       });
                       return;
                     }
-                    
                     if (step === 3) {
                       generatePreview();
                     } else {
@@ -1331,5 +1231,4 @@ const ReportCreationPage = () => {
     </div>
   );
 };
-
 export default ReportCreationPage;

@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { modalOverlay, modalContent } from '@/lib/animations';
-
 export const AnimatedModal = ({ 
   isOpen, 
   onClose,

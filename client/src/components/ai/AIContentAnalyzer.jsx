@@ -10,13 +10,11 @@ import LoadingSpinner from '../ui/LoadingSpinner';
 import { Badge } from '../ui/badge';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import api from '../../lib/api';
-
 const AIContentAnalyzer = ({ content, type = 'general' }) => {
   const [text, setText] = useState(content || '');
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState(null);
   const { toast } = useToast();
-
   const handleAnalyze = async () => {
     if (!text.trim()) {
       toast({
@@ -26,7 +24,6 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
       });
       return;
     }
-
     setLoading(true);
     try {
       const response = await api.post('/ai/analyze-content', {
@@ -35,7 +32,6 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
         include_suggestions: true,
         include_metrics: true
       });
-
       setAnalysis(response.data);
       toast({
         title: "Analysis Complete",
@@ -52,19 +48,16 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
       setLoading(false);
     }
   };
-
   const getScoreColor = (score) => {
     if (score >= 80) return 'text-green-600';
     if (score >= 60) return 'text-yellow-600';
     return 'text-red-600';
   };
-
   const getScoreBadgeVariant = (score) => {
     if (score >= 80) return 'success';
     if (score >= 60) return 'warning';
     return 'destructive';
   };
-
   return (
     <div className="space-y-6">
       <Card>
@@ -90,7 +83,6 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
               {text.length} characters
             </p>
           </div>
-
           <Button
             onClick={handleAnalyze}
             disabled={loading || !text.trim()}
@@ -110,7 +102,6 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
           </Button>
         </CardContent>
       </Card>
-
       {analysis && (
         <div className="space-y-4">
           {/* Overall Score */}
@@ -128,7 +119,6 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
                     {analysis.overall_rating || 'Good'}
                   </Badge>
                 </div>
-
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                   <div className="text-center">
                     <BookOpen className="h-8 w-8 mx-auto mb-2 text-blue-600" />
@@ -154,7 +144,6 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
               </div>
             </CardContent>
           </Card>
-
           {/* Detailed Metrics */}
           {analysis.metrics && (
             <Card>
@@ -183,7 +172,6 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
                       </ResponsiveContainer>
                     </div>
                   )}
-
                   {/* Individual Metrics */}
                   <div className="space-y-3">
                     {Object.entries(analysis.metrics).map(([key, value]) => {
@@ -209,7 +197,6 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
               </CardContent>
             </Card>
           )}
-
           {/* Suggestions */}
           {analysis.suggestions && analysis.suggestions.length > 0 && (
             <Card>
@@ -236,7 +223,6 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
               </CardContent>
             </Card>
           )}
-
           {/* Key Insights */}
           {analysis.insights && (
             <Card>
@@ -262,5 +248,4 @@ const AIContentAnalyzer = ({ content, type = 'general' }) => {
     </div>
   );
 };
-
 export default AIContentAnalyzer;

@@ -345,7 +345,7 @@ if __name__ == "__main__":
     
     # Example CLI usage
     if len(sys.argv) < 2:
-        print("Usage: python backup.py [create|restore|list|cleanup|verify] [options]")
+        logger.info("Usage: python backup.py [create|restore|list|cleanup|verify] [options]")
         sys.exit(1)
     
     manager = DatabaseBackupManager('postgresql://user:pass@localhost/bdc')
@@ -354,28 +354,28 @@ if __name__ == "__main__":
     
     if command == 'create':
         backup_file = manager.create_backup()
-        print(f"Backup created: {backup_file}")
+        logger.info(f"Backup created: {backup_file}")
     
     elif command == 'restore' and len(sys.argv) > 2:
         backup_file = sys.argv[2]
         if manager.restore_backup(backup_file):
-            print(f"Backup restored: {backup_file}")
+            logger.info(f"Backup restored: {backup_file}")
         else:
-            print("Restore failed")
+            logger.info("Restore failed")
     
     elif command == 'list':
         backups = manager.list_backups()
         for backup in backups:
-            print(f"{backup['filename']} - {backup['created_at']} - {backup['size']} bytes")
+            logger.info(f"{backup['filename']} - {backup['created_at']} - {backup['size']} bytes")
     
     elif command == 'cleanup':
         retention_days = int(sys.argv[2]) if len(sys.argv) > 2 else 30
         removed = manager.cleanup_old_backups(retention_days)
-        print(f"Removed {removed} old backups")
+        logger.info(f"Removed {removed} old backups")
     
     elif command == 'verify' and len(sys.argv) > 2:
         backup_file = sys.argv[2]
         if manager.verify_backup(backup_file):
-            print("Backup is valid")
+            logger.info("Backup is valid")
         else:
-            print("Backup is corrupted or invalid") 
+            logger.info("Backup is corrupted or invalid") 

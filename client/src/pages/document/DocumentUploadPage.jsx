@@ -1,644 +1,302 @@
-import { useState, useRef, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Upload, 
-  File, 
-  Folder, 
-  X, 
-  AlertCircle,
-  Check,
-  FileText,
-  FileImage,
-  FileArchive,
-  FolderPlus
-} from 'lucide-react';
-import api from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/toast';
-
-/**
- * DocumentUploadPage allows users to upload new documents or new versions of existing documents
- */
-const DocumentUploadPage = () => {
-  const { id } = useParams(); // document id if updating an existing document
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaFolder, FaTag, FaLock, FaInfoCircle } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import { DocumentUploader, DocumentViewer } from '../../components/document';
+const DocumentUploadPageV2 = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const fileInputRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(id ? true : false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [selectedFiles, setSelectedFiles] = useState([]);
-  const [documentName, setDocumentName] = useState('');
-  const [documentDescription, setDocumentDescription] = useState('');
-  const [folders, setFolders] = useState([]);
-  const [selectedFolderId, setSelectedFolderId] = useState(null);
-  const [showFolderSelector, setShowFolderSelector] = useState(false);
-  const [documentToUpdate, setDocumentToUpdate] = useState(null);
-  
-  const getIconForMimeType = (mimeType) => {
-    if (mimeType.startsWith('image/')) {
-      return <FileImage className="w-8 h-8 text-blue-500" />;
-    } else if (mimeType === 'application/pdf') {
-      return <FileText className="w-8 h-8 text-red-500" />;
-    } else if (mimeType.includes('zip') || mimeType.includes('compressed')) {
-      return <FileArchive className="w-8 h-8 text-yellow-500" />;
-    } else if (mimeType.includes('text/') || mimeType.includes('document')) {
-      return <FileText className="w-8 h-8 text-green-500" />;
-    } else {
-      return <File className="w-8 h-8 text-gray-500" />;
+  const [loading, setLoading] = useState(false);
+  const [uploadComplete, setUploadComplete] = useState(false);
+  const [uploadedDocuments, setUploadedDocuments] = useState([]);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: '',
+    tags: [],
+    visibility: 'private',
+    permissions: {
+      view: [],
+      download: [],
+      edit: []
+    },
+    folder: '',
+    metadata: {
+      author: '',
+      version: '1.0',
+      language: 'tr'
+    }
+  });
+  const [categories] = useState([
+    { id: 'training', name: 'Eğitim Materyalleri' },
+    { id: 'assessment', name: 'Değerlendirme Dokümanları' },
+    { id: 'reports', name: 'Raporlar' },
+    { id: 'policy', name: 'Politikalar' },
+    { id: 'templates', name: 'Şablonlar' },
+    { id: 'other', name: 'Diğer' }
+  ]);
+  const [tagInput, setTagInput] = useState('');
+  const [previewFile, setPreviewFile] = useState(null);
+  const handleUploadComplete = (documents, errors) => {
+    setUploadedDocuments(documents);
+    setUploadComplete(true);
+    setLoading(false);
+    if (documents.length > 0) {
+      toast.success(`${documents.length} dosya başarıyla yüklendi`);
+      setTimeout(() => navigate('/documents'), 2000);
+    }
+    if (errors.length > 0) {
+      toast.error(`${errors.length} dosya yüklenemedi`);
     }
   };
-
-  // If updating an existing document, fetch its details
-  useEffect(() => {
-    const fetchDocumentDetails = async () => {
-      if (!id) return;
-      
-      try {
-        const response = await api.get(`/api/documents/${id}`);
-        setDocumentToUpdate(response.data);
-        setDocumentName(response.data.name);
-        setDocumentDescription(response.data.description || '');
-        setSelectedFolderId(response.data.folder_id);
-      } catch (error) {
-        console.error('Error fetching document details:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load document details',
-          type: 'error',
-        });
-        navigate('/documents');
-      } finally {
-        setIsLoading(false);
+  const handleUploadError = (errorMessages) => {
+    errorMessages.forEach(msg => toast.error(msg));
+    setLoading(false);
+  };
+  const handleAddTag = (e) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      if (!formData.tags.includes(tagInput.trim())) {
+        setFormData({ ...formData, tags: [...formData.tags, tagInput.trim()] });
       }
+      setTagInput('');
+    }
+  };
+  const removeTag = (tag) => {
+    setFormData({ ...formData, tags: formData.tags.filter(t => t !== tag) });
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+  };
+  const getUploadMetadata = () => {
+    return {
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      tags: JSON.stringify(formData.tags),
+      visibility: formData.visibility,
+      permissions: JSON.stringify(formData.permissions),
+      folder: formData.folder,
+      metadata: JSON.stringify(formData.metadata)
     };
-    
-    fetchDocumentDetails();
-  }, [id, navigate]); // Remove toast dependency to prevent infinite loop
-
-  // Fetch available folders
-  useEffect(() => {
-    const fetchFolders = async () => {
-      try {
-        const response = await api.get('/api/folders');
-        setFolders(response.data);
-      } catch (error) {
-        console.error('Error fetching folders:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load folders',
-          type: 'error',
-        });
-      }
-    };
-    
-    fetchFolders();
-  }, []); // Remove toast dependency to prevent infinite loop
-
-  // Handle file selection
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    
-    if (id && files.length > 1) {
-      toast({
-        title: 'Error',
-        description: 'You can only upload one file when updating a document',
-        type: 'error',
-      });
-      return;
-    }
-    
-    // Validate file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
-    const oversizedFiles = files.filter(file => file.size > maxSize);
-    
-    if (oversizedFiles.length > 0) {
-      toast({
-        title: 'Error',
-        description: `Some files exceed the maximum size of 50MB: ${oversizedFiles.map(f => f.name).join(', ')}`,
-        type: 'error',
-      });
-      
-      // Filter out oversized files
-      const validFiles = files.filter(file => file.size <= maxSize);
-      setSelectedFiles(validFiles);
-    } else {
-      setSelectedFiles(files);
-      
-      // If uploading a single file and no name is set, use the file name
-      if (files.length === 1 && (!documentName || documentName === '')) {
-        // Remove file extension
-        const nameWithoutExtension = files[0].name.replace(/\.[^/.]+$/, "");
-        setDocumentName(nameWithoutExtension);
-      }
-    }
   };
-
-  // Handle drag and drop
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.currentTarget.classList.add('border-primary');
+  const handlePreviewDocument = (document) => {
+    setPreviewFile(document);
   };
-  
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove('border-primary');
-  };
-  
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove('border-primary');
-    
-    const files = Array.from(e.dataTransfer.files);
-    
-    if (id && files.length > 1) {
-      toast({
-        title: 'Error',
-        description: 'You can only upload one file when updating a document',
-        type: 'error',
-      });
-      return;
-    }
-    
-    // Validate file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
-    const oversizedFiles = files.filter(file => file.size > maxSize);
-    
-    if (oversizedFiles.length > 0) {
-      toast({
-        title: 'Error',
-        description: `Some files exceed the maximum size of 50MB: ${oversizedFiles.map(f => f.name).join(', ')}`,
-        type: 'error',
-      });
-      
-      // Filter out oversized files
-      const validFiles = files.filter(file => file.size <= maxSize);
-      setSelectedFiles(validFiles);
-    } else {
-      setSelectedFiles(files);
-      
-      // If uploading a single file and no name is set, use the file name
-      if (files.length === 1 && (!documentName || documentName === '')) {
-        // Remove file extension
-        const nameWithoutExtension = files[0].name.replace(/\.[^/.]+$/, "");
-        setDocumentName(nameWithoutExtension);
-      }
-    }
-  };
-
-  // Remove file from selected files
-  const removeFile = (index) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  // Upload documents
-  const uploadDocuments = async () => {
-    if (selectedFiles.length === 0) {
-      toast({
-        title: 'Error',
-        description: 'Please select at least one file to upload',
-        type: 'error',
-      });
-      return;
-    }
-    
-    if (!documentName.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter a document name',
-        type: 'error',
-      });
-      return;
-    }
-    
-    try {
-      setIsUploading(true);
-      
-      if (id) {
-        // Updating an existing document
-        const formData = new FormData();
-        formData.append('file', selectedFiles[0]);
-        formData.append('name', documentName);
-        formData.append('description', documentDescription);
-        if (selectedFolderId) {
-          formData.append('folder_id', selectedFolderId);
-        }
-        
-        await api.put(`/api/documents/${id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadProgress(percentCompleted);
-          }
-        });
-        
-        toast({
-          title: 'Success',
-          description: 'Document updated successfully',
-          type: 'success',
-        });
-        
-        navigate(`/documents/${id}`);
-      } else {
-        // Uploading new documents
-        if (selectedFiles.length === 1) {
-          // Single file upload
-          const formData = new FormData();
-          formData.append('file', selectedFiles[0]);
-          formData.append('name', documentName);
-          formData.append('description', documentDescription);
-          if (selectedFolderId) {
-            formData.append('folder_id', selectedFolderId);
-          }
-          
-          const response = await api.post('/api/documents', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            },
-            onUploadProgress: (progressEvent) => {
-              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              setUploadProgress(percentCompleted);
-            }
-          });
-          
-          toast({
-            title: 'Success',
-            description: 'Document uploaded successfully',
-            type: 'success',
-          });
-          
-          navigate(`/documents/${response.data.id}`);
-        } else {
-          // Multiple files upload
-          const formData = new FormData();
-          
-          selectedFiles.forEach(file => {
-            formData.append('files', file);
-          });
-          
-          if (selectedFolderId) {
-            formData.append('folder_id', selectedFolderId);
-          }
-          
-          await api.post('/api/documents/batch', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            },
-            onUploadProgress: (progressEvent) => {
-              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              setUploadProgress(percentCompleted);
-            }
-          });
-          
-          toast({
-            title: 'Success',
-            description: `${selectedFiles.length} documents uploaded successfully`,
-            type: 'success',
-          });
-          
-          navigate('/documents');
-        }
-      }
-    } catch (error) {
-      console.error('Error uploading document(s):', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to upload document(s)',
-        type: 'error',
-      });
-    } finally {
-      setIsUploading(false);
-      setUploadProgress(0);
-    }
-  };
-
-  // Create a new folder
-  const createNewFolder = async (folderName) => {
-    if (!folderName.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter a folder name',
-        type: 'error',
-      });
-      return;
-    }
-    
-    try {
-      const response = await api.post('/api/folders', {
-        name: folderName,
-        parent_id: selectedFolderId
-      });
-      
-      setFolders(prev => [...prev, response.data]);
-      setSelectedFolderId(response.data.id);
-      setShowFolderSelector(false);
-      
-      toast({
-        title: 'Success',
-        description: 'Folder created successfully',
-        type: 'success',
-      });
-    } catch (error) {
-      console.error('Error creating folder:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create folder',
-        type: 'error',
-      });
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto py-6">
-      {/* Header */}
-      <div className="flex items-center mb-6">
-        <button
-          className="mr-4 p-2 rounded-full hover:bg-gray-100"
-          onClick={() => navigate('/documents')}
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        
-        <h1 className="text-2xl font-bold">
-          {id ? 'Update Document' : 'Upload Documents'}
-        </h1>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Left column: Upload area */}
-        <div className="md:col-span-2">
-          <Card className="p-6">
-            <h2 className="text-lg font-medium mb-4">
-              {id ? 'Upload New Version' : 'Upload Files'}
-            </h2>
-            
-            {id && documentToUpdate && (
-              <div className="mb-6 bg-blue-50 p-4 rounded-lg">
-                <div className="flex items-start">
-                  <div className="mr-3 mt-1">
-                    <AlertCircle className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-blue-700">Updating existing document</h3>
-                    <p className="text-sm text-blue-600 mt-1">
-                      You are uploading a new version of "{documentToUpdate.name}".
-                      The original file will be preserved in the version history.
-                    </p>
-                  </div>
-                </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-6">
+          <button
+            onClick={() => navigate('/documents')}
+            className="text-gray-600 hover:text-gray-800 mb-4"
+          >
+            ← Dokümanlara Geri Dön
+          </button>
+          <h1 className="text-2xl font-bold">Doküman Yükle</h1>
+          <p className="text-gray-600">Yeni dokümanlar yükleyin ve kategorilendirin</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* File Upload Area */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-semibold mb-4">Dosya Seçimi</h3>
+            <DocumentUploader
+              onUploadComplete={handleUploadComplete}
+              onUploadError={handleUploadError}
+              metadata={getUploadMetadata()}
+              maxFileSize={100 * 1024 * 1024} // 100MB
+              allowMultiple={true}
+              maxFiles={10}
+              acceptedFileTypes={['pdf', 'office', 'image', 'text', 'archive']}
+              onPreview={handlePreviewDocument}
+            />
+          </div>
+          {/* Document Details */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-semibold mb-4">Doküman Detayları</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Başlık</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Doküman başlığı"
+                />
               </div>
-            )}
-            
-            <div 
-              className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition-colors"
-              onClick={() => fileInputRef.current.click()}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                multiple={!id} // Allow multiple files only when not updating an existing document
-                className="hidden"
-              />
-              
-              <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              
-              <h3 className="text-lg font-medium text-gray-900 mb-1">
-                {id ? 'Select a file to update' : 'Drag and drop files here'}
-              </h3>
-              
-              <p className="text-gray-500 mb-3">
-                {id ? 'or click to browse' : 'or click to browse your computer'}
-              </p>
-              
-              <p className="text-xs text-gray-400">
-                Maximum file size: 50MB
-              </p>
-            </div>
-            
-            {/* Selected files */}
-            {selectedFiles.length > 0 && (
-              <div className="mt-6">
-                <h3 className="text-md font-medium mb-2">
-                  Selected Files ({selectedFiles.length})
-                </h3>
-                
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {selectedFiles.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center">
-                        {getIconForMimeType(file.type)}
-                        <div className="ml-3">
-                          <div className="font-medium">{file.name}</div>
-                          <div className="text-xs text-gray-500">
-                            {(file.size / 1024).toFixed(2)} KB • {file.type || 'Unknown type'}
-                          </div>
-                        </div>
-                      </div>
-                      
+              <div>
+                <label className="block text-sm font-medium mb-2">Kategori</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  required
+                >
+                  <option value="">Kategori seçin</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">Açıklama</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows="3"
+                  placeholder="Doküman hakkında kısa açıklama"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  <FaFolder className="inline mr-1" />
+                  Klasör
+                </label>
+                <input
+                  type="text"
+                  value={formData.folder}
+                  onChange={(e) => setFormData({ ...formData, folder: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Klasör yolu (örn: /Eğitimler/2024)"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  <FaLock className="inline mr-1" />
+                  Görünürlük
+                </label>
+                <select
+                  value={formData.visibility}
+                  onChange={(e) => setFormData({ ...formData, visibility: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                >
+                  <option value="private">Özel</option>
+                  <option value="restricted">Kısıtlı</option>
+                  <option value="public">Herkese Açık</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">
+                  <FaTag className="inline mr-1" />
+                  Etiketler
+                </label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {formData.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm flex items-center"
+                    >
+                      {tag}
                       <button
-                        className="text-gray-500 hover:text-red-500"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeFile(index);
-                        }}
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        className="ml-2 text-blue-500 hover:text-blue-700"
                       >
-                        <X className="w-5 h-5" />
+                        <FaTimes className="text-xs" />
                       </button>
-                    </div>
+                    </span>
                   ))}
                 </div>
-              </div>
-            )}
-            
-            {/* Upload progress */}
-            {isUploading && (
-              <div className="mt-6">
-                <div className="text-sm font-medium text-gray-700 mb-1">
-                  Uploading... {uploadProgress}%
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-primary h-2.5 rounded-full" 
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
-              </div>
-            )}
-          </Card>
-        </div>
-        
-        {/* Right column: Document details */}
-        <div>
-          <Card className="p-6">
-            <h2 className="text-lg font-medium mb-4">Document Details</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Document Name{selectedFiles.length > 1 ? ' (applies to first file only)' : ''}
-                </label>
-                <Input
+                <input
                   type="text"
-                  value={documentName}
-                  onChange={(e) => setDocumentName(e.target.value)}
-                  placeholder="Enter document name"
-                  required
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleAddTag}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Etiket ekle (Enter ile onaylayın)"
                 />
               </div>
-              
+            </div>
+          </div>
+          {/* Metadata */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-semibold mb-4">Metadata</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description (Optional)
-                </label>
-                <textarea
-                  value={documentDescription}
-                  onChange={(e) => setDocumentDescription(e.target.value)}
-                  placeholder="Enter document description"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  rows={3}
+                <label className="block text-sm font-medium mb-2">Yazar</label>
+                <input
+                  type="text"
+                  value={formData.metadata.author}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    metadata: { ...formData.metadata, author: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Doküman yazarı"
                 />
               </div>
-              
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Folder (Optional)
-                </label>
-                
-                {showFolderSelector ? (
-                  <div className="border rounded-lg p-4">
-                    <div className="mb-4">
-                      <Input
-                        type="text"
-                        placeholder="New folder name..."
-                        className="mb-2"
-                        id="new_folder_name"
-                      />
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowFolderSelector(false)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            const input = document.getElementById('new_folder_name');
-                            createNewFolder(input.value);
-                          }}
-                        >
-                          Create
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="max-h-40 overflow-y-auto">
-                      <div 
-                        className={`p-2 rounded cursor-pointer ${selectedFolderId === null ? 'bg-primary-50 border border-primary' : 'hover:bg-gray-50'}`}
-                        onClick={() => {
-                          setSelectedFolderId(null);
-                          setShowFolderSelector(false);
-                        }}
-                      >
-                        <div className="flex items-center">
-                          <Folder className="w-5 h-5 text-gray-400 mr-2" />
-                          <span>Root folder</span>
-                        </div>
-                      </div>
-                      
-                      {folders.map(folder => (
-                        <div 
-                          key={folder.id}
-                          className={`p-2 rounded cursor-pointer ${selectedFolderId === folder.id ? 'bg-primary-50 border border-primary' : 'hover:bg-gray-50'}`}
-                          onClick={() => {
-                            setSelectedFolderId(folder.id);
-                            setShowFolderSelector(false);
-                          }}
-                        >
-                          <div className="flex items-center">
-                            <Folder className="w-5 h-5 text-gray-400 mr-2" />
-                            <span>{folder.name}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:border-primary"
-                    onClick={() => setShowFolderSelector(true)}
-                  >
-                    <div className="flex items-center">
-                      <Folder className="w-5 h-5 text-gray-400 mr-2" />
-                      <span>
-                        {selectedFolderId 
-                          ? folders.find(f => f.id === selectedFolderId)?.name || 'Selected folder' 
-                          : 'Root folder'}
-                      </span>
-                    </div>
-                    <FolderPlus className="w-5 h-5 text-gray-400" />
-                  </div>
-                )}
+                <label className="block text-sm font-medium mb-2">Versiyon</label>
+                <input
+                  type="text"
+                  value={formData.metadata.version}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    metadata: { ...formData.metadata, version: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="1.0"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Dil</label>
+                <select
+                  value={formData.metadata.language}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    metadata: { ...formData.metadata, language: e.target.value }
+                  })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                >
+                  <option value="tr">Türkçe</option>
+                  <option value="en">İngilizce</option>
+                </select>
               </div>
             </div>
-            
-            <div className="mt-6">
-              <Button
-                onClick={uploadDocuments}
-                disabled={selectedFiles.length === 0 || isUploading || !documentName.trim()}
-                className="w-full flex items-center justify-center"
-              >
-                {isUploading ? (
-                  <>
-                    <div className="animate-spin mr-2 h-4 w-4 border-2 border-gray-500 border-t-white rounded-full"></div>
-                    Uploading...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4 mr-2" />
-                    {id ? 'Update Document' : 'Upload Document' + (selectedFiles.length > 1 ? 's' : '')}
-                  </>
-                )}
-              </Button>
-            </div>
-          </Card>
-          
-          {!id && (
-            <div className="mt-4 bg-blue-50 p-4 rounded-lg text-blue-800 text-sm">
-              <div className="flex items-start">
-                <Check className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium mb-1">Multiple File Upload</p>
-                  <p>
-                    You can upload multiple files at once. Document details will be applied to the first file only.
-                    Other files will use their original filenames.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+          {/* Submit Button */}
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={() => navigate('/documents')}
+              className="px-6 py-2 border rounded-lg hover:bg-gray-50"
+            >
+              İptal
+            </button>
+            <button
+              type="submit"
+              disabled={loading || uploadComplete}
+              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+            >
+              {loading ? 'Yükleniyor...' : uploadComplete ? 'Yükleme Tamamlandı' : 'Dosyaları Yükle'}
+            </button>
+          </div>
+        </form>
       </div>
+      {/* Preview Modal */}
+      {previewFile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-semibold">{previewFile.name}</h3>
+              <button
+                onClick={() => setPreviewFile(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4 overflow-auto max-h-[calc(90vh-8rem)]">
+              <DocumentViewer 
+                document={previewFile}
+                height="600px"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
-export default DocumentUploadPage;
+export default DocumentUploadPageV2;

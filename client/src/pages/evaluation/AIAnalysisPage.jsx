@@ -1,856 +1,833 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, Download, ThumbsUp, ThumbsDown, MessageSquare, Brain, FileText, PieChart, BarChart2, LineChart, Target, ArrowUpRight, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
-import api from '@/lib/api';
-import { API_ENDPOINTS, FEEDBACK_STATUS } from '@/lib/constants';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Tabs } from '@/components/ui/tabs';
-import { useToast } from '@/components/ui/toast';
-
-/**
- * AIAnalysisPage displays comprehensive AI analysis for a test session
- */
-const AIAnalysisPage = () => {
-  const { id } = useParams();
+import { 
+  ArrowLeft, Brain, RefreshCw, Download, MessageSquare, 
+  Target, TrendingUp, BookOpen, Award, AlertTriangle,
+  CheckCircle, XCircle, Lightbulb, BarChart2, LineChart,
+  PieChart, Activity, Zap, Shield, Star, ThumbsUp
+} from 'lucide-react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  RadialLinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+import { Line, Bar, Pie, Doughnut, Radar, PolarArea } from 'react-chartjs-2';
+import axios from '../../lib/api';
+import { toast } from '../../hooks/useToast';
+import { Button } from '../../components/ui/button';
+import { Card } from '../../components/ui/card';
+import { Tabs } from '../../components/ui/tabs';
+import { Badge } from '../../components/ui/badge';
+import { Alert } from '../../components/ui/alert';
+import { Textarea } from '../../components/ui';
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  RadialLinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+const AIAnalysisPageV2 = () => {
+  const { sessionId } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
   const [session, setSession] = useState(null);
   const [test, setTest] = useState(null);
   const [analysis, setAnalysis] = useState(null);
+  const [insights, setInsights] = useState(null);
+  const [recommendations, setRecommendations] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
-  const [feedbackStatus, setFeedbackStatus] = useState(FEEDBACK_STATUS.DRAFT);
-  const [trainerFeedback, setTrainerFeedback] = useState('');
-
-  // Fetch session and analysis data
+  const [userFeedback, setUserFeedback] = useState('');
+  const [showChat, setShowChat] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Fetch session data
-        const sessionResponse = await api.get(API_ENDPOINTS.EVALUATIONS.SESSION(id));
-        setSession(sessionResponse.data);
-        
-        // Fetch test data
-        const testResponse = await api.get(API_ENDPOINTS.EVALUATIONS.DETAIL(sessionResponse.data.test_id));
-        setTest(testResponse.data);
-        
-        // Fetch AI analysis if available
-        try {
-          const analysisResponse = await api.get(`/api/evaluations/sessions/${id}/analysis`);
-          setAnalysis(analysisResponse.data);
-          setFeedbackStatus(analysisResponse.data.status || FEEDBACK_STATUS.DRAFT);
-          setTrainerFeedback(analysisResponse.data.trainer_feedback || '');
-        } catch (error) {
-          console.log('Analysis not available yet');
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load analysis data',
-          type: 'error',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchData();
-  }, [id, toast]);
-
-  // Generate or regenerate AI analysis
-  const handleGenerateAnalysis = async () => {
+  }, [sessionId]);
+  const fetchData = async () => {
     try {
-      setIsGenerating(true);
-      
-      const response = await api.post(`/api/evaluations/sessions/${id}/generate-analysis`);
-      setAnalysis(response.data);
-      setFeedbackStatus(response.data.status || FEEDBACK_STATUS.DRAFT);
-      
-      toast({
-        title: 'Success',
-        description: 'AI analysis generated successfully',
-        type: 'success',
-      });
+      setLoading(true);
+      const response = await axios.get(`/api/evaluations/sessions/${sessionId}/ai-analysis`);
+      setSession(response.data.session);
+      setTest(response.data.test);
+      setAnalysis(response.data.analysis);
+      setInsights(response.data.insights);
+      setRecommendations(response.data.recommendations);
+      if (response.data.chat_history) {
+        setChatMessages(response.data.chat_history);
+      }
     } catch (error) {
-      console.error('Error generating analysis:', error);
+      console.error('Error fetching analysis:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to generate AI analysis',
-        type: 'error',
+        title: 'Hata',
+        description: 'AI analizi yüklenemedi',
+        variant: 'error'
       });
     } finally {
-      setIsGenerating(false);
+      setLoading(false);
     }
   };
-
-  // Approve AI feedback
-  const handleApproveFeedback = async () => {
+  const regenerateAnalysis = async () => {
     try {
-      const response = await api.put(`/api/evaluations/sessions/${id}/analysis/status`, {
-        status: FEEDBACK_STATUS.APPROVED,
-        trainer_feedback: trainerFeedback
-      });
-      
-      setFeedbackStatus(FEEDBACK_STATUS.APPROVED);
+      setGenerating(true);
+      const response = await axios.post(`/api/evaluations/sessions/${sessionId}/regenerate-analysis`);
+      setAnalysis(response.data.analysis);
+      setInsights(response.data.insights);
+      setRecommendations(response.data.recommendations);
       toast({
-        title: 'Success',
-        description: 'Feedback approved successfully',
-        type: 'success',
+        title: 'Başarılı',
+        description: 'AI analizi güncellendi',
+        variant: 'success'
       });
     } catch (error) {
-      console.error('Error approving feedback:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to approve feedback',
-        type: 'error',
+        title: 'Hata',
+        description: 'Analiz güncellenemedi',
+        variant: 'error'
       });
+    } finally {
+      setGenerating(false);
     }
   };
-
-  // Reject AI feedback
-  const handleRejectFeedback = async () => {
+  const exportAnalysis = async (format = 'pdf') => {
     try {
-      const response = await api.put(`/api/evaluations/sessions/${id}/analysis/status`, {
-        status: FEEDBACK_STATUS.REJECTED,
-        trainer_feedback: trainerFeedback
-      });
-      
-      setFeedbackStatus(FEEDBACK_STATUS.REJECTED);
-      toast({
-        title: 'Success',
-        description: 'Feedback rejected',
-        type: 'success',
-      });
-    } catch (error) {
-      console.error('Error rejecting feedback:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to reject feedback',
-        type: 'error',
-      });
-    }
-  };
-
-  // Handle trainer feedback change
-  const handleTrainerFeedbackChange = (e) => {
-    setTrainerFeedback(e.target.value);
-  };
-
-  // Handle downloading PDF report
-  const handleDownloadReport = async () => {
-    try {
-      const response = await api.get(`/api/evaluations/sessions/${id}/analysis/report`, {
-        responseType: 'blob',
-      });
-      
+      const response = await axios.get(
+        `/api/evaluations/sessions/${sessionId}/export-analysis?format=${format}`,
+        { responseType: 'blob' }
+      );
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `ai-analysis-${id}.pdf`);
+      link.setAttribute('download', `ai-analysis-${sessionId}.${format}`);
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (error) {
-      console.error('Error downloading report:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to download report',
-        type: 'error',
+        title: 'Başarılı',
+        description: 'Analiz raporu indirildi',
+        variant: 'success'
+      });
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Rapor indirilemedi',
+        variant: 'error'
       });
     }
   };
-
-  // Render loading state
-  if (isLoading) {
+  const sendChatMessage = async () => {
+    if (!userFeedback.trim()) return;
+    try {
+      const response = await axios.post(`/api/evaluations/sessions/${sessionId}/chat`, {
+        message: userFeedback
+      });
+      setChatMessages([
+        ...chatMessages,
+        { role: 'user', message: userFeedback },
+        { role: 'assistant', message: response.data.response }
+      ]);
+      setUserFeedback('');
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Mesaj gönderilemedi',
+        variant: 'error'
+      });
+    }
+  };
+  const getInsightIcon = (type) => {
+    const icons = {
+      strength: <Shield className="h-5 w-5 text-green-600" />,
+      weakness: <AlertTriangle className="h-5 w-5 text-red-600" />,
+      opportunity: <Lightbulb className="h-5 w-5 text-yellow-600" />,
+      trend: <TrendingUp className="h-5 w-5 text-blue-600" />,
+      achievement: <Award className="h-5 w-5 text-purple-600" />
+    };
+    return icons[type] || <Brain className="h-5 w-5 text-gray-600" />;
+  };
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
       </div>
     );
   }
-
-  // Render empty state if no session or test data
-  if (!session || !test) {
-    return (
-      <div className="container mx-auto py-6">
-        <Card className="p-6 text-center">
-          <div className="text-red-500 mb-4">
-            <XCircle className="w-12 h-12 mx-auto" />
-          </div>
-          <h2 className="text-xl font-semibold mb-2">Session Not Found</h2>
-          <p className="text-gray-600 mb-4">The requested test session could not be found.</p>
-          <Button onClick={() => navigate('/evaluations')}>Back to Tests</Button>
-        </Card>
-      </div>
-    );
-  }
-
+  // Chart configurations
+  const learningProgressChart = {
+    labels: analysis?.learning_curve?.labels || [],
+    datasets: [
+      {
+        label: 'Öğrenme Eğrisi',
+        data: analysis?.learning_curve?.values || [],
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        fill: true,
+        tension: 0.4
+      },
+      {
+        label: 'Beklenen İlerleme',
+        data: analysis?.expected_curve?.values || [],
+        borderColor: 'rgb(34, 197, 94)',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        fill: true,
+        tension: 0.4,
+        borderDash: [5, 5]
+      }
+    ]
+  };
+  const strengthWeaknessChart = {
+    labels: ['Güçlü Yönler', 'Gelişim Alanları', 'Kritik Alanlar'],
+    datasets: [
+      {
+        data: [
+          analysis?.strength_areas?.length || 0,
+          analysis?.improvement_areas?.length || 0,
+          analysis?.critical_areas?.length || 0
+        ],
+        backgroundColor: [
+          'rgba(34, 197, 94, 0.7)',
+          'rgba(251, 191, 36, 0.7)',
+          'rgba(239, 68, 68, 0.7)'
+        ],
+        borderColor: [
+          'rgb(34, 197, 94)',
+          'rgb(251, 191, 36)',
+          'rgb(239, 68, 68)'
+        ],
+        borderWidth: 1
+      }
+    ]
+  };
+  const cognitiveProfileChart = {
+    labels: analysis?.cognitive_profile?.dimensions || [],
+    datasets: [
+      {
+        label: 'Bilişsel Profil',
+        data: analysis?.cognitive_profile?.scores || [],
+        backgroundColor: 'rgba(147, 51, 234, 0.3)',
+        borderColor: 'rgb(147, 51, 234)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgb(147, 51, 234)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(147, 51, 234)'
+      }
+    ]
+  };
+  const topicMasteryChart = {
+    labels: analysis?.topic_mastery?.topics || [],
+    datasets: [
+      {
+        label: 'Konu Hakimiyeti',
+        data: analysis?.topic_mastery?.scores || [],
+        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+        borderColor: 'rgb(59, 130, 246)',
+        borderWidth: 1
+      }
+    ]
+  };
+  const performanceTrendChart = {
+    labels: analysis?.performance_trend?.dates || [],
+    datasets: [
+      {
+        label: 'Performans Trendi',
+        data: analysis?.performance_trend?.scores || [],
+        borderColor: 'rgb(234, 88, 12)',
+        backgroundColor: 'rgba(234, 88, 12, 0.1)',
+        fill: true,
+        tension: 0.3
+      }
+    ]
+  };
+  const timeManagementChart = {
+    datasets: [
+      {
+        label: 'Zaman Yönetimi',
+        data: analysis?.time_management?.distribution || [],
+        backgroundColor: [
+          'rgba(59, 130, 246, 0.6)',
+          'rgba(34, 197, 94, 0.6)',
+          'rgba(251, 191, 36, 0.6)',
+          'rgba(239, 68, 68, 0.6)'
+        ],
+        borderWidth: 1
+      }
+    ],
+    labels: ['Hızlı', 'Normal', 'Yavaş', 'Çok Yavaş']
+  };
   return (
-    <div className="container mx-auto py-6 max-w-6xl">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(`/evaluations/sessions/${id}/results`)}
-            className="flex items-center"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Results
-          </Button>
-          <h1 className="text-2xl font-bold">AI Analysis</h1>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            onClick={handleGenerateAnalysis}
-            disabled={isGenerating}
-            className="flex items-center"
-          >
-            {isGenerating ? (
-              <>
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <RefreshCw className="w-4 h-4 mr-2" />
-                {analysis ? 'Regenerate Analysis' : 'Generate Analysis'}
-              </>
-            )}
-          </Button>
-          
-          {analysis && (
-            <Button
-              onClick={handleDownloadReport}
-              className="flex items-center"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Download Report
-            </Button>
-          )}
-        </div>
-      </div>
-      
-      {/* Session info */}
-      <Card className="mb-6 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <h3 className="text-gray-500 text-sm">Test</h3>
-            <p className="font-medium text-lg">{test.title}</p>
-          </div>
-          <div>
-            <h3 className="text-gray-500 text-sm">Student</h3>
-            <p className="font-medium text-lg">{session.user_name || 'Unknown Student'}</p>
-          </div>
-          <div>
-            <h3 className="text-gray-500 text-sm">Score</h3>
-            <p className="font-medium text-lg">{session.score}%</p>
-          </div>
-        </div>
-      </Card>
-      
-      {!analysis ? (
-        <Card className="p-6 text-center">
-          <Brain className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No AI Analysis Available</h2>
-          <p className="text-gray-600 mb-4">
-            Click the "Generate Analysis" button above to create an AI-powered assessment of this test session.
-          </p>
-        </Card>
-      ) : (
-        <>
-          {/* Status bar for trainers */}
-          <Card className={`mb-6 p-4 ${
-            feedbackStatus === FEEDBACK_STATUS.APPROVED 
-              ? 'bg-green-50 border-green-200' 
-              : feedbackStatus === FEEDBACK_STATUS.REJECTED
-                ? 'bg-red-50 border-red-200'
-                : 'bg-amber-50 border-amber-200'
-          }`}>
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-              <div className="flex items-center">
-                {feedbackStatus === FEEDBACK_STATUS.APPROVED ? (
-                  <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-                ) : feedbackStatus === FEEDBACK_STATUS.REJECTED ? (
-                  <XCircle className="w-5 h-5 text-red-600 mr-2" />
-                ) : (
-                  <AlertTriangle className="w-5 h-5 text-amber-600 mr-2" />
-                )}
-                <div>
-                  <h3 className="font-medium">
-                    {feedbackStatus === FEEDBACK_STATUS.APPROVED
-                      ? 'AI Feedback Approved'
-                      : feedbackStatus === FEEDBACK_STATUS.REJECTED
-                        ? 'AI Feedback Rejected'
-                        : 'AI Feedback Pending Review'}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {feedbackStatus === FEEDBACK_STATUS.APPROVED
-                      ? 'This analysis has been reviewed and approved by a trainer.'
-                      : feedbackStatus === FEEDBACK_STATUS.REJECTED
-                        ? 'This analysis has been reviewed and rejected by a trainer.'
-                        : 'This AI-generated analysis requires review by a trainer before being shared with the student.'}
-                  </p>
-                </div>
-              </div>
-              
-              {feedbackStatus === FEEDBACK_STATUS.DRAFT && (
-                <div className="flex items-center space-x-2 mt-4 md:mt-0">
-                  <Button
-                    variant="outline"
-                    onClick={handleRejectFeedback}
-                    className="flex items-center"
-                  >
-                    <ThumbsDown className="w-4 h-4 mr-2" />
-                    Reject
-                  </Button>
-                  
-                  <Button
-                    onClick={handleApproveFeedback}
-                    className="flex items-center"
-                  >
-                    <ThumbsUp className="w-4 h-4 mr-2" />
-                    Approve
-                  </Button>
-                </div>
-              )}
-            </div>
-          </Card>
-          
-          {/* Trainer feedback input */}
-          <Card className="mb-6 p-6">
-            <h3 className="text-lg font-medium mb-2">Trainer Feedback</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Add your comments or suggestions to supplement the AI-generated analysis.
-            </p>
-            <textarea
-              value={trainerFeedback}
-              onChange={handleTrainerFeedbackChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-              rows="4"
-              placeholder="Enter your feedback here..."
-            ></textarea>
-            <div className="flex justify-end mt-2">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b sticky top-0 z-30">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
               <Button
-                onClick={async () => {
-                  try {
-                    await api.put(`/api/evaluations/sessions/${id}/analysis/trainer-feedback`, {
-                      trainer_feedback: trainerFeedback
-                    });
-                    
-                    toast({
-                      title: 'Success',
-                      description: 'Trainer feedback saved',
-                      type: 'success',
-                    });
-                  } catch (error) {
-                    console.error('Error saving feedback:', error);
-                    toast({
-                      title: 'Error',
-                      description: 'Failed to save feedback',
-                      type: 'error',
-                    });
-                  }
-                }}
-                variant="outline"
-                size="sm"
+                variant="ghost"
+                onClick={() => navigate(`/evaluations/sessions/${sessionId}/results`)}
               >
-                Save Feedback
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Sonuçlara Dön
+              </Button>
+              <div>
+                <h1 className="text-xl font-semibold">AI Performans Analizi</h1>
+                <p className="text-sm text-gray-600">
+                  {test.title} - Detaylı Yapay Zeka Analizi
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={regenerateAnalysis}
+                disabled={generating}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${generating ? 'animate-spin' : ''}`} />
+                Yeniden Analiz Et
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => exportAnalysis('pdf')}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Rapor İndir
+              </Button>
+              <Button
+                onClick={() => setShowChat(!showChat)}
+              >
+                <MessageSquare className="h-4 w-4 mr-2" />
+                AI Asistan
               </Button>
             </div>
+          </div>
+        </div>
+      </div>
+      {/* Content */}
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* AI Insights Summary */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <Brain className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Genel Skor</p>
+                <p className="text-xl font-bold">{analysis?.overall_score}%</p>
+              </div>
+            </div>
           </Card>
-          
-          {/* Analysis content in tabs */}
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="mb-6"
-          >
-            <Tabs.TabsList className="mb-4">
-              <Tabs.TabTrigger value="overview">
-                <FileText className="w-4 h-4 mr-2" />
-                Overview
-              </Tabs.TabTrigger>
-              <Tabs.TabTrigger value="skills">
-                <Target className="w-4 h-4 mr-2" />
-                Skills Analysis
-              </Tabs.TabTrigger>
-              <Tabs.TabTrigger value="patterns">
-                <PieChart className="w-4 h-4 mr-2" />
-                Response Patterns
-              </Tabs.TabTrigger>
-              <Tabs.TabTrigger value="trends">
-                <LineChart className="w-4 h-4 mr-2" />
-                Growth Trends
-              </Tabs.TabTrigger>
-              <Tabs.TabTrigger value="recommendations">
-                <ArrowUpRight className="w-4 h-4 mr-2" />
-                Recommendations
-              </Tabs.TabTrigger>
-            </Tabs.TabsList>
-            
-            {/* Overview tab */}
-            <Tabs.TabContent value="overview">
-              <Card className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Performance Summary</h2>
-                <div className="prose max-w-none">
-                  <p className="mb-4">{analysis.summary}</p>
-                  
-                  <h3 className="font-medium text-lg mt-6 mb-2">Key Observations</h3>
-                  <ul className="space-y-2">
-                    {analysis.key_observations.map((observation, index) => (
-                      <li key={index} className="flex items-start">
-                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-2">
-                          {index + 1}
-                        </div>
-                        {observation}
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <div>
-                      <h3 className="font-medium text-lg mb-2">Strengths</h3>
-                      <ul className="space-y-2 text-green-800">
-                        {analysis.strengths.map((strength, index) => (
-                          <li key={index} className="flex items-start bg-green-50 p-3 rounded-lg">
-                            <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0 text-green-600" />
-                            <span>{strength}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div>
-                      <h3 className="font-medium text-lg mb-2">Areas for Improvement</h3>
-                      <ul className="space-y-2 text-amber-800">
-                        {analysis.areas_for_improvement.map((area, index) => (
-                          <li key={index} className="flex items-start bg-amber-50 p-3 rounded-lg">
-                            <AlertTriangle className="w-5 h-5 mr-2 flex-shrink-0 text-amber-600" />
-                            <span>{area}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-green-100 rounded-lg">
+                <Target className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Potansiyel</p>
+                <p className="text-xl font-bold">{analysis?.potential_score}%</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <TrendingUp className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Gelişim Hızı</p>
+                <p className="text-xl font-bold">
+                  {analysis?.growth_rate > 0 ? '+' : ''}{analysis?.growth_rate}%
+                </p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-yellow-100 rounded-lg">
+                <Activity className="h-6 w-6 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Tutarlılık</p>
+                <p className="text-xl font-bold">{analysis?.consistency_score}%</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+        {/* Key Insights */}
+        <Card className="p-6 mb-6">
+          <h3 className="text-lg font-semibold mb-4">Önemli Bulgular</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {insights?.map((insight, index) => (
+              <div key={index} className="p-4 border rounded-lg">
+                <div className="flex items-start gap-3">
+                  {getInsightIcon(insight.type)}
+                  <div>
+                    <h4 className="font-medium mb-1">{insight.title}</h4>
+                    <p className="text-sm text-gray-600">{insight.description}</p>
+                    {insight.action && (
+                      <Button size="sm" className="mt-2" variant="outline">
+                        {insight.action}
+                      </Button>
+                    )}
                   </div>
-                  
-                  <h3 className="font-medium text-lg mt-6 mb-2">Learning Style Analysis</h3>
-                  <p>{analysis.learning_style_analysis}</p>
-                  
-                  <h3 className="font-medium text-lg mt-6 mb-2">Performance Relative to Peers</h3>
-                  <p>{analysis.peer_comparison}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs.TabsList>
+            <Tabs.TabTrigger value="overview">Genel Bakış</Tabs.TabTrigger>
+            <Tabs.TabTrigger value="cognitive">Bilişsel Analiz</Tabs.TabTrigger>
+            <Tabs.TabTrigger value="learning">Öğrenme Analizi</Tabs.TabTrigger>
+            <Tabs.TabTrigger value="recommendations">Öneriler</Tabs.TabTrigger>
+            <Tabs.TabTrigger value="patterns">Davranış Kalıpları</Tabs.TabTrigger>
+          </Tabs.TabsList>
+          {/* Overview Tab */}
+          <Tabs.TabContent value="overview">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Learning Progress */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Öğrenme İlerlemesi</h3>
+                <div className="h-64">
+                  <Line 
+                    data={learningProgressChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          position: 'bottom'
+                        }
+                      }
+                    }}
+                  />
                 </div>
               </Card>
-            </Tabs.TabContent>
-            
-            {/* Skills Analysis tab */}
-            <Tabs.TabContent value="skills">
+              {/* Strength/Weakness Distribution */}
               <Card className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Skills Analysis</h2>
-                
-                <div className="space-y-6">
-                  {Object.entries(analysis.skills_analysis).map(([skill, data]) => (
-                    <div key={skill} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-medium text-lg">{skill}</h3>
-                        <div className={`px-2 py-1 rounded-full text-sm font-medium ${
-                          data.proficiency >= 80 ? 'bg-green-100 text-green-800' :
-                          data.proficiency >= 60 ? 'bg-blue-100 text-blue-800' :
-                          data.proficiency >= 40 ? 'bg-amber-100 text-amber-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {data.proficiency >= 80 ? 'Advanced' :
-                           data.proficiency >= 60 ? 'Proficient' :
-                           data.proficiency >= 40 ? 'Developing' :
-                           'Beginner'}
-                        </div>
+                <h3 className="text-lg font-semibold mb-4">Güç Dağılımı</h3>
+                <div className="h-64">
+                  <Pie 
+                    data={strengthWeaknessChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          position: 'bottom'
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Card>
+              {/* Topic Mastery */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Konu Hakimiyeti</h3>
+                <div className="h-64">
+                  <Bar 
+                    data={topicMasteryChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          display: false
+                        }
+                      },
+                      scales: {
+                        y: {
+                          beginAtZero: true,
+                          max: 100
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Card>
+              {/* Performance Trend */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Performans Trendi</h3>
+                <div className="h-64">
+                  <Line 
+                    data={performanceTrendChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          display: false
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Card>
+            </div>
+          </Tabs.TabContent>
+          {/* Cognitive Analysis Tab */}
+          <Tabs.TabContent value="cognitive">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Cognitive Profile */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Bilişsel Profil</h3>
+                <div className="h-64">
+                  <Radar 
+                    data={cognitiveProfileChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      scales: {
+                        r: {
+                          beginAtZero: true,
+                          max: 100
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Card>
+              {/* Time Management */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Zaman Yönetimi</h3>
+                <div className="h-64">
+                  <PolarArea 
+                    data={timeManagementChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false
+                    }}
+                  />
+                </div>
+              </Card>
+              {/* Cognitive Insights */}
+              <Card className="p-6 lg:col-span-2">
+                <h3 className="text-lg font-semibold mb-4">Bilişsel Özellikler</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {analysis?.cognitive_traits?.map((trait, index) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium">{trait.name}</h4>
+                        <Badge variant={trait.level === 'high' ? 'success' : trait.level === 'low' ? 'error' : 'warning'}>
+                          {trait.level}
+                        </Badge>
                       </div>
-                      
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-                        <div
-                          className={`h-2.5 rounded-full ${
-                            data.proficiency >= 80 ? 'bg-green-600' :
-                            data.proficiency >= 60 ? 'bg-blue-600' :
-                            data.proficiency >= 40 ? 'bg-amber-500' :
-                            'bg-red-600'
-                          }`}
-                          style={{ width: `${data.proficiency}%` }}
-                        ></div>
-                      </div>
-                      
-                      <p className="text-gray-700 mb-4">{data.analysis}</p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">Strengths</h4>
-                          <ul className="space-y-1">
-                            {data.strengths.map((item, idx) => (
-                              <li key={idx} className="text-sm flex items-start">
-                                <CheckCircle className="w-4 h-4 text-green-600 mr-1 flex-shrink-0" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">Areas to Work On</h4>
-                          <ul className="space-y-1">
-                            {data.areas_to_work_on.map((item, idx) => (
-                              <li key={idx} className="text-sm flex items-start">
-                                <AlertTriangle className="w-4 h-4 text-amber-600 mr-1 flex-shrink-0" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
+                      <p className="text-sm text-gray-600">{trait.description}</p>
+                      <div className="mt-2">
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full ${
+                              trait.score >= 70 ? 'bg-green-600' : 
+                              trait.score >= 40 ? 'bg-yellow-600' : 'bg-red-600'
+                            }`}
+                            style={{ width: `${trait.score}%` }}
+                          />
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </Card>
-            </Tabs.TabContent>
-            
-            {/* Response Patterns tab */}
-            <Tabs.TabContent value="patterns">
+            </div>
+          </Tabs.TabContent>
+          {/* Learning Analysis Tab */}
+          <Tabs.TabContent value="learning">
+            <div className="space-y-6">
+              {/* Learning Style */}
               <Card className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Response Patterns</h2>
-                
-                <div className="mb-6">
-                  <h3 className="font-medium text-lg mb-2">Answer Strategy</h3>
-                  <p className="text-gray-700 mb-4">{analysis.response_patterns.answer_strategy}</p>
-                  
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Key Patterns Observed</h4>
-                    <ul className="space-y-2">
-                      {analysis.response_patterns.key_patterns.map((pattern, index) => (
-                        <li key={index} className="flex items-start">
-                          <div className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mr-2">
-                            {index + 1}
-                          </div>
-                          {pattern}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-                
-                <div className="mb-6">
-                  <h3 className="font-medium text-lg mb-2">Question Type Analysis</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {Object.entries(analysis.response_patterns.question_types).map(([type, data]) => (
-                      <div key={type} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <h4 className="font-medium">{type}</h4>
-                          <span className="text-sm font-medium">{data.accuracy}% Accuracy</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                          <div
-                            className={`h-2 rounded-full ${
-                              data.accuracy >= 80 ? 'bg-green-600' :
-                              data.accuracy >= 60 ? 'bg-blue-600' :
-                              data.accuracy >= 40 ? 'bg-amber-500' :
-                              'bg-red-600'
-                            }`}
-                            style={{ width: `${data.accuracy}%` }}
-                          ></div>
-                        </div>
-                        <p className="text-sm text-gray-700">{data.analysis}</p>
+                <h3 className="text-lg font-semibold mb-4">Öğrenme Stili</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {analysis?.learning_style?.preferences?.map((pref, index) => (
+                    <div key={index} className="p-4 border rounded-lg text-center">
+                      <div className="inline-flex p-3 bg-blue-100 rounded-full mb-3">
+                        <BookOpen className="h-6 w-6 text-blue-600" />
                       </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium text-lg mb-2">Time Management</h3>
-                  <p className="text-gray-700 mb-4">{analysis.response_patterns.time_management.analysis}</p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-blue-50 rounded-lg p-4">
-                      <h4 className="text-sm font-medium text-blue-700 mb-1">Average Time per Question</h4>
-                      <p className="text-lg font-bold text-blue-800">{analysis.response_patterns.time_management.avg_time_per_question} seconds</p>
+                      <h4 className="font-medium mb-1">{pref.type}</h4>
+                      <p className="text-2xl font-bold mb-1">{pref.score}%</p>
+                      <p className="text-sm text-gray-600">{pref.description}</p>
                     </div>
-                    
-                    <div className="bg-purple-50 rounded-lg p-4">
-                      <h4 className="text-sm font-medium text-purple-700 mb-1">Fastest Question Type</h4>
-                      <p className="text-lg font-bold text-purple-800">{analysis.response_patterns.time_management.fastest_question_type}</p>
-                    </div>
-                    
-                    <div className="bg-indigo-50 rounded-lg p-4">
-                      <h4 className="text-sm font-medium text-indigo-700 mb-1">Slowest Question Type</h4>
-                      <p className="text-lg font-bold text-indigo-800">{analysis.response_patterns.time_management.slowest_question_type}</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </Card>
-            </Tabs.TabContent>
-            
-            {/* Growth Trends tab */}
-            <Tabs.TabContent value="trends">
+              {/* Learning Path */}
               <Card className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Growth Trends</h2>
-                
-                <div className="mb-6">
-                  <h3 className="font-medium text-lg mb-2">Longitudinal Analysis</h3>
-                  <p className="text-gray-700 mb-4">{analysis.growth_trends.longitudinal_analysis}</p>
-                  
-                  <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                    <div className="mb-2 flex items-center justify-between">
-                      <h4 className="text-sm font-medium text-gray-700">Skill Progress Over Time</h4>
-                      <span className="text-xs text-gray-500">Last 3 assessments</span>
+                <h3 className="text-lg font-semibold mb-4">Önerilen Öğrenme Yolu</h3>
+                <div className="space-y-4">
+                  {analysis?.learning_path?.steps?.map((step, index) => (
+                    <div key={index} className="flex items-start gap-4">
+                      <div className={`p-2 rounded-full ${
+                        step.status === 'completed' ? 'bg-green-100' : 
+                        step.status === 'current' ? 'bg-blue-100' : 'bg-gray-100'
+                      }`}>
+                        {step.status === 'completed' ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : step.status === 'current' ? (
+                          <Activity className="h-5 w-5 text-blue-600" />
+                        ) : (
+                          <circle className="h-5 w-5 text-gray-400" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium">{step.title}</h4>
+                        <p className="text-sm text-gray-600">{step.description}</p>
+                        {step.resources && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {step.resources.map((resource, idx) => (
+                              <Badge key={idx} variant="secondary" size="sm">
+                                {resource}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-sm text-gray-500">{step.duration}</span>
                     </div>
-                    
-                    {/* Mock bar chart for skill progress */}
-                    <div className="space-y-4">
-                      {Object.entries(analysis.growth_trends.skill_progress).map(([skill, data]) => (
-                        <div key={skill}>
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-sm font-medium">{skill}</span>
-                            <span className="text-xs text-gray-500">
-                              {data.previous} → {data.current} ({data.change >= 0 ? '+' : ''}{data.change}%)
+                  ))}
+                </div>
+              </Card>
+              {/* Knowledge Gaps */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Bilgi Eksiklikleri</h3>
+                <div className="space-y-3">
+                  {analysis?.knowledge_gaps?.map((gap, index) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium">{gap.topic}</h4>
+                        <Badge variant="error">%{gap.severity} eksik</Badge>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{gap.description}</p>
+                      <div className="flex items-center gap-2">
+                        <Lightbulb className="h-4 w-4 text-yellow-600" />
+                        <p className="text-sm text-gray-700">{gap.suggestion}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </Tabs.TabContent>
+          {/* Recommendations Tab */}
+          <Tabs.TabContent value="recommendations">
+            <div className="space-y-6">
+              {/* Priority Recommendations */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Öncelikli Öneriler</h3>
+                <div className="space-y-4">
+                  {recommendations?.priority?.map((rec, index) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <div className="flex items-start gap-4">
+                        <div className="p-2 bg-red-100 rounded-full">
+                          <AlertTriangle className="h-5 w-5 text-red-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium mb-1">{rec.title}</h4>
+                          <p className="text-sm text-gray-600 mb-2">{rec.description}</p>
+                          <div className="flex items-center gap-4">
+                            <span className="text-sm text-gray-500">
+                              Etki: {rec.impact}/5
                             </span>
+                            <span className="text-sm text-gray-500">
+                              Süre: {rec.time_required}
+                            </span>
+                            <Button size="sm" variant="outline">
+                              Başla
+                            </Button>
                           </div>
-                          <div className="flex items-center space-x-1">
-                            <div className="h-4 bg-gray-300 rounded" style={{ width: `${data.previous}%` }}></div>
-                            <ArrowRight className="w-4 h-4 text-gray-500" />
-                            <div className={`h-4 rounded ${data.change >= 0 ? 'bg-green-500' : 'bg-red-500'}`} style={{ width: `${data.current}%` }}></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mb-6">
-                  <h3 className="font-medium text-lg mb-2">Mastery Path</h3>
-                  <p className="text-gray-700 mb-4">{analysis.growth_trends.mastery_path.description}</p>
-                  
-                  <div className="relative">
-                    <div className="absolute left-5 inset-y-0 w-0.5 bg-gray-200"></div>
-                    
-                    <div className="space-y-8">
-                      {analysis.growth_trends.mastery_path.milestones.map((milestone, index) => (
-                        <div key={index} className="relative pl-8">
-                          <div className={`absolute left-0 w-10 h-10 rounded-full ${
-                            milestone.achieved 
-                              ? 'bg-green-100 text-green-600 border-2 border-green-500' 
-                              : 'bg-gray-100 text-gray-400 border-2 border-gray-300'
-                          } flex items-center justify-center`}>
-                            {milestone.achieved ? <CheckCircle className="w-5 h-5" /> : index + 1}
-                          </div>
-                          
-                          <div className={`rounded-lg p-4 ${milestone.achieved ? 'bg-green-50 border border-green-200' : 'bg-white border border-gray-200'}`}>
-                            <h4 className="font-medium mb-1">{milestone.title}</h4>
-                            <p className="text-sm text-gray-700">{milestone.description}</p>
-                            {milestone.achieved && (
-                              <div className="mt-2 text-xs font-medium text-green-600 flex items-center">
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                Achieved
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium text-lg mb-2">Learning Velocity</h3>
-                  <p className="text-gray-700 mb-4">{analysis.growth_trends.learning_velocity.analysis}</p>
-                  
-                  <div className="bg-blue-50 rounded-lg p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-blue-700 mb-1">Current Velocity</h4>
-                        <div className="flex items-baseline">
-                          <span className="text-2xl font-bold text-blue-800">{analysis.growth_trends.learning_velocity.current_velocity}</span>
-                          <span className="text-sm text-blue-600 ml-1">points/month</span>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-blue-700 mb-1">Projected Timeline</h4>
-                        <div className="flex items-baseline">
-                          <span className="text-2xl font-bold text-blue-800">{analysis.growth_trends.learning_velocity.projected_timeline}</span>
-                          <span className="text-sm text-blue-600 ml-1">months to mastery</span>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-blue-700 mb-1">Comparison to Peers</h4>
-                        <div className="flex items-baseline">
-                          <span className="text-2xl font-bold text-blue-800">{analysis.growth_trends.learning_velocity.peer_comparison}</span>
-                          <span className="text-sm text-blue-600 ml-1">percentile</span>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </Card>
-            </Tabs.TabContent>
-            
-            {/* Recommendations tab */}
-            <Tabs.TabContent value="recommendations">
+              {/* Resources */}
               <Card className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Recommendations</h2>
-                
-                <div className="mb-6">
-                  <h3 className="font-medium text-lg mb-2">Next Steps</h3>
-                  <div className="space-y-4">
-                    {analysis.recommendations.next_steps.map((step, index) => (
-                      <div key={index} className="flex items-start">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
-                          {index + 1}
-                        </div>
-                        <div>
-                          <h4 className="font-medium mb-1">{step.title}</h4>
-                          <p className="text-sm text-gray-700">{step.description}</p>
-                        </div>
+                <h3 className="text-lg font-semibold mb-4">Önerilen Kaynaklar</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recommendations?.resources?.map((resource, index) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <div className="flex items-center gap-3 mb-2">
+                        <BookOpen className="h-5 w-5 text-blue-600" />
+                        <h4 className="font-medium">{resource.title}</h4>
                       </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="mb-6">
-                  <h3 className="font-medium text-lg mb-2">Learning Resources</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {analysis.recommendations.resources.map((resource, index) => (
-                      <div key={index} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-start">
-                          {resource.type === 'video' && <FileVideo className="w-5 h-5 text-red-600 mr-2 flex-shrink-0" />}
-                          {resource.type === 'article' && <FileText className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0" />}
-                          {resource.type === 'exercise' && <FilePlay className="w-5 h-5 text-green-600 mr-2 flex-shrink-0" />}
-                          {resource.type === 'course' && <BookOpen className="w-5 h-5 text-purple-600 mr-2 flex-shrink-0" />}
-                          
-                          <div>
-                            <h4 className="font-medium">{resource.title}</h4>
-                            <p className="text-sm text-gray-700 mt-1">{resource.description}</p>
-                            
-                            <div className="flex items-center mt-2">
-                              <span className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-600 mr-2">
-                                {resource.duration}
-                              </span>
-                              <span className="text-xs bg-blue-100 px-2 py-0.5 rounded text-blue-600">
-                                {resource.skill}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                      <p className="text-sm text-gray-600 mb-2">{resource.description}</p>
+                      <div className="flex items-center justify-between">
+                        <Badge variant="secondary">{resource.type}</Badge>
+                        <Button size="sm" variant="outline">
+                          Görüntüle
+                        </Button>
                       </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium text-lg mb-2">Personalized Learning Plan</h3>
-                  <p className="text-gray-700 mb-4">{analysis.recommendations.learning_plan.description}</p>
-                  
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="bg-gray-50 p-3 font-medium">Weekly Focus Areas</div>
-                    <div className="divide-y divide-gray-200">
-                      {analysis.recommendations.learning_plan.weekly_focus.map((week, index) => (
-                        <div key={index} className="p-4">
-                          <h4 className="font-medium mb-2">Week {week.week}: {week.focus}</h4>
-                          <p className="text-sm text-gray-700 mb-2">{week.description}</p>
-                          
-                          <div className="flex items-center space-x-2 text-sm">
-                            <div className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
-                              {week.skills.join(', ')}
-                            </div>
-                            <div className="bg-green-100 text-green-800 px-2 py-0.5 rounded">
-                              {week.hours} hours
-                            </div>
-                          </div>
-                        </div>
-                      ))}
                     </div>
+                  ))}
+                </div>
+              </Card>
+              {/* Action Plan */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Eylem Planı</h3>
+                <div className="space-y-4">
+                  {recommendations?.action_plan?.phases?.map((phase, index) => (
+                    <div key={index} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">
+                          Aşama {index + 1}: {phase.name}
+                        </h4>
+                        <span className="text-sm text-gray-600">{phase.duration}</span>
+                      </div>
+                      <div className="space-y-2">
+                        {phase.tasks?.map((task, taskIndex) => (
+                          <div key={taskIndex} className="flex items-center gap-3">
+                            <input type="checkbox" className="rounded" />
+                            <span className="text-sm">{task}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </Tabs.TabContent>
+          {/* Behavior Patterns Tab */}
+          <Tabs.TabContent value="patterns">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Response Patterns */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Cevap Kalıpları</h3>
+                <div className="space-y-4">
+                  {analysis?.response_patterns?.map((pattern, index) => (
+                    <div key={index} className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium">{pattern.type}</h4>
+                        <Badge variant={pattern.sentiment === 'positive' ? 'success' : 'warning'}>
+                          {pattern.frequency}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">{pattern.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+              {/* Error Patterns */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Hata Kalıpları</h3>
+                <div className="space-y-4">
+                  {analysis?.error_patterns?.map((error, index) => (
+                    <div key={index} className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium">{error.type}</h4>
+                        <Badge variant="error">
+                          {error.count} kez
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{error.description}</p>
+                      <div className="flex items-center gap-2">
+                        <Lightbulb className="h-4 w-4 text-yellow-600" />
+                        <p className="text-sm text-gray-700">{error.solution}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+              {/* Time Patterns */}
+              <Card className="p-6 lg:col-span-2">
+                <h3 className="text-lg font-semibold mb-4">Zaman Kullanım Kalıpları</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center p-4 border rounded-lg">
+                    <Zap className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
+                    <h4 className="font-medium mb-1">Hızlı Cevaplar</h4>
+                    <p className="text-2xl font-bold mb-1">{analysis?.time_patterns?.fast_responses}%</p>
+                    <p className="text-sm text-gray-600">10 saniyeden az</p>
+                  </div>
+                  <div className="text-center p-4 border rounded-lg">
+                    <Clock className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                    <h4 className="font-medium mb-1">Normal Cevaplar</h4>
+                    <p className="text-2xl font-bold mb-1">{analysis?.time_patterns?.normal_responses}%</p>
+                    <p className="text-sm text-gray-600">10-60 saniye</p>
+                  </div>
+                  <div className="text-center p-4 border rounded-lg">
+                    <AlertTriangle className="h-8 w-8 text-red-600 mx-auto mb-2" />
+                    <h4 className="font-medium mb-1">Yavaş Cevaplar</h4>
+                    <p className="text-2xl font-bold mb-1">{analysis?.time_patterns?.slow_responses}%</p>
+                    <p className="text-sm text-gray-600">60 saniyeden fazla</p>
                   </div>
                 </div>
               </Card>
-            </Tabs.TabContent>
-          </Tabs>
-        </>
+            </div>
+          </Tabs.TabContent>
+        </Tabs>
+      </div>
+      {/* AI Chat Assistant */}
+      {showChat && (
+        <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-white rounded-lg shadow-xl border flex flex-col z-50">
+          <div className="p-4 border-b flex items-center justify-between">
+            <h3 className="font-semibold">AI Performans Asistanı</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowChat(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {chatMessages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div className={`max-w-xs p-3 rounded-lg ${
+                  message.role === 'user' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-100 text-gray-900'
+                }`}>
+                  <p className="text-sm">{message.message}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="p-4 border-t">
+            <div className="flex gap-2">
+              <Textarea
+                value={userFeedback}
+                onChange={(e) => setUserFeedback(e.target.value)}
+                placeholder="Sorunuzu yazın..."
+                className="flex-1"
+                rows={2}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendChatMessage();
+                  }
+                }}
+              />
+              <Button onClick={sendChatMessage}>
+                Gönder
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
 };
-
-// Arrow component for progress visualization
-const ArrowRight = (props) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
-  );
-};
-
-// File icons for recommendations
-const FileVideo = (props) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-    <polyline points="14 2 14 8 20 8" />
-    <path d="m10 11 5 3-5 3v-6Z" />
-  </svg>
-);
-
-const FilePlay = (props) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-    <polyline points="14 2 14 8 20 8" />
-    <circle cx="12" cy="15" r="4" />
-    <path d="M14 15l-4 2v-4l4 2z" />
-  </svg>
-);
-
-const BookOpen = (props) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
-    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-  </svg>
-);
-
-export default AIAnalysisPage;
+export default AIAnalysisPageV2;

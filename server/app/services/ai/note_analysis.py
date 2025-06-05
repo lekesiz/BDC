@@ -1,6 +1,7 @@
 """
 AI-powered note analysis service
 """
+import os
 import json
 import logging
 import re
@@ -41,8 +42,8 @@ class OpenAI:
 
 # Yapılandırma için geçici sınıf
 class Config:
-    OPENAI_API_KEY = "placeholder-key"
-    AI_MODEL = "gpt-4"
+    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+    AI_MODEL = os.getenv('AI_MODEL', 'gpt-4')
 
 # Download required NLTK data
 try:

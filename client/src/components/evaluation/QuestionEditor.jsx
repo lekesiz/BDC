@@ -5,7 +5,6 @@ import { QUESTION_TYPES } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RichTextEditor } from '@/components/editor';
-
 /**
  * Question Editor component for creating and editing test questions
  */
@@ -13,23 +12,19 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
   const [questionContent, setQuestionContent] = useState(watch(`questions.${index}.question_text`) || '');
   // Get the question type for this index
   const questionType = watch(`questions.${index}.question_type`);
-  
   // Field arrays for different question types
   const optionsArray = useFieldArray({
     control,
     name: `questions.${index}.options`,
   });
-  
   const matchesArray = useFieldArray({
     control,
     name: `questions.${index}.matches`,
   });
-  
   const orderItemsArray = useFieldArray({
     control,
     name: `questions.${index}.order_items`,
   });
-
   // Update form when question type changes
   useEffect(() => {
     switch(questionType) {
@@ -44,14 +39,12 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
         setValue(`questions.${index}.order_items`, undefined);
         setValue(`questions.${index}.correct_answer`, undefined);
         break;
-        
       case QUESTION_TYPES.TEXT:
         setValue(`questions.${index}.options`, undefined);
         setValue(`questions.${index}.matches`, undefined);
         setValue(`questions.${index}.order_items`, undefined);
         setValue(`questions.${index}.correct_answer`, watch(`questions.${index}.correct_answer`) || '');
         break;
-        
       case QUESTION_TYPES.TRUE_FALSE:
         setValue(`questions.${index}.options`, [
           { text: 'True', is_correct: false },
@@ -61,7 +54,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
         setValue(`questions.${index}.order_items`, undefined);
         setValue(`questions.${index}.correct_answer`, undefined);
         break;
-        
       case QUESTION_TYPES.MATCHING:
         if (!watch(`questions.${index}.matches`) || watch(`questions.${index}.matches`).length < 2) {
           setValue(`questions.${index}.matches`, [
@@ -73,7 +65,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
         setValue(`questions.${index}.order_items`, undefined);
         setValue(`questions.${index}.correct_answer`, undefined);
         break;
-        
       case QUESTION_TYPES.ORDERING:
         if (!watch(`questions.${index}.order_items`) || watch(`questions.${index}.order_items`).length < 2) {
           setValue(`questions.${index}.order_items`, [
@@ -86,22 +77,18 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
         setValue(`questions.${index}.correct_answer`, undefined);
         break;
     }
-    
     trigger(`questions.${index}`);
   }, [questionType, index, setValue, watch, trigger]);
-
   // Add a new multiple choice option
   const handleAddOption = () => {
     optionsArray.append({ text: '', is_correct: false });
   };
-  
   // Remove a multiple choice option
   const handleRemoveOption = (optionIndex) => {
     if (optionsArray.fields.length > 2) {
       optionsArray.remove(optionIndex);
     }
   };
-  
   // Set an option as correct (for multiple choice)
   const handleSetCorrectOption = (optionIndex) => {
     // Update all options to be incorrect
@@ -109,23 +96,19 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
       text: watch(`questions.${index}.options.${i}.text`),
       is_correct: i === optionIndex,
     }));
-    
     // Set all options at once to avoid multiple rerenders
     setValue(`questions.${index}.options`, updatedOptions);
   };
-  
   // Add a new matching pair
   const handleAddMatch = () => {
     matchesArray.append({ left: '', right: '' });
   };
-  
   // Remove a matching pair
   const handleRemoveMatch = (matchIndex) => {
     if (matchesArray.fields.length > 2) {
       matchesArray.remove(matchIndex);
     }
   };
-  
   // Add a new ordering item
   const handleAddOrderItem = () => {
     orderItemsArray.append({ 
@@ -133,7 +116,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
       position: orderItemsArray.fields.length 
     });
   };
-  
   // Remove an ordering item
   const handleRemoveOrderItem = (itemIndex) => {
     if (orderItemsArray.fields.length > 2) {
@@ -143,41 +125,33 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
           ...item,
           position: i
         }));
-      
       setValue(`questions.${index}.order_items`, newItems);
     }
   };
-  
   // Move an ordering item up
   const handleMoveItemUp = (itemIndex) => {
     if (itemIndex > 0) {
       const items = [...orderItemsArray.fields];
       [items[itemIndex - 1], items[itemIndex]] = [items[itemIndex], items[itemIndex - 1]];
-      
       const newItems = items.map((item, i) => ({
         ...item,
         position: i
       }));
-      
       setValue(`questions.${index}.order_items`, newItems);
     }
   };
-  
   // Move an ordering item down
   const handleMoveItemDown = (itemIndex) => {
     if (itemIndex < orderItemsArray.fields.length - 1) {
       const items = [...orderItemsArray.fields];
       [items[itemIndex], items[itemIndex + 1]] = [items[itemIndex + 1], items[itemIndex]];
-      
       const newItems = items.map((item, i) => ({
         ...item,
         position: i
       }));
-      
       setValue(`questions.${index}.order_items`, newItems);
     }
   };
-
   return (
     <div className="space-y-4">
       {/* Question text and type */}
@@ -202,7 +176,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
             <p className="mt-1 text-sm text-red-600">{errors.questions[index].question_text.message}</p>
           )}
         </div>
-        
         <div className="md:col-span-1">
           <label className="block text-sm font-medium text-gray-700">
             Question Type*
@@ -218,7 +191,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
             <option value={QUESTION_TYPES.ORDERING}>Ordering</option>
           </select>
         </div>
-        
         <div className="md:col-span-1">
           <label className="block text-sm font-medium text-gray-700">
             Points*
@@ -231,7 +203,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
           />
         </div>
       </div>
-      
       {/* Multiple choice options */}
       {questionType === QUESTION_TYPES.MULTIPLE_CHOICE && (
         <div className="space-y-2">
@@ -250,7 +221,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
               Add Option
             </Button>
           </div>
-          
           {optionsArray.fields.map((field, optionIndex) => (
             <div key={field.id} className="flex items-center space-x-2">
               <input
@@ -285,7 +255,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
           )}
         </div>
       )}
-      
       {/* Text answer */}
       {questionType === QUESTION_TYPES.TEXT && (
         <div>
@@ -302,7 +271,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
           </p>
         </div>
       )}
-      
       {/* True/False answer */}
       {questionType === QUESTION_TYPES.TRUE_FALSE && (
         <div className="space-y-2">
@@ -339,7 +307,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
           </div>
         </div>
       )}
-      
       {/* Matching pairs */}
       {questionType === QUESTION_TYPES.MATCHING && (
         <div className="space-y-2">
@@ -358,12 +325,10 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
               Add Pair
             </Button>
           </div>
-          
           <div className="grid grid-cols-2 gap-4">
             <div className="font-medium text-sm">Left Items</div>
             <div className="font-medium text-sm">Right Items</div>
           </div>
-          
           {matchesArray.fields.map((field, matchIndex) => (
             <div key={field.id} className="grid grid-cols-2 gap-4 items-center">
               <Input
@@ -394,7 +359,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
           ))}
         </div>
       )}
-      
       {/* Ordering items */}
       {questionType === QUESTION_TYPES.ORDERING && (
         <div className="space-y-2">
@@ -414,7 +378,6 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
             </Button>
           </div>
           <p className="text-xs text-gray-500">Arrange items in the correct order. The order below will be the correct answer.</p>
-          
           {orderItemsArray.fields.map((field, itemIndex) => (
             <div key={field.id} className="flex items-center space-x-2">
               <div className="flex-none flex items-center space-x-1">
@@ -472,5 +435,4 @@ const QuestionEditor = ({ register, control, index, errors, watch, setValue, tri
     </div>
   );
 };
-
 export default QuestionEditor;

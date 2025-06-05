@@ -21,10 +21,8 @@ import { useAsync } from '@/hooks/useAsync';
 import AsyncBoundary from '@/components/common/AsyncBoundary';
 import { CardLoader } from '@/components/common/LoadingStates';
 import api from '@/lib/api';
-
 const AISettingsPage = () => {
   const { addToast } = useToast();
-  
   // State for AI providers and their settings
   const [aiProviders, setAiProviders] = useState({
     openai: {
@@ -59,17 +57,14 @@ const AISettingsPage = () => {
       showKey: false
     }
   });
-
   // Custom endpoints for specific AI features
   const [customEndpoints, setCustomEndpoints] = useState([]);
   const [newEndpoint, setNewEndpoint] = useState({ name: '', url: '', apiKey: '' });
-
   // Load settings
   const settingsAsync = useAsync(async () => {
     const response = await api.get('/api/settings/ai');
     return response.data;
   }, [], true);
-
   // Apply loaded settings
   useEffect(() => {
     if (settingsAsync.data) {
@@ -77,7 +72,6 @@ const AISettingsPage = () => {
       setCustomEndpoints(settingsAsync.data.customEndpoints || []);
     }
   }, [settingsAsync.data]);
-
   // Save settings
   const handleSave = async () => {
     try {
@@ -89,12 +83,10 @@ const AISettingsPage = () => {
         };
         return acc;
       }, {});
-
       const response = await api.put('/api/settings/ai', {
         providers: aiProviders,
         customEndpoints
       });
-
       addToast({
         type: 'success',
         title: 'Settings saved',
@@ -108,7 +100,6 @@ const AISettingsPage = () => {
       });
     }
   };
-
   // Test API connection
   const testConnection = async (provider) => {
     try {
@@ -116,7 +107,6 @@ const AISettingsPage = () => {
         provider,
         config: aiProviders[provider]
       });
-
       addToast({
         type: 'success',
         title: 'Connection successful',
@@ -130,7 +120,6 @@ const AISettingsPage = () => {
       });
     }
   };
-
   // Toggle API key visibility
   const toggleKeyVisibility = (provider) => {
     setAiProviders(prev => ({
@@ -141,7 +130,6 @@ const AISettingsPage = () => {
       }
     }));
   };
-
   // Update provider settings
   const updateProvider = (provider, field, value) => {
     setAiProviders(prev => ({
@@ -152,7 +140,6 @@ const AISettingsPage = () => {
       }
     }));
   };
-
   // Add custom endpoint
   const addCustomEndpoint = () => {
     if (newEndpoint.name && newEndpoint.url) {
@@ -160,12 +147,10 @@ const AISettingsPage = () => {
       setNewEndpoint({ name: '', url: '', apiKey: '' });
     }
   };
-
   // Remove custom endpoint
   const removeCustomEndpoint = (id) => {
     setCustomEndpoints(prev => prev.filter(endpoint => endpoint.id !== id));
   };
-
   // Mask API key for display
   const maskApiKey = (key) => {
     if (!key) return '';
@@ -173,7 +158,6 @@ const AISettingsPage = () => {
     if (key.length <= visibleChars * 2) return key;
     return key.substring(0, visibleChars) + '...' + key.substring(key.length - visibleChars);
   };
-
   return (
     <div className="space-y-6">
       <div>
@@ -182,7 +166,6 @@ const AISettingsPage = () => {
           Configure AI providers and API keys for intelligent features
         </p>
       </div>
-
       <AsyncBoundary
         loading={settingsAsync.loading}
         error={settingsAsync.error}
@@ -215,7 +198,6 @@ const AISettingsPage = () => {
                   </label>
                 </div>
               </div>
-
               {aiProviders.openai.enabled && (
                 <div className="space-y-4">
                   <div>
@@ -263,7 +245,6 @@ const AISettingsPage = () => {
                       </a>
                     </p>
                   </div>
-
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -279,7 +260,6 @@ const AISettingsPage = () => {
                         <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
                       </select>
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Temperature
@@ -294,7 +274,6 @@ const AISettingsPage = () => {
                       />
                     </div>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Max Tokens
@@ -311,7 +290,6 @@ const AISettingsPage = () => {
               )}
             </div>
           </Card>
-
           {/* Anthropic Claude */}
           <Card>
             <div className="p-6">
@@ -337,7 +315,6 @@ const AISettingsPage = () => {
                   </label>
                 </div>
               </div>
-
               {aiProviders.anthropic.enabled && (
                 <div className="space-y-4">
                   <div>
@@ -385,7 +362,6 @@ const AISettingsPage = () => {
                       </a>
                     </p>
                   </div>
-
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -402,7 +378,6 @@ const AISettingsPage = () => {
                         <option value="claude-2.1">Claude 2.1</option>
                       </select>
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Temperature
@@ -421,7 +396,6 @@ const AISettingsPage = () => {
               )}
             </div>
           </Card>
-
           {/* Google AI */}
           <Card>
             <div className="p-6">
@@ -447,7 +421,6 @@ const AISettingsPage = () => {
                   </label>
                 </div>
               </div>
-
               {aiProviders.google.enabled && (
                 <div className="space-y-4">
                   <div>
@@ -495,7 +468,6 @@ const AISettingsPage = () => {
                       </a>
                     </p>
                   </div>
-
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -510,7 +482,6 @@ const AISettingsPage = () => {
                         <option value="gemini-pro-vision">Gemini Pro Vision</option>
                       </select>
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Temperature
@@ -529,7 +500,6 @@ const AISettingsPage = () => {
               )}
             </div>
           </Card>
-
           {/* Custom Endpoints */}
           <Card>
             <div className="p-6">
@@ -537,7 +507,6 @@ const AISettingsPage = () => {
                 <h3 className="text-lg font-medium text-gray-900">Custom AI Endpoints</h3>
                 <p className="text-sm text-gray-500">Add custom AI endpoints for specialized models</p>
               </div>
-
               <div className="space-y-4">
                 {customEndpoints.map((endpoint) => (
                   <div key={endpoint.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -554,7 +523,6 @@ const AISettingsPage = () => {
                     </Button>
                   </div>
                 ))}
-
                 <div className="border-t pt-4">
                   <div className="grid grid-cols-3 gap-3">
                     <Input
@@ -586,7 +554,6 @@ const AISettingsPage = () => {
               </div>
             </div>
           </Card>
-
           {/* AI Features Configuration */}
           <Card>
             <div className="p-6">
@@ -594,7 +561,6 @@ const AISettingsPage = () => {
                 <h3 className="text-lg font-medium text-gray-900">AI Features</h3>
                 <p className="text-sm text-gray-500">Configure which AI features are enabled</p>
               </div>
-
               <div className="space-y-3">
                 <label className="flex items-center space-x-3">
                   <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary" />
@@ -615,7 +581,6 @@ const AISettingsPage = () => {
               </div>
             </div>
           </Card>
-
           {/* Save Button */}
           <div className="flex justify-end">
             <Button onClick={handleSave}>
@@ -628,5 +593,4 @@ const AISettingsPage = () => {
     </div>
   );
 };
-
 export default AISettingsPage;

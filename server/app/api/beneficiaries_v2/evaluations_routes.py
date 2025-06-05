@@ -93,7 +93,7 @@ def beneficiary_progress(beneficiary_id):
             },
             'recent_activity': [{
                 'type': 'evaluation',
-                'title': e.title,
+                'title': e.test.title if e.test else f'Evaluation #{e.id}',
                 'date': e.created_at.isoformat(),
                 'status': e.status,
             } for e in evaluations[:5]],

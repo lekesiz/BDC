@@ -14,7 +14,6 @@ import {
 } from 'chart.js';
 import { Radar, Bar, Doughnut } from 'react-chartjs-2';
 import { motion } from 'framer-motion';
-
 // Register ChartJS components
 ChartJS.register(
   RadialLinearScale,
@@ -28,18 +27,15 @@ ChartJS.register(
   BarElement,
   ArcElement
 );
-
 const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
   const [chartType, setChartType] = useState('radar');
   const [skillsData, setSkillsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [timeRange, setTimeRange] = useState('last30days');
-
   useEffect(() => {
     fetchSkillsData();
   }, [beneficiaryId, timeRange]);
-
   const fetchSkillsData = async () => {
     try {
       setLoading(true);
@@ -54,19 +50,15 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
       setLoading(false);
     }
   };
-
   const getRadarData = () => {
     if (!skillsData) return null;
-
     const categories = selectedCategory === 'all' 
       ? skillsData.categories 
       : skillsData.categories.filter(cat => cat.id === selectedCategory);
-
     const labels = categories.map(cat => cat.name);
     const currentScores = categories.map(cat => cat.currentScore);
     const previousScores = categories.map(cat => cat.previousScore);
     const targetScores = categories.map(cat => cat.targetScore);
-
     return {
       labels,
       datasets: [
@@ -108,19 +100,15 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
       ]
     };
   };
-
   const getBarData = () => {
     if (!skillsData) return null;
-
     const categories = selectedCategory === 'all' 
       ? skillsData.categories 
       : skillsData.categories.filter(cat => cat.id === selectedCategory);
-
     const labels = categories.map(cat => cat.name);
     const improvements = categories.map(cat => 
       ((cat.currentScore - cat.previousScore) / cat.previousScore * 100).toFixed(1)
     );
-
     return {
       labels,
       datasets: [
@@ -138,12 +126,9 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
       ]
     };
   };
-
   const getDoughnutData = () => {
     if (!skillsData) return null;
-
     const masteryLevels = skillsData.masteryDistribution;
-
     return {
       labels: ['Expert', 'Proficient', 'Developing', 'Beginner'],
       datasets: [
@@ -171,7 +156,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
       ]
     };
   };
-
   const radarOptions = {
     scales: {
       r: {
@@ -215,7 +199,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
     },
     maintainAspectRatio: false,
   };
-
   const barOptions = {
     scales: {
       y: {
@@ -241,7 +224,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
     },
     maintainAspectRatio: false,
   };
-
   const doughnutOptions = {
     plugins: {
       legend: {
@@ -267,11 +249,9 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
     },
     maintainAspectRatio: false,
   };
-
   const SkillCard = ({ skill }) => {
     const improvement = ((skill.currentScore - skill.previousScore) / skill.previousScore * 100).toFixed(1);
     const isImproving = improvement >= 0;
-
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -296,7 +276,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             <span className="font-semibold">{improvement}%</span>
           </div>
         </div>
-
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-600 mb-1">
             <span>Current Level</span>
@@ -309,7 +288,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             />
           </div>
         </div>
-
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-600 mb-1">
             <span>Target Level</span>
@@ -322,7 +300,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             />
           </div>
         </div>
-
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-gray-500">Last Assessment</p>
@@ -333,7 +310,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             <p className="font-semibold">{skill.nextTargetDate}</p>
           </div>
         </div>
-
         {skill.recommendations && skill.recommendations.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-200">
             <p className="text-sm font-semibold text-gray-700 mb-2">Recommendations:</p>
@@ -350,7 +326,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
       </motion.div>
     );
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -358,7 +333,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
       </div>
     );
   }
-
   if (!skillsData) {
     return (
       <div className="text-center py-8">
@@ -366,7 +340,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {/* Controls */}
@@ -386,7 +359,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             <option value="cards">Skill Cards</option>
           </select>
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Category
@@ -402,7 +374,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             ))}
           </select>
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Time Range
@@ -420,7 +391,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
           </select>
         </div>
       </div>
-
       {/* Charts */}
       <div className="bg-white rounded-lg shadow-md p-6">
         {chartType === 'radar' && (
@@ -429,14 +399,12 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             <Radar data={getRadarData()} options={radarOptions} />
           </div>
         )}
-
         {chartType === 'bar' && (
           <div className="h-96">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Improvement Progress</h3>
             <Bar data={getBarData()} options={barOptions} />
           </div>
         )}
-
         {chartType === 'doughnut' && (
           <div className="h-96">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Mastery Level Distribution</h3>
@@ -445,7 +413,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             </div>
           </div>
         )}
-
         {chartType === 'cards' && (
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Skills Analysis</h3>
@@ -457,7 +424,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
           </div>
         )}
       </div>
-
       {/* Summary Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <motion.div
@@ -478,7 +444,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             </div>
           </div>
         </motion.div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -497,7 +462,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             </div>
           </div>
         </motion.div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -516,7 +480,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
             </div>
           </div>
         </motion.div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -536,7 +499,6 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
           </div>
         </motion.div>
       </div>
-
       {/* Insights and Recommendations */}
       {skillsData.insights && skillsData.insights.length > 0 && (
         <motion.div
@@ -572,5 +534,4 @@ const SkillsVisualization = ({ assessmentData, beneficiaryId }) => {
     </div>
   );
 };
-
 export default SkillsVisualization;

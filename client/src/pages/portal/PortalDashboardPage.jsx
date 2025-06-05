@@ -3,7 +3,6 @@ import api from '@/lib/api';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
 import DashboardWidgetGrid from '@/components/portal/DashboardWidgetGrid';
-
 /**
  * PortalDashboardPage provides the main dashboard interface for student beneficiaries
  * with customizable widgets
@@ -21,14 +20,12 @@ const PortalDashboardPage = () => {
     notifications: null,
     resources: null
   });
-  
   // Load dashboard data
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
         // Use Promise.allSettled to fetch all data in parallel
         // and continue even if some requests fail
         const [
@@ -46,7 +43,6 @@ const PortalDashboardPage = () => {
           api.get('/api/portal/notifications'),
           api.get('/api/portal/resources')
         ]);
-        
         setDashboardData({
           dashboard: dashboardResponse.status === 'fulfilled' ? dashboardResponse.value.data : null,
           skills: skillsResponse.status === 'fulfilled' ? skillsResponse.value.data : null,
@@ -67,10 +63,8 @@ const PortalDashboardPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchDashboardData();
   }, []); // Remove toast dependency to prevent infinite loop
-  
   // Load saved layout from localStorage
   const getSavedLayout = () => {
     try {
@@ -80,7 +74,6 @@ const PortalDashboardPage = () => {
       return null;
     }
   };
-  
   // Save layout to localStorage
   const handleSaveLayout = (layoutData) => {
     try {
@@ -99,7 +92,6 @@ const PortalDashboardPage = () => {
       });
     }
   };
-  
   return (
     <div className="container mx-auto py-6">
       <DashboardWidgetGrid 
@@ -112,5 +104,4 @@ const PortalDashboardPage = () => {
     </div>
   );
 };
-
 export default PortalDashboardPage;

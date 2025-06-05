@@ -23,7 +23,6 @@ import {
   AchievementsWidget,
   AssessmentsWidget
 } from './widgets';
-
 /**
  * Configurable dashboard grid component for displaying widgets
  */
@@ -46,9 +45,7 @@ const DashboardWidgetGrid = ({
     { id: 'resources', name: 'Learning Resources', component: ResourcesWidget, span: 1 },
     { id: 'achievements', name: 'My Achievements', component: AchievementsWidget, span: 1 }
   ]);
-  
   const [availableWidgets, setAvailableWidgets] = useState([]);
-  
   // Load saved layout if available
   useEffect(() => {
     if (savedLayout) {
@@ -62,15 +59,12 @@ const DashboardWidgetGrid = ({
           const validWidgets = layoutData.widgets.filter(widget => 
             activeWidgets.some(aw => aw.id === widget.id)
           );
-          
           // Merge saved widget details with the full component data
           const mergedWidgets = validWidgets.map(widget => {
             const fullWidget = activeWidgets.find(aw => aw.id === widget.id);
             return { ...fullWidget, ...widget };
           });
-          
           setActiveWidgets(mergedWidgets);
-          
           // Update available widgets
           const activeIds = mergedWidgets.map(w => w.id);
           const available = activeWidgets.filter(w => !activeIds.includes(w.id));
@@ -84,7 +78,6 @@ const DashboardWidgetGrid = ({
       setAvailableWidgets([]);
     }
   }, [savedLayout]);
-  
   // Handle save layout
   const handleSaveLayout = () => {
     // Create a layout object with only the necessary data
@@ -96,11 +89,9 @@ const DashboardWidgetGrid = ({
         order: widget.order
       }))
     };
-    
     onSaveLayout(JSON.stringify(layoutData));
     setIsEditing(false);
   };
-  
   // Handle reset to default layout
   const handleResetLayout = () => {
     setColumns(2);
@@ -116,21 +107,17 @@ const DashboardWidgetGrid = ({
     ]);
     setAvailableWidgets([]);
   };
-  
   // Handle remove widget
   const handleRemoveWidget = (widgetId) => {
     const widgetToRemove = activeWidgets.find(w => w.id === widgetId);
-    
     if (widgetToRemove) {
       setActiveWidgets(activeWidgets.filter(w => w.id !== widgetId));
       setAvailableWidgets([...availableWidgets, widgetToRemove]);
     }
   };
-  
   // Handle add widget
   const handleAddWidget = (widgetId) => {
     const widgetToAdd = availableWidgets.find(w => w.id === widgetId);
-    
     if (widgetToAdd) {
       setActiveWidgets([...activeWidgets, { 
         ...widgetToAdd, 
@@ -139,7 +126,6 @@ const DashboardWidgetGrid = ({
       setAvailableWidgets(availableWidgets.filter(w => w.id !== widgetId));
     }
   };
-  
   // Handle change widget span
   const handleChangeWidgetSpan = (widgetId, newSpan) => {
     setActiveWidgets(
@@ -150,48 +136,37 @@ const DashboardWidgetGrid = ({
       )
     );
   };
-  
   // Handle move widget up
   const handleMoveWidgetUp = (widgetId) => {
     const index = activeWidgets.findIndex(w => w.id === widgetId);
-    
     if (index > 0) {
       const newActiveWidgets = [...activeWidgets];
       [newActiveWidgets[index], newActiveWidgets[index - 1]] = [newActiveWidgets[index - 1], newActiveWidgets[index]];
-      
       // Update orders
       newActiveWidgets.forEach((widget, idx) => {
         widget.order = idx;
       });
-      
       setActiveWidgets(newActiveWidgets);
     }
   };
-  
   // Handle move widget down
   const handleMoveWidgetDown = (widgetId) => {
     const index = activeWidgets.findIndex(w => w.id === widgetId);
-    
     if (index < activeWidgets.length - 1) {
       const newActiveWidgets = [...activeWidgets];
       [newActiveWidgets[index], newActiveWidgets[index + 1]] = [newActiveWidgets[index + 1], newActiveWidgets[index]];
-      
       // Update orders
       newActiveWidgets.forEach((widget, idx) => {
         widget.order = idx;
       });
-      
       setActiveWidgets(newActiveWidgets);
     }
   };
-  
   // Get sorted active widgets
   const getSortedActiveWidgets = () => {
     return [...activeWidgets].sort((a, b) => (a.order || 0) - (b.order || 0));
   };
-  
   const sortedWidgets = getSortedActiveWidgets();
-  
   return (
     <div>
       {/* Controls */}
@@ -200,7 +175,6 @@ const DashboardWidgetGrid = ({
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-gray-600">Welcome to your learning dashboard</p>
         </div>
-        
         {isEditing ? (
           <div className="flex space-x-2">
             <div className="flex mr-4 border rounded-lg overflow-hidden">
@@ -229,7 +203,6 @@ const DashboardWidgetGrid = ({
                 <Grid3X3 className="h-4 w-4" />
               </Button>
             </div>
-            
             <Button 
               variant="outline"
               onClick={handleResetLayout}
@@ -237,7 +210,6 @@ const DashboardWidgetGrid = ({
               <RotateCcw className="h-4 w-4 mr-2" />
               Reset
             </Button>
-            
             <Button
               variant="outline"
               onClick={() => setIsEditing(false)}
@@ -245,7 +217,6 @@ const DashboardWidgetGrid = ({
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
-            
             <Button
               onClick={handleSaveLayout}
             >
@@ -263,7 +234,6 @@ const DashboardWidgetGrid = ({
           </Button>
         )}
       </div>
-      
       {/* Available widgets (when editing) */}
       {isEditing && availableWidgets.length > 0 && (
         <div className="mb-8">
@@ -284,14 +254,12 @@ const DashboardWidgetGrid = ({
           </div>
         </div>
       )}
-      
       {/* Widget grid */}
       <div className={`grid grid-cols-1 ${
         columns === 1 ? '' : columns === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'
       } gap-6`}>
         {sortedWidgets.map(widget => {
           const WidgetComponent = widget.component;
-          
           return (
             <div 
               key={widget.id}
@@ -312,7 +280,6 @@ const DashboardWidgetGrid = ({
                         <Grip className="h-4 w-4 mr-2 text-gray-400" />
                         <h3 className="font-medium">{widget.name}</h3>
                       </div>
-                      
                       <div className="flex items-center">
                         {columns > 1 && (
                           <div className="flex border rounded-md overflow-hidden mr-2">
@@ -341,7 +308,6 @@ const DashboardWidgetGrid = ({
                             )}
                           </div>
                         )}
-                        
                         <div className="flex mr-2">
                           <Button 
                             variant="ghost" 
@@ -354,7 +320,6 @@ const DashboardWidgetGrid = ({
                               <path d="m18 15-6-6-6 6"/>
                             </svg>
                           </Button>
-                          
                           <Button 
                             variant="ghost" 
                             size="sm"
@@ -367,7 +332,6 @@ const DashboardWidgetGrid = ({
                             </svg>
                           </Button>
                         </div>
-                        
                         <Button 
                           variant="ghost" 
                           size="sm"
@@ -381,7 +345,6 @@ const DashboardWidgetGrid = ({
                   </Card>
                 </div>
               ) : null}
-              
               <WidgetComponent 
                 data={
                   widget.id === 'profile' ? dashboardData?.profile :
@@ -404,5 +367,4 @@ const DashboardWidgetGrid = ({
     </div>
   );
 };
-
 export default DashboardWidgetGrid;

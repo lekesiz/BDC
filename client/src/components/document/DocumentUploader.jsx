@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useDropzone } from 'react-dropzone';
 import { FaUpload, FaFilePdf, FaFileImage, FaFileAlt, FaFileArchive, FaFile, FaTimes, FaCheck } from 'react-icons/fa';
 import DocumentService from './DocumentService';
-
 /**
  * DocumentUploader - Component for uploading documents with drag and drop
  */
@@ -24,11 +23,9 @@ const DocumentUploader = ({
   const [uploadProgress, setUploadProgress] = useState({});
   const [uploadStatus, setUploadStatus] = useState({});
   const uploadTimersRef = useRef({});
-
   // Create accept object for react-dropzone
   const getAcceptedTypes = () => {
     if (!acceptedFileTypes) return undefined;
-    
     // Convert array of file extensions to object for dropzone
     if (Array.isArray(acceptedFileTypes)) {
       return acceptedFileTypes.reduce((acc, ext) => {
@@ -39,11 +36,9 @@ const DocumentUploader = ({
         return acc;
       }, {});
     }
-    
     // Direct mime type definitions
     return acceptedFileTypes;
   };
-  
   // File drop handler
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     // Handle rejected files first
@@ -52,12 +47,10 @@ const DocumentUploader = ({
         const errorMsg = errors.map(e => e.message).join(', ');
         return `${file.name}: ${errorMsg}`;
       });
-      
       if (onUploadError) {
         onUploadError(errorMessages);
       }
     }
-    
     // Process accepted files
     const newFiles = acceptedFiles.map(file => ({
       file,
@@ -66,14 +59,12 @@ const DocumentUploader = ({
       status: 'pending',
       error: null
     }));
-    
     // Add to existing files, ensuring we don't exceed maxFiles
     setFiles(prevFiles => {
       const combinedFiles = [...prevFiles, ...newFiles];
       return combinedFiles.slice(0, maxFiles);
     });
   }, [maxFiles, onUploadError]);
-
   // Set up react-dropzone
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -82,16 +73,13 @@ const DocumentUploader = ({
     multiple: allowMultiple,
     disabled: uploading
   });
-
   // Handle file removal before upload
   const removeFile = (fileId) => {
     setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
   };
-  
   // Get file icon based on type
   const getFileIcon = (file) => {
     const fileType = file.type;
-    
     if (fileType.includes('pdf')) {
       return <FaFilePdf className="text-red-500" />;
     } else if (fileType.includes('image')) {
@@ -104,14 +92,12 @@ const DocumentUploader = ({
       return <FaFile className="text-gray-500" />;
     }
   };
-  
   // Handle upload progress updates
   const updateProgress = (fileId, progress) => {
     setUploadProgress(prev => ({
       ...prev,
       [fileId]: progress
     }));
-    
     // Simulate progress even if server doesn't send updates
     if (progress > 0 && progress < 100) {
       clearTimeout(uploadTimersRef.current[fileId]);
@@ -120,7 +106,6 @@ const DocumentUploader = ({
       }, 500);
     }
   };
-  
   // Update status for a file
   const updateStatus = (fileId, status, error = null) => {
     setUploadStatus(prev => ({
@@ -128,51 +113,39 @@ const DocumentUploader = ({
       [fileId]: { status, error }
     }));
   };
-
   // Handle form submission and upload
   const handleUpload = async () => {
     if (files.length === 0) return;
-    
     setUploading(true);
-    
     const uploadPromises = files.map(async (fileObj) => {
       const { file, id } = fileObj;
-      
       // Skip already uploaded files
       if (uploadStatus[id]?.status === 'success') {
         return { id, success: true, data: null };
       }
-      
       // Reset progress
       updateProgress(id, 0);
       updateStatus(id, 'uploading');
-      
       try {
         const data = await DocumentService.uploadDocument(
           file, 
           metadata,
           (progress) => updateProgress(id, progress)
         );
-        
         updateProgress(id, 100);
         updateStatus(id, 'success');
         clearTimeout(uploadTimersRef.current[id]);
-        
         return { id, success: true, data };
       } catch (error) {
         updateStatus(id, 'error', error.message || 'Upload failed');
         clearTimeout(uploadTimersRef.current[id]);
-        
         return { id, success: false, error };
       }
     });
-    
     try {
       const results = await Promise.all(uploadPromises);
-      
       const successfulUploads = results.filter(r => r.success).map(r => r.data);
       const failedUploads = results.filter(r => !r.success);
-      
       // Call the complete callback with results
       if (onUploadComplete) {
         onUploadComplete(successfulUploads, failedUploads);
@@ -185,14 +158,12 @@ const DocumentUploader = ({
       setUploading(false);
     }
   };
-  
   // File preview renderer
   const renderFilePreview = (fileObj) => {
     const { file, id } = fileObj;
     const progress = uploadProgress[id] || 0;
     const status = uploadStatus[id]?.status || 'pending';
     const error = uploadStatus[id]?.error;
-    
     return (
       <div 
         key={id} 
@@ -209,7 +180,6 @@ const DocumentUploader = ({
             {error && <p className="text-xs text-red-500">{error}</p>}
           </div>
         </div>
-        
         <div className="flex items-center">
           {status === 'pending' && (
             <button
@@ -220,7 +190,6 @@ const DocumentUploader = ({
               <FaTimes />
             </button>
           )}
-          
           {status === 'uploading' && (
             <div className="w-24 bg-gray-200 h-2 rounded-full overflow-hidden">
               <div 
@@ -229,11 +198,9 @@ const DocumentUploader = ({
               ></div>
             </div>
           )}
-          
           {status === 'success' && (
             <FaCheck className="text-green-500" />
           )}
-          
           {status === 'error' && (
             <FaTimes className="text-red-500" />
           )}
@@ -241,7 +208,6 @@ const DocumentUploader = ({
       </div>
     );
   };
-
   return (
     <div className={`document-uploader ${className}`} data-cy="document-uploader">
       {/* Dropzone area */}
@@ -271,7 +237,6 @@ const DocumentUploader = ({
           </p>
         )}
       </div>
-
       {/* File list */}
       {showPreview && files.length > 0 && (
         <div className="mt-4" data-cy="file-list">
@@ -281,7 +246,6 @@ const DocumentUploader = ({
           </div>
         </div>
       )}
-
       {/* Upload button */}
       {files.length > 0 && (
         <button
@@ -297,7 +261,6 @@ const DocumentUploader = ({
     </div>
   );
 };
-
 DocumentUploader.propTypes = {
   /** Callback function when upload is complete */
   onUploadComplete: PropTypes.func,
@@ -323,5 +286,4 @@ DocumentUploader.propTypes = {
   /** Disable default toast notifications */
   disableDefaultToast: PropTypes.bool
 };
-
 export default DocumentUploader;

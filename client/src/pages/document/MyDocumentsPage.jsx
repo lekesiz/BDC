@@ -8,7 +8,6 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
 import { formatDate, formatBytes } from '@/lib/utils';
-
 /**
  * MyDocumentsPage displays documents for student users
  */
@@ -19,7 +18,6 @@ const MyDocumentsPage = () => {
   const [folders, setFolders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFolder, setSelectedFolder] = useState(null);
-
   // Fetch student's documents
   useEffect(() => {
     const fetchMyDocuments = async () => {
@@ -33,7 +31,6 @@ const MyDocumentsPage = () => {
           }
         });
         setDocuments(docsResponse.data.items || []);
-
         // Fetch folders if not already loaded
         if (!selectedFolder && folders.length === 0) {
           const foldersResponse = await api.get(API_ENDPOINTS.DOCUMENTS.FOLDERS || '/api/folders');
@@ -50,22 +47,18 @@ const MyDocumentsPage = () => {
         setIsLoading(false);
       }
     };
-
     fetchMyDocuments();
   }, [selectedFolder]); // Remove toast dependency to prevent infinite loop
-
   // View document
   const handleViewDocument = (document) => {
     navigate(`/documents/${document.id}`);
   };
-
   // Download document
   const handleDownloadDocument = async (document) => {
     try {
       const response = await api.get(`${API_ENDPOINTS.DOCUMENTS.BASE}/${document.id}/download`, {
         responseType: 'blob'
       });
-      
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -74,7 +67,6 @@ const MyDocumentsPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      
       toast({
         title: 'Success',
         description: 'Document downloaded successfully',
@@ -89,13 +81,11 @@ const MyDocumentsPage = () => {
       });
     }
   };
-
   // Get document type icon
   const getDocumentIcon = (type) => {
     // You can customize this based on actual file types
     return <FileText className="h-10 w-10 text-blue-500" />;
   };
-
   // Get document type color
   const getTypeColor = (type) => {
     switch (type?.toLowerCase()) {
@@ -114,7 +104,6 @@ const MyDocumentsPage = () => {
         return 'secondary';
     }
   };
-
   if (isLoading) {
     return (
       <div className="p-6">
@@ -124,14 +113,12 @@ const MyDocumentsPage = () => {
       </div>
     );
   }
-
   return (
     <div className="p-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">My Documents</h1>
         <p className="text-gray-600 mt-1">Access your study materials and documents</p>
       </div>
-
       {/* Folders */}
       {folders.length > 0 && (
         <div className="mb-6">
@@ -157,7 +144,6 @@ const MyDocumentsPage = () => {
           </div>
         </div>
       )}
-
       {/* Documents */}
       {documents.length === 0 ? (
         <Card className="p-8 text-center">
@@ -186,13 +172,11 @@ const MyDocumentsPage = () => {
                     {document.type?.toUpperCase() || 'FILE'}
                   </Badge>
                 </div>
-
                 {document.description && (
                   <p className="text-gray-600 text-sm mb-4">
                     {document.description}
                   </p>
                 )}
-
                 <div className="space-y-2 text-sm text-gray-500">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
@@ -205,7 +189,6 @@ const MyDocumentsPage = () => {
                     </div>
                   )}
                 </div>
-
                 <div className="mt-6 flex gap-2">
                   <Button
                     onClick={() => handleViewDocument(document)}
@@ -234,5 +217,4 @@ const MyDocumentsPage = () => {
     </div>
   );
 };
-
 export default MyDocumentsPage;

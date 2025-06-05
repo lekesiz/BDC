@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Switch component - A toggle switch element
  * 
@@ -41,5 +40,4 @@ export const Switch = React.forwardRef(({
     </button>
   );
 });
-
 Switch.displayName = "Switch";

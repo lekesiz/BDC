@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { cardHover, fadeInUp } from '@/lib/animations';
 import { useTheme } from '@/contexts/ThemeContext';
-
 export const AnimatedCard = ({ 
   children, 
   className, 
@@ -14,7 +13,6 @@ export const AnimatedCard = ({
   const combinedVariants = hoverEffect 
     ? { ...variants, ...cardHover }
     : variants;
-
   // Dark mode hover effects
   const darkHoverVariants = {
     ...combinedVariants,
@@ -23,7 +21,6 @@ export const AnimatedCard = ({
       boxShadow: isDark ? '0 10px 20px rgba(255, 255, 255, 0.05)' : '0 10px 20px rgba(0, 0, 0, 0.1)'
     } : undefined
   };
-
   return (
     <motion.div
       variants={darkHoverVariants}

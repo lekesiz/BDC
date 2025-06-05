@@ -321,3 +321,5 @@ def export_appearance_settings():
 
 
 from datetime import datetime  # Add this import at the top
+
+from app.utils.logging import logger

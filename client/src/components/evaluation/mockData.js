@@ -27,7 +27,6 @@ import {
   fetchMockGoogleCalendarSync,
   updateMockGoogleCalendarSync
 } from '../appointment/mockAppointmentsData';
-
 // Sample evaluations data for development and testing
 export const mockEvaluations = [
   {
@@ -113,7 +112,6 @@ export const mockEvaluations = [
     ],
   },
 ];
-
 // Mock data for test sessions
 export const mockSessions = [
   {
@@ -142,7 +140,6 @@ export const mockSessions = [
     ],
   }
 ];
-
 // Mock feedback data
 export const mockFeedback = {
   overall_assessment: 'You demonstrated good communication skills with particular strength in understanding the importance of active listening. Your responses indicate a solid grasp of both verbal and non-verbal communication principles.',
@@ -164,7 +161,6 @@ export const mockFeedback = {
     'Leadership': 'Your leadership communication shows promise. Focus on developing more advanced techniques for team communication.',
   }
 };
-
 // Mock API responses
 export const mockApiResponses = {
   getEvaluations: () => {
@@ -178,23 +174,19 @@ export const mockApiResponses = {
       },
     };
   },
-  
   getEvaluation: (id) => {
     const evaluation = mockEvaluations.find(e => e.id === parseInt(id));
-    
     if (evaluation) {
       return {
         status: 200,
         data: evaluation,
       };
     }
-    
     return {
       status: 404,
       data: { message: 'Evaluation not found' },
     };
   },
-  
   createEvaluation: (data) => {
     // In a real implementation, this would add to the database
     return {
@@ -206,10 +198,8 @@ export const mockApiResponses = {
       },
     };
   },
-  
   updateEvaluation: (id, data) => {
     const evaluation = mockEvaluations.find(e => e.id === parseInt(id));
-    
     if (evaluation) {
       return {
         status: 200,
@@ -220,46 +210,38 @@ export const mockApiResponses = {
         },
       };
     }
-    
     return {
       status: 404,
       data: { message: 'Evaluation not found' },
     };
   },
-  
   deleteEvaluation: (id) => {
     const evaluation = mockEvaluations.find(e => e.id === parseInt(id));
-    
     if (evaluation) {
       return {
         status: 204,
         data: null,
       };
     }
-    
     return {
       status: 404,
       data: { message: 'Evaluation not found' },
     };
   },
-
   // Session API responses
   getSession: (id) => {
     const session = mockSessions.find(s => s.id === parseInt(id));
-    
     if (session) {
       return {
         status: 200,
         data: session,
       };
     }
-    
     return {
       status: 404,
       data: { message: 'Session not found' },
     };
   },
-  
   createSession: (data) => {
     return {
       status: 201,
@@ -271,7 +253,6 @@ export const mockApiResponses = {
       },
     };
   },
-  
   getFeedback: (id) => {
     // In a real app, this would retrieve feedback specific to the session
     return {
@@ -280,7 +261,6 @@ export const mockApiResponses = {
     };
   },
 };
-
 // This function can be used to intercept API calls during development
 export const setupMockApi = (api) => {
   // Store the original get/post/put/delete methods
@@ -288,14 +268,12 @@ export const setupMockApi = (api) => {
   const originalPost = api.post;
   const originalPut = api.put;
   const originalDelete = api.delete;
-
   // Mock API endpoints
   api.get = function(url, config) {
     // Evaluations list
     if (url === '/api/evaluations') {
       return Promise.resolve(mockApiResponses.getEvaluations());
     }
-    
     // Analysis report download (return empty blob)
     if (url.includes('/analysis/report')) {
       return Promise.resolve({
@@ -303,7 +281,6 @@ export const setupMockApi = (api) => {
         data: new Blob(['Mock Analysis PDF content'], { type: 'application/pdf' }),
       });
     }
-    
     // Appointments list
     const appointmentsMatch = url.match(/\/api\/appointments/);
     if (appointmentsMatch && !url.includes('/api/appointments/')) {
@@ -311,56 +288,46 @@ export const setupMockApi = (api) => {
       const urlObj = new URL(url, 'http://example.com');
       const start = urlObj.searchParams.get('start');
       const end = urlObj.searchParams.get('end');
-      
       return Promise.resolve(fetchMockAppointments(start, end));
     }
-    
     // Appointment detail
     const appointmentDetailMatch = url.match(/\/api\/appointments\/(\d+)$/);
     if (appointmentDetailMatch) {
       return Promise.resolve(fetchMockAppointment(appointmentDetailMatch[1]));
     }
-    
     // Trainer evaluations list for a beneficiary
     const trainerEvaluationsMatch = url.match(/\/api\/beneficiaries\/(\d+)\/evaluations/);
     if (trainerEvaluationsMatch) {
       return Promise.resolve(fetchMockTrainerEvaluations(trainerEvaluationsMatch[1]));
     }
-    
     // Trainer evaluation detail
     const trainerEvaluationMatch = url.match(/\/api\/trainer-evaluations\/(\d+)$/);
     if (trainerEvaluationMatch) {
       return Promise.resolve(fetchMockTrainerEvaluation(trainerEvaluationMatch[1]));
     }
-    
     // Trainer evaluation PDF download
     const evaluationPdfMatch = url.match(/\/api\/trainer-evaluations\/(\d+)\/pdf/);
     if (evaluationPdfMatch) {
       return Promise.resolve(downloadMockTrainerEvaluationPDF());
     }
-    
     // AI Analysis for a session
     const analysisMatch = url.match(/\/api\/evaluations\/sessions\/(\d+)\/analysis/);
     if (analysisMatch) {
       return Promise.resolve(getMockAnalysis(analysisMatch[1]));
     }
-    
     // Evaluation session feedback
     const feedbackMatch = url.match(/\/api\/evaluations\/sessions\/(\d+)\/feedback/);
     if (feedbackMatch) {
       return Promise.resolve(mockApiResponses.getFeedback(feedbackMatch[1]));
     }
-    
     // Availability settings
     if (url === '/api/availability') {
       return Promise.resolve(fetchMockAvailability());
     }
-    
     // Google Calendar sync settings
     if (url === '/api/calendar/google-sync') {
       return Promise.resolve(fetchMockGoogleCalendarSync());
     }
-    
     // Certificate and report downloads (return empty blob)
     if (url.includes('/certificate') || url.includes('/report')) {
       return Promise.resolve({
@@ -368,73 +335,60 @@ export const setupMockApi = (api) => {
         data: new Blob(['Mock PDF content'], { type: 'application/pdf' }),
       });
     }
-    
     // Evaluation session
     const sessionMatch = url.match(/\/api\/evaluations\/sessions\/(\d+)$/);
     if (sessionMatch) {
       return Promise.resolve(mockApiResponses.getSession(sessionMatch[1]));
     }
-    
     // Evaluation detail
     const evaluationDetailMatch = url.match(/\/api\/evaluations\/(\d+)/);
     if (evaluationDetailMatch) {
       return Promise.resolve(mockApiResponses.getEvaluation(evaluationDetailMatch[1]));
     }
-    
     // Fallback to original implementation
     return originalGet.call(this, url, config);
   };
-  
   api.post = function(url, data, config) {
     // Create appointment
     if (url === '/api/appointments') {
       return Promise.resolve(createMockAppointment(data));
     }
-    
     // Notify appointment participants
     const notifyParticipantsMatch = url.match(/\/api\/appointments\/(\d+)\/notify/);
     if (notifyParticipantsMatch) {
       return Promise.resolve(notifyMockParticipants(notifyParticipantsMatch[1]));
     }
-    
     // Create trainer evaluation
     if (url === '/api/trainer-evaluations') {
       return Promise.resolve(createMockTrainerEvaluation(data));
     }
-    
     // Share trainer evaluation with beneficiary
     const shareEvaluationMatch = url.match(/\/api\/trainer-evaluations\/(\d+)\/share/);
     if (shareEvaluationMatch) {
       return Promise.resolve(shareMockTrainerEvaluation(shareEvaluationMatch[1]));
     }
-    
     // Generate AI analysis
     const generateAnalysisMatch = url.match(/\/api\/evaluations\/sessions\/(\d+)\/generate-analysis/);
     if (generateAnalysisMatch) {
       return Promise.resolve(generateMockAnalysis());
     }
-    
     // Create evaluation
     if (url === '/api/evaluations') {
       return Promise.resolve(mockApiResponses.createEvaluation(data));
     }
-    
     // Create session
     if (url === '/api/evaluations/sessions') {
       return Promise.resolve(mockApiResponses.createSession(data));
     }
-    
     // Fallback to original implementation
     return originalPost.call(this, url, data, config);
   };
-  
   api.put = function(url, data, config) {
     // Update appointment
     const updateAppointmentMatch = url.match(/\/api\/appointments\/(\d+)/);
     if (updateAppointmentMatch) {
       return Promise.resolve(updateMockAppointment(updateAppointmentMatch[1], data));
     }
-    
     // Mark session as evaluated by trainer
     const markEvaluatedMatch = url.match(/\/api\/evaluations\/sessions\/(\d+)\/mark-evaluated/);
     if (markEvaluatedMatch) {
@@ -447,56 +401,46 @@ export const setupMockApi = (api) => {
         }
       });
     }
-    
     // Update analysis status
     const analysisStatusMatch = url.match(/\/api\/evaluations\/sessions\/(\d+)\/analysis\/status/);
     if (analysisStatusMatch) {
       return Promise.resolve(updateMockAnalysisStatus(analysisStatusMatch[1], data));
     }
-    
     // Update trainer feedback
     const trainerFeedbackMatch = url.match(/\/api\/evaluations\/sessions\/(\d+)\/analysis\/trainer-feedback/);
     if (trainerFeedbackMatch) {
       return Promise.resolve(updateMockTrainerFeedback(trainerFeedbackMatch[1], data));
     }
-    
     // Update evaluation 
     const evaluationDetailMatch = url.match(/\/api\/evaluations\/(\d+)/);
     if (evaluationDetailMatch) {
       return Promise.resolve(mockApiResponses.updateEvaluation(evaluationDetailMatch[1], data));
     }
-    
     // Update availability settings
     if (url === '/api/availability') {
       return Promise.resolve(updateMockAvailability(data));
     }
-    
     // Update Google Calendar sync settings
     if (url === '/api/calendar/google-sync') {
       return Promise.resolve(updateMockGoogleCalendarSync(data));
     }
-    
     // Fallback to original implementation
     return originalPut.call(this, url, data, config);
   };
-  
   api.delete = function(url, config) {
     // Delete appointment
     const deleteAppointmentMatch = url.match(/\/api\/appointments\/(\d+)/);
     if (deleteAppointmentMatch) {
       return Promise.resolve(deleteMockAppointment(deleteAppointmentMatch[1]));
     }
-    
     // Delete evaluation
     const evaluationDetailMatch = url.match(/\/api\/evaluations\/(\d+)/);
     if (evaluationDetailMatch) {
       return Promise.resolve(mockApiResponses.deleteEvaluation(evaluationDetailMatch[1]));
     }
-    
     // Fallback to original implementation
     return originalDelete.call(this, url, config);
   };
-  
   return () => {
     // Restore original methods when needed
     api.get = originalGet;

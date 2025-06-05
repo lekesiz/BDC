@@ -1,0 +1,131 @@
+{
+  "default_strategy": {
+    "type": "probabilistic",
+    "param": 1.0,
+    "max_traces_per_second": 1000
+  },
+  "per_service_strategies": [
+    {
+      "service": "bdc-backend",
+      "type": "probabilistic",
+      "param": 1.0,
+      "max_traces_per_second": 500,
+      "operation_strategies": [
+        {
+          "operation": "GET /health",
+          "type": "probabilistic",
+          "param": 0.1
+        },
+        {
+          "operation": "GET /metrics",
+          "type": "probabilistic",
+          "param": 0.1
+        },
+        {
+          "operation": "POST /api/auth/login",
+          "type": "probabilistic",
+          "param": 1.0
+        },
+        {
+          "operation": "POST /api/evaluations",
+          "type": "probabilistic",
+          "param": 1.0
+        },
+        {
+          "operation": "GET /api/users",
+          "type": "probabilistic",
+          "param": 0.5
+        },
+        {
+          "operation": "database_query",
+          "type": "probabilistic",
+          "param": 0.8
+        },
+        {
+          "operation": "redis_operation",
+          "type": "probabilistic",
+          "param": 0.3
+        }
+      ]
+    },
+    {
+      "service": "bdc-frontend",
+      "type": "probabilistic",
+      "param": 0.5,
+      "max_traces_per_second": 200,
+      "operation_strategies": [
+        {
+          "operation": "page_load",
+          "type": "probabilistic",
+          "param": 1.0
+        },
+        {
+          "operation": "api_call",
+          "type": "probabilistic",
+          "param": 0.8
+        },
+        {
+          "operation": "user_interaction",
+          "type": "probabilistic",
+          "param": 0.3
+        }
+      ]
+    },
+    {
+      "service": "bdc-nginx",
+      "type": "probabilistic",
+      "param": 0.2,
+      "max_traces_per_second": 100,
+      "operation_strategies": [
+        {
+          "operation": "static_content",
+          "type": "probabilistic",
+          "param": 0.05
+        },
+        {
+          "operation": "api_proxy",
+          "type": "probabilistic",
+          "param": 0.5
+        }
+      ]
+    },
+    {
+      "service": "postgres",
+      "type": "probabilistic", 
+      "param": 0.8,
+      "max_traces_per_second": 300
+    },
+    {
+      "service": "redis",
+      "type": "probabilistic",
+      "param": 0.3,
+      "max_traces_per_second": 100
+    }
+  ],
+  "per_operation_strategies": [
+    {
+      "service": "*",
+      "operation": "health_check",
+      "type": "probabilistic",
+      "param": 0.01
+    },
+    {
+      "service": "*",
+      "operation": "metrics",
+      "type": "probabilistic",
+      "param": 0.01
+    },
+    {
+      "service": "*",
+      "operation": "error",
+      "type": "probabilistic",
+      "param": 1.0
+    },
+    {
+      "service": "*",
+      "operation": "slow_query",
+      "type": "probabilistic",
+      "param": 1.0
+    }
+  ]
+}

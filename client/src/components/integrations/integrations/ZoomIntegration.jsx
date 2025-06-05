@@ -16,7 +16,6 @@ import {
   BarChart3,
   Recording
 } from 'lucide-react';
-
 const ZoomIntegration = ({ integration, onBack }) => {
   const [accountInfo, setAccountInfo] = useState({
     type: 'Pro',
@@ -25,7 +24,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
     totalParticipants: 3456,
     storageUsed: '15.2 GB'
   });
-
   const [meetingDefaults, setMeetingDefaults] = useState({
     enableWaitingRoom: true,
     muteOnEntry: true,
@@ -34,14 +32,12 @@ const ZoomIntegration = ({ integration, onBack }) => {
     allowScreenShare: true,
     enableBreakoutRooms: true
   });
-
   const [upcomingMeetings, setUpcomingMeetings] = useState([
     { id: '1', topic: 'Python Programming - Session 5', time: '2024-11-18 10:00 AM', duration: 90, participants: 25, status: 'scheduled' },
     { id: '2', topic: 'Web Development Workshop', time: '2024-11-18 2:00 PM', duration: 120, participants: 30, status: 'scheduled' },
     { id: '3', topic: 'Trainer Meeting', time: '2024-11-19 9:00 AM', duration: 60, participants: 8, status: 'scheduled' },
     { id: '4', topic: 'Beneficiary Q&A Session', time: '2024-11-19 3:00 PM', duration: 45, participants: 15, status: 'scheduled' }
   ]);
-
   const configFields = [
     {
       name: 'accountId',
@@ -84,7 +80,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
       required: true
     }
   ];
-
   const oauthConfig = {
     authUrl: 'https://zoom.us/oauth/authorize',
     tokenUrl: 'https://zoom.us/oauth/token',
@@ -99,7 +94,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
       'webinar:write'
     ]
   };
-
   const webhookEvents = [
     'meeting.started',
     'meeting.ended',
@@ -108,7 +102,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
     'recording.completed',
     'webinar.created'
   ];
-
   const apiEndpoints = [
     {
       method: 'GET',
@@ -131,7 +124,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
       description: 'Start a meeting'
     }
   ];
-
   const customOverview = (
     <>
       {/* Account Overview */}
@@ -169,7 +161,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Upcoming Meetings */}
       <Card>
         <div className="p-6">
@@ -215,7 +206,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Meeting Defaults */}
       <Card>
         <div className="p-6">
@@ -242,7 +232,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <MicOff className="w-4 h-4 text-gray-400 mr-3" />
@@ -264,7 +253,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Recording className="w-4 h-4 text-gray-400 mr-3" />
@@ -286,7 +274,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
                 <option value="cloud">Cloud Recording</option>
               </select>
             </div>
-
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Monitor className="w-4 h-4 text-gray-400 mr-3" />
@@ -311,7 +298,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Quick Actions */}
       <Card>
         <div className="p-6">
@@ -348,7 +334,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Recent Meetings */}
       <Card>
         <div className="p-6">
@@ -387,7 +372,6 @@ const ZoomIntegration = ({ integration, onBack }) => {
       </Card>
     </>
   );
-
   return (
     <BaseIntegration
       integration={integration}
@@ -401,5 +385,4 @@ const ZoomIntegration = ({ integration, onBack }) => {
     </BaseIntegration>
   );
 };
-
 export default ZoomIntegration;

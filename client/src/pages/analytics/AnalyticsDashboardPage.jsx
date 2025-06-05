@@ -26,7 +26,6 @@ import { AppointmentMetrics } from '@/components/analytics/AppointmentMetrics';
 import { EvaluationResults } from '@/components/analytics/EvaluationResults';
 import { SkillsDistribution } from '@/components/analytics/SkillsDistribution';
 import { ActivityTimeline } from '@/components/analytics/ActivityTimeline';
-
 /**
  * AnalyticsDashboardPage provides a comprehensive view of program statistics and analytics
  */
@@ -42,31 +41,25 @@ const AnalyticsDashboardPage = () => {
   const [selectedPrograms, setSelectedPrograms] = useState([]);
   const [trainers, setTrainers] = useState([]);
   const [programs, setPrograms] = useState([]);
-
   // Fetch analytics data
   useEffect(() => {
     const fetchAnalyticsData = async () => {
       try {
         setIsLoading(true);
-        
         // Fetch trainers and programs for filters
         const [trainersResponse, programsResponse] = await Promise.all([
           api.get('/api/analytics/trainers'),
           api.get('/api/analytics/programs')
         ]);
-        
         setTrainers(trainersResponse.data.trainers || []);
         setPrograms(programsResponse.data.programs || []);
-        
         // Set default selections if none are made
         if (selectedTrainers.length === 0) {
           setSelectedTrainers((trainersResponse.data?.trainers || []).map(trainer => trainer.id));
         }
-        
         if (selectedPrograms.length === 0) {
           setSelectedPrograms((programsResponse.data?.programs || []).map(program => program.id));
         }
-        
         // Fetch analytics data with filters
         const response = await api.get('/api/analytics/dashboard', {
           params: {
@@ -75,7 +68,6 @@ const AnalyticsDashboardPage = () => {
             program_ids: selectedPrograms.join(',')
           }
         });
-        
         setAnalyticsData(response.data);
       } catch (error) {
         console.error('Error fetching analytics data:', error);
@@ -88,15 +80,12 @@ const AnalyticsDashboardPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchAnalyticsData();
   }, [toast, dateRange, selectedTrainers, selectedPrograms]);
-
   // Handle date range change
   const handleDateRangeChange = (range) => {
     setDateRange(range);
   };
-
   // Toggle trainer selection
   const toggleTrainer = (trainerId) => {
     setSelectedTrainers(prev => {
@@ -107,7 +96,6 @@ const AnalyticsDashboardPage = () => {
       }
     });
   };
-
   // Toggle program selection
   const toggleProgram = (programId) => {
     setSelectedPrograms(prev => {
@@ -118,27 +106,22 @@ const AnalyticsDashboardPage = () => {
       }
     });
   };
-
   // Select all trainers
   const selectAllTrainers = () => {
     setSelectedTrainers((trainers || []).map(trainer => trainer.id));
   };
-
   // Select all programs
   const selectAllPrograms = () => {
     setSelectedPrograms((programs || []).map(program => program.id));
   };
-
   // Clear all trainer selections
   const clearTrainerSelection = () => {
     setSelectedTrainers([]);
   };
-
   // Clear all program selections
   const clearProgramSelection = () => {
     setSelectedPrograms([]);
   };
-
   // Export analytics data
   const exportAnalyticsData = async (format) => {
     try {
@@ -151,7 +134,6 @@ const AnalyticsDashboardPage = () => {
         },
         responseType: 'blob'
       });
-      
       // Create a URL for the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -160,7 +142,6 @@ const AnalyticsDashboardPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      
       toast({
         title: 'Success',
         description: `Analytics data exported successfully as ${format.toUpperCase()}`,
@@ -175,7 +156,6 @@ const AnalyticsDashboardPage = () => {
       });
     }
   };
-
   // Format date range for display
   const formatDateRange = () => {
     switch(dateRange) {
@@ -193,7 +173,6 @@ const AnalyticsDashboardPage = () => {
         return 'Last 30 Days';
     }
   };
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -201,12 +180,10 @@ const AnalyticsDashboardPage = () => {
       </div>
     );
   }
-
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Analytics Dashboard</h1>
-        
         <div className="flex space-x-2">
           <div className="relative">
             <Button
@@ -218,7 +195,6 @@ const AnalyticsDashboardPage = () => {
               Filters
               <ChevronDown className="w-4 h-4 ml-2" />
             </Button>
-            
             {filterOpen && (
               <div className="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-lg z-10 border p-4">
                 <h3 className="text-sm font-medium mb-2">Date Range</h3>
@@ -260,7 +236,6 @@ const AnalyticsDashboardPage = () => {
                     All Time
                   </Button>
                 </div>
-                
                 <div className="border-t pt-4 mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium">Trainers</h3>
@@ -297,7 +272,6 @@ const AnalyticsDashboardPage = () => {
                     ))}
                   </div>
                 </div>
-                
                 <div className="border-t pt-4 mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium">Programs</h3>
@@ -334,7 +308,6 @@ const AnalyticsDashboardPage = () => {
                     ))}
                   </div>
                 </div>
-                
                 <div className="flex justify-end">
                   <Button
                     variant="default"
@@ -347,7 +320,6 @@ const AnalyticsDashboardPage = () => {
               </div>
             )}
           </div>
-          
           <div className="relative">
             <Button
               variant="outline"
@@ -358,7 +330,6 @@ const AnalyticsDashboardPage = () => {
               Export
               <ChevronDown className="w-4 h-4 ml-2" />
             </Button>
-            
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border p-2 hidden group-hover:block">
               <button
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
@@ -382,7 +353,6 @@ const AnalyticsDashboardPage = () => {
           </div>
         </div>
       </div>
-      
       <div className="mb-6 bg-gray-50 rounded-lg p-4 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-medium">Analytics Overview</h2>
@@ -390,13 +360,11 @@ const AnalyticsDashboardPage = () => {
             Data shown for: <span className="font-medium">{formatDateRange()}</span>
           </p>
         </div>
-        
         <div className="text-sm text-gray-500 flex items-center">
           <Clock className="w-4 h-4 mr-1" />
           Last updated: {new Date().toLocaleString()}
         </div>
       </div>
-      
       {(!selectedTrainers.length || !selectedPrograms.length) && (
         <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start">
           <AlertCircle className="w-5 h-5 text-amber-500 mr-3 flex-shrink-0 mt-0.5" />
@@ -412,7 +380,6 @@ const AnalyticsDashboardPage = () => {
           </div>
         </div>
       )}
-      
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <Card className="p-6">
@@ -434,7 +401,6 @@ const AnalyticsDashboardPage = () => {
             </div>
           </div>
         </Card>
-        
         <Card className="p-6">
           <div className="flex justify-between items-start">
             <div>
@@ -454,7 +420,6 @@ const AnalyticsDashboardPage = () => {
             </div>
           </div>
         </Card>
-        
         <Card className="p-6">
           <div className="flex justify-between items-start">
             <div>
@@ -474,7 +439,6 @@ const AnalyticsDashboardPage = () => {
             </div>
           </div>
         </Card>
-        
         <Card className="p-6">
           <div className="flex justify-between items-start">
             <div>
@@ -495,44 +459,37 @@ const AnalyticsDashboardPage = () => {
           </div>
         </Card>
       </div>
-      
       {/* Main Analytics Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="p-6">
           <h2 className="text-lg font-medium mb-4">Beneficiary Statistics</h2>
           <BeneficiaryStatistics data={analyticsData?.beneficiary_statistics || []} />
         </Card>
-        
         <Card className="p-6">
           <h2 className="text-lg font-medium mb-4">Training Progress</h2>
           <TrainingProgress data={analyticsData?.training_progress || []} />
         </Card>
       </div>
-      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="p-6">
           <h2 className="text-lg font-medium mb-4">Appointment Metrics</h2>
           <AppointmentMetrics data={analyticsData?.appointment_metrics || {}} />
         </Card>
-        
         <Card className="p-6">
           <h2 className="text-lg font-medium mb-4">Evaluation Results</h2>
           <EvaluationResults data={analyticsData?.evaluation_results || {}} />
         </Card>
       </div>
-      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="p-6">
           <h2 className="text-lg font-medium mb-4">Skills Distribution</h2>
           <SkillsDistribution data={analyticsData?.skills_distribution || []} />
         </Card>
-        
         <Card className="p-6">
           <h2 className="text-lg font-medium mb-4">Activity Timeline</h2>
           <ActivityTimeline data={analyticsData?.activity_timeline || []} />
         </Card>
       </div>
-      
       {/* Program Performance Table */}
       <Card className="p-6 mb-6">
         <div className="flex justify-between items-center mb-4">
@@ -545,7 +502,6 @@ const AnalyticsDashboardPage = () => {
             View All Programs
           </Button>
         </div>
-        
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -587,7 +543,6 @@ const AnalyticsDashboardPage = () => {
           </table>
         </div>
       </Card>
-      
       {/* Trainer Performance Table */}
       <Card className="p-6 mb-6">
         <div className="flex justify-between items-center mb-4">
@@ -600,7 +555,6 @@ const AnalyticsDashboardPage = () => {
             View All Trainers
           </Button>
         </div>
-        
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -644,7 +598,6 @@ const AnalyticsDashboardPage = () => {
           </table>
         </div>
       </Card>
-      
       {/* Beneficiary Performance Table */}
       <Card className="p-6">
         <div className="flex justify-between items-center mb-4">
@@ -657,7 +610,6 @@ const AnalyticsDashboardPage = () => {
             View All Beneficiaries
           </Button>
         </div>
-        
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -724,5 +676,4 @@ const AnalyticsDashboardPage = () => {
     </div>
   );
 };
-
 export default AnalyticsDashboardPage;

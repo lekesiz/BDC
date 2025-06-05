@@ -5,7 +5,6 @@ import {
   FileText, Filter, Download, Calendar, Brain
 } from 'lucide-react';
 import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +29,6 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-
 /**
  * TrainerAssessmentStatisticsPage provides comprehensive analytics and reporting
  * for assessments across the organization
@@ -41,12 +39,10 @@ const TrainerAssessmentStatisticsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
-  
   // Date range filter
   const [dateRange, setDateRange] = useState('30');
   const [startDate, setStartDate] = useState(subDays(new Date(), 30));
   const [endDate, setEndDate] = useState(new Date());
-  
   // Filters
   const [filters, setFilters] = useState({
     assessmentType: 'all',
@@ -54,7 +50,6 @@ const TrainerAssessmentStatisticsPage = () => {
     trainerId: 'all',
     status: 'all'
   });
-  
   // Statistics data
   const [overviewStats, setOverviewStats] = useState(null);
   const [performanceData, setPerformanceData] = useState(null);
@@ -62,80 +57,58 @@ const TrainerAssessmentStatisticsPage = () => {
   const [assessmentStats, setAssessmentStats] = useState(null);
   const [studentStats, setStudentStats] = useState(null);
   const [questionStats, setQuestionStats] = useState(null);
-  
   // Load statistics data
   useEffect(() => {
     let isMounted = true;
-    
     const fetchStatistics = async () => {
       try {
         if (!isMounted) return;
-        
         setIsLoading(true);
         setError(null);
-        
         // Fetch overview statistics
         const overviewResponse = await fetch(`/api/assessment/statistics/overview?start=${startDate.toISOString()}&end=${endDate.toISOString()}`);
         if (!isMounted) return;
-        
         if (!overviewResponse.ok) throw new Error('Failed to fetch overview statistics');
         const overviewData = await overviewResponse.json();
-        
         if (!isMounted) return;
         setOverviewStats(overviewData);
-        
         // Fetch performance data
         const performanceResponse = await fetch(`/api/assessment/statistics/performance?start=${startDate.toISOString()}&end=${endDate.toISOString()}`);
         if (!isMounted) return;
-        
         if (!performanceResponse.ok) throw new Error('Failed to fetch performance data');
         const performanceData = await performanceResponse.json();
-        
         if (!isMounted) return;
         setPerformanceData(performanceData);
-        
         // Fetch completion data
         const completionResponse = await fetch(`/api/assessment/statistics/completion?start=${startDate.toISOString()}&end=${endDate.toISOString()}`);
         if (!isMounted) return;
-        
         if (!completionResponse.ok) throw new Error('Failed to fetch completion data');
         const completionData = await completionResponse.json();
-        
         if (!isMounted) return;
         setCompletionData(completionData);
-        
         // Fetch assessment statistics
         const assessmentResponse = await fetch(`/api/assessment/statistics/assessments?start=${startDate.toISOString()}&end=${endDate.toISOString()}`);
         if (!isMounted) return;
-        
         if (!assessmentResponse.ok) throw new Error('Failed to fetch assessment statistics');
         const assessmentData = await assessmentResponse.json();
-        
         if (!isMounted) return;
         setAssessmentStats(assessmentData);
-        
         // Fetch student statistics
         const studentResponse = await fetch(`/api/assessment/statistics/students?start=${startDate.toISOString()}&end=${endDate.toISOString()}`);
         if (!isMounted) return;
-        
         if (!studentResponse.ok) throw new Error('Failed to fetch student statistics');
         const studentData = await studentResponse.json();
-        
         if (!isMounted) return;
         setStudentStats(studentData);
-        
         // Fetch question statistics
         const questionResponse = await fetch(`/api/assessment/statistics/questions?start=${startDate.toISOString()}&end=${endDate.toISOString()}`);
         if (!isMounted) return;
-        
         if (!questionResponse.ok) throw new Error('Failed to fetch question statistics');
         const questionData = await questionResponse.json();
-        
         if (!isMounted) return;
         setQuestionStats(questionData);
       } catch (err) {
         if (!isMounted) return;
-        
         console.error('Error fetching statistics:', err);
         setError(err.message);
         toast({
@@ -149,19 +122,15 @@ const TrainerAssessmentStatisticsPage = () => {
         }
       }
     };
-    
     fetchStatistics();
-    
     return () => {
       isMounted = false;
     };
   }, [startDate, endDate, filters, toast]);
-  
   // Handle date range change
   const handleDateRangeChange = (range) => {
     setDateRange(range);
     const now = new Date();
-    
     switch (range) {
       case '7':
         setStartDate(subDays(now, 7));
@@ -191,7 +160,6 @@ const TrainerAssessmentStatisticsPage = () => {
         setEndDate(now);
     }
   };
-  
   // Export report
   const handleExportReport = () => {
     // In a real app, this would generate and download a report
@@ -201,7 +169,6 @@ const TrainerAssessmentStatisticsPage = () => {
       type: 'info',
     });
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -210,7 +177,6 @@ const TrainerAssessmentStatisticsPage = () => {
       </div>
     );
   }
-  
   // Render error state
   if (error) {
     return (
@@ -223,10 +189,8 @@ const TrainerAssessmentStatisticsPage = () => {
       </div>
     );
   }
-  
   // Chart colors
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
-  
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -235,7 +199,6 @@ const TrainerAssessmentStatisticsPage = () => {
           <h1 className="text-2xl font-bold mb-2">Assessment Statistics</h1>
           <p className="text-gray-600">Comprehensive analytics and reporting</p>
         </div>
-        
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -247,7 +210,6 @@ const TrainerAssessmentStatisticsPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Date Range Filter */}
       <Card className="p-4 mb-6">
         <div className="flex flex-wrap items-center gap-4">
@@ -266,7 +228,6 @@ const TrainerAssessmentStatisticsPage = () => {
               <Select.Option value="custom">Custom range</Select.Option>
             </Select>
           </div>
-          
           {dateRange === 'custom' && (
             <div className="flex items-center gap-2">
               <DatePicker
@@ -282,9 +243,7 @@ const TrainerAssessmentStatisticsPage = () => {
               />
             </div>
           )}
-          
           <div className="flex-1"></div>
-          
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-gray-500" />
             <Select
@@ -299,7 +258,6 @@ const TrainerAssessmentStatisticsPage = () => {
           </div>
         </div>
       </Card>
-      
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <Card className="p-6">
@@ -311,7 +269,6 @@ const TrainerAssessmentStatisticsPage = () => {
           <p className="text-2xl font-bold">{overviewStats?.totalAssessments || 0}</p>
           <p className="text-sm text-green-600 mt-2">+12% from last period</p>
         </Card>
-        
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <Users className="w-8 h-8 text-primary" />
@@ -321,7 +278,6 @@ const TrainerAssessmentStatisticsPage = () => {
           <p className="text-2xl font-bold">{overviewStats?.activeStudents || 0}</p>
           <p className="text-sm text-green-600 mt-2">+8% from last period</p>
         </Card>
-        
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <Award className="w-8 h-8 text-primary" />
@@ -333,7 +289,6 @@ const TrainerAssessmentStatisticsPage = () => {
           <Progress value={overviewStats?.averageScore || 0} className="h-2" />
           <p className="text-sm text-blue-600 mt-2">Above target by 5%</p>
         </Card>
-        
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <Clock className="w-8 h-8 text-primary" />
@@ -346,7 +301,6 @@ const TrainerAssessmentStatisticsPage = () => {
           <p className="text-sm text-amber-600 mt-2">Target: 85%</p>
         </Card>
       </div>
-      
       {/* Tabs */}
       <Tabs
         value={activeTab}
@@ -375,7 +329,6 @@ const TrainerAssessmentStatisticsPage = () => {
             Insights
           </Tabs.TabTrigger>
         </Tabs.TabsList>
-        
         {/* Overview Tab */}
         <Tabs.TabContent value="overview">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -395,7 +348,6 @@ const TrainerAssessmentStatisticsPage = () => {
                 </LineChart>
               </ResponsiveContainer>
             </Card>
-            
             {/* Assessment Type Distribution */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Assessment Type Distribution</h3>
@@ -419,7 +371,6 @@ const TrainerAssessmentStatisticsPage = () => {
                 </PieChart>
               </ResponsiveContainer>
             </Card>
-            
             {/* Score Distribution */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Score Distribution</h3>
@@ -433,7 +384,6 @@ const TrainerAssessmentStatisticsPage = () => {
                 </BarChart>
               </ResponsiveContainer>
             </Card>
-            
             {/* Time to Complete */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Average Time to Complete</h3>
@@ -449,7 +399,6 @@ const TrainerAssessmentStatisticsPage = () => {
             </Card>
           </div>
         </Tabs.TabContent>
-        
         {/* Performance Tab */}
         <Tabs.TabContent value="performance">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -483,7 +432,6 @@ const TrainerAssessmentStatisticsPage = () => {
                 </Table.Body>
               </Table>
             </Card>
-            
             {/* Performance by Trainer */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Performance by Trainer</h3>
@@ -513,7 +461,6 @@ const TrainerAssessmentStatisticsPage = () => {
                 </Table.Body>
               </Table>
             </Card>
-            
             {/* Pass Rate Trends */}
             <Card className="p-6 lg:col-span-2">
               <h3 className="text-lg font-semibold mb-4">Pass Rate Trends</h3>
@@ -532,7 +479,6 @@ const TrainerAssessmentStatisticsPage = () => {
             </Card>
           </div>
         </Tabs.TabContent>
-        
         {/* Assessments Tab */}
         <Tabs.TabContent value="assessments">
           <div className="space-y-6">
@@ -582,7 +528,6 @@ const TrainerAssessmentStatisticsPage = () => {
                 </Table.Body>
               </Table>
             </Card>
-            
             {/* Most Challenging Questions */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Most Challenging Questions</h3>
@@ -615,7 +560,6 @@ const TrainerAssessmentStatisticsPage = () => {
             </Card>
           </div>
         </Tabs.TabContent>
-        
         {/* Students Tab */}
         <Tabs.TabContent value="students">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -656,7 +600,6 @@ const TrainerAssessmentStatisticsPage = () => {
                 </Table.Body>
               </Table>
             </Card>
-            
             {/* Students Needing Support */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Students Needing Support</h3>
@@ -700,7 +643,6 @@ const TrainerAssessmentStatisticsPage = () => {
                 </Table.Body>
               </Table>
             </Card>
-            
             {/* Engagement Metrics */}
             <Card className="p-6 lg:col-span-2">
               <h3 className="text-lg font-semibold mb-4">Student Engagement Trends</h3>
@@ -719,7 +661,6 @@ const TrainerAssessmentStatisticsPage = () => {
             </Card>
           </div>
         </Tabs.TabContent>
-        
         {/* Insights Tab */}
         <Tabs.TabContent value="insights">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -729,7 +670,6 @@ const TrainerAssessmentStatisticsPage = () => {
                 <Brain className="w-5 h-5 inline mr-2 text-primary" />
                 AI-Generated Insights
               </h3>
-              
               <div className="space-y-4">
                 <div className="p-4 bg-blue-50 rounded-lg">
                   <h4 className="font-medium text-blue-800 mb-2">Trending Upward</h4>
@@ -738,7 +678,6 @@ const TrainerAssessmentStatisticsPage = () => {
                     particularly in the Python programming course.
                   </p>
                 </div>
-                
                 <div className="p-4 bg-amber-50 rounded-lg">
                   <h4 className="font-medium text-amber-800 mb-2">Attention Needed</h4>
                   <p className="text-sm text-amber-700">
@@ -746,14 +685,12 @@ const TrainerAssessmentStatisticsPage = () => {
                     Consider reviewing the difficulty level or providing additional resources.
                   </p>
                 </div>
-                
                 <div className="p-4 bg-green-50 rounded-lg">
                   <h4 className="font-medium text-green-800 mb-2">Success Story</h4>
                   <p className="text-sm text-green-700">
                     Students who complete practice quizzes score 25% higher on final assessments.
                   </p>
                 </div>
-                
                 <div className="p-4 bg-purple-50 rounded-lg">
                   <h4 className="font-medium text-purple-800 mb-2">Recommendation</h4>
                   <p className="text-sm text-purple-700">
@@ -763,11 +700,9 @@ const TrainerAssessmentStatisticsPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Predictive Analytics */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Predictive Analytics</h3>
-              
               <div className="space-y-6">
                 <div>
                   <h4 className="font-medium mb-3">Likely to Succeed</h4>
@@ -787,7 +722,6 @@ const TrainerAssessmentStatisticsPage = () => {
                     ))}
                   </div>
                 </div>
-                
                 <div>
                   <h4 className="font-medium mb-3">At Risk</h4>
                   <div className="space-y-2">
@@ -808,11 +742,9 @@ const TrainerAssessmentStatisticsPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Recommendations */}
             <Card className="p-6 lg:col-span-2">
               <h3 className="text-lg font-semibold mb-4">Actionable Recommendations</h3>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-start gap-3">
@@ -827,7 +759,6 @@ const TrainerAssessmentStatisticsPage = () => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
@@ -841,7 +772,6 @@ const TrainerAssessmentStatisticsPage = () => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
@@ -855,7 +785,6 @@ const TrainerAssessmentStatisticsPage = () => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
@@ -877,5 +806,4 @@ const TrainerAssessmentStatisticsPage = () => {
     </div>
   );
 };
-
 export default TrainerAssessmentStatisticsPage;

@@ -5,6 +5,10 @@ from datetime import datetime, timezone
 from app.models import Evaluation, Question, TestSession, Response, AIFeedback
 from app.extensions import db
 from app.utils import clear_model_cache
+from app.services.question_randomization_service import (
+    question_randomization_service, 
+    RandomizationStrategy
+)
 
 
 class EvaluationService:
@@ -388,6 +392,111 @@ class QuestionService:
 
 class TestSessionService:
     """Test session service."""
+    
+    @staticmethod
+    def get_randomized_questions(session_id):
+        """
+        Get randomized questions for a test session.
+        
+        Args:
+            session_id (int): Test session ID.
+            
+        Returns:
+            tuple: (questions, answer_mappings) or (None, None) if session not found
+        """
+        try:
+            session = TestSession.query.get(session_id)
+            if not session:
+                return None, None
+            
+            # Get the test set
+            from app.models import TestSet
+            test_set = TestSet.query.get(session.test_set_id)
+            if not test_set:
+                return None, None
+            
+            # Get all questions for the test set
+            questions = Question.query.filter_by(test_set_id=session.test_set_id).all()
+            
+            # If session already has question order, use it
+            if session.question_order:
+                # Reorder questions based on stored order
+                question_dict = {q.id: q for q in questions}
+                ordered_questions = []
+                for q_id in session.question_order:
+                    if q_id in question_dict:
+                        ordered_questions.append(question_dict[q_id])
+                questions = ordered_questions
+            elif test_set.randomization_enabled:
+                # Generate new randomization
+                try:
+                    strategy = RandomizationStrategy(test_set.randomization_strategy)
+                except ValueError:
+                    strategy = RandomizationStrategy.SIMPLE_RANDOM
+                
+                # Apply repetition prevention
+                if test_set.randomization_config and test_set.randomization_config.get('prevent_repetition', True):
+                    questions = question_randomization_service.prevent_question_repetition(
+                        questions,
+                        session.beneficiary_id,
+                        test_set.randomization_config.get('lookback_sessions', 3),
+                        test_set.randomization_config.get('min_gap_between_exposure', 5)
+                    )
+                
+                # Randomize questions
+                config = test_set.randomization_config or {}
+                if test_set.anchor_questions:
+                    config['anchor_positions'] = test_set.anchor_questions
+                if test_set.blocking_rules:
+                    config['blocking_rules'] = test_set.blocking_rules
+                if test_set.question_order_template:
+                    config['template'] = test_set.question_order_template
+                
+                questions = question_randomization_service.randomize_questions(
+                    questions,
+                    strategy,
+                    session.beneficiary_id,
+                    session.id,
+                    config
+                )
+                
+                # Store the order in session for consistency
+                session.question_order = [q.id for q in questions]
+                
+                # Generate randomization seed for reproducibility
+                if test_set.time_based_seed:
+                    session.randomization_seed = question_randomization_service.apply_time_based_seed(
+                        config.get('time_window', 'daily')
+                    )
+                
+                db.session.commit()
+            
+            # Handle answer randomization
+            answer_mappings = session.answer_mappings or {}
+            
+            if test_set.answer_randomization and not answer_mappings:
+                for question in questions:
+                    if question.type == 'multiple_choice' and question.options:
+                        randomization_result = question_randomization_service.randomize_multiple_choice_answers(question)
+                        answer_mappings[str(question.id)] = randomization_result['mapping']
+                
+                # Store answer mappings in session
+                session.answer_mappings = answer_mappings
+                db.session.commit()
+            
+            # Track exposure for each question
+            for question in questions:
+                question_randomization_service.track_question_exposure(
+                    question.id,
+                    session.beneficiary_id,
+                    session.id
+                )
+            
+            return questions, answer_mappings
+            
+        except Exception as e:
+            db.session.rollback()
+            raise e
     
     @staticmethod
     def get_sessions(evaluation_id=None, beneficiary_id=None, status=None, page=1, per_page=10):

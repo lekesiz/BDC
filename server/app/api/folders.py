@@ -6,6 +6,8 @@ from app.models.tenant import Tenant
 from app.models.user import User
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.utils.logging import logger
+
 folders_bp = Blueprint('folders', __name__)
 
 @folders_bp.route('/folders', methods=['POST'])

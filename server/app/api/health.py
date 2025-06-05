@@ -6,6 +6,8 @@ from app.extensions import db
 import redis
 import os
 
+from app.utils.logging import logger
+
 health_bp = Blueprint('health', __name__)
 
 

@@ -223,3 +223,91 @@ def send_notification_email(user, notification):
         text_body=text_body,
         html_body=html_body
     )
+
+
+class EmailService:
+    """Email service for sending various types of emails."""
+    
+    @staticmethod
+    def send_recurring_appointment_created(email, data):
+        """Send email when a recurring appointment series is created."""
+        subject = f"Recurring Appointment Created: {data['title']}"
+        
+        text_body = f"""
+Dear {data['beneficiary_name']},
+
+A recurring appointment series has been created for you:
+
+Title: {data['title']}
+Trainer: {data['trainer_name']}
+Frequency: {data['frequency'].capitalize()}
+Starting: {data['start_date']}
+Number of appointments: {data['appointment_count']}
+
+Please log in to your account to view the full schedule.
+
+Best regards,
+BDC Team
+        """
+        
+        html_body = f"""
+<h2>Recurring Appointment Created</h2>
+<p>Dear {data['beneficiary_name']},</p>
+<p>A recurring appointment series has been created for you:</p>
+<ul>
+    <li><strong>Title:</strong> {data['title']}</li>
+    <li><strong>Trainer:</strong> {data['trainer_name']}</li>
+    <li><strong>Frequency:</strong> {data['frequency'].capitalize()}</li>
+    <li><strong>Starting:</strong> {data['start_date']}</li>
+    <li><strong>Number of appointments:</strong> {data['appointment_count']}</li>
+</ul>
+<p>Please log in to your account to view the full schedule.</p>
+<p>Best regards,<br>BDC Team</p>
+        """
+        
+        return send_email(
+            subject=subject,
+            recipients=[email],
+            text_body=text_body,
+            html_body=html_body
+        )
+    
+    @staticmethod
+    def send_recurring_appointment_cancelled(email, data):
+        """Send email when a recurring appointment series is cancelled."""
+        subject = f"Recurring Appointments Cancelled: {data['title']}"
+        
+        text_body = f"""
+Dear {data['beneficiary_name']},
+
+Your recurring appointment series has been cancelled:
+
+Title: {data['title']}
+Number of cancelled appointments: {data['cancelled_count']}
+Reason: {data['reason']}
+
+If you have any questions, please contact your trainer.
+
+Best regards,
+BDC Team
+        """
+        
+        html_body = f"""
+<h2>Recurring Appointments Cancelled</h2>
+<p>Dear {data['beneficiary_name']},</p>
+<p>Your recurring appointment series has been cancelled:</p>
+<ul>
+    <li><strong>Title:</strong> {data['title']}</li>
+    <li><strong>Number of cancelled appointments:</strong> {data['cancelled_count']}</li>
+    <li><strong>Reason:</strong> {data['reason']}</li>
+</ul>
+<p>If you have any questions, please contact your trainer.</p>
+<p>Best regards,<br>BDC Team</p>
+        """
+        
+        return send_email(
+            subject=subject,
+            recipients=[email],
+            text_body=text_body,
+            html_body=html_body
+        )

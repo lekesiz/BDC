@@ -31,13 +31,17 @@ class SecurityManager:
         payload['exp'] = datetime.utcnow() + timedelta(seconds=expires_in)
         payload['iat'] = datetime.utcnow()
         
-        secret_key = self.secret_key or current_app.config.get('SECRET_KEY', 'dev-secret')
+        secret_key = self.secret_key or current_app.config.get('SECRET_KEY')
+        if not secret_key:
+            raise ValueError("SECRET_KEY must be set in environment variables")
         return jwt.encode(payload, secret_key, algorithm=self.algorithm)
     
     def decode_token(self, token: str) -> Optional[Dict[str, Any]]:
         """Decode and verify JWT token."""
         try:
-            secret_key = self.secret_key or current_app.config.get('SECRET_KEY', 'dev-secret')
+            secret_key = self.secret_key or current_app.config.get('SECRET_KEY')
+        if not secret_key:
+            raise ValueError("SECRET_KEY must be set in environment variables")
             payload = jwt.decode(token, secret_key, algorithms=[self.algorithm])
             return payload
         except jwt.ExpiredSignatureError:

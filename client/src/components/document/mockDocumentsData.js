@@ -1,12 +1,10 @@
 import { addDays, subDays } from 'date-fns';
-
 // Generate dates
 const today = new Date();
 const yesterday = subDays(today, 1);
 const lastWeek = subDays(today, 7);
 const twoWeeksAgo = subDays(today, 14);
 const nextWeek = addDays(today, 7);
-
 // Mock folders data
 export const mockFolders = [
   {
@@ -60,7 +58,6 @@ export const mockFolders = [
     document_count: 3
   }
 ];
-
 // Mock documents data
 export const mockDocuments = [
   {
@@ -224,7 +221,6 @@ export const mockDocuments = [
     is_shared: false
   }
 ];
-
 // Mock document versions
 export const mockDocumentVersions = {
   // Document ID 2 (Programming Fundamentals.pdf) has 2 versions
@@ -250,7 +246,6 @@ export const mockDocumentVersions = {
       change_type: 'Initial upload'
     }
   ],
-  
   // Document ID 5 (Beneficiary Progress Tracker.xlsx) has 3 versions
   5: [
     {
@@ -284,7 +279,6 @@ export const mockDocumentVersions = {
       change_type: 'Initial upload'
     }
   ],
-  
   // Document ID 9 (Beneficiary Assessment Form.pdf) has 2 versions
   9: [
     {
@@ -309,7 +303,6 @@ export const mockDocumentVersions = {
     }
   ]
 };
-
 // Mock comments data
 export const mockComments = {
   // Comments for document ID 1
@@ -331,7 +324,6 @@ export const mockComments = {
       created_at: yesterday.toISOString()
     }
   ],
-  
   // Comments for document ID 3
   3: [
     {
@@ -343,7 +335,6 @@ export const mockComments = {
       created_at: yesterday.toISOString()
     }
   ],
-  
   // Comments for document ID 5
   5: [
     {
@@ -364,7 +355,6 @@ export const mockComments = {
     }
   ]
 };
-
 // Mock shared users data
 export const mockSharedUsers = {
   // Users with whom document ID 1 is shared
@@ -384,7 +374,6 @@ export const mockSharedUsers = {
       shared_at: lastWeek.toISOString()
     }
   ],
-  
   // Users with whom document ID 2 is shared
   2: [
     {
@@ -402,7 +391,6 @@ export const mockSharedUsers = {
       shared_at: lastWeek.toISOString()
     }
   ],
-  
   // Users with whom document ID 5 is shared
   5: [
     {
@@ -421,17 +409,14 @@ export const mockSharedUsers = {
     }
   ]
 };
-
 // Mock API functions
 export const fetchDocuments = (folderId = null) => {
   const folderDocuments = folderId 
     ? mockDocuments.filter(doc => doc.folder_id === parseInt(folderId))
     : mockDocuments.filter(doc => doc.folder_id === null);
-  
   const foldersList = folderId
     ? mockFolders.filter(folder => folder.parent_id === parseInt(folderId))
     : mockFolders.filter(folder => folder.parent_id === null);
-  
   return {
     status: 200,
     data: {
@@ -440,48 +425,37 @@ export const fetchDocuments = (folderId = null) => {
     }
   };
 };
-
 export const fetchDocument = (id) => {
   const document = mockDocuments.find(doc => doc.id === parseInt(id));
-  
   if (!document) {
     return {
       status: 404,
       data: { message: 'Document not found' }
     };
   }
-  
   return {
     status: 200,
     data: document
   };
 };
-
 export const fetchFolder = (id) => {
   const folder = mockFolders.find(folder => folder.id === parseInt(id));
-  
   if (!folder) {
     return {
       status: 404,
       data: { message: 'Folder not found' }
     };
   }
-  
   // Build the folder path
   const buildPath = (folderId) => {
     const pathFolder = mockFolders.find(f => f.id === folderId);
-    
     if (!pathFolder) return [];
-    
     if (pathFolder.parent_id) {
       return [...buildPath(pathFolder.parent_id), { id: pathFolder.id, name: pathFolder.name }];
     }
-    
     return [{ id: pathFolder.id, name: pathFolder.name }];
   };
-  
   const path = folder.parent_id ? buildPath(folder.parent_id) : [];
-  
   return {
     status: 200,
     data: {
@@ -490,14 +464,11 @@ export const fetchFolder = (id) => {
     }
   };
 };
-
 export const fetchDocumentVersions = (id) => {
   const versions = mockDocumentVersions[id] || [];
-  
   if (versions.length === 0) {
     // If no specific versions are defined, create a default version
     const document = mockDocuments.find(doc => doc.id === parseInt(id));
-    
     if (document) {
       versions.push({
         id: 1000 + parseInt(id),
@@ -511,22 +482,18 @@ export const fetchDocumentVersions = (id) => {
       });
     }
   }
-  
   return {
     status: 200,
     data: versions
   };
 };
-
 export const fetchDocumentComments = (id) => {
   const comments = mockComments[id] || [];
-  
   return {
     status: 200,
     data: comments
   };
 };
-
 export const addDocumentComment = (id, data) => {
   const newComment = {
     id: Math.floor(Math.random() * 1000) + 100, // Generate a random ID
@@ -536,19 +503,16 @@ export const addDocumentComment = (id, data) => {
     content: data.content,
     created_at: new Date().toISOString()
   };
-  
   return {
     status: 201,
     data: newComment
   };
 };
-
 export const fetchDocumentSharing = (id) => {
   const sharedUsers = mockSharedUsers[id] || [];
   const shareLink = sharedUsers.length > 0 
     ? `https://bdc-app.example.com/share/${id}/${Math.random().toString(36).substring(2, 10)}`
     : '';
-  
   return {
     status: 200,
     data: {
@@ -557,7 +521,6 @@ export const fetchDocumentSharing = (id) => {
     }
   };
 };
-
 export const generateShareLink = (id) => {
   return {
     status: 200,
@@ -566,7 +529,6 @@ export const generateShareLink = (id) => {
     }
   };
 };
-
 export const shareDocument = (id, data) => {
   return {
     status: 200,
@@ -576,7 +538,6 @@ export const shareDocument = (id, data) => {
     }
   };
 };
-
 export const shareMultipleDocuments = (data) => {
   return {
     status: 200,
@@ -587,7 +548,6 @@ export const shareMultipleDocuments = (data) => {
     }
   };
 };
-
 export const updateDocument = (id, data) => {
   return {
     status: 200,
@@ -598,17 +558,14 @@ export const updateDocument = (id, data) => {
     }
   };
 };
-
 export const deleteDocument = (id) => {
   return {
     status: 204,
     data: null
   };
 };
-
 export const uploadDocument = (data) => {
   const newId = Math.floor(Math.random() * 1000) + 100;
-  
   return {
     status: 201,
     data: {
@@ -628,10 +585,8 @@ export const uploadDocument = (data) => {
     }
   };
 };
-
 export const createFolder = (data) => {
   const newId = Math.floor(Math.random() * 1000) + 100;
-  
   return {
     status: 201,
     data: {
@@ -646,7 +601,6 @@ export const createFolder = (data) => {
     }
   };
 };
-
 export const searchUsers = (query) => {
   const users = [
     { id: 1, name: 'Sarah Johnson', email: 'sarah.johnson@example.com' },
@@ -655,21 +609,17 @@ export const searchUsers = (query) => {
     { id: 4, name: 'Robert Wilson', email: 'robert.wilson@example.com' },
     { id: 5, name: 'Jennifer Lopez', email: 'jennifer.lopez@example.com' }
   ];
-  
   const results = users.filter(user => 
     user.name.toLowerCase().includes(query.toLowerCase()) || 
     user.email.toLowerCase().includes(query.toLowerCase())
   );
-  
   return {
     status: 200,
     data: results
   };
 };
-
 export const fetchMultipleDocuments = (ids) => {
   const documents = mockDocuments.filter(doc => ids.includes(doc.id.toString()));
-  
   return {
     status: 200,
     data: documents

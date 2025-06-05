@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Dropdown component
  * 
@@ -26,7 +25,6 @@ export const Dropdown = ({
   const triggerRef = useRef(null);
   const itemRefs = useRef([]);
   const [focusedIndex, setFocusedIndex] = useState(-1);
-
   // Close dropdown when clicking outside and handle keyboard navigation
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -35,10 +33,8 @@ export const Dropdown = ({
         setFocusedIndex(-1);
       }
     };
-
     const handleKeyDown = (event) => {
       if (!isOpen) return;
-      
       switch (event.key) {
         case 'Escape':
           setIsOpen(false);
@@ -74,16 +70,13 @@ export const Dropdown = ({
           break;
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleKeyDown);
-    
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
-
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
     if (!isOpen) {
@@ -95,7 +88,6 @@ export const Dropdown = ({
       }, 0);
     }
   };
-
   return (
     <div className="relative inline-block" ref={dropdownRef}>
       <button 
@@ -109,7 +101,6 @@ export const Dropdown = ({
       >
         {trigger}
       </button>
-      
       {isOpen && (
         <div 
           className={cn(
@@ -142,7 +133,6 @@ export const Dropdown = ({
     </div>
   );
 };
-
 /**
  * Dropdown Item component
  * 
@@ -167,14 +157,12 @@ export const DropdownItem = React.forwardRef(({
       onClose && onClose();
     }
   };
-
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleClick(e);
     }
   };
-
   return (
     <a
       ref={ref}
@@ -193,9 +181,7 @@ export const DropdownItem = React.forwardRef(({
     </a>
   );
 });
-
 DropdownItem.displayName = 'DropdownItem';
-
 /**
  * Dropdown Divider component
  * 

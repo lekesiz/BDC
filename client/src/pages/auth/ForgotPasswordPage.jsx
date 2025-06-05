@@ -4,18 +4,15 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Mail, ArrowLeft } from 'lucide-react';
-
 import { useToast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import api from '@/lib/api';
-
 // Validation schema
 const forgotPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
 });
-
 /**
  * Forgot Password page component
  */
@@ -23,7 +20,6 @@ const ForgotPasswordPage = () => {
   const { addToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
-  
   // React Hook Form with Zod validation
   const { 
     register, 
@@ -36,32 +32,26 @@ const ForgotPasswordPage = () => {
       email: '',
     }
   });
-  
   // Handle form submission
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
-      
       // Call the forgot password API
       await api.post('/api/auth/forgot-password', {
         email: data.email,
       });
-      
       // Show success message
       addToast({
         type: 'success',
         title: 'Email sent',
         message: 'If an account exists with this email, a password reset link has been sent.',
       });
-      
       // Update UI state
       setIsEmailSent(true);
-      
       // Reset form
       reset();
     } catch (err) {
       console.error('Forgot password error:', err);
-      
       // We don't want to reveal if the email exists or not for security reasons
       // So we show a success message even if the API call fails
       addToast({
@@ -69,14 +59,12 @@ const ForgotPasswordPage = () => {
         title: 'Email sent',
         message: 'If an account exists with this email, a password reset link has been sent.',
       });
-      
       // Update UI state
       setIsEmailSent(true);
     } finally {
       setIsLoading(false);
     }
   };
-  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
@@ -94,7 +82,6 @@ const ForgotPasswordPage = () => {
             </Link>
           </p>
         </div>
-        
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Forgot your password?</CardTitle>
@@ -102,7 +89,6 @@ const ForgotPasswordPage = () => {
               Enter your email address and we'll send you a link to reset your password.
             </CardDescription>
           </CardHeader>
-          
           {isEmailSent ? (
             <CardContent className="space-y-4">
               <div className="bg-green-50 p-4 rounded-md border border-green-100">
@@ -111,7 +97,6 @@ const ForgotPasswordPage = () => {
                   We've sent a password reset link to your email address. Please check your inbox and spam folder.
                 </p>
               </div>
-              
               <div className="text-center mt-4">
                 <p className="text-sm text-gray-600">
                   Didn't receive the email?{' '}
@@ -139,7 +124,6 @@ const ForgotPasswordPage = () => {
                   {...register('email')}
                 />
               </CardContent>
-              
               <CardFooter>
                 <Button
                   type="submit"
@@ -153,7 +137,6 @@ const ForgotPasswordPage = () => {
             </form>
           )}
         </Card>
-        
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Remember your password?{' '}
@@ -166,5 +149,4 @@ const ForgotPasswordPage = () => {
     </div>
   );
 };
-
 export default ForgotPasswordPage;

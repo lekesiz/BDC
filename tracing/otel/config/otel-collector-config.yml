@@ -1,0 +1,262 @@
+# OpenTelemetry Collector Configuration for BDC
+# This collector receives traces from applications and forwards to Jaeger
+
+receivers:
+  # OTLP receiver for traces, metrics, and logs
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "http://localhost:5173"
+            - "http://localhost:3000" 
+            - "https://*.bdc.com"
+
+  # Jaeger receiver (legacy support)
+  jaeger:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:14250
+      thrift_http:
+        endpoint: 0.0.0.0:14268
+      thrift_compact:
+        endpoint: 0.0.0.0:6831
+      thrift_binary:
+        endpoint: 0.0.0.0:6832
+
+  # Zipkin receiver (compatibility)
+  zipkin:
+    endpoint: 0.0.0.0:9411
+
+  # Prometheus metrics scraping
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'bdc-backend'
+          static_configs:
+            - targets: ['backend:5000']
+          metrics_path: /metrics
+          scrape_interval: 30s
+        - job_name: 'bdc-frontend'
+          static_configs:
+            - targets: ['frontend:80']
+          metrics_path: /metrics
+          scrape_interval: 30s
+
+processors:
+  # Memory limiter to prevent OOM
+  memory_limiter:
+    limit_mib: 128
+    spike_limit_mib: 32
+    check_interval: 5s
+
+  # Batch processor for better performance
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+    send_batch_max_size: 2048
+
+  # Resource processor to add service information
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: "${BDC_ENVIRONMENT}"
+        action: upsert
+      - key: service.version
+        value: "${BDC_VERSION}"
+        action: upsert
+      - key: service.namespace
+        value: "bdc"
+        action: upsert
+
+  # Attributes processor for trace enrichment
+  attributes:
+    actions:
+      # Add correlation ID to all spans
+      - key: correlation_id
+        action: insert
+        from_attribute: http.request.header.x-correlation-id
+      # Add user information
+      - key: user.id
+        action: insert
+        from_attribute: http.request.header.x-user-id
+      - key: user.role
+        action: insert
+        from_attribute: http.request.header.x-user-role
+      # Add request information
+      - key: http.request_id
+        action: insert
+        from_attribute: http.request.header.x-request-id
+      # Normalize service names
+      - key: service.name
+        action: update
+        from_attribute: service.name
+        pattern: "^bdc-(.*)"
+        replacement: "bdc-$1"
+
+  # Span processor for span filtering and modification
+  span:
+    name:
+      # Rename health check spans to reduce noise
+      from_attributes: ["http.route"]
+      separator: " "
+    include:
+      match_type: regexp
+      services: ["bdc-.*"]
+    exclude:
+      match_type: strict
+      span_names: ["health_check", "metrics"]
+
+  # Probabilistic sampler
+  probabilistic_sampler:
+    hash_seed: 22
+    sampling_percentage: 100.0
+
+  # Tail sampling for intelligent sampling decisions
+  tail_sampling:
+    decision_wait: 30s
+    num_traces: 50000
+    expected_new_traces_per_sec: 100
+    policies:
+      # Always sample errors
+      - name: error_policy
+        type: status_code
+        status_code: 
+          status_codes: [ERROR]
+      # Always sample slow requests
+      - name: slow_requests
+        type: latency
+        latency:
+          threshold_ms: 5000
+      # Sample authentication requests
+      - name: auth_requests
+        type: string_attribute
+        string_attribute:
+          key: http.route
+          values:
+            - "/api/auth/login"
+            - "/api/auth/logout"
+            - "/api/auth/refresh"
+      # Sample critical operations
+      - name: critical_operations
+        type: string_attribute
+        string_attribute:
+          key: operation.name
+          values:
+            - "database_write"
+            - "payment_process"
+            - "evaluation_submit"
+      # Probabilistic sampling for everything else
+      - name: probabilistic_policy
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: 10.0
+
+exporters:
+  # Jaeger exporter
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+    sending_queue:
+      enabled: true
+      queue_size: 1000
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 300s
+
+  # OTLP exporter for chaining collectors
+  otlp:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+    sending_queue:
+      enabled: true
+      queue_size: 1000
+
+  # Prometheus metrics exporter
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    const_labels:
+      environment: "${BDC_ENVIRONMENT}"
+      service_namespace: "bdc"
+
+  # Logging exporter for debugging
+  logging:
+    loglevel: info
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+  # File exporter for backup
+  file:
+    path: /tmp/traces.json
+
+extensions:
+  # Health check extension
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+  # Performance profiling
+  pprof:
+    endpoint: 0.0.0.0:1777
+
+  # zPages for debugging
+  zpages:
+    endpoint: 0.0.0.0:55679
+
+  # Memory ballast for stable memory usage
+  memory_ballast:
+    size_mib: 64
+
+service:
+  extensions: [health_check, pprof, zpages, memory_ballast]
+  
+  pipelines:
+    # Traces pipeline
+    traces:
+      receivers: [otlp, jaeger, zipkin]
+      processors: [
+        memory_limiter,
+        resource,
+        attributes,
+        span,
+        tail_sampling,
+        batch
+      ]
+      exporters: [jaeger, logging]
+
+    # Metrics pipeline
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [
+        memory_limiter,
+        resource,
+        batch
+      ]
+      exporters: [prometheus, logging]
+
+    # Logs pipeline
+    logs:
+      receivers: [otlp]
+      processors: [
+        memory_limiter,
+        resource,
+        batch
+      ]
+      exporters: [logging]
+
+  # Telemetry configuration
+  telemetry:
+    logs:
+      level: "info"
+    metrics:
+      address: 0.0.0.0:8888
+      level: detailed
+    resource:
+      service.name: "bdc-otel-collector"
+      service.version: "1.0.0"

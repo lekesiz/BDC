@@ -19,7 +19,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
-
 /**
  * CreateProgramPage for creating new training programs
  */
@@ -27,12 +26,10 @@ const CreateProgramPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [levels, setLevels] = useState([]);
   const [trainers, setTrainers] = useState([]);
-  
   const [formData, setFormData] = useState({
     name: '',
     code: '',
@@ -49,7 +46,6 @@ const CreateProgramPage = () => {
     start_date: '',
     end_date: ''
   });
-  
   const [modules, setModules] = useState([]);
   const [newModule, setNewModule] = useState({
     name: '',
@@ -57,7 +53,6 @@ const CreateProgramPage = () => {
     duration: 0,
     order: 1
   });
-  
   // Fetch initial data
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -67,7 +62,6 @@ const CreateProgramPage = () => {
           api.get('/api/programs/levels'),
           api.get('/api/users?role=trainer')
         ]);
-        
         setCategories(categoriesRes.data);
         setLevels(levelsRes.data);
         setTrainers(trainersRes.data || []);
@@ -75,10 +69,8 @@ const CreateProgramPage = () => {
         console.error('Error fetching initial data:', error);
       }
     };
-    
     fetchInitialData();
   }, []);
-  
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -87,7 +79,6 @@ const CreateProgramPage = () => {
       [name]: value
     }));
   };
-  
   // Add module
   const handleAddModule = () => {
     if (!newModule.name) {
@@ -98,7 +89,6 @@ const CreateProgramPage = () => {
       });
       return;
     }
-    
     setModules([...modules, { ...newModule, id: Date.now() }]);
     setNewModule({
       name: '',
@@ -107,16 +97,13 @@ const CreateProgramPage = () => {
       order: modules.length + 2
     });
   };
-  
   // Remove module
   const handleRemoveModule = (moduleId) => {
     setModules(modules.filter(m => m.id !== moduleId));
   };
-  
   // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     // Validation
     if (!formData.name || !formData.category || !formData.level) {
       toast({
@@ -126,14 +113,11 @@ const CreateProgramPage = () => {
       });
       return;
     }
-    
     setIsLoading(true);
-    
     try {
       // Create program
       const programResponse = await api.post('/api/programs', formData);
       const programId = programResponse.data.id;
-      
       // Create modules if any
       if (modules.length > 0) {
         await Promise.all(
@@ -148,13 +132,11 @@ const CreateProgramPage = () => {
           )
         );
       }
-      
       toast({
         title: 'Success',
         description: 'Program created successfully',
         type: 'success',
       });
-      
       navigate(`/programs/${programId}`);
     } catch (error) {
       console.error('Error creating program:', error);
@@ -167,7 +149,6 @@ const CreateProgramPage = () => {
       setIsLoading(false);
     }
   };
-  
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center mb-6">
@@ -177,19 +158,16 @@ const CreateProgramPage = () => {
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        
         <div>
           <h1 className="text-2xl font-bold">Create Training Program</h1>
           <p className="text-gray-500">Set up a new training program for beneficiaries</p>
         </div>
       </div>
-      
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Basic Information */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
-            
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -203,7 +181,6 @@ const CreateProgramPage = () => {
                   required
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Program Code
@@ -215,7 +192,6 @@ const CreateProgramPage = () => {
                   placeholder="e.g., LDP-2024"
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
@@ -228,7 +204,6 @@ const CreateProgramPage = () => {
                   placeholder="Describe the program objectives and content..."
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Category *
@@ -248,7 +223,6 @@ const CreateProgramPage = () => {
                   ))}
                 </select>
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Level *
@@ -269,11 +243,9 @@ const CreateProgramPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Schedule & Capacity */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Schedule & Capacity</h3>
-            
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -287,7 +259,6 @@ const CreateProgramPage = () => {
                   min="1"
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Start Date
@@ -299,7 +270,6 @@ const CreateProgramPage = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   End Date
@@ -311,7 +281,6 @@ const CreateProgramPage = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Maximum Participants
@@ -324,7 +293,6 @@ const CreateProgramPage = () => {
                   min="1"
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Price (€)
@@ -340,11 +308,9 @@ const CreateProgramPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Requirements */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Requirements</h3>
-            
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -358,7 +324,6 @@ const CreateProgramPage = () => {
                   placeholder="List any prerequisites for this program..."
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Minimum Attendance (%)
@@ -372,7 +337,6 @@ const CreateProgramPage = () => {
                   max="100"
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Passing Score (%)
@@ -386,7 +350,6 @@ const CreateProgramPage = () => {
                   max="100"
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
@@ -405,11 +368,9 @@ const CreateProgramPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Modules */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Modules</h3>
-            
             <div className="space-y-4">
               {modules.map((module, index) => (
                 <div key={module.id} className="p-3 border rounded-md">
@@ -432,7 +393,6 @@ const CreateProgramPage = () => {
                   </div>
                 </div>
               ))}
-              
               <div className="border-t pt-4">
                 <h4 className="font-medium mb-3">Add Module</h4>
                 <div className="space-y-3">
@@ -468,7 +428,6 @@ const CreateProgramPage = () => {
             </div>
           </Card>
         </div>
-        
         <div className="flex justify-end mt-6 space-x-3">
           <Button
             type="button"
@@ -477,7 +436,6 @@ const CreateProgramPage = () => {
           >
             Cancel
           </Button>
-          
           <Button
             type="submit"
             disabled={isLoading}
@@ -500,5 +458,4 @@ const CreateProgramPage = () => {
     </div>
   );
 };
-
 export default CreateProgramPage;

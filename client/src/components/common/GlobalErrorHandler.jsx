@@ -1,71 +1,58 @@
 import React, { useEffect } from 'react';
 import { X, AlertTriangle, CheckCircle, Info, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
-
 /**
  * Global error handler that listens for unhandled errors and displays them
  */
 const GlobalErrorHandler = () => {
   const { addToast } = useToast();
-
   useEffect(() => {
     // Handle unhandled promise rejections
     const handleUnhandledRejection = (event) => {
       console.error('Unhandled promise rejection:', event.reason);
-      
       let message = 'An unexpected error occurred';
       if (event.reason instanceof Error) {
         message = event.reason.message;
       } else if (typeof event.reason === 'string') {
         message = event.reason;
       }
-      
       addToast({
         type: 'error',
         title: 'Error',
         message,
         duration: 5000
       });
-      
       // Prevent the default error handling
       event.preventDefault();
     };
-
     // Handle global errors
     const handleError = (event) => {
       console.error('Global error:', event.error);
-      
       addToast({
         type: 'error',
         title: 'Application Error',
         message: event.error?.message || 'An unexpected error occurred',
         duration: 5000
       });
-      
       // Prevent the default error handling
       event.preventDefault();
     };
-
     // Add event listeners
     window.addEventListener('unhandledrejection', handleUnhandledRejection);
     window.addEventListener('error', handleError);
-
     // Cleanup
     return () => {
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
       window.removeEventListener('error', handleError);
     };
   }, [addToast]);
-
   return null; // This component doesn't render anything
 };
-
 /**
  * Hook to handle errors in a consistent way
  */
 export const useErrorHandler = () => {
   const { addToast } = useToast();
-
   const handleError = (error, options = {}) => {
     const {
       title = 'Error',
@@ -73,12 +60,10 @@ export const useErrorHandler = () => {
       logError = true,
       rethrow = false
     } = options;
-
     // Log error if enabled
     if (logError) {
       console.error(`[${title}]:`, error);
     }
-
     // Extract error message
     let message = 'An unexpected error occurred';
     if (error instanceof Error) {
@@ -90,7 +75,6 @@ export const useErrorHandler = () => {
     } else if (typeof error === 'string') {
       message = error;
     }
-
     // Show toast if enabled
     if (showToast) {
       addToast({
@@ -100,18 +84,14 @@ export const useErrorHandler = () => {
         duration: 5000
       });
     }
-
     // Rethrow if requested
     if (rethrow) {
       throw error;
     }
-
     return { error, message };
   };
-
   return { handleError };
 };
-
 /**
  * Network error interceptor to handle common API errors
  */
@@ -123,7 +103,6 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
       if (error.code === 'ERR_CANCELED') {
         return Promise.reject(error);
       }
-
       // Network error
       if (!error.response) {
         toast.addToast({
@@ -134,10 +113,8 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
         });
         return Promise.reject(error);
       }
-
       // Handle specific status codes
       const { status, data } = error.response;
-      
       switch (status) {
         case 400:
           // Bad request - show error message from server
@@ -148,11 +125,9 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
             duration: 5000
           });
           break;
-          
         case 401:
           // Unauthorized - handled by auth interceptor
           break;
-          
         case 403:
           toast.addToast({
             type: 'error',
@@ -161,7 +136,6 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
             duration: 5000
           });
           break;
-          
         case 404:
           toast.addToast({
             type: 'error',
@@ -170,7 +144,6 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
             duration: 5000
           });
           break;
-          
         case 422:
           // Validation error
           let validationMessage = 'Please check your input and try again';
@@ -180,7 +153,6 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
           } else if (data?.message) {
             validationMessage = data.message;
           }
-          
           toast.addToast({
             type: 'error',
             title: 'Validation Error',
@@ -188,7 +160,6 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
             duration: 5000
           });
           break;
-          
         case 429:
           toast.addToast({
             type: 'error',
@@ -197,7 +168,6 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
             duration: 5000
           });
           break;
-          
         case 500:
         case 502:
         case 503:
@@ -209,7 +179,6 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
             duration: 5000
           });
           break;
-          
         default:
           if (status >= 400) {
             toast.addToast({
@@ -220,12 +189,10 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
             });
           }
       }
-      
       return Promise.reject(error);
     }
   );
 };
-
 /**
  * Enhanced error message component for better UX
  */
@@ -237,10 +204,8 @@ export const ErrorMessage = ({
   className = ''
 }) => {
   if (!error) return null;
-
   let message = 'An unexpected error occurred';
   let details = null;
-
   if (error instanceof Error) {
     message = error.message;
     details = error.stack;
@@ -250,7 +215,6 @@ export const ErrorMessage = ({
   } else if (typeof error === 'string') {
     message = error;
   }
-
   return (
     <div className={`rounded-md bg-red-50 p-4 ${className}`}>
       <div className="flex">
@@ -262,7 +226,6 @@ export const ErrorMessage = ({
           <div className="mt-2 text-sm text-red-700">
             <p>{message}</p>
           </div>
-          
           {showDetails && details && (
             <details className="mt-3">
               <summary className="text-sm text-red-600 cursor-pointer hover:text-red-800">
@@ -273,7 +236,6 @@ export const ErrorMessage = ({
               </pre>
             </details>
           )}
-          
           {onRetry && (
             <div className="mt-4">
               <button
@@ -290,5 +252,4 @@ export const ErrorMessage = ({
     </div>
   );
 };
-
 export default GlobalErrorHandler;

@@ -1,6 +1,5 @@
 import React from 'react';
 import LazyImage from './LazyImage';
-
 const OptimizedPicture = ({
   src,
   alt,
@@ -43,7 +42,6 @@ const OptimizedPicture = ({
       </picture>
     );
   }
-
   // For non-priority images, use LazyImage
   return (
     <picture>
@@ -69,5 +67,4 @@ const OptimizedPicture = ({
     </picture>
   );
 };
-
 export default React.memo(OptimizedPicture);

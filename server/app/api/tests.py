@@ -8,6 +8,8 @@ from app.extensions import db
 from app.models.test import Test, TestSet, Question
 from app.models.user import User
 
+from app.utils.logging import logger
+
 tests_bp = Blueprint('tests', __name__)
 
 @tests_bp.route('/tests', methods=['GET'])

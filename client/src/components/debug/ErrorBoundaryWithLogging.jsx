@@ -2,7 +2,6 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, RefreshCw } from 'lucide-react';
-
 class ErrorBoundaryWithLogging extends React.Component {
   constructor(props) {
     super(props);
@@ -13,15 +12,12 @@ class ErrorBoundaryWithLogging extends React.Component {
       errorCount: 0
     };
   }
-
   static getDerivedStateFromError(error) {
     return { hasError: true };
   }
-
   componentDidCatch(error, errorInfo) {
     // Log error details to console
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
     // Store error details in localStorage for debugging
     const errorLog = {
       timestamp: new Date().toISOString(),
@@ -31,18 +27,14 @@ class ErrorBoundaryWithLogging extends React.Component {
       url: window.location.href,
       userAgent: navigator.userAgent
     };
-    
     // Get existing errors from localStorage
     const existingErrors = JSON.parse(localStorage.getItem('bdc_error_log') || '[]');
     existingErrors.push(errorLog);
-    
     // Keep only last 10 errors
     if (existingErrors.length > 10) {
       existingErrors.shift();
     }
-    
     localStorage.setItem('bdc_error_log', JSON.stringify(existingErrors));
-    
     // Update state
     this.setState(prevState => ({
       error,
@@ -50,20 +42,17 @@ class ErrorBoundaryWithLogging extends React.Component {
       errorCount: prevState.errorCount + 1
     }));
   }
-
   handleReset = () => {
     this.setState({ 
       hasError: false, 
       error: null, 
       errorInfo: null 
     });
-    
     // Optionally reload the page
     if (this.state.errorCount > 2) {
       window.location.reload();
     }
   };
-
   render() {
     if (this.state.hasError) {
       return (
@@ -79,7 +68,6 @@ class ErrorBoundaryWithLogging extends React.Component {
               <p className="text-gray-600">
                 An error occurred while rendering this component. The error has been logged for debugging.
               </p>
-              
               {process.env.NODE_ENV === 'development' && (
                 <div className="space-y-2">
                   <details className="bg-gray-100 p-4 rounded-md">
@@ -102,13 +90,11 @@ class ErrorBoundaryWithLogging extends React.Component {
                       )}
                     </div>
                   </details>
-                  
                   <div className="text-xs text-gray-500">
                     Error #{this.state.errorCount} • Check console for full details
                   </div>
                 </div>
               )}
-              
               <div className="flex gap-2">
                 <Button 
                   onClick={this.handleReset}
@@ -118,14 +104,12 @@ class ErrorBoundaryWithLogging extends React.Component {
                   <RefreshCw className="h-4 w-4" />
                   Try Again
                 </Button>
-                
                 <Button
                   onClick={() => window.history.back()}
                   variant="outline"
                 >
                   Go Back
                 </Button>
-                
                 <Button
                   onClick={() => window.location.href = '/'}
                   variant="outline"
@@ -138,9 +122,7 @@ class ErrorBoundaryWithLogging extends React.Component {
         </div>
       );
     }
-
     return this.props.children;
   }
 }
-
 export default ErrorBoundaryWithLogging;

@@ -4,9 +4,8 @@ import { ArrowLeft, Download, User, Clock, Calendar, CheckCircle, AlertTriangle,
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Tabs } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabTrigger, TabContent } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/toast';
-
 /**
  * TrainerEvaluationDetailPage displays a detailed view of a trainer evaluation
  */
@@ -18,17 +17,14 @@ const TrainerEvaluationDetailPage = () => {
   const [evaluation, setEvaluation] = useState(null);
   const [beneficiary, setBeneficiary] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
-  
   // Fetch evaluation and beneficiary data
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
         // Fetch evaluation data
         const evaluationResponse = await api.get(`/api/trainer-evaluations/${id}`);
         setEvaluation(evaluationResponse.data);
-        
         // Fetch beneficiary data
         const beneficiaryResponse = await api.get(`/api/beneficiaries/${evaluationResponse.data.beneficiary_id}`);
         setBeneficiary(beneficiaryResponse.data);
@@ -43,17 +39,14 @@ const TrainerEvaluationDetailPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchData();
   }, [id, toast]);
-  
   // Handle downloading the evaluation as PDF
   const handleDownloadPDF = async () => {
     try {
       const response = await api.get(`/api/trainer-evaluations/${id}/pdf`, {
         responseType: 'blob',
       });
-      
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -70,12 +63,10 @@ const TrainerEvaluationDetailPage = () => {
       });
     }
   };
-  
   // Handle sharing the evaluation with the beneficiary
   const handleShareWithBeneficiary = async () => {
     try {
       await api.post(`/api/trainer-evaluations/${id}/share`);
-      
       toast({
         title: 'Success',
         description: 'Evaluation has been shared with the beneficiary',
@@ -90,7 +81,6 @@ const TrainerEvaluationDetailPage = () => {
       });
     }
   };
-
   // Render loading state
   if (isLoading) {
     return (
@@ -99,7 +89,6 @@ const TrainerEvaluationDetailPage = () => {
       </div>
     );
   }
-
   // Render empty state if no evaluation data
   if (!evaluation || !beneficiary) {
     return (
@@ -113,12 +102,10 @@ const TrainerEvaluationDetailPage = () => {
       </div>
     );
   }
-
   // Calculate average competency score
   const averageScore = 
     evaluation.competencies.reduce((sum, comp) => sum + comp.score, 0) / 
     evaluation.competencies.length;
-
   return (
     <div className="container mx-auto py-6 max-w-5xl">
       <div className="flex items-center justify-between mb-6">
@@ -133,7 +120,6 @@ const TrainerEvaluationDetailPage = () => {
           </Button>
           <h1 className="text-2xl font-bold">Evaluation Details</h1>
         </div>
-        
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -143,7 +129,6 @@ const TrainerEvaluationDetailPage = () => {
             <Download className="w-4 h-4 mr-2" />
             Download PDF
           </Button>
-          
           <Button
             onClick={handleShareWithBeneficiary}
             className="flex items-center"
@@ -153,30 +138,25 @@ const TrainerEvaluationDetailPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Evaluation header card */}
       <Card className="mb-6 p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h2 className="text-xl font-semibold mb-2">{evaluation.title}</h2>
             <p className="text-gray-700 mb-4">{evaluation.description}</p>
-            
             <div className="flex items-center text-gray-600 mb-2">
               <User className="w-4 h-4 mr-2" />
               <span>Beneficiary: {beneficiary.first_name} {beneficiary.last_name}</span>
             </div>
-            
             <div className="flex items-center text-gray-600 mb-2">
               <Calendar className="w-4 h-4 mr-2" />
               <span>Date: {new Date(evaluation.evaluation_date).toLocaleDateString()}</span>
             </div>
-            
             <div className="flex items-center text-gray-600">
               <User className="w-4 h-4 mr-2" />
               <span>Evaluator: {evaluation.trainer_name || 'Unknown Trainer'}</span>
             </div>
           </div>
-          
           <div className="bg-gray-50 p-4 rounded-lg flex flex-col items-center justify-center">
             <div className="text-center mb-2">
               <h3 className="text-sm font-medium text-gray-500">Average Competency Score</h3>
@@ -185,7 +165,6 @@ const TrainerEvaluationDetailPage = () => {
                 <div className="text-xl text-gray-400 ml-1">/5</div>
               </div>
             </div>
-            
             <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2">
               <div
                 className={`h-1.5 rounded-full ${
@@ -197,7 +176,6 @@ const TrainerEvaluationDetailPage = () => {
                 style={{ width: `${(averageScore / 5) * 100}%` }}
               ></div>
             </div>
-            
             <div className="flex justify-between w-full px-1 mt-1 text-xs text-gray-500">
               <span>Needs Improvement</span>
               <span>Outstanding</span>
@@ -205,30 +183,28 @@ const TrainerEvaluationDetailPage = () => {
           </div>
         </div>
       </Card>
-      
       {/* Evaluation content tabs */}
       <Tabs 
         value={activeTab} 
         onValueChange={setActiveTab}
         className="mb-6"
       >
-        <Tabs.TabsList>
-          <Tabs.TabTrigger value="overview">
+        <TabsList>
+          <TabTrigger value="overview">
             <BarChart2 className="w-4 h-4 mr-2" />
             Overview
-          </Tabs.TabTrigger>
-          <Tabs.TabTrigger value="competencies">
+          </TabTrigger>
+          <TabTrigger value="competencies">
             <Award className="w-4 h-4 mr-2" />
             Competencies
-          </Tabs.TabTrigger>
-          <Tabs.TabTrigger value="development">
+          </TabTrigger>
+          <TabTrigger value="development">
             <CheckCircle className="w-4 h-4 mr-2" />
             Development Plan
-          </Tabs.TabTrigger>
-        </Tabs.TabsList>
-        
+          </TabTrigger>
+        </TabsList>
         {/* Overview tab */}
-        <Tabs.TabContent value="overview">
+        <TabContent value="overview">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Strengths */}
             <Card className="p-6">
@@ -247,7 +223,6 @@ const TrainerEvaluationDetailPage = () => {
                 ))}
               </ul>
             </Card>
-            
             {/* Areas for Improvement */}
             <Card className="p-6">
               <h3 className="font-medium text-lg mb-3 flex items-center text-amber-700">
@@ -266,7 +241,6 @@ const TrainerEvaluationDetailPage = () => {
               </ul>
             </Card>
           </div>
-          
           {/* Overall Feedback */}
           <Card className="p-6 mb-6">
             <h3 className="font-medium text-lg mb-3">Overall Feedback</h3>
@@ -274,13 +248,11 @@ const TrainerEvaluationDetailPage = () => {
               <p className="text-gray-700 whitespace-pre-line">{evaluation.overall_feedback}</p>
             </div>
           </Card>
-        </Tabs.TabContent>
-        
+        </TabContent>
         {/* Competencies tab */}
-        <Tabs.TabContent value="competencies">
+        <TabContent value="competencies">
           <Card className="p-6 mb-6">
             <h3 className="font-medium text-lg mb-4">Competency Assessment</h3>
-            
             <div className="space-y-6">
               {evaluation.competencies.map((competency, index) => (
                 <div key={index} className="border-b border-gray-200 pb-6 last:border-0 last:pb-0">
@@ -310,7 +282,6 @@ const TrainerEvaluationDetailPage = () => {
                       </div>
                     </div>
                   </div>
-                  
                   {competency.notes && (
                     <div className="bg-gray-50 p-3 rounded-lg mt-2">
                       <p className="text-gray-700 text-sm">{competency.notes}</p>
@@ -320,11 +291,9 @@ const TrainerEvaluationDetailPage = () => {
               ))}
             </div>
           </Card>
-          
           {/* Competency visualization */}
           <Card className="p-6">
             <h3 className="font-medium text-lg mb-4">Competency Radar</h3>
-            
             <div className="aspect-square max-w-md mx-auto">
               {/* This would be a radar chart in a real implementation */}
               <div className="h-full rounded-full border border-gray-200 relative">
@@ -336,13 +305,11 @@ const TrainerEvaluationDetailPage = () => {
                   <div className="w-[80%] h-[80%] rounded-full border border-gray-200"></div>
                   <div className="w-full h-full rounded-full border border-gray-200"></div>
                 </div>
-                
                 {/* Radar lines */}
                 {evaluation.competencies.map((_, index) => {
                   const angle = (index / evaluation.competencies.length) * 2 * Math.PI;
                   const x2 = 50 + 50 * Math.sin(angle);
                   const y2 = 50 - 50 * Math.cos(angle);
-                  
                   return (
                     <div 
                       key={index}
@@ -355,14 +322,12 @@ const TrainerEvaluationDetailPage = () => {
                     ></div>
                   );
                 })}
-                
                 {/* Radar points */}
                 {evaluation.competencies.map((competency, index) => {
                   const angle = (index / evaluation.competencies.length) * 2 * Math.PI;
                   const radius = (competency.score / 5) * 50;
                   const x = 50 + radius * Math.sin(angle);
                   const y = 50 - radius * Math.cos(angle);
-                  
                   return (
                     <div 
                       key={index}
@@ -375,13 +340,11 @@ const TrainerEvaluationDetailPage = () => {
                     ></div>
                   );
                 })}
-                
                 {/* Labels */}
                 {evaluation.competencies.map((competency, index) => {
                   const angle = (index / evaluation.competencies.length) * 2 * Math.PI;
                   const x = 50 + 60 * Math.sin(angle);
                   const y = 50 - 60 * Math.cos(angle);
-                  
                   return (
                     <div 
                       key={index}
@@ -400,10 +363,9 @@ const TrainerEvaluationDetailPage = () => {
               </div>
             </div>
           </Card>
-        </Tabs.TabContent>
-        
+        </TabContent>
         {/* Development Plan tab */}
-        <Tabs.TabContent value="development">
+        <TabContent value="development">
           {/* Action Plan */}
           <Card className="p-6 mb-6">
             <h3 className="font-medium text-lg mb-3">Action Plan</h3>
@@ -411,11 +373,9 @@ const TrainerEvaluationDetailPage = () => {
               <p className="text-gray-700 whitespace-pre-line">{evaluation.action_plan}</p>
             </div>
           </Card>
-          
           {/* Development Goals */}
           <Card className="p-6">
             <h3 className="font-medium text-lg mb-4">Development Goals</h3>
-            
             <div className="space-y-4">
               {evaluation.goals.map((goal, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-4">
@@ -425,7 +385,6 @@ const TrainerEvaluationDetailPage = () => {
                     </div>
                     <h4 className="font-medium text-gray-900">{goal.description}</h4>
                   </div>
-                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-11">
                     <div>
                       <p className="text-sm text-gray-500 mb-1">Timeline</p>
@@ -434,7 +393,6 @@ const TrainerEvaluationDetailPage = () => {
                         {goal.timeline}
                       </p>
                     </div>
-                    
                     <div>
                       <p className="text-sm text-gray-500 mb-1">Success Criteria</p>
                       <p className="text-gray-700 flex items-center">
@@ -447,10 +405,9 @@ const TrainerEvaluationDetailPage = () => {
               ))}
             </div>
           </Card>
-        </Tabs.TabContent>
+        </TabContent>
       </Tabs>
     </div>
   );
 };
-
 export default TrainerEvaluationDetailPage;

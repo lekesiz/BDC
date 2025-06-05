@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart3, Zap, Clock, TrendingUp } from 'lucide-react';
-
 /**
  * Performance monitoring component that tracks Core Web Vitals
  */
@@ -18,12 +17,10 @@ export const PerformanceMonitor = ({
     ttfb: null
   });
   const [isVisible, setIsVisible] = useState(true);
-
   useEffect(() => {
     if (process.env.NODE_ENV === 'production' && !showInProduction) {
       return;
     }
-
     // Track Largest Contentful Paint
     const lcpObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
@@ -31,7 +28,6 @@ export const PerformanceMonitor = ({
       setMetrics(prev => ({ ...prev, lcp: Math.round(lastEntry.renderTime || lastEntry.loadTime) }));
     });
     lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-
     // Track First Input Delay
     const fidObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
@@ -39,7 +35,6 @@ export const PerformanceMonitor = ({
       setMetrics(prev => ({ ...prev, fid: Math.round(firstEntry.processingStart - firstEntry.startTime) }));
     });
     fidObserver.observe({ entryTypes: ['first-input'] });
-
     // Track Cumulative Layout Shift
     let clsValue = 0;
     const clsObserver = new PerformanceObserver((list) => {
@@ -51,7 +46,6 @@ export const PerformanceMonitor = ({
       }
     });
     clsObserver.observe({ entryTypes: ['layout-shift'] });
-
     // Track First Contentful Paint
     const fcpObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
@@ -61,13 +55,11 @@ export const PerformanceMonitor = ({
       }
     });
     fcpObserver.observe({ entryTypes: ['paint'] });
-
     // Track Time to First Byte
     const navigationEntry = performance.getEntriesByType('navigation')[0];
     if (navigationEntry) {
       setMetrics(prev => ({ ...prev, ttfb: Math.round(navigationEntry.responseStart - navigationEntry.requestStart) }));
     }
-
     // Auto-hide after delay
     if (autoHide) {
       const timer = setTimeout(() => {
@@ -75,7 +67,6 @@ export const PerformanceMonitor = ({
       }, hideDelay);
       return () => clearTimeout(timer);
     }
-
     return () => {
       lcpObserver.disconnect();
       fidObserver.disconnect();
@@ -83,18 +74,14 @@ export const PerformanceMonitor = ({
       fcpObserver.disconnect();
     };
   }, [showInProduction, autoHide, hideDelay]);
-
   if (process.env.NODE_ENV === 'production' && !showInProduction) {
     return null;
   }
-
   if (!isVisible) {
     return null;
   }
-
   const getMetricColor = (metric, value) => {
     if (value === null) return 'text-gray-500';
-    
     switch (metric) {
       case 'lcp':
         return value <= 2500 ? 'text-green-500' : value <= 4000 ? 'text-yellow-500' : 'text-red-500';
@@ -110,14 +97,12 @@ export const PerformanceMonitor = ({
         return 'text-gray-500';
     }
   };
-
   const positionClasses = {
     'top-left': 'top-4 left-4',
     'top-right': 'top-4 right-4',
     'bottom-left': 'bottom-4 left-4',
     'bottom-right': 'bottom-4 right-4'
   };
-
   return (
     <div className={`fixed ${positionClasses[position]} z-50`}>
       <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 min-w-[250px]">
@@ -130,7 +115,6 @@ export const PerformanceMonitor = ({
             ×
           </button>
         </div>
-        
         <div className="space-y-2">
           <MetricRow
             icon={<TrendingUp className="w-4 h-4" />}
@@ -140,7 +124,6 @@ export const PerformanceMonitor = ({
             color={getMetricColor('lcp', metrics.lcp)}
             tooltip="Largest Contentful Paint"
           />
-          
           <MetricRow
             icon={<Zap className="w-4 h-4" />}
             label="FID"
@@ -149,7 +132,6 @@ export const PerformanceMonitor = ({
             color={getMetricColor('fid', metrics.fid)}
             tooltip="First Input Delay"
           />
-          
           <MetricRow
             icon={<BarChart3 className="w-4 h-4" />}
             label="CLS"
@@ -158,7 +140,6 @@ export const PerformanceMonitor = ({
             color={getMetricColor('cls', metrics.cls)}
             tooltip="Cumulative Layout Shift"
           />
-          
           <MetricRow
             icon={<Clock className="w-4 h-4" />}
             label="FCP"
@@ -167,7 +148,6 @@ export const PerformanceMonitor = ({
             color={getMetricColor('fcp', metrics.fcp)}
             tooltip="First Contentful Paint"
           />
-          
           <MetricRow
             icon={<Clock className="w-4 h-4" />}
             label="TTFB"
@@ -181,7 +161,6 @@ export const PerformanceMonitor = ({
     </div>
   );
 };
-
 const MetricRow = ({ icon, label, value, unit, color, tooltip }) => (
   <div className="flex items-center justify-between" title={tooltip}>
     <div className="flex items-center gap-2">
@@ -193,7 +172,6 @@ const MetricRow = ({ icon, label, value, unit, color, tooltip }) => (
     </span>
   </div>
 );
-
 /**
  * Hook to track performance metrics
  */
@@ -203,17 +181,14 @@ export const usePerformanceMetrics = () => {
     componentLoadTime: null,
     dataFetchTime: null
   });
-
   useEffect(() => {
     const startTime = performance.now();
-    
     return () => {
       const endTime = performance.now();
       const renderTime = Math.round(endTime - startTime);
       setMetrics(prev => ({ ...prev, renderTime }));
     };
   }, []);
-
   const trackDataFetch = async (fetchFunction) => {
     const startTime = performance.now();
     try {
@@ -226,10 +201,8 @@ export const usePerformanceMetrics = () => {
       throw error;
     }
   };
-
   return { metrics, trackDataFetch };
 };
-
 /**
  * Performance boundary to catch performance issues
  */
@@ -238,7 +211,6 @@ export class PerformanceBoundary extends React.Component {
     super(props);
     this.state = { hasPerformanceIssue: false };
   }
-
   componentDidCatch(error, errorInfo) {
     // Log performance issues
     if (error.message.includes('performance')) {
@@ -246,7 +218,6 @@ export class PerformanceBoundary extends React.Component {
       this.setState({ hasPerformanceIssue: true });
     }
   }
-
   render() {
     if (this.state.hasPerformanceIssue) {
       return (
@@ -258,7 +229,6 @@ export class PerformanceBoundary extends React.Component {
         </div>
       );
     }
-
     return this.props.children;
   }
 }

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { ArrowUpRight, TrendingUp, TrendingDown } from 'lucide-react';
-
 /**
  * Responsive dashboard widget component
  * Adapts layout and content based on screen size
@@ -28,26 +27,22 @@ export const ResponsiveWidget = ({
     default: 'p-4 sm:p-6',
     large: 'p-6 sm:p-8'
   };
-
   const iconSizes = {
     compact: 'h-8 w-8 sm:h-10 sm:w-10',
     default: 'h-10 w-10 sm:h-12 sm:w-12',
     large: 'h-12 w-12 sm:h-14 sm:w-14'
   };
-
   const valueSizes = {
     compact: 'text-xl sm:text-2xl',
     default: 'text-2xl sm:text-3xl',
     large: 'text-3xl sm:text-4xl'
   };
-
   // Hide low priority widgets on very small screens
   const priorityClasses = {
     high: '',
     normal: '',
     low: 'hidden xs:block'
   };
-
   if (loading) {
     return (
       <Card className={cn('animate-pulse', className)}>
@@ -63,7 +58,6 @@ export const ResponsiveWidget = ({
       </Card>
     );
   }
-
   if (error) {
     return (
       <Card className={cn('border-red-200 dark:border-red-800', className)}>
@@ -73,7 +67,6 @@ export const ResponsiveWidget = ({
       </Card>
     );
   }
-
   return (
     <Card className={cn(
       'hover:shadow-md transition-shadow',
@@ -130,7 +123,6 @@ export const ResponsiveWidget = ({
     </Card>
   );
 };
-
 /**
  * Responsive widget grid component
  * Automatically adjusts grid layout based on screen size
@@ -148,7 +140,6 @@ export const ResponsiveWidgetGrid = ({
     4: 'grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
     6: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6'
   };
-
   return (
     <div className={cn(
       'grid gap-3 sm:gap-4 lg:gap-6',
@@ -159,7 +150,6 @@ export const ResponsiveWidgetGrid = ({
     </div>
   );
 };
-
 /**
  * Mobile-optimized activity feed widget
  */
@@ -189,7 +179,6 @@ export const ActivityWidget = ({
       </Card>
     );
   }
-
   return (
     <Card className={className}>
       <CardHeader className="pb-3">

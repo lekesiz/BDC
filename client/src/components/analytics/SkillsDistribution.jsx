@@ -1,6 +1,5 @@
 import React from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, ResponsiveContainer, Tooltip } from 'recharts';
-
 /**
  * SkillsDistribution component displays the distribution of skills among beneficiaries
  * @param {Object} props - Component props
@@ -14,7 +13,6 @@ export const SkillsDistribution = ({ data = [] }) => {
       </div>
     );
   }
-  
   // Format data for radar chart if needed
   const chartData = data.map(item => ({
     skill: item.name,
@@ -22,7 +20,6 @@ export const SkillsDistribution = ({ data = [] }) => {
     postTraining: item.postTraining,
     industryAverage: item.industryAverage
   }));
-  
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
@@ -58,5 +55,4 @@ export const SkillsDistribution = ({ data = [] }) => {
     </div>
   );
 };
-
 export default SkillsDistribution;

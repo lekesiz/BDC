@@ -19,19 +19,16 @@ import {
   Video,
   Edit
 } from 'lucide-react';
-
 const ProgramSchedulePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [program, setProgram] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [editingSession, setEditingSession] = useState(null);
   const [showAddSession, setShowAddSession] = useState(false);
-  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -44,12 +41,10 @@ const ProgramSchedulePage = () => {
     meeting_link: '',
     capacity: 30
   });
-
   useEffect(() => {
     fetchProgramDetails();
     fetchProgramSessions();
   }, [id]);
-
   const fetchProgramDetails = async () => {
     try {
       const res = await fetch(`/api/programs/${id}`, {
@@ -57,9 +52,7 @@ const ProgramSchedulePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch program');
-
       const data = await res.json();
       setProgram(data);
     } catch (error) {
@@ -71,7 +64,6 @@ const ProgramSchedulePage = () => {
       });
     }
   };
-
   const fetchProgramSessions = async () => {
     try {
       const res = await fetch(`/api/programs/${id}/sessions`, {
@@ -79,9 +71,7 @@ const ProgramSchedulePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch sessions');
-
       const data = await res.json();
       setSessions(data);
     } catch (error) {
@@ -95,25 +85,20 @@ const ProgramSchedulePage = () => {
       setLoading(false);
     }
   };
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-
     try {
       const url = editingSession
         ? `/api/programs/${id}/sessions/${editingSession.id}`
         : `/api/programs/${id}/sessions`;
-      
       const method = editingSession ? 'PUT' : 'POST';
-
       const res = await fetch(url, {
         method,
         headers: {
@@ -122,14 +107,11 @@ const ProgramSchedulePage = () => {
         },
         body: JSON.stringify(formData)
       });
-
       if (!res.ok) throw new Error('Failed to save session');
-
       toast({
         title: 'Success',
         description: editingSession ? 'Session updated successfully' : 'Session created successfully'
       });
-
       fetchProgramSessions();
       resetForm();
     } catch (error) {
@@ -143,7 +125,6 @@ const ProgramSchedulePage = () => {
       setSaving(false);
     }
   };
-
   const handleEditSession = (session) => {
     setEditingSession(session);
     setFormData({
@@ -160,10 +141,8 @@ const ProgramSchedulePage = () => {
     });
     setShowAddSession(true);
   };
-
   const handleDeleteSession = async (sessionId) => {
     if (!confirm('Are you sure you want to delete this session?')) return;
-
     try {
       const res = await fetch(`/api/programs/${id}/sessions/${sessionId}`, {
         method: 'DELETE',
@@ -171,14 +150,11 @@ const ProgramSchedulePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to delete session');
-
       toast({
         title: 'Success',
         description: 'Session deleted successfully'
       });
-
       fetchProgramSessions();
     } catch (error) {
       console.error('Error deleting session:', error);
@@ -189,7 +165,6 @@ const ProgramSchedulePage = () => {
       });
     }
   };
-
   const resetForm = () => {
     setFormData({
       title: '',
@@ -206,7 +181,6 @@ const ProgramSchedulePage = () => {
     setEditingSession(null);
     setShowAddSession(false);
   };
-
   const getTypeColor = (type) => {
     switch (type) {
       case 'lecture':
@@ -223,7 +197,6 @@ const ProgramSchedulePage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -231,7 +204,6 @@ const ProgramSchedulePage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -248,20 +220,17 @@ const ProgramSchedulePage = () => {
             Schedule for {program?.name}
           </h1>
         </div>
-        
         <Button onClick={() => setShowAddSession(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add Session
         </Button>
       </div>
-
       {/* Add/Edit Session Form */}
       {showAddSession && (
         <Card className="p-6">
           <h2 className="text-lg font-semibold mb-4">
             {editingSession ? 'Edit Session' : 'Add New Session'}
           </h2>
-          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -277,7 +246,6 @@ const ProgramSchedulePage = () => {
                   placeholder="Enter session title"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Type *
@@ -295,7 +263,6 @@ const ProgramSchedulePage = () => {
                   <option value="online">Online</option>
                 </Select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Date *
@@ -308,7 +275,6 @@ const ProgramSchedulePage = () => {
                   required
                 />
               </div>
-
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -335,7 +301,6 @@ const ProgramSchedulePage = () => {
                   />
                 </div>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Location
@@ -348,7 +313,6 @@ const ProgramSchedulePage = () => {
                   placeholder="Enter location"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Meeting Link
@@ -361,7 +325,6 @@ const ProgramSchedulePage = () => {
                   placeholder="Enter online meeting link"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Capacity
@@ -375,7 +338,6 @@ const ProgramSchedulePage = () => {
                 />
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description
@@ -388,7 +350,6 @@ const ProgramSchedulePage = () => {
                 placeholder="Enter session description"
               />
             </div>
-
             <div className="flex gap-3">
               <Button type="submit" disabled={saving}>
                 {saving ? (
@@ -407,13 +368,11 @@ const ProgramSchedulePage = () => {
           </form>
         </Card>
       )}
-
       {/* Sessions List */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">
           Sessions ({sessions.length})
         </h2>
-        
         {sessions.length === 0 ? (
           <div className="text-center py-12">
             <CalendarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -435,7 +394,6 @@ const ProgramSchedulePage = () => {
                         {session.type}
                       </Badge>
                     </div>
-                    
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                       <div className="flex items-center">
                         <CalendarIcon className="h-4 w-4 mr-1" />
@@ -460,12 +418,10 @@ const ProgramSchedulePage = () => {
                         </div>
                       )}
                     </div>
-                    
                     {session.description && (
                       <p className="text-sm text-gray-500 mt-2">{session.description}</p>
                     )}
                   </div>
-                  
                   <div className="flex gap-2 ml-4">
                     <Button
                       variant="ghost"
@@ -492,5 +448,4 @@ const ProgramSchedulePage = () => {
     </div>
   );
 };
-
 export default ProgramSchedulePage;

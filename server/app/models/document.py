@@ -1,7 +1,7 @@
 """Document model module."""
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Boolean, JSON
 from sqlalchemy.orm import relationship
 
 from app.extensions import db
@@ -24,10 +24,30 @@ class Document(db.Model):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    # Versioning fields
+    current_version = Column(Integer, default=1)
+    version_control_enabled = Column(Boolean, default=False)
+    max_versions = Column(Integer, default=10)  # Maximum versions to keep
+    
+    # Additional metadata
+    tags = Column(JSON)
+    category = Column(String(50))
+    tenant_id = Column(Integer, ForeignKey('tenants.id'), nullable=True)
+    
+    # File metadata
+    filename = Column(String(255))
+    mime_type = Column(String(100))
+    file_hash = Column(String(64))  # SHA-256 hash
+    
+    # Access tracking
+    download_count = Column(Integer, default=0)
+    last_accessed_at = Column(DateTime)
+    
     # Relationships
     uploader = relationship('User', backref='uploaded_documents', lazy='select')
     beneficiary = relationship('Beneficiary', back_populates='documents', lazy='select')
     evaluation = relationship('Evaluation', backref='documents', lazy='select')
+    tenant = relationship('Tenant', backref='documents')
     
     def to_dict(self):
         """Return a dict representation of the document."""
@@ -44,6 +64,14 @@ class Document(db.Model):
             'uploader_name': f"{self.uploader.first_name} {self.uploader.last_name}" if self.uploader else None,
             'beneficiary_id': self.beneficiary_id,
             'evaluation_id': self.evaluation_id,
+            'current_version': self.current_version,
+            'version_control_enabled': self.version_control_enabled,
+            'tags': self.tags,
+            'category': self.category,
+            'filename': self.filename,
+            'mime_type': self.mime_type,
+            'download_count': self.download_count,
+            'last_accessed_at': self.last_accessed_at.isoformat() if self.last_accessed_at else None,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

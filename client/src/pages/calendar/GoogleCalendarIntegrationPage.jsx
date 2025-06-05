@@ -18,12 +18,10 @@ import {
   Unlink,
   AlertTriangle
 } from 'lucide-react';
-
 const GoogleCalendarIntegrationPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [integration, setIntegration] = useState(null);
@@ -35,11 +33,9 @@ const GoogleCalendarIntegrationPage = () => {
     calendar_id: '',
     webhook_url: ''
   });
-
   useEffect(() => {
     fetchIntegrationStatus();
   }, []);
-
   const fetchIntegrationStatus = async () => {
     try {
       const res = await fetch('/api/integrations/google-calendar', {
@@ -47,12 +43,9 @@ const GoogleCalendarIntegrationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch integration status');
-
       const data = await res.json();
       setIntegration(data);
-      
       if (data.connected) {
         setSyncSettings(data.settings || syncSettings);
       }
@@ -67,7 +60,6 @@ const GoogleCalendarIntegrationPage = () => {
       setLoading(false);
     }
   };
-
   const handleConnect = async () => {
     try {
       const res = await fetch('/api/integrations/google-calendar/auth-url', {
@@ -75,11 +67,8 @@ const GoogleCalendarIntegrationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to get auth URL');
-
       const { auth_url } = await res.json();
-      
       // Redirect to Google OAuth
       window.location.href = auth_url;
     } catch (error) {
@@ -91,12 +80,10 @@ const GoogleCalendarIntegrationPage = () => {
       });
     }
   };
-
   const handleDisconnect = async () => {
     if (!confirm('Are you sure you want to disconnect Google Calendar? This will stop all syncing.')) {
       return;
     }
-
     try {
       const res = await fetch('/api/integrations/google-calendar/disconnect', {
         method: 'POST',
@@ -104,14 +91,11 @@ const GoogleCalendarIntegrationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to disconnect');
-
       toast({
         title: 'Success',
         description: 'Google Calendar disconnected successfully'
       });
-
       setIntegration({ connected: false });
       setSyncSettings({
         sync_enabled: false,
@@ -130,7 +114,6 @@ const GoogleCalendarIntegrationPage = () => {
       });
     }
   };
-
   const handleSync = async () => {
     setSaving(true);
     try {
@@ -140,16 +123,12 @@ const GoogleCalendarIntegrationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to sync');
-
       const { synced_events, errors } = await res.json();
-      
       toast({
         title: 'Sync Complete',
         description: `Synced ${synced_events} events${errors > 0 ? `, ${errors} errors` : ''}`
       });
-
       fetchIntegrationStatus();
     } catch (error) {
       console.error('Error syncing:', error);
@@ -162,14 +141,12 @@ const GoogleCalendarIntegrationPage = () => {
       setSaving(false);
     }
   };
-
   const handleSettingsChange = (field, value) => {
     setSyncSettings({
       ...syncSettings,
       [field]: value
     });
   };
-
   const handleSaveSettings = async () => {
     setSaving(true);
     try {
@@ -181,9 +158,7 @@ const GoogleCalendarIntegrationPage = () => {
         },
         body: JSON.stringify(syncSettings)
       });
-
       if (!res.ok) throw new Error('Failed to save settings');
-
       toast({
         title: 'Success',
         description: 'Settings saved successfully'
@@ -199,7 +174,6 @@ const GoogleCalendarIntegrationPage = () => {
       setSaving(false);
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -207,13 +181,11 @@ const GoogleCalendarIntegrationPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Google Calendar Integration</h1>
       </div>
-
       {/* Connection Status */}
       <Card className="p-6">
         <div className="flex items-center justify-between">
@@ -226,7 +198,6 @@ const GoogleCalendarIntegrationPage = () => {
               </p>
             </div>
           </div>
-
           {integration?.connected ? (
             <div className="flex items-center gap-3">
               <Badge variant="success">
@@ -245,7 +216,6 @@ const GoogleCalendarIntegrationPage = () => {
             </Button>
           )}
         </div>
-
         {integration?.connected && integration.account_email && (
           <div className="mt-4 p-4 bg-gray-50 rounded">
             <p className="text-sm text-gray-600">
@@ -257,7 +227,6 @@ const GoogleCalendarIntegrationPage = () => {
           </div>
         )}
       </Card>
-
       {/* Sync Settings */}
       {integration?.connected && (
         <>
@@ -275,7 +244,6 @@ const GoogleCalendarIntegrationPage = () => {
                   Sync Now
                 </Button>
               </div>
-
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -289,10 +257,8 @@ const GoogleCalendarIntegrationPage = () => {
                     onCheckedChange={(checked) => handleSettingsChange('sync_enabled', checked)}
                   />
                 </div>
-
                 <div className="border-t pt-4 space-y-3">
                   <h3 className="font-medium text-gray-900">Event Types to Sync</h3>
-                  
                   <label className="flex items-center gap-3">
                     <input
                       type="checkbox"
@@ -305,7 +271,6 @@ const GoogleCalendarIntegrationPage = () => {
                       <p className="text-sm text-gray-600">Sync training appointments</p>
                     </div>
                   </label>
-
                   <label className="flex items-center gap-3">
                     <input
                       type="checkbox"
@@ -318,7 +283,6 @@ const GoogleCalendarIntegrationPage = () => {
                       <p className="text-sm text-gray-600">Sync program schedule sessions</p>
                     </div>
                   </label>
-
                   <label className="flex items-center gap-3">
                     <input
                       type="checkbox"
@@ -332,7 +296,6 @@ const GoogleCalendarIntegrationPage = () => {
                     </div>
                   </label>
                 </div>
-
                 <div className="border-t pt-4">
                   <label className="block">
                     <p className="font-medium mb-1">Calendar ID (Optional)</p>
@@ -348,7 +311,6 @@ const GoogleCalendarIntegrationPage = () => {
                   </label>
                 </div>
               </div>
-
               <div className="flex justify-end">
                 <Button 
                   onClick={handleSaveSettings}
@@ -369,11 +331,9 @@ const GoogleCalendarIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           {/* Sync History */}
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Recent Sync Activity</h2>
-            
             {integration.sync_history && integration.sync_history.length > 0 ? (
               <div className="space-y-3">
                 {integration.sync_history.map((entry, index) => (
@@ -397,7 +357,6 @@ const GoogleCalendarIntegrationPage = () => {
           </Card>
         </>
       )}
-
       {/* Help Section */}
       <Card className="p-6 bg-blue-50 border-blue-200">
         <div className="flex gap-3">
@@ -414,5 +373,4 @@ const GoogleCalendarIntegrationPage = () => {
     </div>
   );
 };
-
 export default GoogleCalendarIntegrationPage;

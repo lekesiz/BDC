@@ -12,9 +12,12 @@ from app.schemas import (
     ResponseSchema, ResponseCreateSchema,
     AIFeedbackSchema, AIFeedbackUpdateSchema
 )
+from app.services import QuestionService
 from app.services.evaluation_service_factory import EvaluationServiceFactory
 from app.middleware.request_context import auth_required, role_required
 from app.utils import cache_response
+
+from app.utils.logging import logger
 
 
 evaluations_bp = Blueprint('evaluations', __name__)
@@ -22,9 +25,7 @@ evaluations_bp = Blueprint('evaluations', __name__)
 # Create service instance
 evaluation_service = EvaluationServiceFactory.create()
 
-# Import additional endpoints
-from app.api.evaluations_endpoints import register_additional_routes
-register_additional_routes(evaluations_bp)
+# Additional endpoints can be added here if needed
 
 
 @evaluations_bp.route('', methods=['GET'])
@@ -155,8 +156,36 @@ def get_evaluation(id):
                     'message': 'You do not have permission to access this evaluation'
                 }), 403
         
-        # Get questions
-        questions, _, _ = QuestionService.get_questions(evaluation.id, per_page=100)
+        # Get questions - check if we need randomized order
+        if current_user.role == 'student':
+            # For students, get questions in randomized order if this is part of an active session
+            from app.services.evaluation_service import TestSessionService
+            
+            # Try to find an active session for this student
+            from app.models import Beneficiary
+            beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+            if beneficiary:
+                active_session = TestSession.query.filter_by(
+                    test_set_id=evaluation.id,
+                    beneficiary_id=beneficiary.id,
+                    status='in_progress'
+                ).first()
+                
+                if active_session:
+                    questions, answer_mappings = TestSessionService.get_randomized_questions(active_session.id)
+                    if questions is None:
+                        questions, _, _ = QuestionService.get_questions(evaluation.id, per_page=100)
+                        answer_mappings = {}
+                else:
+                    questions, _, _ = QuestionService.get_questions(evaluation.id, per_page=100)
+                    answer_mappings = {}
+            else:
+                questions, _, _ = QuestionService.get_questions(evaluation.id, per_page=100)
+                answer_mappings = {}
+        else:
+            # For non-students, get regular order
+            questions, _, _ = QuestionService.get_questions(evaluation.id, per_page=100)
+            answer_mappings = {}
         
         # Serialize data
         schema = EvaluationSchema()
@@ -164,7 +193,26 @@ def get_evaluation(id):
         
         # Add questions to the result
         question_schema = QuestionSchema(many=True)
-        result['questions'] = question_schema.dump(questions)
+        serialized_questions = question_schema.dump(questions)
+        
+        # Apply answer randomization if needed
+        if answer_mappings:
+            for q_data in serialized_questions:
+                q_id = str(q_data['id'])
+                if q_id in answer_mappings and q_data.get('options'):
+                    # Reorder options based on mapping
+                    original_options = q_data['options']
+                    mapping = answer_mappings[q_id]
+                    
+                    # Create new options array
+                    new_options = [None] * len(original_options)
+                    for original_idx, new_idx in mapping.items():
+                        if int(original_idx) < len(original_options):
+                            new_options[new_idx] = original_options[int(original_idx)]
+                    
+                    q_data['options'] = [opt for opt in new_options if opt is not None]
+        
+        result['questions'] = serialized_questions
         
         # Return evaluation
         return jsonify(result), 200
@@ -730,6 +778,244 @@ def get_sessions():
     
     except Exception as e:
         current_app.logger.exception(f"Get sessions error: {str(e)}")
+        return jsonify({
+            'error': 'server_error',
+            'message': 'An unexpected error occurred'
+        }), 500
+
+
+@evaluations_bp.route('/<int:id>/submit', methods=['POST'])
+@jwt_required()
+def submit_evaluation(id):
+    """Submit responses for an evaluation."""
+    try:
+        # Get evaluation
+        evaluation = evaluation_service.get_evaluation_by_id(id)
+        
+        if not evaluation:
+            return jsonify({
+                'error': 'not_found',
+                'message': 'Evaluation not found'
+            }), 404
+        
+        # Check permissions - only the assigned beneficiary can submit
+        if current_user.role == 'student':
+            from app.models import Beneficiary
+            beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+            beneficiary_id = beneficiary.id if beneficiary else None
+            if not beneficiary_id or evaluation.beneficiary_id != beneficiary_id:
+                return jsonify({
+                    'error': 'forbidden',
+                    'message': 'You do not have permission to submit this evaluation'
+                }), 403
+        else:
+            return jsonify({
+                'error': 'forbidden',
+                'message': 'Only students can submit evaluations'
+            }), 403
+        
+        # Get or create test session
+        from app.services import TestSessionService
+        session = TestSessionService.get_active_session(evaluation.id, beneficiary_id)
+        if not session:
+            session = TestSessionService.create_session({
+                'evaluation_id': evaluation.id,
+                'beneficiary_id': beneficiary_id,
+                'status': 'in_progress'
+            })
+        
+        # Save responses
+        responses = request.json.get('responses', [])
+        from app.services import ResponseService
+        for response_data in responses:
+            response_data['session_id'] = session.id
+            response_data['beneficiary_id'] = beneficiary_id
+            ResponseService.create_response(response_data)
+        
+        # Mark session as completed
+        TestSessionService.update_session(session.id, {'status': 'completed'})
+        
+        # Calculate score
+        from app.services import EvaluationScoringService
+        score = EvaluationScoringService.calculate_score(session.id)
+        TestSessionService.update_session(session.id, {'score': score})
+        
+        return jsonify({
+            'message': 'Evaluation submitted successfully',
+            'session_id': session.id,
+            'score': score
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.exception(f"Submit evaluation error: {str(e)}")
+        return jsonify({
+            'error': 'server_error',
+            'message': 'An unexpected error occurred'
+        }), 500
+
+
+@evaluations_bp.route('/<int:id>/results', methods=['GET'])
+@jwt_required()
+def get_evaluation_results(id):
+    """Get results for an evaluation."""
+    try:
+        # Get evaluation
+        evaluation = evaluation_service.get_evaluation_by_id(id)
+        
+        if not evaluation:
+            return jsonify({
+                'error': 'not_found',
+                'message': 'Evaluation not found'
+            }), 404
+        
+        # Check permissions
+        beneficiary_id = None
+        if current_user.role == 'student':
+            from app.models import Beneficiary
+            beneficiary = Beneficiary.query.filter_by(user_id=current_user.id).first()
+            beneficiary_id = beneficiary.id if beneficiary else None
+            if not beneficiary_id or evaluation.beneficiary_id != beneficiary_id:
+                return jsonify({
+                    'error': 'forbidden',
+                    'message': 'You do not have permission to view these results'
+                }), 403
+        elif current_user.role == 'trainer':
+            # Trainers can view results of their evaluations or beneficiaries
+            if evaluation.creator_id != current_user.id:
+                from app.models import Beneficiary
+                beneficiary = Beneficiary.query.get(evaluation.beneficiary_id)
+                if not beneficiary or beneficiary.trainer_id != current_user.id:
+                    return jsonify({
+                        'error': 'forbidden',
+                        'message': 'You do not have permission to view these results'
+                    }), 403
+            beneficiary_id = request.args.get('beneficiary_id', type=int) or evaluation.beneficiary_id
+        else:
+            beneficiary_id = request.args.get('beneficiary_id', type=int) or evaluation.beneficiary_id
+        
+        # Get test session
+        from app.services import TestSessionService
+        session = TestSessionService.get_latest_session(evaluation.id, beneficiary_id)
+        
+        if not session:
+            return jsonify({
+                'error': 'not_found',
+                'message': 'No completed evaluation session found'
+            }), 404
+        
+        # Get responses
+        from app.services import ResponseService
+        responses = ResponseService.get_session_responses(session.id)
+        
+        # Get AI feedback if available
+        from app.services import AIFeedbackService
+        ai_feedback = AIFeedbackService.get_session_feedback(session.id)
+        
+        result = {
+            'evaluation_id': evaluation.id,
+            'evaluation_title': evaluation.title,
+            'session_id': session.id,
+            'beneficiary_id': beneficiary_id,
+            'score': session.score,
+            'status': session.status,
+            'started_at': session.started_at.isoformat() if session.started_at else None,
+            'completed_at': session.completed_at.isoformat() if session.completed_at else None,
+            'responses': ResponseSchema(many=True).dump(responses),
+            'ai_feedback': AIFeedbackSchema(many=True).dump(ai_feedback) if ai_feedback else []
+        }
+        
+        return jsonify(result), 200
+        
+    except Exception as e:
+        current_app.logger.exception(f"Get evaluation results error: {str(e)}")
+        return jsonify({
+            'error': 'server_error',
+            'message': 'An unexpected error occurred'
+        }), 500
+
+
+@evaluations_bp.route('/<int:id>/analyze', methods=['POST'])
+@jwt_required()
+@role_required(['super_admin', 'tenant_admin', 'trainer'])
+def analyze_evaluation(id):
+    """Analyze evaluation results using AI."""
+    try:
+        # Get evaluation
+        evaluation = evaluation_service.get_evaluation_by_id(id)
+        
+        if not evaluation:
+            return jsonify({
+                'error': 'not_found',
+                'message': 'Evaluation not found'
+            }), 404
+        
+        # Check permissions
+        if current_user.role == 'tenant_admin':
+            tenant_id = current_user.tenants[0].id if current_user.tenants else None
+            if not tenant_id or evaluation.tenant_id != tenant_id:
+                return jsonify({
+                    'error': 'forbidden',
+                    'message': 'You do not have permission to analyze this evaluation'
+                }), 403
+        elif current_user.role == 'trainer':
+            if evaluation.creator_id != current_user.id:
+                return jsonify({
+                    'error': 'forbidden',
+                    'message': 'You do not have permission to analyze this evaluation'
+                }), 403
+        
+        # Get session to analyze
+        session_id = request.json.get('session_id')
+        if not session_id:
+            return jsonify({
+                'error': 'validation_error',
+                'message': 'Session ID is required'
+            }), 400
+        
+        # Perform AI analysis
+        from app.services.ai import AIService
+        from app.services import ResponseService
+        
+        # Get responses for the session
+        responses = ResponseService.get_session_responses(session_id)
+        
+        # Prepare data for AI analysis
+        response_data = []
+        for response in responses:
+            question = response.question
+            response_data.append({
+                'question': question.text,
+                'question_type': question.question_type,
+                'response': response.answer_text or response.answer_choice,
+                'correct_answer': question.correct_answer
+            })
+        
+        # Get AI analysis
+        analysis = AIService.analyze_evaluation_responses(
+            evaluation_title=evaluation.title,
+            responses=response_data
+        )
+        
+        # Save AI feedback
+        from app.services import AIFeedbackService
+        feedback = AIFeedbackService.create_feedback({
+            'session_id': session_id,
+            'feedback_type': 'evaluation_analysis',
+            'content': analysis.get('summary', ''),
+            'recommendations': analysis.get('recommendations', []),
+            'strengths': analysis.get('strengths', []),
+            'areas_for_improvement': analysis.get('areas_for_improvement', []),
+            'confidence_score': analysis.get('confidence_score', 0.0)
+        })
+        
+        return jsonify({
+            'message': 'Analysis completed successfully',
+            'analysis': analysis,
+            'feedback_id': feedback.id if feedback else None
+        }), 200
+        
+    except Exception as e:
+        current_app.logger.exception(f"Analyze evaluation error: {str(e)}")
         return jsonify({
             'error': 'server_error',
             'message': 'An unexpected error occurred'

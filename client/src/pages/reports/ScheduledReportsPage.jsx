@@ -36,7 +36,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../components/ui/table';
-
 const ScheduledReportsPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -45,16 +44,13 @@ const ScheduledReportsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterFrequency, setFilterFrequency] = useState('all');
-
   useEffect(() => {
     fetchScheduledReports();
   }, []);
-
   const fetchScheduledReports = async () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
       setSchedules([
         {
           id: 1,
@@ -132,20 +128,16 @@ const ScheduledReportsPage = () => {
       setLoading(false);
     }
   };
-
   const handleToggleStatus = async (schedule) => {
     try {
       const newStatus = schedule.status === 'active' ? 'paused' : 'active';
-      
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
-      
       setSchedules(schedules.map(s => 
         s.id === schedule.id 
           ? { ...s, status: newStatus }
           : s
       ));
-      
       toast({
         title: "Success",
         description: `Report schedule ${newStatus === 'active' ? 'activated' : 'paused'}`
@@ -158,16 +150,12 @@ const ScheduledReportsPage = () => {
       });
     }
   };
-
   const handleDeleteSchedule = async (scheduleId) => {
     if (!confirm('Are you sure you want to delete this scheduled report?')) return;
-
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
-      
       setSchedules(schedules.filter(s => s.id !== scheduleId));
-      
       toast({
         title: "Success",
         description: "Scheduled report deleted successfully"
@@ -180,12 +168,10 @@ const ScheduledReportsPage = () => {
       });
     }
   };
-
   const handleRunNow = async (schedule) => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
       toast({
         title: "Report Generation Started",
         description: `${schedule.name} is being generated and will be sent to recipients shortly.`
@@ -198,7 +184,6 @@ const ScheduledReportsPage = () => {
       });
     }
   };
-
   const getFrequencyBadgeVariant = (frequency) => {
     switch (frequency) {
       case 'daily': return 'default';
@@ -209,7 +194,6 @@ const ScheduledReportsPage = () => {
       default: return 'default';
     }
   };
-
   const filteredSchedules = schedules.filter(schedule => {
     const matchesSearch = 
       schedule.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -218,7 +202,6 @@ const ScheduledReportsPage = () => {
     const matchesFrequency = filterFrequency === 'all' || schedule.frequency === filterFrequency;
     return matchesSearch && matchesStatus && matchesFrequency;
   });
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -226,7 +209,6 @@ const ScheduledReportsPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -240,7 +222,6 @@ const ScheduledReportsPage = () => {
           Create Schedule
         </Button>
       </div>
-
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
         <Card>
@@ -296,7 +277,6 @@ const ScheduledReportsPage = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
@@ -340,7 +320,6 @@ const ScheduledReportsPage = () => {
           </div>
         </CardContent>
       </Card>
-
       {/* Schedules Table */}
       <Card>
         <CardHeader>
@@ -462,5 +441,4 @@ const ScheduledReportsPage = () => {
     </div>
   );
 };
-
 export default ScheduledReportsPage;

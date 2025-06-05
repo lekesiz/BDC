@@ -24,7 +24,6 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useToast } from '../../components/ui/use-toast';
-
 const formatOptions = [
   { id: 'original', name: 'Original', description: 'Keep original format' },
   { id: 'webp', name: 'WebP', description: 'Modern image format with better compression' },
@@ -32,7 +31,6 @@ const formatOptions = [
   { id: 'jpg', name: 'JPEG', description: 'Standard format for photos' },
   { id: 'png', name: 'PNG', description: 'Lossless format for graphics' }
 ];
-
 const presetSizes = [
   { id: 'thumbnail', width: 150, height: 150, name: 'Thumbnail' },
   { id: 'small', width: 320, height: 240, name: 'Small' },
@@ -40,7 +38,6 @@ const presetSizes = [
   { id: 'large', width: 1024, height: 768, name: 'Large' },
   { id: 'xlarge', width: 1920, height: 1080, name: 'Extra Large' }
 ];
-
 const ImageOptimizationPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -68,12 +65,10 @@ const ImageOptimizationPage = () => {
     lazyLoading: true
   });
   const [batchProgress, setBatchProgress] = useState(null);
-
   useEffect(() => {
     fetchImages();
     fetchStats();
   }, []);
-
   const fetchImages = async () => {
     setLoading(true);
     try {
@@ -82,7 +77,6 @@ const ImageOptimizationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setImages(data.images || []);
@@ -93,7 +87,6 @@ const ImageOptimizationPage = () => {
       setLoading(false);
     }
   };
-
   const fetchStats = async () => {
     try {
       const response = await fetch('/api/admin/images/stats', {
@@ -101,7 +94,6 @@ const ImageOptimizationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setStats(data.stats);
@@ -110,13 +102,11 @@ const ImageOptimizationPage = () => {
       console.error('Error fetching stats:', error);
     }
   };
-
   const optimizeImages = async (imageIds) => {
     if (imageIds.length === 0) {
       showToast('Please select images to optimize', 'error');
       return;
     }
-    
     setBatchProgress(0);
     try {
       const response = await fetch('/api/admin/images/optimize', {
@@ -130,7 +120,6 @@ const ImageOptimizationPage = () => {
           config: optimizationConfig
         })
       });
-      
       if (response.ok) {
         // Simulate progress
         const interval = setInterval(() => {
@@ -156,7 +145,6 @@ const ImageOptimizationPage = () => {
       setBatchProgress(null);
     }
   };
-
   const analyzeImage = async (imageId) => {
     try {
       const response = await fetch(`/api/admin/images/${imageId}/analyze`, {
@@ -164,7 +152,6 @@ const ImageOptimizationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         return data.analysis;
@@ -173,7 +160,6 @@ const ImageOptimizationPage = () => {
       console.error('Error analyzing image:', error);
     }
   };
-
   const updateConfig = async (config) => {
     try {
       const response = await fetch('/api/admin/images/config', {
@@ -184,7 +170,6 @@ const ImageOptimizationPage = () => {
         },
         body: JSON.stringify(config)
       });
-      
       if (response.ok) {
         setOptimizationConfig(config);
         showToast('Configuration updated', 'success');
@@ -193,7 +178,6 @@ const ImageOptimizationPage = () => {
       showToast('Error updating configuration', 'error');
     }
   };
-
   const formatBytes = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -201,14 +185,12 @@ const ImageOptimizationPage = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
-
   // Spinner component definition
   const Spinner = () => (
     <div className="flex justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
   );
-
   const getFormatBadgeColor = (format) => {
     switch (format) {
       case 'webp':
@@ -224,7 +206,6 @@ const ImageOptimizationPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Stats Cards */}
@@ -241,7 +222,6 @@ const ImageOptimizationPage = () => {
             <FileImage className="w-8 h-8 text-primary" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -254,7 +234,6 @@ const ImageOptimizationPage = () => {
             <HardDrive className="w-8 h-8 text-blue-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -269,7 +248,6 @@ const ImageOptimizationPage = () => {
             <TrendingDown className="w-8 h-8 text-green-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -286,7 +264,6 @@ const ImageOptimizationPage = () => {
           </div>
         </Card>
       </div>
-
       {/* Quick Actions */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Quick Actions</h3>
@@ -301,7 +278,6 @@ const ImageOptimizationPage = () => {
             <Zap className="w-4 h-4 mr-2" />
             Optimize All
           </Button>
-          
           <Button
             variant="secondary"
             onClick={() => setActiveTab('batch')}
@@ -309,7 +285,6 @@ const ImageOptimizationPage = () => {
             <FolderOpen className="w-4 h-4 mr-2" />
             Batch Process
           </Button>
-          
           <Button
             variant="secondary"
             onClick={() => setActiveTab('settings')}
@@ -317,7 +292,6 @@ const ImageOptimizationPage = () => {
             <Settings className="w-4 h-4 mr-2" />
             Settings
           </Button>
-          
           <Button
             variant="secondary"
             onClick={fetchImages}
@@ -327,7 +301,6 @@ const ImageOptimizationPage = () => {
           </Button>
         </div>
       </Card>
-
       {/* Format Distribution Chart */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Format Distribution</h3>
@@ -335,7 +308,6 @@ const ImageOptimizationPage = () => {
           <p className="text-gray-600">Format distribution chart would go here</p>
         </div>
       </Card>
-
       {/* Recent Images */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Recent Images</h3>
@@ -369,7 +341,6 @@ const ImageOptimizationPage = () => {
       </Card>
     </div>
   );
-
   const renderGallery = () => (
     <div className="space-y-6">
       {/* Filters */}
@@ -409,7 +380,6 @@ const ImageOptimizationPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Image Grid */}
       {loading ? (
         <div className="flex justify-center py-12">
@@ -465,7 +435,6 @@ const ImageOptimizationPage = () => {
       )}
     </div>
   );
-
   const renderBatchOptimization = () => (
     <div className="space-y-6">
       {/* Batch Progress */}
@@ -486,11 +455,9 @@ const ImageOptimizationPage = () => {
           </div>
         </Card>
       )}
-
       {/* Batch Settings */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Batch Optimization Settings</h3>
-        
         <div className="space-y-4">
           {/* Quality Slider */}
           <div>
@@ -515,7 +482,6 @@ const ImageOptimizationPage = () => {
               <span>High (100%)</span>
             </div>
           </div>
-
           {/* Format Selection */}
           <div>
             <label className="block text-sm font-medium mb-2">Output Format</label>
@@ -548,7 +514,6 @@ const ImageOptimizationPage = () => {
               ))}
             </div>
           </div>
-
           {/* Resize Options */}
           <div>
             <div className="flex items-center mb-3">
@@ -593,7 +558,6 @@ const ImageOptimizationPage = () => {
               </div>
             )}
           </div>
-
           {/* Generate Sizes */}
           <div>
             <label className="block text-sm font-medium mb-2">Generate Sizes</label>
@@ -626,7 +590,6 @@ const ImageOptimizationPage = () => {
               ))}
             </div>
           </div>
-
           {/* Additional Options */}
           <div className="space-y-3">
             <label className="flex items-center cursor-pointer">
@@ -641,7 +604,6 @@ const ImageOptimizationPage = () => {
               />
               <span>Strip metadata (EXIF, IPTC, etc.)</span>
             </label>
-            
             <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -654,7 +616,6 @@ const ImageOptimizationPage = () => {
               />
               <span>Progressive loading (better perceived performance)</span>
             </label>
-            
             <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -668,7 +629,6 @@ const ImageOptimizationPage = () => {
               <span>Enable lazy loading for web</span>
             </label>
           </div>
-
           <div className="flex space-x-2 pt-4">
             <Button
               onClick={() => updateConfig(optimizationConfig)}
@@ -684,7 +644,6 @@ const ImageOptimizationPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Batch Results */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Recent Optimization Results</h3>
@@ -713,12 +672,10 @@ const ImageOptimizationPage = () => {
       </Card>
     </div>
   );
-
   const renderSettings = () => (
     <div className="space-y-6">
       <Card>
         <h3 className="font-semibold text-lg mb-4">Global Image Settings</h3>
-        
         <div className="space-y-4">
           {/* Auto-optimization */}
           <div className="flex items-center justify-between">
@@ -735,7 +692,6 @@ const ImageOptimizationPage = () => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           {/* WebP fallback */}
           <div className="flex items-center justify-between">
             <div>
@@ -751,7 +707,6 @@ const ImageOptimizationPage = () => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           {/* Responsive images */}
           <div className="flex items-center justify-between">
             <div>
@@ -767,7 +722,6 @@ const ImageOptimizationPage = () => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           {/* Storage location */}
           <div>
             <label className="block text-sm font-medium mb-2">Storage Location</label>
@@ -778,7 +732,6 @@ const ImageOptimizationPage = () => {
               <option value="custom">Custom CDN</option>
             </select>
           </div>
-
           {/* CDN settings */}
           <div>
             <label className="block text-sm font-medium mb-2">CDN Domain</label>
@@ -791,11 +744,9 @@ const ImageOptimizationPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Presets */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Optimization Presets</h3>
-        
         <div className="space-y-3">
           {[
             {
@@ -848,11 +799,9 @@ const ImageOptimizationPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Image Rules */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Image Processing Rules</h3>
-        
         <div className="space-y-3">
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
@@ -864,7 +813,6 @@ const ImageOptimizationPage = () => {
             </div>
             <p className="text-sm text-gray-600">Square crop, 200x200, high quality</p>
           </div>
-          
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h4 className="font-medium">Document Thumbnails</h4>
@@ -875,7 +823,6 @@ const ImageOptimizationPage = () => {
             </div>
             <p className="text-sm text-gray-600">16:9 ratio, 320x180, medium quality</p>
           </div>
-          
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h4 className="font-medium">Content Images</h4>
@@ -890,7 +837,6 @@ const ImageOptimizationPage = () => {
       </Card>
     </div>
   );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -902,7 +848,6 @@ const ImageOptimizationPage = () => {
           Back to Settings
         </Button>
       </div>
-
       {/* Tabs */}
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
@@ -921,7 +866,6 @@ const ImageOptimizationPage = () => {
           ))}
         </nav>
       </div>
-
       {/* Tab Content */}
       {activeTab === 'overview' && renderOverview()}
       {activeTab === 'gallery' && renderGallery()}
@@ -930,5 +874,4 @@ const ImageOptimizationPage = () => {
     </div>
   );
 };
-
 export default ImageOptimizationPage;

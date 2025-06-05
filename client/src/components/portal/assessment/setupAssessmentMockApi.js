@@ -5,7 +5,6 @@ import {
   getAssessmentResult, 
   submitQuizResults
 } from './mockData';
-
 /**
  * Setup mock API handlers for assessments
  */
@@ -13,14 +12,12 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
   // Store original methods
   const baseGet = originalGet || api.get;
   const basePost = originalPost || api.post;
-  
   // Override get method
   api.get = function(url, config) {
     // Get all assessments
     if (url === '/api/portal/assessments') {
       try {
         const assessmentsData = getAssessments();
-        
         return Promise.resolve({
           data: assessmentsData,
           status: 200,
@@ -37,15 +34,12 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
         });
       }
     }
-    
     // Get assessment by ID
     const assessmentMatch = url.match(/^\/api\/portal\/assessments\/(\d+)$/);
     if (assessmentMatch) {
       const id = assessmentMatch[1];
-      
       try {
         const assessment = getAssessmentById(id);
-        
         if (!assessment) {
           return Promise.reject({
             response: {
@@ -54,7 +48,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
             }
           });
         }
-        
         return Promise.resolve({
           data: assessment,
           status: 200,
@@ -71,16 +64,13 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
         });
       }
     }
-    
     // Get quiz by assessment and quiz ID
     const quizMatch = url.match(/^\/api\/portal\/assessments\/(\d+)\/quiz\/(\d+)$/);
     if (quizMatch) {
       const assessmentId = quizMatch[1];
       const quizId = quizMatch[2];
-      
       try {
         const quiz = getQuizById(assessmentId, quizId);
-        
         if (!quiz) {
           return Promise.reject({
             response: {
@@ -89,7 +79,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
             }
           });
         }
-        
         return Promise.resolve({
           data: quiz,
           status: 200,
@@ -106,15 +95,12 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
         });
       }
     }
-    
     // Get assessment results
     const resultsMatch = url.match(/^\/api\/portal\/assessments\/(\d+)\/results$/);
     if (resultsMatch) {
       const id = resultsMatch[1];
-      
       try {
         const result = getAssessmentResult(id);
-        
         if (!result) {
           return Promise.reject({
             response: {
@@ -123,7 +109,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
             }
           });
         }
-        
         return Promise.resolve({
           data: result,
           status: 200,
@@ -140,11 +125,9 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
         });
       }
     }
-    
     // Fall back to original get method
     return baseGet(url, config);
   };
-  
   // Override post method
   api.post = function(url, data, config) {
     // Submit quiz results
@@ -152,10 +135,8 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
     if (submitMatch) {
       const assessmentId = submitMatch[1];
       const quizId = submitMatch[2];
-      
       try {
         const result = submitQuizResults(assessmentId, quizId, data);
-        
         return Promise.resolve({
           data: result,
           status: 200,
@@ -172,7 +153,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
         });
       }
     }
-    
     // Fall back to original post method
     return basePost(url, data, config);
   };

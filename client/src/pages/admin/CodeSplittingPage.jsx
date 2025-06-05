@@ -25,7 +25,6 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useToast } from '../../components/ui/use-toast';
-
 const bundleCategories = [
   { id: 'vendor', name: 'Vendor Libraries', color: 'blue' },
   { id: 'core', name: 'Core Components', color: 'green' },
@@ -33,7 +32,6 @@ const bundleCategories = [
   { id: 'lazy', name: 'Lazy Loaded', color: 'yellow' },
   { id: 'common', name: 'Common Chunks', color: 'gray' }
 ];
-
 const optimizationStrategies = [
   {
     id: 'route_splitting',
@@ -64,7 +62,6 @@ const optimizationStrategies = [
     status: 'active'
   }
 ];
-
 const CodeSplittingPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -95,13 +92,11 @@ const CodeSplittingPage = () => {
   });
   const [analysis, setAnalysis] = useState(null);
   const [selectedBundle, setSelectedBundle] = useState(null);
-
   useEffect(() => {
     fetchBundles();
     fetchStats();
     fetchRoutes();
   }, []);
-
   const fetchBundles = async () => {
     setLoading(true);
     try {
@@ -110,7 +105,6 @@ const CodeSplittingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setBundles(data.bundles || []);
@@ -121,7 +115,6 @@ const CodeSplittingPage = () => {
       setLoading(false);
     }
   };
-
   const fetchStats = async () => {
     try {
       const response = await fetch('/api/admin/bundles/stats', {
@@ -129,7 +122,6 @@ const CodeSplittingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setStats(data.stats);
@@ -138,7 +130,6 @@ const CodeSplittingPage = () => {
       console.error('Error fetching stats:', error);
     }
   };
-
   const fetchRoutes = async () => {
     try {
       const response = await fetch('/api/admin/routes/analysis', {
@@ -146,7 +137,6 @@ const CodeSplittingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setRoutes(data.routes || []);
@@ -155,7 +145,6 @@ const CodeSplittingPage = () => {
       console.error('Error fetching routes:', error);
     }
   };
-
   const analyzeBundle = async (bundleId) => {
     try {
       const response = await fetch(`/api/admin/bundles/${bundleId}/analyze`, {
@@ -163,7 +152,6 @@ const CodeSplittingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setAnalysis(data.analysis);
@@ -173,7 +161,6 @@ const CodeSplittingPage = () => {
       showToast('Error analyzing bundle', 'error');
     }
   };
-
   const optimizeBundle = async (bundleId, strategy) => {
     try {
       const response = await fetch(`/api/admin/bundles/${bundleId}/optimize`, {
@@ -184,7 +171,6 @@ const CodeSplittingPage = () => {
         },
         body: JSON.stringify({ strategy })
       });
-      
       if (response.ok) {
         showToast('Bundle optimized successfully', 'success');
         fetchBundles();
@@ -194,7 +180,6 @@ const CodeSplittingPage = () => {
       showToast('Error optimizing bundle', 'error');
     }
   };
-
   const updateConfig = async (newConfig) => {
     try {
       const response = await fetch('/api/admin/bundles/config', {
@@ -205,7 +190,6 @@ const CodeSplittingPage = () => {
         },
         body: JSON.stringify(newConfig)
       });
-      
       if (response.ok) {
         setConfig(newConfig);
         showToast('Configuration updated', 'success');
@@ -214,7 +198,6 @@ const CodeSplittingPage = () => {
       showToast('Error updating configuration', 'error');
     }
   };
-
   const generateReport = async () => {
     try {
       const response = await fetch('/api/admin/bundles/report', {
@@ -222,7 +205,6 @@ const CodeSplittingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -238,7 +220,6 @@ const CodeSplittingPage = () => {
       showToast('Error generating report', 'error');
     }
   };
-
   const formatBytes = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -246,19 +227,16 @@ const CodeSplittingPage = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
-
   // Spinner component definition
   const Spinner = () => (
     <div className="flex justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
   );
-
   const getCategoryColor = (category) => {
     const cat = bundleCategories.find(c => c.id === category);
     return cat ? `bg-${cat.color}-100 text-${cat.color}-800` : 'bg-gray-100 text-gray-800';
   };
-
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Metrics Grid */}
@@ -275,7 +253,6 @@ const CodeSplittingPage = () => {
             <Package className="w-8 h-8 text-primary" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -286,7 +263,6 @@ const CodeSplittingPage = () => {
             <BarChart className="w-8 h-8 text-green-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -297,7 +273,6 @@ const CodeSplittingPage = () => {
             <Clock className="w-8 h-8 text-blue-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -309,7 +284,6 @@ const CodeSplittingPage = () => {
           </div>
         </Card>
       </div>
-
       {/* Optimization Strategies */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Optimization Strategies</h3>
@@ -338,7 +312,6 @@ const CodeSplittingPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Bundle Distribution */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Bundle Distribution</h3>
@@ -346,7 +319,6 @@ const CodeSplittingPage = () => {
           <p className="text-gray-600">Bundle distribution chart would go here</p>
         </div>
       </Card>
-
       {/* Recent Changes */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Recent Optimizations</h3>
@@ -368,7 +340,6 @@ const CodeSplittingPage = () => {
       </Card>
     </div>
   );
-
   const renderBundles = () => (
     <div className="space-y-6">
       {/* Filters */}
@@ -394,7 +365,6 @@ const CodeSplittingPage = () => {
           </Button>
         </div>
       </Card>
-
       {/* Bundle List */}
       {loading ? (
         <div className="flex justify-center py-12">
@@ -413,7 +383,6 @@ const CodeSplittingPage = () => {
                       {bundle.category}
                     </span>
                   </div>
-                  
                   <div className="grid grid-cols-4 gap-4 text-sm mb-3">
                     <div>
                       <p className="text-gray-600">Size</p>
@@ -432,7 +401,6 @@ const CodeSplittingPage = () => {
                       <p className="font-medium">{bundle.loadTime}ms</p>
                     </div>
                   </div>
-                  
                   {/* Module List */}
                   <div className="text-sm">
                     <p className="text-gray-600 mb-1">Top Modules:</p>
@@ -450,7 +418,6 @@ const CodeSplittingPage = () => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="flex space-x-2">
                   <Button
                     size="sm"
@@ -473,12 +440,10 @@ const CodeSplittingPage = () => {
           ))}
         </div>
       )}
-
       {/* Bundle Analysis */}
       {analysis && selectedBundle && (
         <Card>
           <h3 className="font-semibold text-lg mb-4">Bundle Analysis</h3>
-          
           <div className="space-y-4">
             <div>
               <h4 className="font-medium mb-2">Size Analysis</h4>
@@ -497,7 +462,6 @@ const CodeSplittingPage = () => {
                 </div>
               </div>
             </div>
-            
             <div>
               <h4 className="font-medium mb-2">Dependencies</h4>
               <div className="space-y-2">
@@ -512,7 +476,6 @@ const CodeSplittingPage = () => {
                 ))}
               </div>
             </div>
-            
             <div>
               <h4 className="font-medium mb-2">Optimization Suggestions</h4>
               <div className="space-y-2">
@@ -529,12 +492,10 @@ const CodeSplittingPage = () => {
       )}
     </div>
   );
-
   const renderRoutes = () => (
     <div className="space-y-6">
       <Card>
         <h3 className="font-semibold text-lg mb-4">Route Analysis</h3>
-        
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
@@ -584,7 +545,6 @@ const CodeSplittingPage = () => {
           </table>
         </div>
       </Card>
-
       {/* Route Tree */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Route Hierarchy</h3>
@@ -619,17 +579,14 @@ const CodeSplittingPage = () => {
       </Card>
     </div>
   );
-
   const renderSettings = () => (
     <div className="space-y-6">
       <Card>
         <h3 className="font-semibold text-lg mb-4">Webpack Configuration</h3>
-        
         <div className="space-y-4">
           {/* Split Chunks Settings */}
           <div>
             <h4 className="font-medium mb-3">Split Chunks</h4>
-            
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Max Async Requests</label>
@@ -643,7 +600,6 @@ const CodeSplittingPage = () => {
                   })}
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium mb-1">Max Initial Requests</label>
                 <input
@@ -656,7 +612,6 @@ const CodeSplittingPage = () => {
                   })}
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium mb-1">Min Size (bytes)</label>
                 <input
@@ -669,7 +624,6 @@ const CodeSplittingPage = () => {
                   })}
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium mb-1">Max Size (bytes)</label>
                 <input
@@ -684,11 +638,9 @@ const CodeSplittingPage = () => {
               </div>
             </div>
           </div>
-
           {/* Cache Groups */}
           <div>
             <h4 className="font-medium mb-3">Cache Groups</h4>
-            
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
@@ -711,7 +663,6 @@ const CodeSplittingPage = () => {
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                 </label>
               </div>
-              
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Common Chunks</p>
@@ -735,11 +686,9 @@ const CodeSplittingPage = () => {
               </div>
             </div>
           </div>
-
           {/* Runtime Options */}
           <div>
             <h4 className="font-medium mb-3">Runtime Options</h4>
-            
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium mb-1">Runtime Chunk</label>
@@ -756,7 +705,6 @@ const CodeSplittingPage = () => {
                   <option value="false">Disabled</option>
                 </select>
               </div>
-              
               <div>
                 <label className="block text-sm font-medium mb-1">Module IDs</label>
                 <select
@@ -775,7 +723,6 @@ const CodeSplittingPage = () => {
               </div>
             </div>
           </div>
-
           <div className="flex space-x-2 pt-4">
             <Button
               onClick={() => updateConfig(config)}
@@ -791,11 +738,9 @@ const CodeSplittingPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Presets */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Optimization Presets</h3>
-        
         <div className="space-y-3">
           {[
             {
@@ -834,7 +779,6 @@ const CodeSplittingPage = () => {
       </Card>
     </div>
   );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -846,7 +790,6 @@ const CodeSplittingPage = () => {
           Back to Settings
         </Button>
       </div>
-
       {/* Tabs */}
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
@@ -865,7 +808,6 @@ const CodeSplittingPage = () => {
           ))}
         </nav>
       </div>
-
       {/* Tab Content */}
       {activeTab === 'overview' && renderOverview()}
       {activeTab === 'bundles' && renderBundles()}
@@ -874,5 +816,4 @@ const CodeSplittingPage = () => {
     </div>
   );
 };
-
 export default CodeSplittingPage;

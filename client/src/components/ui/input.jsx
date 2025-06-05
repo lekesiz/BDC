@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Input component for text input fields
  * 
@@ -30,7 +29,6 @@ const Input = React.forwardRef(({
   const id = props.id || props.name || React.useId();
   const errorId = error ? `${id}-error` : undefined;
   const helpTextId = helpText ? `${id}-help` : undefined;
-  
   return (
     <div className="w-full space-y-2">
       {label && (
@@ -47,14 +45,12 @@ const Input = React.forwardRef(({
           {required && <span className="text-red-500 dark:text-red-400 ml-1" aria-label="required">*</span>}
         </label>
       )}
-      
       <div className="relative">
         {leftIcon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" aria-hidden="true">
             {leftIcon}
           </div>
         )}
-        
         <input
           id={id}
           type={type}
@@ -88,25 +84,20 @@ const Input = React.forwardRef(({
           aria-required={required}
           {...props}
         />
-        
         {rightIcon && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center" aria-hidden="true">
             {rightIcon}
           </div>
         )}
       </div>
-      
       {helpText && !error && (
         <p id={helpTextId} className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">{helpText}</p>
       )}
-      
       {error && (
         <p id={errorId} className="text-xs sm:text-sm text-red-500 dark:text-red-400 mt-1" role="alert">{error}</p>
       )}
     </div>
   );
 });
-
 Input.displayName = "Input";
-
 export { Input };

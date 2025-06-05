@@ -18,7 +18,6 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useBreakpoint, useTouchDevice } from '@/hooks/useMediaQuery';
 import { tapTargetClasses } from '@/utils/responsive';
-
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
   const { user } = useAuth();
@@ -26,7 +25,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const isTouch = useTouchDevice();
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
-
   // Student menu items - Portal paths
   const studentMenuItems = [
     { 
@@ -84,7 +82,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       path: '/portal/notifications' 
     },
   ];
-
   // Admin/Trainer menu items - Dashboard paths
   const defaultMenuItems = [
     { 
@@ -142,48 +139,38 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       path: '/notifications' 
     },
   ];
-
-  // Choose menu items based on user role
+  // Choose menu items based on user role with permission filtering
   const menuItems = user?.role === 'student' ? studentMenuItems : defaultMenuItems;
-
   const isActive = (path) => {
     if (path === '/' && user?.role !== 'student') {
       return location.pathname === '/';
     }
     return location.pathname.startsWith(path);
   };
-
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
-
   const onTouchStart = (e) => {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
-
   const onTouchMove = (e) => {
     setTouchEnd(e.targetTouches[0].clientX);
   };
-
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
-    
     if (isLeftSwipe && isOpen) {
       toggleSidebar();
     }
   };
-
   // Close sidebar on route change on mobile
   useEffect(() => {
     if (isMobile && isOpen) {
       toggleSidebar();
     }
   }, [location.pathname]);
-
   return (
     <>
       {/* Mobile backdrop */}
@@ -194,7 +181,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           aria-hidden="true"
         />
       )}
-
       {/* Sidebar */}
       <aside 
         className={`
@@ -222,7 +208,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <X className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
             </button>
           </div>
-
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto px-3 py-4 sm:p-4" aria-label="Sidebar navigation">
             <ul className="space-y-1" role="list">
@@ -258,7 +243,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               })}
             </ul>
           </nav>
-
           {/* User Info */}
           <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-4">
             <div className="flex items-center gap-3">
@@ -281,5 +265,4 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     </>
   );
 };
-
 export default Sidebar;

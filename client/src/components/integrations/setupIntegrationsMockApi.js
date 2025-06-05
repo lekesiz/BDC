@@ -4,7 +4,6 @@ import {
   generateIntegrationStats,
   generateOAuthConfigs 
 } from './mockIntegrationsData';
-
 export const setupIntegrationsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -12,13 +11,11 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     put: originalPut || api.put.bind(api),
     delete: originalDelete || api.delete.bind(api)
   };
-
   // Integration endpoints
   api.get = function(url, ...args) {
     // List all integrations
     if (url === '/api/integrations') {
       const integrationsData = generateIntegrationsData();
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -27,13 +24,11 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // Get specific integration
     if (url.match(/^\/api\/integrations\/[\w-]+$/)) {
       const integrationId = url.split('/').pop();
       const integrationsData = generateIntegrationsData();
       const integration = integrationsData.available.find(i => i.id === integrationId);
-      
       if (integration) {
         return Promise.resolve({
           status: 200,
@@ -46,11 +41,9 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         });
       }
     }
-    
     // Integration activity
     if (url === '/api/integrations/activity') {
       const activity = generateIntegrationActivity();
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -59,21 +52,17 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // Integration statistics
     if (url === '/api/integrations/statistics') {
       const stats = generateIntegrationStats();
-      
       return Promise.resolve({
         status: 200,
         data: stats
       });
     }
-    
     // Webhooks list
     if (url === '/api/integrations/webhooks') {
       const integrationsData = generateIntegrationsData();
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -82,13 +71,11 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // Specific webhook
     if (url.match(/^\/api\/integrations\/webhooks\/\d+$/)) {
       const webhookId = parseInt(url.split('/').pop());
       const integrationsData = generateIntegrationsData();
       const webhook = integrationsData.webhooks.find(w => w.id === webhookId);
-      
       if (webhook) {
         return Promise.resolve({
           status: 200,
@@ -101,11 +88,9 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         });
       }
     }
-    
     // API keys list
     if (url === '/api/integrations/api-keys') {
       const integrationsData = generateIntegrationsData();
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -114,23 +99,19 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // OAuth configurations
     if (url === '/api/integrations/oauth-configs') {
       const configs = generateOAuthConfigs();
-      
       return Promise.resolve({
         status: 200,
         data: configs
       });
     }
-    
     // Integration settings
     if (url.match(/^\/api\/integrations\/[\w-]+\/settings$/)) {
       const integrationId = url.split('/')[3];
       const integrationsData = generateIntegrationsData();
       const integration = integrationsData.available.find(i => i.id === integrationId);
-      
       if (integration) {
         return Promise.resolve({
           status: 200,
@@ -143,10 +124,8 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         });
       }
     }
-    
     // Webhook events
     if (url === '/api/integrations/webhook-events') {
-      
       const events = [
         { category: "Enrollment", events: ["enrollment.created", "enrollment.updated", "enrollment.deleted"] },
         { category: "Course", events: ["course.started", "course.completed", "course.abandoned"] },
@@ -154,23 +133,19 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         { category: "User", events: ["user.created", "user.updated", "user.deleted", "user.login"] },
         { category: "Certificate", events: ["certificate.issued", "certificate.revoked"] }
       ];
-      
       return Promise.resolve({
         status: 200,
         data: events
       });
     }
-    
     // Call original get for other endpoints
     return originalFunctions.get.call(api, url, ...args);
   };
-  
   // Integration POST endpoints
   api.post = function(url, data, ...args) {
     // Connect integration
     if (url.match(/^\/api\/integrations\/[\w-]+\/connect$/)) {
       const integrationId = url.split('/')[3];
-      
       // Simulate OAuth flow
       return Promise.resolve({
         status: 200,
@@ -180,11 +155,9 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // OAuth callback
     if (url.match(/^\/api\/integrations\/[\w-]+\/callback$/)) {
       const integrationId = url.split('/')[3];
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -195,10 +168,8 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // Create webhook
     if (url === '/api/integrations/webhooks') {
-      
       const newWebhook = {
         id: Date.now(),
         ...data,
@@ -207,16 +178,13 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         lastTriggered: null,
         successRate: 0
       };
-      
       return Promise.resolve({
         status: 201,
         data: newWebhook
       });
     }
-    
     // Create API key
     if (url === '/api/integrations/api-keys') {
-      
       const newApiKey = {
         id: Date.now(),
         name: data.name,
@@ -227,17 +195,14 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         expiresAt: data.expiresAt || null,
         requestCount: 0
       };
-      
       return Promise.resolve({
         status: 201,
         data: newApiKey
       });
     }
-    
     // Test webhook
     if (url.match(/^\/api\/integrations\/webhooks\/\d+\/test$/)) {
       const webhookId = parseInt(url.split('/')[3]);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -252,11 +217,9 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // Sync integration data
     if (url.match(/^\/api\/integrations\/[\w-]+\/sync$/)) {
       const integrationId = url.split('/')[3];
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -267,16 +230,13 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     return originalFunctions.post.call(api, url, data, ...args);
   };
-  
   // Integration PUT endpoints
   api.put = function(url, data, ...args) {
     // Update integration settings
     if (url.match(/^\/api\/integrations\/[\w-]+\/settings$/)) {
       const integrationId = url.split('/')[3];
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -286,27 +246,22 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // Update webhook
     if (url.match(/^\/api\/integrations\/webhooks\/\d+$/)) {
       const webhookId = parseInt(url.split('/').pop());
-      
       const updatedWebhook = {
         ...data,
         id: webhookId,
         updatedAt: new Date().toISOString()
       };
-      
       return Promise.resolve({
         status: 200,
         data: updatedWebhook
       });
     }
-    
     // Toggle webhook status
     if (url.match(/^\/api\/integrations\/webhooks\/\d+\/toggle$/)) {
       const webhookId = parseInt(url.split('/')[3]);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -316,27 +271,22 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // Update API key
     if (url.match(/^\/api\/integrations\/api-keys\/\d+$/)) {
       const keyId = parseInt(url.split('/').pop());
-      
       const updatedKey = {
         ...data,
         id: keyId,
         updatedAt: new Date().toISOString()
       };
-      
       return Promise.resolve({
         status: 200,
         data: updatedKey
       });
     }
-    
     // Rotate API key
     if (url.match(/^\/api\/integrations\/api-keys\/\d+\/rotate$/)) {
       const keyId = parseInt(url.split('/')[3]);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -346,16 +296,13 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     return originalFunctions.put.call(api, url, data, ...args);
   };
-  
   // Integration DELETE endpoints
   api.delete = function(url, ...args) {
     // Disconnect integration
     if (url.match(/^\/api\/integrations\/[\w-]+\/disconnect$/)) {
       const integrationId = url.split('/')[3];
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -365,11 +312,9 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // Delete webhook
     if (url.match(/^\/api\/integrations\/webhooks\/\d+$/)) {
       const webhookId = parseInt(url.split('/').pop());
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -378,11 +323,9 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // Delete API key
     if (url.match(/^\/api\/integrations\/api-keys\/\d+$/)) {
       const keyId = parseInt(url.split('/').pop());
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -391,11 +334,9 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     // Clear integration cache
     if (url.match(/^\/api\/integrations\/[\w-]+\/cache$/)) {
       const integrationId = url.split('/')[3];
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -405,7 +346,6 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
         }
       });
     }
-    
     return originalFunctions.delete.call(api, url, ...args);
   };
 };

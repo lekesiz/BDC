@@ -36,7 +36,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
-
 const ProgramModulesPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -55,16 +54,13 @@ const ProgramModulesPage = () => {
     order: 0,
     status: 'draft'
   });
-
   useEffect(() => {
     fetchProgramAndModules();
   }, [id]);
-
   const fetchProgramAndModules = async () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
       setProgram({
         id,
         name: 'Professional Development Program',
@@ -72,7 +68,6 @@ const ProgramModulesPage = () => {
         total_modules: 8,
         total_duration: '120 hours'
       });
-
       setModules([
         {
           id: 1,
@@ -129,7 +124,6 @@ const ProgramModulesPage = () => {
       setLoading(false);
     }
   };
-
   const handleCreateModule = () => {
     setSelectedModule(null);
     setModuleForm({
@@ -141,7 +135,6 @@ const ProgramModulesPage = () => {
     });
     setShowModuleDialog(true);
   };
-
   const handleEditModule = (module) => {
     setSelectedModule(module);
     setModuleForm({
@@ -153,7 +146,6 @@ const ProgramModulesPage = () => {
     });
     setShowModuleDialog(true);
   };
-
   const handleSaveModule = async () => {
     try {
       // Validate form
@@ -165,10 +157,8 @@ const ProgramModulesPage = () => {
         });
         return;
       }
-
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-
       if (selectedModule) {
         // Update existing module
         setModules(modules.map(m => 
@@ -195,7 +185,6 @@ const ProgramModulesPage = () => {
           description: "Module created successfully"
         });
       }
-
       setShowModuleDialog(false);
     } catch (error) {
       toast({
@@ -205,14 +194,11 @@ const ProgramModulesPage = () => {
       });
     }
   };
-
   const handleDeleteModule = async (moduleId) => {
     if (!confirm('Are you sure you want to delete this module?')) return;
-
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
-      
       setModules(modules.filter(m => m.id !== moduleId));
       toast({
         title: "Success",
@@ -226,14 +212,12 @@ const ProgramModulesPage = () => {
       });
     }
   };
-
   const filteredModules = modules.filter(module => {
     const matchesSearch = module.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          module.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'all' || module.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -241,7 +225,6 @@ const ProgramModulesPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -255,7 +238,6 @@ const ProgramModulesPage = () => {
           Add Module
         </Button>
       </div>
-
       {/* Program Overview */}
       <Card>
         <CardContent className="pt-6">
@@ -283,7 +265,6 @@ const ProgramModulesPage = () => {
           </div>
         </CardContent>
       </Card>
-
       {/* Search and Filter */}
       <div className="flex gap-4">
         <div className="flex-1">
@@ -309,7 +290,6 @@ const ProgramModulesPage = () => {
           </SelectContent>
         </Select>
       </div>
-
       {/* Modules List */}
       <div className="space-y-4">
         {filteredModules.length === 0 ? (
@@ -385,7 +365,6 @@ const ProgramModulesPage = () => {
           ))
         )}
       </div>
-
       {/* Module Dialog */}
       <Dialog open={showModuleDialog} onOpenChange={setShowModuleDialog}>
         <DialogContent>
@@ -459,5 +438,4 @@ const ProgramModulesPage = () => {
     </div>
   );
 };
-
 export default ProgramModulesPage;

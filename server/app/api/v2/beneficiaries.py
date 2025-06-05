@@ -10,6 +10,8 @@ from app.schemas.document import DocumentSchema
 from app.schemas.appointment import AppointmentSchema
 from app.utils.decorators import validate_request, requires_permission
 
+from app.utils.logging import logger
+
 
 beneficiaries_bp_v2 = Blueprint('beneficiaries_v2', __name__, url_prefix='/api/v2/beneficiaries')
 beneficiary_schema = BeneficiarySchema()

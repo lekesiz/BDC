@@ -20,7 +20,6 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useToast } from '../../components/ui/toast';
-
 const validationRules = [
   {
     id: 'sql_injection',
@@ -103,7 +102,6 @@ const validationRules = [
     examples: ['<p>Safe content</p>', '<strong>Bold text</strong>']
   }
 ];
-
 const InputValidationPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -119,12 +117,10 @@ const InputValidationPage = () => {
     falsePositives: 0,
     performanceImpact: 'Low'
   });
-
   useEffect(() => {
     fetchValidationStats();
     fetchCustomRules();
   }, []);
-
   const fetchValidationStats = async () => {
     try {
       const response = await fetch('/api/admin/validation/stats', {
@@ -132,7 +128,6 @@ const InputValidationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setStats(data.stats || stats);
@@ -141,7 +136,6 @@ const InputValidationPage = () => {
       console.error('Error fetching stats:', error);
     }
   };
-
   const fetchCustomRules = async () => {
     try {
       const response = await fetch('/api/admin/validation/rules', {
@@ -149,7 +143,6 @@ const InputValidationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setRules([...validationRules, ...(data.customRules || [])]);
@@ -158,7 +151,6 @@ const InputValidationPage = () => {
       console.error('Error fetching custom rules:', error);
     }
   };
-
   const updateRule = async (ruleId, updates) => {
     try {
       const response = await fetch(`/api/admin/validation/rules/${ruleId}`, {
@@ -169,7 +161,6 @@ const InputValidationPage = () => {
         },
         body: JSON.stringify(updates)
       });
-      
       if (response.ok) {
         setRules(rules.map(rule => 
           rule.id === ruleId ? { ...rule, ...updates } : rule
@@ -180,16 +171,12 @@ const InputValidationPage = () => {
       showToast('Error updating rule', 'error');
     }
   };
-
   const testValidation = () => {
     const results = [];
-    
     rules.forEach(rule => {
       if (!rule.enabled) return;
-      
       let isValid = true;
       let message = 'Passed';
-      
       switch (rule.id) {
         case 'sql_injection':
         case 'xss_prevention':
@@ -198,7 +185,6 @@ const InputValidationPage = () => {
             message = `Potential ${rule.name} detected`;
           }
           break;
-          
         case 'email_validation':
         case 'phone_validation':
         case 'url_validation':
@@ -208,7 +194,6 @@ const InputValidationPage = () => {
             message = `Invalid ${rule.name.replace(' Validation', '')}`;
           }
           break;
-          
         case 'file_extension':
           const ext = testInput.split('.').pop()?.toLowerCase();
           if (!rule.allowedExtensions.includes(ext)) {
@@ -216,7 +201,6 @@ const InputValidationPage = () => {
             message = `File extension '${ext}' not allowed`;
           }
           break;
-          
         case 'sanitize_html':
           const tempDiv = document.createElement('div');
           tempDiv.innerHTML = testInput;
@@ -230,7 +214,6 @@ const InputValidationPage = () => {
           }
           break;
       }
-      
       results.push({
         rule: rule.name,
         category: rule.category,
@@ -239,10 +222,8 @@ const InputValidationPage = () => {
         message
       });
     });
-    
     setTestResults(results);
   };
-
   const getSeverityColor = (severity) => {
     switch (severity) {
       case 'critical':
@@ -257,7 +238,6 @@ const InputValidationPage = () => {
         return 'text-gray-600 bg-gray-100';
     }
   };
-
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Stats Cards */}
@@ -271,7 +251,6 @@ const InputValidationPage = () => {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -281,7 +260,6 @@ const InputValidationPage = () => {
             <Shield className="w-8 h-8 text-red-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -291,7 +269,6 @@ const InputValidationPage = () => {
             <AlertTriangle className="w-8 h-8 text-yellow-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -302,7 +279,6 @@ const InputValidationPage = () => {
           </div>
         </Card>
       </div>
-
       {/* Active Rules */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Active Validation Rules</h3>
@@ -343,7 +319,6 @@ const InputValidationPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Quick Test */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Quick Validation Test</h3>
@@ -362,7 +337,6 @@ const InputValidationPage = () => {
             <Play className="w-4 h-4 mr-2" />
             Test Validation
           </Button>
-          
           {testResults.length > 0 && (
             <div className="mt-4 space-y-2">
               <h4 className="font-medium">Test Results</h4>
@@ -385,7 +359,6 @@ const InputValidationPage = () => {
       </Card>
     </div>
   );
-
   const renderRules = () => (
     <div className="space-y-6">
       <Card>
@@ -396,7 +369,6 @@ const InputValidationPage = () => {
             Add Custom Rule
           </Button>
         </div>
-        
         <div className="space-y-4">
           {rules.map(rule => (
             <div key={rule.id} className="border rounded-lg p-4">
@@ -416,10 +388,8 @@ const InputValidationPage = () => {
                     </Button>
                   </div>
                 </div>
-                
                 <div>
                   <p className="text-sm text-gray-600 mb-2">{rule.description}</p>
-                  
                   {rule.pattern && (
                     <div className="mb-3">
                       <p className="text-xs font-medium text-gray-500 mb-1">Pattern/Regex</p>
@@ -428,7 +398,6 @@ const InputValidationPage = () => {
                       </code>
                     </div>
                   )}
-                  
                   {rule.allowedExtensions && (
                     <div className="mb-3">
                       <p className="text-xs font-medium text-gray-500 mb-1">Allowed Extensions</p>
@@ -441,7 +410,6 @@ const InputValidationPage = () => {
                       </div>
                     </div>
                   )}
-                  
                   {rule.allowedTags && (
                     <div className="mb-3">
                       <p className="text-xs font-medium text-gray-500 mb-1">Allowed HTML Tags</p>
@@ -454,7 +422,6 @@ const InputValidationPage = () => {
                       </div>
                     </div>
                   )}
-                  
                   {rule.examples && (
                     <div>
                       <p className="text-xs font-medium text-gray-500 mb-1">Examples</p>
@@ -468,7 +435,6 @@ const InputValidationPage = () => {
                     </div>
                   )}
                 </div>
-                
                 <div className="flex items-center justify-between pt-3 border-t">
                   <label className="flex items-center cursor-pointer">
                     <input
@@ -495,7 +461,6 @@ const InputValidationPage = () => {
       </Card>
     </div>
   );
-
   const renderLogs = () => (
     <Card>
       <h3 className="font-semibold text-lg mb-4">Validation Logs</h3>
@@ -553,12 +518,10 @@ const InputValidationPage = () => {
       </div>
     </Card>
   );
-
   const renderImplementation = () => (
     <div className="space-y-6">
       <Card>
         <h3 className="font-semibold text-lg mb-4">Implementation Examples</h3>
-        
         <div className="space-y-6">
           {/* Backend Validation */}
           <div>
@@ -567,33 +530,26 @@ const InputValidationPage = () => {
               <code>{`from flask import request, jsonify
 import re
 import html
-
 class InputValidator:
     @staticmethod
     def validate_email(email):
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return re.match(pattern, email) is not None
-    
     @staticmethod
     def sanitize_html(content):
         return html.escape(content)
-    
     @staticmethod
     def prevent_sql_injection(query):
         # Use parameterized queries instead
         return query.replace("'", "''")
-
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
-    
     # Validate email
     if not InputValidator.validate_email(data.get('email')):
         return jsonify({'error': 'Invalid email format'}), 400
-    
     # Sanitize input
     username = InputValidator.sanitize_html(data.get('username'))
-    
     # Continue with registration...`}</code>
             </pre>
             <Button
@@ -603,58 +559,47 @@ def register():
               onClick={() => copyToClipboard(`from flask import request, jsonify
 import re
 import html
-
 class InputValidator:
     @staticmethod
     def validate_email(email):
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return re.match(pattern, email) is not None
-    
     @staticmethod
     def sanitize_html(content):
         return html.escape(content)
-    
     @staticmethod
     def prevent_sql_injection(query):
         # Use parameterized queries instead
         return query.replace("'", "''")
-
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
-    
     # Validate email
     if not InputValidator.validate_email(data.get('email')):
         return jsonify({'error': 'Invalid email format'}), 400
-    
     # Sanitize input
     username = InputValidator.sanitize_html(data.get('username'))
-    
     # Continue with registration...`)}
             >
               <Copy className="w-4 h-4 mr-2" />
               Copy Code
             </Button>
           </div>
-
           {/* Frontend Validation */}
           <div>
             <h4 className="font-medium mb-2">React Frontend Validation</h4>
             <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
               <code>{`import React, { useState } from 'react';
 import DOMPurify from 'dompurify';
-
 const InputValidation = {
   email: (value) => {
     const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return pattern.test(value);
   },
-  
   password: (value) => {
     const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/;
     return pattern.test(value);
   },
-  
   sanitizeHTML: (dirty) => {
     return DOMPurify.sanitize(dirty, {
       ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li'],
@@ -662,31 +607,25 @@ const InputValidation = {
     });
   }
 };
-
 const RegistrationForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-  
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
-    
     if (!InputValidation.email(email)) {
       newErrors.email = 'Invalid email format';
     }
-    
     if (!InputValidation.password(password)) {
       newErrors.password = 'Password must be at least 8 characters with uppercase, lowercase, number and special character';
     }
-    
     if (Object.keys(newErrors).length === 0) {
       // Submit form
     } else {
       setErrors(newErrors);
     }
   };
-  
   return (
     <form onSubmit={handleSubmit}>
       <input
@@ -696,7 +635,6 @@ const RegistrationForm = () => {
         className={errors.email ? 'error' : ''}
       />
       {errors.email && <span className="error-message">{errors.email}</span>}
-      
       <input
         type="password"
         value={password}
@@ -704,7 +642,6 @@ const RegistrationForm = () => {
         className={errors.password ? 'error' : ''}
       />
       {errors.password && <span className="error-message">{errors.password}</span>}
-      
       <button type="submit">Register</button>
     </form>
   );
@@ -716,18 +653,15 @@ const RegistrationForm = () => {
               className="mt-2"
               onClick={() => copyToClipboard(`import React, { useState } from 'react';
 import DOMPurify from 'dompurify';
-
 const InputValidation = {
   email: (value) => {
     const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return pattern.test(value);
   },
-  
   password: (value) => {
     const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/;
     return pattern.test(value);
   },
-  
   sanitizeHTML: (dirty) => {
     return DOMPurify.sanitize(dirty, {
       ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li'],
@@ -735,31 +669,25 @@ const InputValidation = {
     });
   }
 };
-
 const RegistrationForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-  
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
-    
     if (!InputValidation.email(email)) {
       newErrors.email = 'Invalid email format';
     }
-    
     if (!InputValidation.password(password)) {
       newErrors.password = 'Password must be at least 8 characters with uppercase, lowercase, number and special character';
     }
-    
     if (Object.keys(newErrors).length === 0) {
       // Submit form
     } else {
       setErrors(newErrors);
     }
   };
-  
   return (
     <form onSubmit={handleSubmit}>
       <input
@@ -769,7 +697,6 @@ const RegistrationForm = () => {
         className={errors.email ? 'error' : ''}
       />
       {errors.email && <span className="error-message">{errors.email}</span>}
-      
       <input
         type="password"
         value={password}
@@ -777,7 +704,6 @@ const RegistrationForm = () => {
         className={errors.password ? 'error' : ''}
       />
       {errors.password && <span className="error-message">{errors.password}</span>}
-      
       <button type="submit">Register</button>
     </form>
   );
@@ -787,20 +713,17 @@ const RegistrationForm = () => {
               Copy Code
             </Button>
           </div>
-
           {/* SQL Injection Prevention */}
           <div>
             <h4 className="font-medium mb-2">SQL Injection Prevention</h4>
             <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
               <code>{`# Bad - Vulnerable to SQL injection
 query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"
-
 # Good - Using parameterized queries
 cursor.execute(
     "SELECT * FROM users WHERE username = %s AND password = %s",
     (username, password)
 )
-
 # With SQLAlchemy
 from sqlalchemy import text
 query = text("SELECT * FROM users WHERE username = :username AND password = :password")
@@ -809,7 +732,6 @@ result = db.execute(query, {"username": username, "password": password})`}</code
           </div>
         </div>
       </Card>
-
       <Card>
         <h3 className="font-semibold text-lg mb-4">Best Practices</h3>
         <ul className="space-y-3">
@@ -852,7 +774,6 @@ result = db.execute(query, {"username": username, "password": password})`}</code
       </Card>
     </div>
   );
-
   const renderSelectedRule = () => (
     selectedRule && (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -867,25 +788,21 @@ result = db.execute(query, {"username": username, "password": password})`}</code
               <XCircle className="w-4 h-4" />
             </Button>
           </div>
-
           <div className="space-y-4">
             <div>
               <p className="font-medium mb-1">Description</p>
               <p className="text-sm text-gray-600">{selectedRule.description}</p>
             </div>
-
             <div>
               <p className="font-medium mb-1">Category</p>
               <p className="text-sm">{selectedRule.category}</p>
             </div>
-
             <div>
               <p className="font-medium mb-1">Severity</p>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(selectedRule.severity)}`}>
                 {selectedRule.severity}
               </span>
             </div>
-
             {selectedRule.pattern && (
               <div>
                 <p className="font-medium mb-1">Pattern/Regex</p>
@@ -894,7 +811,6 @@ result = db.execute(query, {"username": username, "password": password})`}</code
                 </pre>
               </div>
             )}
-
             {selectedRule.examples && (
               <div>
                 <p className="font-medium mb-1">Examples</p>
@@ -917,7 +833,6 @@ result = db.execute(query, {"username": username, "password": password})`}</code
                 </div>
               </div>
             )}
-
             <div className="pt-4 border-t">
               <Button
                 onClick={() => setSelectedRule(null)}
@@ -931,7 +846,6 @@ result = db.execute(query, {"username": username, "password": password})`}</code
       </div>
     )
   );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -943,7 +857,6 @@ result = db.execute(query, {"username": username, "password": password})`}</code
           Back to Settings
         </Button>
       </div>
-
       {/* Tabs */}
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
@@ -962,7 +875,6 @@ result = db.execute(query, {"username": username, "password": password})`}</code
           ))}
         </nav>
       </div>
-
       {/* Tab Content */}
       {loading ? (
         <div className="flex justify-center py-12">
@@ -976,10 +888,8 @@ result = db.execute(query, {"username": username, "password": password})`}</code
           {activeTab === 'implementation' && renderImplementation()}
         </>
       )}
-
       {renderSelectedRule()}
     </div>
   );
 };
-
 export default InputValidationPage;

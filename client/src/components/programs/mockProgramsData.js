@@ -318,7 +318,6 @@ export const generateProgramsData = (userRole) => {
       reviews: 98
     }
   ];
-
   // Filter programs based on user role
   if (userRole === "student") {
     // Students see their enrolled programs and available programs
@@ -346,7 +345,6 @@ export const generateProgramsData = (userRole) => {
     };
   }
 };
-
 // Generate program requests for trainers
 export const generateProgramRequests = () => {
   return [
@@ -370,7 +368,6 @@ export const generateProgramRequests = () => {
     }
   ];
 };
-
 // Generate program statistics
 export const generateProgramStats = () => {
   return {
@@ -387,7 +384,6 @@ export const generateProgramStats = () => {
     ]
   };
 };
-
 // Group programs by category
 export const groupProgramsByCategory = (programs) => {
   const grouped = {};
@@ -401,7 +397,6 @@ export const groupProgramsByCategory = (programs) => {
   });
   return grouped;
 };
-
 // Generate program performance metrics
 export const generateProgramPerformance = () => {
   return {
@@ -432,7 +427,6 @@ export const generateProgramPerformance = () => {
     }
   };
 };
-
 // Generate program resources
 export const generateProgramResources = (programId) => {
   return {
@@ -457,16 +451,13 @@ export const generateProgramResources = (programId) => {
     ]
   };
 };
-
 // Generate program schedule
 export const generateProgramSchedule = (programId) => {
   const schedule = [];
   const startDate = new Date('2024-01-15');
-  
   for (let week = 0; week < 24; week++) {
     const weekStart = new Date(startDate);
     weekStart.setDate(startDate.getDate() + (week * 7));
-    
     schedule.push({
       week: week + 1,
       startDate: weekStart.toISOString().split('T')[0],
@@ -484,6 +475,5 @@ export const generateProgramSchedule = (programId) => {
       } : null
     });
   }
-  
   return schedule;
 };

@@ -9,10 +9,11 @@ from app.repositories.user_repository import UserRepository
 from app.repositories.beneficiary_repository import BeneficiaryRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.repositories.document_repository import DocumentRepository
-from app.services.auth_service_refactored import AuthServiceRefactored
-from app.services.user_service_refactored import UserServiceRefactored
+from app.services.auth_service import AuthService
+from app.services.user_service import UserService
 from app.services.notification_service import NotificationService
-from app.services.document_service_refactored import DocumentService
+from app.services.document_service import DocumentService
+from app.services.beneficiary_service import BeneficiaryService
 from app.services.interfaces.auth_service_interface import IAuthService
 from app.services.interfaces.user_repository_interface import IUserRepository
 from app.services.interfaces.beneficiary_repository_interface import IBeneficiaryRepository
@@ -22,7 +23,7 @@ from app.services.interfaces.document_service_interface import IDocumentService
 from app.services.interfaces.document_repository_interface import IDocumentRepository
 from app.repositories.interfaces.notification_repository_interface import INotificationRepository
 from app.repositories.appointment_repository import AppointmentRepository
-from app.services.appointment_service_refactored import AppointmentServiceRefactored
+from app.services.appointment_service import AppointmentService
 from app.services.interfaces.appointment_service_interface import IAppointmentService
 from app.services.interfaces.appointment_repository_interface import IAppointmentRepository
 
@@ -49,6 +50,7 @@ class DIContainer:
         # Register services
         self.register('auth_service', self._create_auth_service, singleton=False)
         self.register('user_service', self._create_user_service, singleton=False)
+        self.register('beneficiary_service', self._create_beneficiary_service, singleton=False)
         self.register('notification_service', self._create_notification_service, singleton=False)
         self.register('document_service', self._create_document_service, singleton=False)
         self.register('appointment_service', self._create_appointment_service, singleton=False)
@@ -117,7 +119,7 @@ class DIContainer:
     def _create_auth_service(self) -> IAuthService:
         """Create auth service instance."""
         user_repository = self.resolve('user_repository')
-        return AuthServiceRefactored(user_repository)
+        return AuthService(user_repository)
     
     def _create_user_service(self) -> IUserService:
         """Create user service instance."""
@@ -125,7 +127,7 @@ class DIContainer:
         beneficiary_repository = self.resolve('beneficiary_repository')
         from flask import current_app
         upload_folder = current_app.config.get('UPLOAD_FOLDER', 'uploads')
-        return UserServiceRefactored(user_repository, beneficiary_repository, upload_folder)
+        return UserService(user_repository, beneficiary_repository, upload_folder)
     
     def _create_notification_service(self) -> INotificationService:
         """Create notification service instance."""
@@ -145,10 +147,16 @@ class DIContainer:
             notification_service
         )
     
+    def _create_beneficiary_service(self):
+        """Create beneficiary service instance."""
+        beneficiary_repository = self.resolve('beneficiary_repository')
+        user_repository = self.resolve('user_repository')
+        return BeneficiaryService(beneficiary_repository, user_repository)
+    
     def _create_appointment_service(self) -> IAppointmentService:
         """Create appointment service instance."""
-        # AppointmentServiceRefactored expects db_session
-        return AppointmentServiceRefactored(db.session)
+        appointment_repository = self.resolve('appointment_repository')
+        return AppointmentService(appointment_repository)
     
     def clear_singletons(self):
         """Clear all singleton instances."""

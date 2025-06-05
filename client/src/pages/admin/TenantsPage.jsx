@@ -17,7 +17,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
-
 /**
  * Tenants management page
  */
@@ -30,7 +29,6 @@ const TenantsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showNewTenantModal, setShowNewTenantModal] = useState(false);
   const [editingTenant, setEditingTenant] = useState(null);
-  
   // Fetch tenants
   useEffect(() => {
     const fetchTenants = async () => {
@@ -49,15 +47,12 @@ const TenantsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchTenants();
   }, [addToast]);
-  
   // Filter tenants based on search
   const filteredTenants = tenants.filter(tenant => 
     tenant.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
   // Handle create/update tenant
   const handleSaveTenant = async (tenantData) => {
     try {
@@ -93,13 +88,11 @@ const TenantsPage = () => {
       });
     }
   };
-  
   // Handle delete tenant
   const handleDeleteTenant = async (tenantId) => {
     if (!window.confirm('Are you sure you want to delete this tenant?')) {
       return;
     }
-    
     try {
       await api.delete(`/api/tenants/${tenantId}`);
       setTenants(prev => prev.filter(t => t.id !== tenantId));
@@ -117,12 +110,10 @@ const TenantsPage = () => {
       });
     }
   };
-  
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Tenants Management</h1>
-        
         <Button
           onClick={() => {
             setEditingTenant(null);
@@ -134,7 +125,6 @@ const TenantsPage = () => {
           Add Tenant
         </Button>
       </div>
-      
       {/* Search bar */}
       <div className="mb-6">
         <div className="relative">
@@ -148,7 +138,6 @@ const TenantsPage = () => {
           />
         </div>
       </div>
-      
       {/* Tenants list */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
@@ -174,7 +163,6 @@ const TenantsPage = () => {
                     <p className="text-sm text-gray-500">ID: {tenant.id}</p>
                   </div>
                 </div>
-                
                 <div className="relative group">
                   <Button
                     variant="ghost"
@@ -184,7 +172,6 @@ const TenantsPage = () => {
                   >
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
-                  
                   <div className="absolute right-0 top-8 w-48 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
                     <button
                       onClick={() => {
@@ -196,7 +183,6 @@ const TenantsPage = () => {
                       <Edit className="w-4 h-4 mr-2" />
                       Edit Tenant
                     </button>
-                    
                     <button
                       onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
                       className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center"
@@ -204,7 +190,6 @@ const TenantsPage = () => {
                       <Building className="w-4 h-4 mr-2" />
                       View Details
                     </button>
-                    
                     <button
                       onClick={() => handleDeleteTenant(tenant.id)}
                       className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center text-red-600"
@@ -215,7 +200,6 @@ const TenantsPage = () => {
                   </div>
                 </div>
               </div>
-              
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Status:</span>
@@ -242,7 +226,6 @@ const TenantsPage = () => {
                   <span>{new Date(tenant.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
-              
               <div className="flex space-x-2">
                 <Button
                   variant="outline"
@@ -270,7 +253,6 @@ const TenantsPage = () => {
           ))
         )}
       </div>
-      
       {/* Create/Edit Tenant Modal */}
       {showNewTenantModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -278,7 +260,6 @@ const TenantsPage = () => {
             <div className="fixed inset-0 transition-opacity" onClick={() => setShowNewTenantModal(false)}>
               <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
             </div>
-
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
@@ -297,7 +278,6 @@ const TenantsPage = () => {
                       className="mt-1 w-full"
                     />
                   </div>
-                  
                   <div>
                     <label htmlFor="tenantEmail" className="block text-sm font-medium text-gray-700">
                       Email
@@ -310,7 +290,6 @@ const TenantsPage = () => {
                       className="mt-1 w-full"
                     />
                   </div>
-                  
                   <div>
                     <label htmlFor="tenantPlan" className="block text-sm font-medium text-gray-700">
                       Plan
@@ -326,7 +305,6 @@ const TenantsPage = () => {
                       <option value="enterprise">Enterprise</option>
                     </select>
                   </div>
-                  
                   <div>
                     <label htmlFor="tenantStatus" className="block text-sm font-medium text-gray-700">
                       Status
@@ -350,7 +328,6 @@ const TenantsPage = () => {
                     const email = document.getElementById('tenantEmail').value;
                     const plan = document.getElementById('tenantPlan').value;
                     const is_active = document.getElementById('tenantStatus').value === 'true';
-                    
                     if (name.trim()) {
                       const tenantData = { 
                         name, 
@@ -383,5 +360,4 @@ const TenantsPage = () => {
     </div>
   );
 };
-
 export default TenantsPage;

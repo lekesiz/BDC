@@ -21,7 +21,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
-
 /**
  * PortalProfilePage displays and allows editing of the student's profile
  */
@@ -39,7 +38,6 @@ const PortalProfilePage = () => {
     interests: '',
     goals: ''
   });
-  
   // Fetch profile data
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -47,7 +45,6 @@ const PortalProfilePage = () => {
         setIsLoading(true);
         const response = await api.get('/api/portal/profile');
         setProfileData(response.data);
-        
         // Safely access nested properties
         const contact = response.data.contact || {};
         setEditableFields({
@@ -69,10 +66,8 @@ const PortalProfilePage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchProfileData();
   }, []); // Remove toast dependency to prevent infinite loop
-  
   // Handle field change
   const handleFieldChange = (field, value) => {
     setEditableFields(prev => ({
@@ -80,13 +75,11 @@ const PortalProfilePage = () => {
       [field]: value
     }));
   };
-  
   // Handle save changes
   const handleSaveChanges = async () => {
     try {
       // In a real app, this would submit changes to the server
       await api.put('/api/portal/profile', editableFields);
-      
       // Update local state
       setProfileData(prev => ({
         ...prev,
@@ -100,9 +93,7 @@ const PortalProfilePage = () => {
         interests: editableFields.interests,
         goals: editableFields.goals
       }));
-      
       setIsEditing(false);
-      
       toast({
         title: 'Success',
         description: 'Profile updated successfully',
@@ -117,7 +108,6 @@ const PortalProfilePage = () => {
       });
     }
   };
-  
   // Format date
   const formatDate = (dateString) => {
     if (!dateString) return 'Not set';
@@ -128,7 +118,6 @@ const PortalProfilePage = () => {
       return 'Invalid date';
     }
   };
-  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -136,7 +125,6 @@ const PortalProfilePage = () => {
       </div>
     );
   }
-  
   if (!profileData) {
     return (
       <div className="container mx-auto py-6">
@@ -147,7 +135,6 @@ const PortalProfilePage = () => {
       </div>
     );
   }
-  
   return (
     <div className="container mx-auto py-6">
       {/* Page header */}
@@ -176,7 +163,6 @@ const PortalProfilePage = () => {
           </Button>
         )}
       </div>
-      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left column: Basic info and summary */}
         <div className="space-y-6">
@@ -254,7 +240,6 @@ const PortalProfilePage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Program info */}
           <Card className="overflow-hidden">
             <div className="p-6 border-b">
@@ -288,7 +273,6 @@ const PortalProfilePage = () => {
             </div>
           </Card>
         </div>
-        
         {/* Right column: Detailed information */}
         <div className="lg:col-span-2 space-y-6">
           {/* Bio */}
@@ -310,7 +294,6 @@ const PortalProfilePage = () => {
               )}
             </div>
           </Card>
-          
           {/* Education */}
           <Card className="overflow-hidden">
             <div className="p-6 border-b">
@@ -330,7 +313,6 @@ const PortalProfilePage = () => {
               )}
             </div>
           </Card>
-          
           {/* Skills */}
           <Card className="overflow-hidden">
             <div className="p-6 border-b">
@@ -355,7 +337,6 @@ const PortalProfilePage = () => {
               ))}
             </div>
           </Card>
-          
           {/* Interests */}
           <Card className="overflow-hidden">
             <div className="p-6 border-b">
@@ -375,7 +356,6 @@ const PortalProfilePage = () => {
               )}
             </div>
           </Card>
-          
           {/* Goals */}
           <Card className="overflow-hidden">
             <div className="p-6 border-b">
@@ -400,5 +380,4 @@ const PortalProfilePage = () => {
     </div>
   );
 };
-
 export default PortalProfilePage;

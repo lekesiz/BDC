@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 import { 
   Webhook, 
   Link, 
@@ -23,7 +23,6 @@ import {
   Filter
 } from 'lucide-react';
 import { LineChart, Line, BarChart as RechartsBarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 const WebhooksPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -37,7 +36,6 @@ const WebhooksPage = () => {
     failedCalls: 234,
     pendingRetries: 12
   });
-
   useEffect(() => {
     const mockWebhooks = [
       { 
@@ -79,7 +77,6 @@ const WebhooksPage = () => {
     ];
     setWebhooks(mockWebhooks);
   }, []);
-
   const webhookActivity = [
     { hour: '00:00', calls: 234, success: 232, failed: 2 },
     { hour: '04:00', calls: 189, success: 187, failed: 2 },
@@ -88,7 +85,6 @@ const WebhooksPage = () => {
     { hour: '16:00', calls: 589, success: 578, failed: 11 },
     { hour: '20:00', calls: 345, success: 340, failed: 5 }
   ];
-
   const eventTypes = [
     { event: 'user.created', count: 12345, percentage: 27 },
     { event: 'payment.completed', count: 8967, percentage: 20 },
@@ -97,7 +93,6 @@ const WebhooksPage = () => {
     { event: 'course.finished', count: 5432, percentage: 12 },
     { event: 'other', count: 4567, percentage: 10 }
   ];
-
   const recentLogs = [
     { 
       id: 1, 
@@ -136,7 +131,6 @@ const WebhooksPage = () => {
       duration: 89
     }
   ];
-
   const availableEvents = [
     { category: 'User Events', events: ['user.created', 'user.updated', 'user.deleted', 'user.verified'] },
     { category: 'Payment Events', events: ['payment.completed', 'payment.failed', 'payment.refunded'] },
@@ -144,7 +138,6 @@ const WebhooksPage = () => {
     { category: 'Test Events', events: ['test.created', 'test.started', 'test.completed', 'test.graded'] },
     { category: 'Beneficiary Events', events: ['beneficiary.created', 'beneficiary.updated', 'beneficiary.assigned'] }
   ];
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'webhooks', label: 'Webhooks', icon: Webhook },
@@ -153,9 +146,7 @@ const WebhooksPage = () => {
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
-
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -165,7 +156,6 @@ const WebhooksPage = () => {
           Create Webhook
         </Button>
       </div>
-
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -189,7 +179,6 @@ const WebhooksPage = () => {
           })}
         </nav>
       </div>
-
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -205,7 +194,6 @@ const WebhooksPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -218,7 +206,6 @@ const WebhooksPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -231,7 +218,6 @@ const WebhooksPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -245,7 +231,6 @@ const WebhooksPage = () => {
               </div>
             </Card>
           </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <div className="p-6">
@@ -266,7 +251,6 @@ const WebhooksPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Event Distribution</h3>
@@ -294,7 +278,6 @@ const WebhooksPage = () => {
               </div>
             </Card>
           </div>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">System Status</h3>
@@ -331,7 +314,6 @@ const WebhooksPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'webhooks' && (
         <div className="space-y-6">
           <Card>
@@ -411,7 +393,6 @@ const WebhooksPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Webhook Details</h3>
@@ -468,7 +449,6 @@ const WebhooksPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'logs' && (
         <div className="space-y-6">
           <Card>
@@ -533,7 +513,6 @@ const WebhooksPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Log Details</h3>
@@ -576,7 +555,6 @@ const WebhooksPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'events' && (
         <div className="space-y-6">
           <Card>
@@ -605,7 +583,6 @@ const WebhooksPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Event Testing</h3>
@@ -647,7 +624,6 @@ const WebhooksPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'security' && (
         <div className="space-y-6">
           <Card>
@@ -663,7 +639,6 @@ const WebhooksPage = () => {
                     Verify webhook signatures to ensure requests are from authorized sources
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -673,7 +648,6 @@ const WebhooksPage = () => {
                     Only send webhooks to HTTPS endpoints
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -683,7 +657,6 @@ const WebhooksPage = () => {
                     Restrict webhook delivery to specific IP addresses
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Request timeout (seconds)
@@ -693,7 +666,6 @@ const WebhooksPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">API Keys</h3>
@@ -737,7 +709,6 @@ const WebhooksPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'settings' && (
         <div className="space-y-6">
           <Card>
@@ -753,7 +724,6 @@ const WebhooksPage = () => {
                     Number of times to retry failed webhook deliveries
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Retry delay (seconds)
@@ -768,7 +738,6 @@ const WebhooksPage = () => {
                     Time to wait between retry attempts
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -778,7 +747,6 @@ const WebhooksPage = () => {
                     Increase delay between retries exponentially
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" />
@@ -791,7 +759,6 @@ const WebhooksPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Rate Limiting</h3>
@@ -810,7 +777,6 @@ const WebhooksPage = () => {
                     <Input type="number" defaultValue="100" />
                   </div>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -820,14 +786,12 @@ const WebhooksPage = () => {
                     Apply different rate limits to different webhook endpoints
                   </p>
                 </div>
-
                 <div className="pt-4">
                   <Button variant="primary">Save Settings</Button>
                 </div>
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Event Filtering</h3>
@@ -841,7 +805,6 @@ const WebhooksPage = () => {
                     Filter events based on custom conditions before sending webhooks
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Filter Rules
@@ -878,5 +841,4 @@ const WebhooksPage = () => {
     </div>
   );
 };
-
 export default WebhooksPage;

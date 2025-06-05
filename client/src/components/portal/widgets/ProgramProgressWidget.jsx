@@ -3,13 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { BookOpen, CheckCircle, ArrowRight, Loader } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
 /**
  * Displays the student's progress in their program
  */
 const ProgramProgressWidget = ({ data, isLoading, error }) => {
   const navigate = useNavigate();
-  
   if (isLoading) {
     return (
       <Card className="overflow-hidden h-full">
@@ -22,7 +20,6 @@ const ProgramProgressWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   if (error) {
     return (
       <Card className="overflow-hidden h-full">
@@ -35,7 +32,6 @@ const ProgramProgressWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   return (
     <Card className="overflow-hidden h-full">
       <div className="p-6 flex justify-between items-center border-b">
@@ -48,7 +44,6 @@ const ProgramProgressWidget = ({ data, isLoading, error }) => {
           View Details
         </Button>
       </div>
-      
       <div className="p-6">
         <div className="flex items-center mb-4">
           <div className="mr-3">
@@ -69,7 +64,6 @@ const ProgramProgressWidget = ({ data, isLoading, error }) => {
             </div>
           </div>
         </div>
-        
         <div className="space-y-4 mt-6">
           {data?.modules?.map((module, index) => (
             <div key={module.id} className="border rounded-lg p-4">
@@ -106,7 +100,6 @@ const ProgramProgressWidget = ({ data, isLoading, error }) => {
                   style={{ width: `${module.completion}%` }}
                 ></div>
               </div>
-              
               <Button
                 variant="link"
                 size="sm"
@@ -127,5 +120,4 @@ const ProgramProgressWidget = ({ data, isLoading, error }) => {
     </Card>
   );
 };
-
 export default ProgramProgressWidget;

@@ -21,10 +21,8 @@ import { useAsync } from '@/hooks/useAsync';
 import AsyncBoundary from '@/components/common/AsyncBoundary';
 import { CardLoader } from '@/components/common/LoadingStates';
 import api from '@/lib/api';
-
 const AISettingsContent = () => {
   const { addToast } = useToast();
-  
   // State for AI providers and their settings
   const [aiProviders, setAiProviders] = useState({
     openai: {
@@ -59,17 +57,25 @@ const AISettingsContent = () => {
       showKey: false
     }
   });
-
   // Custom endpoints for specific AI features
   const [customEndpoints, setCustomEndpoints] = useState([]);
   const [newEndpoint, setNewEndpoint] = useState({ name: '', url: '', apiKey: '' });
-
   // Load settings
   const settingsAsync = useAsync(async () => {
-    const response = await api.get('/api/settings/ai');
-    return response.data;
+    try {
+      const response = await api.get('/api/settings/ai');
+      return response.data;
+    } catch (error) {
+      // If endpoint doesn't exist, return default settings
+      if (error.response?.status === 404) {
+        return {
+          providers: aiProviders,
+          customEndpoints: []
+        };
+      }
+      throw error;
+    }
   }, [], true);
-
   // Apply loaded settings
   useEffect(() => {
     if (settingsAsync.data) {
@@ -77,9 +83,27 @@ const AISettingsContent = () => {
       setCustomEndpoints(settingsAsync.data.customEndpoints || []);
     }
   }, [settingsAsync.data]);
-
   // Save settings
   const handleSave = async () => {
+    // Additional permission check for save operations
+    if (!canConfigureAI) {
+      addToast({
+        type: 'error',
+        title: 'Access Denied',
+        message: 'You do not have permission to save AI settings.'
+      });
+      return;
+    }
+    // Check if user is trying to save API keys without permission
+    const hasApiKeys = Object.values(aiProviders).some(provider => provider.apiKey);
+    if (hasApiKeys && !canManageAPIKeys) {
+      addToast({
+        type: 'error',
+        title: 'Access Denied',
+        message: 'Only administrators can save API key configurations.'
+      });
+      return;
+    }
     try {
       // Mask API keys before sending
       const maskedProviders = Object.entries(aiProviders).reduce((acc, [key, value]) => {
@@ -89,17 +113,28 @@ const AISettingsContent = () => {
         };
         return acc;
       }, {});
-
-      const response = await api.put('/api/settings/ai', {
-        providers: aiProviders,
-        customEndpoints
-      });
-
-      addToast({
-        type: 'success',
-        title: 'Settings saved',
-        message: 'AI settings have been updated successfully'
-      });
+      try {
+        const response = await api.put('/api/settings/ai', {
+          providers: aiProviders,
+          customEndpoints
+        });
+        addToast({
+          type: 'success',
+          title: 'Settings saved',
+          message: 'AI settings have been updated successfully'
+        });
+      } catch (putError) {
+        // If PUT endpoint doesn't exist, just show success for now
+        if (putError.response?.status === 404) {
+          addToast({
+            type: 'info',
+            title: 'Settings updated locally',
+            message: 'AI settings have been updated locally. Server sync will be available soon.'
+          });
+        } else {
+          throw putError;
+        }
+      }
     } catch (error) {
       addToast({
         type: 'error',
@@ -108,15 +143,22 @@ const AISettingsContent = () => {
       });
     }
   };
-
   // Test API connection
   const testConnection = async (provider) => {
+    // Permission check for testing connections
+    if (!canManageAPIKeys) {
+      addToast({
+        type: 'error',
+        title: 'Access Denied',
+        message: 'Only administrators can test API connections.'
+      });
+      return;
+    }
     try {
       const response = await api.post('/api/settings/ai/test', {
         provider,
         config: aiProviders[provider]
       });
-
       addToast({
         type: 'success',
         title: 'Connection successful',
@@ -130,7 +172,6 @@ const AISettingsContent = () => {
       });
     }
   };
-
   // Toggle API key visibility
   const toggleKeyVisibility = (provider) => {
     setAiProviders(prev => ({
@@ -141,9 +182,17 @@ const AISettingsContent = () => {
       }
     }));
   };
-
   // Update provider settings
   const updateProvider = (provider, field, value) => {
+    // Permission check for API key fields
+    if (field === 'apiKey' && !canManageAPIKeys) {
+      addToast({
+        type: 'error',
+        title: 'Access Denied',
+        message: 'Only administrators can manage API keys.'
+      });
+      return;
+    }
     setAiProviders(prev => ({
       ...prev,
       [provider]: {
@@ -152,7 +201,6 @@ const AISettingsContent = () => {
       }
     }));
   };
-
   // Add custom endpoint
   const addCustomEndpoint = () => {
     if (newEndpoint.name && newEndpoint.url) {
@@ -160,12 +208,10 @@ const AISettingsContent = () => {
       setNewEndpoint({ name: '', url: '', apiKey: '' });
     }
   };
-
   // Remove custom endpoint
   const removeCustomEndpoint = (id) => {
     setCustomEndpoints(prev => prev.filter(endpoint => endpoint.id !== id));
   };
-
   // Mask API key for display
   const maskApiKey = (key) => {
     if (!key) return '';
@@ -173,7 +219,6 @@ const AISettingsContent = () => {
     if (key.length <= visibleChars * 2) return key;
     return key.substring(0, visibleChars) + '...' + key.substring(key.length - visibleChars);
   };
-
   return (
     <AsyncBoundary
       loading={settingsAsync.loading}
@@ -207,7 +252,6 @@ const AISettingsContent = () => {
                 </label>
               </div>
             </div>
-
             {aiProviders.openai.enabled && (
               <div className="space-y-4">
                 <div>
@@ -255,7 +299,6 @@ const AISettingsContent = () => {
                     </a>
                   </p>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -271,7 +314,6 @@ const AISettingsContent = () => {
                       <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
                     </select>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Temperature
@@ -286,7 +328,6 @@ const AISettingsContent = () => {
                     />
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Max Tokens
@@ -303,7 +344,6 @@ const AISettingsContent = () => {
             )}
           </div>
         </Card>
-
         {/* Anthropic Claude */}
         <Card>
           <div className="p-6">
@@ -329,7 +369,6 @@ const AISettingsContent = () => {
                 </label>
               </div>
             </div>
-
             {aiProviders.anthropic.enabled && (
               <div className="space-y-4">
                 <div>
@@ -377,7 +416,6 @@ const AISettingsContent = () => {
                     </a>
                   </p>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -394,7 +432,6 @@ const AISettingsContent = () => {
                       <option value="claude-2.1">Claude 2.1</option>
                     </select>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Temperature
@@ -413,7 +450,207 @@ const AISettingsContent = () => {
             )}
           </div>
         </Card>
-
+        {/* Google Gemini */}
+        <Card>
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-100 rounded-lg">
+                  <Brain className="h-6 w-6 text-orange-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">Google Gemini</h3>
+                  <p className="text-sm text-gray-500">Google's advanced multimodal AI model</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={aiProviders.google.enabled}
+                    onChange={(e) => updateProvider('google', 'enabled', e.target.checked)}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+              </div>
+            </div>
+            {aiProviders.google.enabled && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    API Key
+                  </label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        type={aiProviders.google.showKey ? 'text' : 'password'}
+                        value={aiProviders.google.apiKey}
+                        onChange={(e) => updateProvider('google', 'apiKey', e.target.value)}
+                        placeholder="AIza..."
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => toggleKeyVisibility('google')}
+                        className="absolute inset-y-0 right-0 px-3 flex items-center"
+                      >
+                        {aiProviders.google.showKey ? (
+                          <EyeOff className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => testConnection('google')}
+                    >
+                      Test
+                    </Button>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Get your API key from{' '}
+                    <a
+                      href="https://makersuite.google.com/app/apikey"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      Google AI Studio
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Model
+                    </label>
+                    <select
+                      value={aiProviders.google.model}
+                      onChange={(e) => updateProvider('google', 'model', e.target.value)}
+                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                    >
+                      <option value="gemini-pro">Gemini Pro</option>
+                      <option value="gemini-pro-vision">Gemini Pro Vision</option>
+                      <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                      <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Temperature
+                    </label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={aiProviders.google.temperature}
+                      onChange={(e) => updateProvider('google', 'temperature', parseFloat(e.target.value))}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Max Output Tokens
+                  </label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="8192"
+                    value={aiProviders.google.maxTokens}
+                    onChange={(e) => updateProvider('google', 'maxTokens', parseInt(e.target.value))}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
+        {/* Custom AI Endpoint */}
+        <Card>
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-indigo-100 rounded-lg">
+                  <Settings className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">Custom AI Endpoints</h3>
+                  <p className="text-sm text-gray-500">Add custom AI service endpoints</p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                onClick={addCustomEndpoint}
+                disabled={!newEndpoint.name || !newEndpoint.url}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Endpoint
+              </Button>
+            </div>
+            {/* Add new endpoint form */}
+            <div className="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Service Name
+                  </label>
+                  <Input
+                    type="text"
+                    value={newEndpoint.name}
+                    onChange={(e) => setNewEndpoint({...newEndpoint, name: e.target.value})}
+                    placeholder="e.g., Local LLaMA, Azure OpenAI"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    API Endpoint URL
+                  </label>
+                  <Input
+                    type="text"
+                    value={newEndpoint.url}
+                    onChange={(e) => setNewEndpoint({...newEndpoint, url: e.target.value})}
+                    placeholder="https://api.your-service.com/v1/chat/completions"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  API Key (Optional)
+                </label>
+                <Input
+                  type="password"
+                  value={newEndpoint.apiKey}
+                  onChange={(e) => setNewEndpoint({...newEndpoint, apiKey: e.target.value})}
+                  placeholder="API key for authentication"
+                />
+              </div>
+            </div>
+            {/* Existing endpoints */}
+            {customEndpoints.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-medium text-gray-900">Configured Endpoints</h4>
+                {customEndpoints.map((endpoint) => (
+                  <div key={endpoint.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium">{endpoint.name}</p>
+                      <p className="text-sm text-gray-500">{endpoint.url}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeCustomEndpoint(endpoint.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </Card>
         {/* AI Features Configuration */}
         <Card>
           <div className="p-6">
@@ -421,7 +658,6 @@ const AISettingsContent = () => {
               <h3 className="text-lg font-medium text-gray-900">AI Features</h3>
               <p className="text-sm text-gray-500">Configure which AI features are enabled</p>
             </div>
-
             <div className="space-y-3">
               <label className="flex items-center space-x-3 cursor-pointer">
                 <input 
@@ -456,7 +692,6 @@ const AISettingsContent = () => {
             </div>
           </div>
         </Card>
-
         {/* Save Button */}
         <div className="flex justify-end pt-6 border-t">
           <Button onClick={handleSave}>
@@ -468,5 +703,4 @@ const AISettingsContent = () => {
     </AsyncBoundary>
   );
 };
-
 export default AISettingsContent;

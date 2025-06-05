@@ -3,25 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { CalendarCheck, Clock, Users, ChevronRight, Loader } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
 /**
  * Displays upcoming sessions for the student
  */
 const UpcomingSessionsWidget = ({ data, isLoading, error }) => {
   const navigate = useNavigate();
-  
   // Format date
   const formatDate = (dateString) => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-  
   // Format time
   const formatTime = (dateString) => {
     const options = { hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleTimeString(undefined, options);
   };
-  
   if (isLoading) {
     return (
       <Card className="overflow-hidden h-full">
@@ -34,7 +30,6 @@ const UpcomingSessionsWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   if (error) {
     return (
       <Card className="overflow-hidden h-full">
@@ -47,7 +42,6 @@ const UpcomingSessionsWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   return (
     <Card className="overflow-hidden h-full">
       <div className="p-6 flex justify-between items-center border-b">
@@ -60,7 +54,6 @@ const UpcomingSessionsWidget = ({ data, isLoading, error }) => {
           View Calendar
         </Button>
       </div>
-      
       {data && data.length > 0 ? (
         <div className="divide-y">
           {data.map(session => (
@@ -118,5 +111,4 @@ const UpcomingSessionsWidget = ({ data, isLoading, error }) => {
     </Card>
   );
 };
-
 export default UpcomingSessionsWidget;

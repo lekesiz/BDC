@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-
 const LazyExample = () => {
   return (
     <Card>
@@ -18,5 +17,4 @@ const LazyExample = () => {
     </Card>
   );
 };
-
 export default LazyExample;

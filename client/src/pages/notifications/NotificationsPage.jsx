@@ -21,7 +21,6 @@ import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
-
 /**
  * NotificationsPage displays user notifications with filtering and management options
  */
@@ -35,9 +34,7 @@ const NotificationsPage = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   const itemsPerPage = 10;
-  
   // Filter options
   const filters = [
     { id: 'all', label: 'All', icon: Bell },
@@ -47,13 +44,11 @@ const NotificationsPage = () => {
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'system', label: 'System', icon: Activity },
   ];
-
   // Fetch notifications
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         setIsLoading(true);
-        
         const response = await api.get('/api/notifications', {
           params: {
             page: currentPage,
@@ -61,7 +56,6 @@ const NotificationsPage = () => {
             filter: activeFilter !== 'all' ? activeFilter : undefined
           }
         });
-        
         setNotifications(response.data.notifications);
         setFilteredNotifications(response.data.notifications);
         setTotalPages(Math.ceil(response.data.total / itemsPerPage));
@@ -76,10 +70,8 @@ const NotificationsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchNotifications();
   }, [activeFilter, currentPage]); // Remove toast dependency to prevent infinite loop
-
   // Get icon for notification type
   const getNotificationIcon = (notification) => {
     switch (notification.type) {
@@ -97,12 +89,10 @@ const NotificationsPage = () => {
         return <Bell className="w-5 h-5 text-primary" />;
     }
   };
-
   // Mark notification as read
   const markAsRead = async (notificationId) => {
     try {
       await api.post(`/api/notifications/${notificationId}/mark-read`);
-      
       // Update notification in the list
       setNotifications(prev => 
         prev.map(notif => 
@@ -120,17 +110,14 @@ const NotificationsPage = () => {
       });
     }
   };
-
   // Mark all notifications as read
   const markAllAsRead = async () => {
     try {
       await api.post('/api/notifications/mark-all-read');
-      
       // Update all notifications in the list
       setNotifications(prev => 
         prev.map(notif => ({ ...notif, is_read: true }))
       );
-      
       toast({
         title: 'Success',
         description: 'All notifications marked as read',
@@ -145,39 +132,33 @@ const NotificationsPage = () => {
       });
     }
   };
-
   // Handle notification click
   const handleNotificationClick = (notification) => {
     // Mark as read if unread
     if (!notification.is_read) {
       markAsRead(notification.id);
     }
-    
     // Navigate based on notification type and data
     if (notification.link) {
       navigate(notification.link);
     }
   };
-
   // Navigate to previous page
   const goToPreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
-
   // Navigate to next page
   const goToNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
-
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Notifications</h1>
-        
         <Button
           variant="outline"
           onClick={markAllAsRead}
@@ -187,7 +168,6 @@ const NotificationsPage = () => {
           Mark All as Read
         </Button>
       </div>
-      
       {/* Filters */}
       <div className="flex overflow-x-auto mb-6 pb-2">
         {filters.map(filter => (
@@ -210,7 +190,6 @@ const NotificationsPage = () => {
           </Button>
         ))}
       </div>
-      
       {/* Notifications List */}
       <Card className="divide-y">
         {isLoading ? (
@@ -236,7 +215,6 @@ const NotificationsPage = () => {
                     {getNotificationIcon(notification)}
                   </div>
                 </div>
-                
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
                     <div>
@@ -247,7 +225,6 @@ const NotificationsPage = () => {
                         {notification.content}
                       </p>
                     </div>
-                    
                     <div className="ml-4 flex-shrink-0 flex flex-col items-end">
                       <span className="text-xs text-gray-500">
                         {formatDistanceToNow(new Date(notification.created_at), {
@@ -255,13 +232,11 @@ const NotificationsPage = () => {
                           locale: tr
                         })}
                       </span>
-                      
                       {!notification.is_read && (
                         <span className="mt-1 bg-primary w-2 h-2 rounded-full"></span>
                       )}
                     </div>
                   </div>
-                  
                   {notification.action_text && (
                     <div className="mt-2">
                       <Button 
@@ -277,7 +252,6 @@ const NotificationsPage = () => {
                     </div>
                   )}
                 </div>
-                
                 <div className="ml-2">
                   <Button
                     variant="ghost"
@@ -293,7 +267,6 @@ const NotificationsPage = () => {
                 </div>
               </div>
             ))}
-            
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-between items-center p-4">
@@ -304,7 +277,6 @@ const NotificationsPage = () => {
                   </span> of{' '}
                   <span className="font-medium">{totalPages * itemsPerPage}</span> results
                 </div>
-                
                 <div className="flex space-x-2">
                   <Button
                     variant="outline"
@@ -314,7 +286,6 @@ const NotificationsPage = () => {
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
-                  
                   <Button
                     variant="outline"
                     size="sm"
@@ -329,7 +300,6 @@ const NotificationsPage = () => {
           </>
         )}
       </Card>
-      
       <div className="mt-6 bg-blue-50 p-4 rounded-lg">
         <div className="flex">
           <div className="flex-shrink-0">
@@ -356,7 +326,6 @@ const NotificationsPage = () => {
     </div>
   );
 };
-
 // Info icon component
 const Info = ({ className }) => (
   <svg
@@ -372,5 +341,4 @@ const Info = ({ className }) => (
     />
   </svg>
 );
-
 export default NotificationsPage;

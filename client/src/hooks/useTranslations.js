@@ -1,17 +1,14 @@
 import { useTranslation } from 'react-i18next';
-
 /**
  * Custom hook for using translations in the BDC application
  * Provides typed translation keys and helper functions
  */
 export const useTranslations = () => {
   const { t, i18n } = useTranslation();
-
   // Helper function to get nested translation
   const translate = (key, options = {}) => {
     return t(key, options);
   };
-
   // Common translations shortcuts
   const common = {
     welcome: () => t('common.welcome'),
@@ -25,7 +22,6 @@ export const useTranslations = () => {
     error: () => t('common.error'),
     success: () => t('common.success'),
   };
-
   const navigation = {
     dashboard: () => t('navigation.dashboard'),
     beneficiaries: () => t('navigation.beneficiaries'),
@@ -38,7 +34,6 @@ export const useTranslations = () => {
     users: () => t('navigation.users'),
     profile: () => t('navigation.profile'),
   };
-
   const auth = {
     loginTitle: () => t('auth.loginTitle'),
     email: () => t('auth.email'),
@@ -47,7 +42,6 @@ export const useTranslations = () => {
     signOut: () => t('auth.signOut'),
     loginError: () => t('auth.loginError'),
   };
-
   const errors = {
     generic: () => t('errors.generic'),
     network: () => t('errors.network'),
@@ -55,14 +49,12 @@ export const useTranslations = () => {
     unauthorized: () => t('errors.unauthorized'),
     validation: () => t('errors.validation'),
   };
-
   const success = {
     saved: () => t('success.saved'),
     created: () => t('success.created'),
     updated: () => t('success.updated'),
     deleted: () => t('success.deleted'),
   };
-
   return {
     t: translate,
     i18n,
@@ -73,5 +65,4 @@ export const useTranslations = () => {
     success,
   };
 };
-
 export default useTranslations;

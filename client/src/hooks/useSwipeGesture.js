@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-
 /**
  * Hook for detecting swipe gestures on touch devices
  * @param {Object} config - Configuration object
@@ -23,10 +22,8 @@ export const useSwipeGesture = ({
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [touchStartTime, setTouchStartTime] = useState(null);
-
   const handleTouchStart = (e) => {
     if (!enabled) return;
-    
     setTouchEnd(null);
     setTouchStart({
       x: e.targetTouches[0].clientX,
@@ -34,30 +31,23 @@ export const useSwipeGesture = ({
     });
     setTouchStartTime(Date.now());
   };
-
   const handleTouchMove = (e) => {
     if (!enabled) return;
-    
     setTouchEnd({
       x: e.targetTouches[0].clientX,
       y: e.targetTouches[0].clientY
     });
   };
-
   const handleTouchEnd = () => {
     if (!enabled || !touchStart || !touchEnd) return;
-
     const touchDuration = Date.now() - touchStartTime;
     if (touchDuration > timeout) return; // Gesture took too long
-
     const distanceX = touchStart.x - touchEnd.x;
     const distanceY = touchStart.y - touchEnd.y;
     const absDistanceX = Math.abs(distanceX);
     const absDistanceY = Math.abs(distanceY);
-
     // Determine if this was a horizontal or vertical swipe
     const isHorizontalSwipe = absDistanceX > absDistanceY;
-
     if (isHorizontalSwipe && absDistanceX > threshold) {
       if (distanceX > 0 && onSwipeLeft) {
         onSwipeLeft();
@@ -71,20 +61,17 @@ export const useSwipeGesture = ({
         onSwipeDown();
       }
     }
-
     // Reset values
     setTouchStart(null);
     setTouchEnd(null);
     setTouchStartTime(null);
   };
-
   return {
     onTouchStart: handleTouchStart,
     onTouchMove: handleTouchMove,
     onTouchEnd: handleTouchEnd
   };
 };
-
 /**
  * Hook for carousel/slider swipe functionality
  * @param {Object} config - Configuration object
@@ -102,11 +89,9 @@ export const useSwipeCarousel = ({
   enabled = true
 }) => {
   const [index, setIndex] = useState(currentIndex);
-
   useEffect(() => {
     setIndex(currentIndex);
   }, [currentIndex]);
-
   const goToNext = () => {
     const nextIndex = index + 1;
     if (nextIndex < totalItems) {
@@ -117,7 +102,6 @@ export const useSwipeCarousel = ({
       onChange && onChange(0);
     }
   };
-
   const goToPrevious = () => {
     const prevIndex = index - 1;
     if (prevIndex >= 0) {
@@ -129,13 +113,11 @@ export const useSwipeCarousel = ({
       onChange && onChange(lastIndex);
     }
   };
-
   const swipeHandlers = useSwipeGesture({
     onSwipeLeft: goToNext,
     onSwipeRight: goToPrevious,
     enabled
   });
-
   return {
     currentIndex: index,
     ...swipeHandlers,

@@ -1,11 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-
 /**
  * Animated loading components using framer-motion
  */
-
 // Pulsing dots loader
 export const PulsingDots = ({ size = "md", color = "primary" }) => {
   const sizes = {
@@ -13,18 +11,15 @@ export const PulsingDots = ({ size = "md", color = "primary" }) => {
     md: "h-3 w-3",
     lg: "h-4 w-4"
   };
-  
   const colors = {
     primary: "bg-primary",
     secondary: "bg-secondary",
     gray: "bg-gray-400"
   };
-  
   const dotVariants = {
     initial: { scale: 0.8, opacity: 0.5 },
     animate: { scale: 1, opacity: 1 }
   };
-  
   return (
     <div className="flex items-center space-x-2">
       {[0, 1, 2].map((index) => (
@@ -45,7 +40,6 @@ export const PulsingDots = ({ size = "md", color = "primary" }) => {
     </div>
   );
 };
-
 // Spinning circle loader
 export const SpinningCircle = ({ size = "md", className = "" }) => {
   const sizes = {
@@ -54,7 +48,6 @@ export const SpinningCircle = ({ size = "md", className = "" }) => {
     lg: "h-12 w-12",
     xl: "h-16 w-16"
   };
-  
   return (
     <motion.div
       className={`${sizes[size]} border-2 border-gray-200 border-t-primary rounded-full ${className}`}
@@ -67,7 +60,6 @@ export const SpinningCircle = ({ size = "md", className = "" }) => {
     />
   );
 };
-
 // Progress bar loader
 export const ProgressBar = ({ progress = 0, className = "" }) => {
   return (
@@ -81,7 +73,6 @@ export const ProgressBar = ({ progress = 0, className = "" }) => {
     </div>
   );
 };
-
 // Skeleton pulse animation
 export const SkeletonPulse = ({ className = "" }) => {
   return (
@@ -98,7 +89,6 @@ export const SkeletonPulse = ({ className = "" }) => {
     />
   );
 };
-
 // Content loading placeholder
 export const ContentLoader = ({ lines = 3, className = "" }) => {
   return (
@@ -112,7 +102,6 @@ export const ContentLoader = ({ lines = 3, className = "" }) => {
     </div>
   );
 };
-
 // Card skeleton loader
 export const CardSkeleton = ({ showAvatar = true, lines = 3 }) => {
   return (
@@ -130,7 +119,6 @@ export const CardSkeleton = ({ showAvatar = true, lines = 3 }) => {
     </div>
   );
 };
-
 // Table skeleton loader
 export const TableSkeleton = ({ rows = 5, columns = 4 }) => {
   return (
@@ -160,7 +148,6 @@ export const TableSkeleton = ({ rows = 5, columns = 4 }) => {
     </div>
   );
 };
-
 // Form skeleton loader
 export const FormSkeleton = ({ fields = 4 }) => {
   return (
@@ -178,7 +165,6 @@ export const FormSkeleton = ({ fields = 4 }) => {
     </div>
   );
 };
-
 // Page loading overlay
 export const LoadingOverlay = ({ 
   visible = true, 
@@ -186,11 +172,9 @@ export const LoadingOverlay = ({
   fullScreen = false 
 }) => {
   if (!visible) return null;
-  
   const containerClass = fullScreen 
     ? "fixed inset-0 z-50" 
     : "absolute inset-0";
-  
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -205,7 +189,6 @@ export const LoadingOverlay = ({
     </motion.div>
   );
 };
-
 // Button loading state
 export const ButtonLoading = ({ 
   loading = false, 
@@ -234,7 +217,6 @@ export const ButtonLoading = ({
     </button>
   );
 };
-
 // Stagger children animation for lists
 export const StaggerChildren = ({ children, className = "" }) => {
   const container = {
@@ -246,12 +228,10 @@ export const StaggerChildren = ({ children, className = "" }) => {
       }
     }
   };
-  
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 }
   };
-  
   return (
     <motion.div
       className={className}

@@ -14,7 +14,6 @@ import {
   Send,
   AlertCircle
 } from 'lucide-react';
-
 const SlackIntegration = ({ integration, onBack }) => {
   const [workspace, setWorkspace] = useState({
     name: 'BDC Academy',
@@ -22,7 +21,6 @@ const SlackIntegration = ({ integration, onBack }) => {
     members: 156,
     channels: 24
   });
-
   const [channels, setChannels] = useState([
     { id: 'C001', name: 'general', type: 'public', notifications: true, members: 156 },
     { id: 'C002', name: 'announcements', type: 'public', notifications: true, members: 145 },
@@ -30,7 +28,6 @@ const SlackIntegration = ({ integration, onBack }) => {
     { id: 'C004', name: 'beneficiary-support', type: 'private', notifications: false, members: 23 },
     { id: 'C005', name: 'dev-team', type: 'private', notifications: false, members: 12 }
   ]);
-
   const [notificationSettings, setNotificationSettings] = useState({
     newEnrollment: true,
     assignmentSubmission: true,
@@ -39,7 +36,6 @@ const SlackIntegration = ({ integration, onBack }) => {
     programUpdate: true,
     systemAlerts: false
   });
-
   const configFields = [
     {
       name: 'botToken',
@@ -77,7 +73,6 @@ const SlackIntegration = ({ integration, onBack }) => {
       description: 'Group related messages in threads'
     }
   ];
-
   const oauthConfig = {
     authUrl: 'https://slack.com/oauth/v2/authorize',
     tokenUrl: 'https://slack.com/api/oauth.v2.access',
@@ -92,7 +87,6 @@ const SlackIntegration = ({ integration, onBack }) => {
       'im:write'
     ]
   };
-
   const webhookEvents = [
     'message.channels',
     'message.im',
@@ -101,7 +95,6 @@ const SlackIntegration = ({ integration, onBack }) => {
     'member_joined_channel',
     'reaction_added'
   ];
-
   const apiEndpoints = [
     {
       method: 'GET',
@@ -124,7 +117,6 @@ const SlackIntegration = ({ integration, onBack }) => {
       description: 'List workspace members'
     }
   ];
-
   const customOverview = (
     <>
       {/* Workspace Overview */}
@@ -162,7 +154,6 @@ const SlackIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Channel Management */}
       <Card>
         <div className="p-6">
@@ -208,7 +199,6 @@ const SlackIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Notification Settings */}
       <Card>
         <div className="p-6">
@@ -251,7 +241,6 @@ const SlackIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Quick Actions */}
       <Card>
         <div className="p-6">
@@ -288,7 +277,6 @@ const SlackIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Recent Messages */}
       <Card>
         <div className="p-6">
@@ -319,7 +307,6 @@ const SlackIntegration = ({ integration, onBack }) => {
       </Card>
     </>
   );
-
   return (
     <BaseIntegration
       integration={integration}
@@ -333,8 +320,6 @@ const SlackIntegration = ({ integration, onBack }) => {
     </BaseIntegration>
   );
 };
-
 // Add missing Lock icon import
 import { Lock } from 'lucide-react';
-
 export default SlackIntegration;

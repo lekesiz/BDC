@@ -161,7 +161,6 @@ export const generateNotificationsData = (userRole) => {
       }
     }
   ];
-
   // Add role-specific notifications
   if (userRole === "trainer") {
     const trainerNotifications = [
@@ -228,7 +227,6 @@ export const generateNotificationsData = (userRole) => {
     ];
     return [...baseNotifications, ...trainerNotifications];
   }
-
   if (userRole === "admin" || userRole === "tenant_admin") {
     const adminNotifications = [
       {
@@ -294,10 +292,8 @@ export const generateNotificationsData = (userRole) => {
     ];
     return [...baseNotifications, ...adminNotifications];
   }
-
   return baseNotifications;
 };
-
 // Generate notification preferences
 export const generateNotificationPreferences = () => {
   return {
@@ -367,7 +363,6 @@ export const generateNotificationPreferences = () => {
     }
   };
 };
-
 // Generate notification statistics
 export const generateNotificationStats = () => {
   return {
@@ -403,7 +398,6 @@ export const generateNotificationStats = () => {
     }
   };
 };
-
 // Generate notification templates
 export const generateNotificationTemplates = () => {
   return [

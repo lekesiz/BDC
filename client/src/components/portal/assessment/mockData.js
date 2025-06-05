@@ -1,11 +1,8 @@
 /**
  * Mock data for assessments and quizzes
  */
-
 import { subDays, addDays } from 'date-fns';
-
 const NOW = new Date();
-
 // Sample assessment data
 export const assessmentsData = {
   moduleAssessments: [
@@ -174,7 +171,6 @@ export const assessmentsData = {
     }
   ]
 };
-
 // Sample quiz data
 export const quizzes = {
   "m1-assessment": {
@@ -349,7 +345,6 @@ export const quizzes = {
     ]
   }
 };
-
 // Sample assessment results
 export const assessmentResults = {
   "m1-assessment": {
@@ -375,12 +370,10 @@ export const assessmentResults = {
     feedback: "Excellent understanding of HTML and CSS fundamentals! You might want to review CSS selectors a bit more."
   }
 };
-
 // Mock API functions
 export const getAssessments = () => {
   return Promise.resolve(assessmentsData);
 };
-
 export const getAssessmentById = (id) => {
   // Find the assessment in all categories
   const allAssessments = [
@@ -388,40 +381,29 @@ export const getAssessmentById = (id) => {
     ...assessmentsData.programAssessments,
     ...assessmentsData.skillAssessments
   ];
-  
   const assessment = allAssessments.find(a => a.id === id);
-  
   if (!assessment) {
     return Promise.reject(new Error('Assessment not found'));
   }
-  
   return Promise.resolve(assessment);
 };
-
 export const getQuizById = (id) => {
   const quiz = quizzes[id];
-  
   if (!quiz) {
     return Promise.reject(new Error('Quiz not found'));
   }
-  
   return Promise.resolve(quiz);
 };
-
 export const getAssessmentResult = (assessmentId) => {
   const result = assessmentResults[assessmentId];
-  
   if (!result) {
     return Promise.reject(new Error('Assessment result not found'));
   }
-  
   return Promise.resolve(result);
 };
-
 export const submitQuizResults = (assessmentId, results) => {
   // In a real implementation, this would store the results in the database
   // For our mock, we'll just simulate a successful submission
-  
   return Promise.resolve({
     success: true,
     message: "Quiz results submitted successfully",

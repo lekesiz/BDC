@@ -1,7 +1,6 @@
 /**
  * Evaluations Mock Data for Demo and Testing
  */
-
 // Evaluation types
 export const EVALUATION_TYPES = {
   QUIZ: 'quiz',
@@ -11,7 +10,6 @@ export const EVALUATION_TYPES = {
   PRESENTATION: 'presentation',
   PRACTICAL: 'practical'
 };
-
 // Evaluation status
 export const EVALUATION_STATUS = {
   DRAFT: 'draft',
@@ -20,7 +18,6 @@ export const EVALUATION_STATUS = {
   COMPLETED: 'completed',
   ARCHIVED: 'archived'
 };
-
 // Difficulty levels
 export const DIFFICULTY_LEVELS = {
   BEGINNER: 'beginner',
@@ -28,7 +25,6 @@ export const DIFFICULTY_LEVELS = {
   ADVANCED: 'advanced',
   EXPERT: 'expert'
 };
-
 // Question types
 export const QUESTION_TYPES = {
   MULTIPLE_CHOICE: 'multiple_choice',
@@ -38,7 +34,6 @@ export const QUESTION_TYPES = {
   MATCHING: 'matching',
   FILL_BLANK: 'fill_blank'
 };
-
 // Sample evaluation topics
 const evaluationTopics = [
   'Genel Yetenek', 'Matematik', 'Türkçe', 'İngilizce', 'Bilgisayar Bilimleri',
@@ -46,7 +41,6 @@ const evaluationTopics = [
   'Yaratıcı Düşünce', 'Liderlik', 'Takım Çalışması', 'Proje Yönetimi',
   'Dijital Okuryazarlık', 'Finansal Okuryazarlık', 'Girişimcilik'
 ];
-
 // Generate sample questions
 const generateQuestions = (count, type = null) => {
   const questions = [];
@@ -57,18 +51,15 @@ const generateQuestions = (count, type = null) => {
     'Bu problemin çözümü için hangi adımlar izlenmelidir?',
     'Aşağıdaki kavramlardan hangisi tanımla eşleşir?'
   ];
-  
   const options = [
     ['Seçenek A', 'Seçenek B', 'Seçenek C', 'Seçenek D'],
     ['Doğru planlamak', 'Hızlı hareket etmek', 'Beklemek', 'Vazgeçmek'],
     ['Sakin kalmak', 'Acele etmek', 'Panik yapmak', 'Görmezden gelmek'],
     ['Analiz → Plan → Uygulama → Değerlendirme', 'Uygulama → Plan → Analiz', 'Plan → Analiz → Uygulama', 'Değerlendirme → Plan → Uygulama']
   ];
-
   for (let i = 1; i <= count; i++) {
     const questionType = type || Object.values(QUESTION_TYPES)[Math.floor(Math.random() * Object.values(QUESTION_TYPES).length)];
     const questionText = questionTexts[Math.floor(Math.random() * questionTexts.length)];
-    
     let question = {
       id: i,
       type: questionType,
@@ -76,7 +67,6 @@ const generateQuestions = (count, type = null) => {
       points: Math.floor(Math.random() * 10) + 5, // 5-15 points
       difficulty: Object.values(DIFFICULTY_LEVELS)[Math.floor(Math.random() * Object.values(DIFFICULTY_LEVELS).length)]
     };
-
     switch (questionType) {
       case QUESTION_TYPES.MULTIPLE_CHOICE:
         question.options = options[Math.floor(Math.random() * options.length)];
@@ -99,24 +89,19 @@ const generateQuestions = (count, type = null) => {
         question.correctAnswer = ['blank1', 'blank2'];
         break;
     }
-
     questions.push(question);
   }
-
   return questions;
 };
-
 // Generate evaluations
 const generateEvaluation = (id) => {
   const topic = evaluationTopics[Math.floor(Math.random() * evaluationTopics.length)];
   const type = Object.values(EVALUATION_TYPES)[Math.floor(Math.random() * Object.values(EVALUATION_TYPES).length)];
   const status = Object.values(EVALUATION_STATUS)[Math.floor(Math.random() * Object.values(EVALUATION_STATUS).length)];
   const difficulty = Object.values(DIFFICULTY_LEVELS)[Math.floor(Math.random() * Object.values(DIFFICULTY_LEVELS).length)];
-  
   const createdDate = new Date(2024, Math.floor(Math.random() * 6), Math.floor(Math.random() * 28));
   const questionCount = Math.floor(Math.random() * 20) + 10; // 10-30 questions
   const duration = Math.floor(Math.random() * 90) + 30; // 30-120 minutes
-  
   return {
     id,
     title: `${topic} ${type === 'exam' ? 'Sınavı' : type === 'quiz' ? 'Quiz' : 'Değerlendirmesi'}`,
@@ -125,28 +110,23 @@ const generateEvaluation = (id) => {
     status,
     difficulty,
     category: topic,
-    
     // Basic info
     duration, // minutes
     totalQuestions: questionCount,
     totalPoints: questionCount * 10, // assuming average 10 points per question
     passingScore: 60, // percentage
     maxAttempts: type === 'exam' ? 1 : 3,
-    
     // Scheduling
     startDate: createdDate.toISOString(),
     endDate: new Date(createdDate.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days later
     isActive: status === 'active',
-    
     // Visibility and access
     isPublic: Math.random() > 0.3,
     allowRetake: type !== 'exam',
     showResults: Math.random() > 0.2,
     showCorrectAnswers: Math.random() > 0.5,
-    
     // Questions
     questions: generateQuestions(questionCount),
-    
     // Statistics
     stats: {
       totalAttempts: Math.floor(Math.random() * 100) + 10,
@@ -154,7 +134,6 @@ const generateEvaluation = (id) => {
       passRate: Math.floor(Math.random() * 30) + 70, // 70-100%
       averageTimeSpent: Math.floor(Math.random() * 30) + duration - 15 // near duration
     },
-    
     // Settings
     settings: {
       randomizeQuestions: Math.random() > 0.5,
@@ -165,7 +144,6 @@ const generateEvaluation = (id) => {
       fullscreen: type === 'exam',
       preventCopy: type === 'exam'
     },
-    
     // Metadata
     createdBy: {
       id: Math.floor(Math.random() * 5) + 1,
@@ -174,7 +152,6 @@ const generateEvaluation = (id) => {
     },
     createdAt: createdDate.toISOString(),
     updatedAt: new Date(createdDate.getTime() + Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString(),
-    
     // Tags and categories
     tags: [topic, difficulty, type].filter(Boolean),
     learningOutcomes: [
@@ -184,28 +161,23 @@ const generateEvaluation = (id) => {
     ]
   };
 };
-
 // Generate evaluation results/attempts
 const generateEvaluationResult = (evaluationId, userId) => {
   const startTime = new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000);
   const duration = Math.floor(Math.random() * 90) + 30; // 30-120 minutes
   const endTime = new Date(startTime.getTime() + duration * 60 * 1000);
-  
   const totalQuestions = Math.floor(Math.random() * 20) + 10;
   const correctAnswers = Math.floor(Math.random() * totalQuestions);
   const score = Math.round((correctAnswers / totalQuestions) * 100);
-  
   return {
     id: Math.floor(Math.random() * 10000),
     evaluationId,
     userId,
     attemptNumber: Math.floor(Math.random() * 3) + 1,
-    
     // Timing
     startedAt: startTime.toISOString(),
     completedAt: endTime.toISOString(),
     timeSpent: duration, // minutes
-    
     // Scoring
     totalQuestions,
     correctAnswers,
@@ -214,7 +186,6 @@ const generateEvaluationResult = (evaluationId, userId) => {
     score, // percentage
     grade: score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 70 ? 'C' : score >= 60 ? 'D' : 'F',
     passed: score >= 60,
-    
     // Detailed results
     questionResults: Array.from({ length: totalQuestions }, (_, i) => ({
       questionId: i + 1,
@@ -224,7 +195,6 @@ const generateEvaluationResult = (evaluationId, userId) => {
       points: Math.floor(Math.random() * 10) + 5,
       timeSpent: Math.floor(Math.random() * 3) + 1 // minutes per question
     })),
-    
     // Analysis
     categoryScores: {
       'Temel Bilgiler': Math.floor(Math.random() * 40) + 60,
@@ -232,18 +202,15 @@ const generateEvaluationResult = (evaluationId, userId) => {
       'Analiz': Math.floor(Math.random() * 40) + 60,
       'Sentez': Math.floor(Math.random() * 40) + 60
     },
-    
     difficultyScores: {
       beginner: Math.floor(Math.random() * 20) + 80,
       intermediate: Math.floor(Math.random() * 30) + 70,
       advanced: Math.floor(Math.random() * 40) + 60
     },
-    
     feedback: score >= 90 ? 'Mükemmel performans!' : 
              score >= 80 ? 'Çok iyi çalışma!' :
              score >= 70 ? 'İyi bir performans.' :
              score >= 60 ? 'Geçer not, geliştirilmeli.' : 'Başarısız, tekrar çalışılmalı.',
-    
     recommendations: [
       score < 70 ? 'Temel konuları tekrar edin' : 'İleri düzey konulara geçebilirsiniz',
       'Pratik sorular çözün',
@@ -251,10 +218,8 @@ const generateEvaluationResult = (evaluationId, userId) => {
     ].filter(Boolean)
   };
 };
-
 // Generate mock data
 export const mockEvaluations = Array.from({ length: 25 }, (_, i) => generateEvaluation(i + 1));
-
 // Generate evaluation results
 export const mockEvaluationResults = [];
 for (let evalId = 1; evalId <= 25; evalId++) {
@@ -264,7 +229,6 @@ for (let evalId = 1; evalId <= 25; evalId++) {
     mockEvaluationResults.push(generateEvaluationResult(evalId, userId));
   }
 }
-
 // Evaluation statistics
 export const evaluationStats = {
   total: mockEvaluations.length,
@@ -274,21 +238,17 @@ export const evaluationStats = {
   totalAttempts: mockEvaluationResults.length,
   averageScore: Math.round(mockEvaluationResults.reduce((sum, r) => sum + r.score, 0) / mockEvaluationResults.length),
   passRate: Math.round((mockEvaluationResults.filter(r => r.passed).length / mockEvaluationResults.length) * 100),
-  
   byType: Object.values(EVALUATION_TYPES).reduce((acc, type) => {
     acc[type] = mockEvaluations.filter(e => e.type === type).length;
     return acc;
   }, {}),
-  
   byDifficulty: Object.values(DIFFICULTY_LEVELS).reduce((acc, level) => {
     acc[level] = mockEvaluations.filter(e => e.difficulty === level).length;
     return acc;
   }, {}),
-  
   categoryDistribution: evaluationTopics.reduce((acc, topic) => {
     acc[topic] = mockEvaluations.filter(e => e.category === topic).length;
     return acc;
   }, {})
 };
-
 export default mockEvaluations;

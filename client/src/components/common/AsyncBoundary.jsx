@@ -1,7 +1,6 @@
 import React from 'react';
 import ErrorBoundary from './ErrorBoundary';
 import { DataState } from './LoadingStates';
-
 /**
  * Combined component that handles both error boundaries and loading states
  * Simplifies the pattern of wrapping components with both error and loading handling
@@ -47,7 +46,6 @@ const AsyncBoundary = ({
     </ErrorBoundary>
   );
 };
-
 /**
  * Hook to manage async boundary state
  */
@@ -57,23 +55,18 @@ export const useAsyncBoundary = () => {
     error: null,
     data: null
   });
-
   const setLoading = (loading) => {
     setState(prev => ({ ...prev, loading }));
   };
-
   const setError = (error) => {
     setState(prev => ({ ...prev, error, loading: false }));
   };
-
   const setData = (data) => {
     setState(prev => ({ ...prev, data, loading: false, error: null }));
   };
-
   const reset = () => {
     setState({ loading: false, error: null, data: null });
   };
-
   return {
     ...state,
     setLoading,
@@ -82,7 +75,6 @@ export const useAsyncBoundary = () => {
     reset
   };
 };
-
 /**
  * HOC to wrap any component with async boundary
  */
@@ -93,5 +85,4 @@ export const withAsyncBoundary = (Component, boundaryProps = {}) => {
     </AsyncBoundary>
   );
 };
-
 export default AsyncBoundary;

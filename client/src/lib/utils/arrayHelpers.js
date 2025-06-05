@@ -1,7 +1,6 @@
 /**
  * Safe array helper functions to prevent undefined errors
  */
-
 /**
  * Safely access array for mapping
  * @param {any} data - The data that should be an array
@@ -17,7 +16,6 @@ export const safeArray = (data, defaultValue = []) => {
   if (data && typeof data === 'object' && Array.isArray(data.data)) return data.data;
   return defaultValue;
 };
-
 /**
  * Safely access nested array property
  * @param {Object} obj - The object containing the array
@@ -27,10 +25,8 @@ export const safeArray = (data, defaultValue = []) => {
  */
 export const safeArrayPath = (obj, path, defaultValue = []) => {
   if (!obj || typeof obj !== 'object') return defaultValue;
-  
   const keys = path.split('.');
   let current = obj;
-  
   for (const key of keys) {
     if (current && typeof current === 'object' && key in current) {
       current = current[key];
@@ -38,10 +34,8 @@ export const safeArrayPath = (obj, path, defaultValue = []) => {
       return defaultValue;
     }
   }
-  
   return safeArray(current, defaultValue);
 };
-
 /**
  * Check if a value is a non-empty array
  * @param {any} value - The value to check
@@ -50,7 +44,6 @@ export const safeArrayPath = (obj, path, defaultValue = []) => {
 export const isNonEmptyArray = (value) => {
   return Array.isArray(value) && value.length > 0;
 };
-
 /**
  * Safely find an item in an array
  * @param {any} data - The data that should be an array
@@ -62,7 +55,6 @@ export const safeFind = (data, predicate, defaultValue = null) => {
   const array = safeArray(data);
   return array.find(predicate) || defaultValue;
 };
-
 /**
  * Safely filter an array
  * @param {any} data - The data that should be an array
@@ -73,7 +65,6 @@ export const safeFilter = (data, predicate) => {
   const array = safeArray(data);
   return array.filter(predicate);
 };
-
 /**
  * Get length of array safely
  * @param {any} data - The data that should be an array

@@ -8,6 +8,8 @@ from app.models.user import User
 from app.models.appointment import Appointment
 from app.models.availability import AvailabilitySchedule, AvailabilitySlot
 
+from app.utils.logging import logger
+
 calendar_bp = Blueprint('calendar', __name__)
 
 @calendar_bp.route('/calendar/events', methods=['GET'])
@@ -109,7 +111,7 @@ def get_calendar_events():
             'total': len(events)
         })
     except Exception as e:
-        print(f"Calendar error: {str(e)}")
+        logger.info(f"Calendar error: {str(e)}")
         return jsonify({'message': str(e)}), 400
 
 

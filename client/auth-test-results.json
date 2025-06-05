@@ -1,0 +1,107 @@
+{
+  "mockDataCheck": {
+    "totalRoles": 4,
+    "foundRoles": 4,
+    "missingRoles": [],
+    "success": true
+  },
+  "userExistence": {
+    "super_admin": true,
+    "tenant_admin": true,
+    "trainer": true,
+    "student": true
+  },
+  "loginTests": {
+    "super_admin": {
+      "success": false,
+      "error": "timeout of 10000ms exceeded"
+    },
+    "tenant_admin": {
+      "success": false,
+      "error": "timeout of 10000ms exceeded"
+    },
+    "trainer": {
+      "success": false,
+      "error": "timeout of 10000ms exceeded"
+    },
+    "student": {
+      "success": false,
+      "error": "timeout of 10000ms exceeded"
+    }
+  },
+  "tokenTests": {
+    "super_admin": {
+      "hasToken": false
+    },
+    "tenant_admin": {
+      "hasToken": false
+    },
+    "trainer": {
+      "hasToken": false
+    },
+    "student": {
+      "hasToken": false
+    }
+  },
+  "redirectTests": {
+    "super_admin": {
+      "hasLogic": true,
+      "expectedPath": "/"
+    },
+    "tenant_admin": {
+      "hasLogic": true,
+      "expectedPath": "/"
+    },
+    "trainer": {
+      "hasLogic": true,
+      "expectedPath": "/"
+    },
+    "student": {
+      "hasLogic": true,
+      "expectedPath": "/portal"
+    }
+  },
+  "authFlowTests": {
+    "super_admin": {
+      "steps": {
+        "login": false,
+        "token": false,
+        "redirect": true
+      },
+      "success": false,
+      "completeness": 0.3333333333333333
+    },
+    "tenant_admin": {
+      "steps": {
+        "login": false,
+        "token": false,
+        "redirect": true
+      },
+      "success": false,
+      "completeness": 0.3333333333333333
+    },
+    "trainer": {
+      "steps": {
+        "login": false,
+        "token": false,
+        "redirect": true
+      },
+      "success": false,
+      "completeness": 0.3333333333333333
+    },
+    "student": {
+      "steps": {
+        "login": false,
+        "token": false,
+        "redirect": true
+      },
+      "success": false,
+      "completeness": 0.3333333333333333
+    }
+  },
+  "summary": {
+    "passed": 11,
+    "failed": 4,
+    "total": 0
+  }
+}

@@ -10,7 +10,6 @@ import AccessibleSelect from '@/components/ui/accessible-select';
 import AccessibleForm from '@/components/forms/AccessibleForm';
 import { useToast } from '@/components/ui/toast';
 import { announceToScreenReader } from '@/utils/accessibility';
-
 /**
  * Example component demonstrating accessibility features
  * This serves as a reference for implementing accessible components
@@ -21,21 +20,18 @@ const AccessibilityExample = () => {
   const [selectedValue, setSelectedValue] = useState('');
   const [formData, setFormData] = useState({});
   const { toast } = useToast();
-
   // Example data
   const tableData = [
     { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
     { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User' },
     { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'User' },
   ];
-
   const selectOptions = [
     { value: 'option1', label: 'Option 1' },
     { value: 'option2', label: 'Option 2' },
     { value: 'option3', label: 'Option 3', disabled: true },
     { value: 'option4', label: 'Option 4' },
   ];
-
   const handleFormSubmit = async (data) => {
     setFormData(data);
     toast({
@@ -45,7 +41,6 @@ const AccessibilityExample = () => {
     });
     announceToScreenReader('Form submitted successfully');
   };
-
   const handleAction = (action) => {
     toast({
       type: 'info',
@@ -53,7 +48,6 @@ const AccessibilityExample = () => {
       message: `You selected: ${action}`,
     });
   };
-
   return (
     <div className="p-6 space-y-8">
       <header>
@@ -63,13 +57,11 @@ const AccessibilityExample = () => {
           keyboard navigation, and screen reader support.
         </p>
       </header>
-
       {/* Section: Buttons and Inputs */}
       <section aria-labelledby="buttons-heading">
         <h2 id="buttons-heading" className="text-2xl font-semibold mb-4">
           Buttons and Inputs
         </h2>
-        
         <div className="space-y-4">
           <div className="flex gap-4">
             <Button onClick={() => setModalOpen(true)} aria-label="Open modal dialog">
@@ -91,7 +83,6 @@ const AccessibilityExample = () => {
               Loading State
             </Button>
           </div>
-          
           <div className="max-w-md">
             <Input
               label="Example Input"
@@ -103,13 +94,11 @@ const AccessibilityExample = () => {
           </div>
         </div>
       </section>
-
       {/* Section: Select and Dropdown */}
       <section aria-labelledby="select-heading">
         <h2 id="select-heading" className="text-2xl font-semibold mb-4">
           Select and Dropdown
         </h2>
-        
         <div className="flex gap-8">
           <div className="w-64">
             <AccessibleSelect
@@ -121,7 +110,6 @@ const AccessibilityExample = () => {
               required
             />
           </div>
-          
           <Dropdown
             trigger={
               <Button variant="outline" aria-label="Actions menu">
@@ -139,13 +127,11 @@ const AccessibilityExample = () => {
           </Dropdown>
         </div>
       </section>
-
       {/* Section: Tabs */}
       <section aria-labelledby="tabs-heading">
         <h2 id="tabs-heading" className="text-2xl font-semibold mb-4">
           Accessible Tabs
         </h2>
-        
         <Tabs defaultValue="tab1" className="w-full">
           <TabsList>
             <TabTrigger value="tab1">Tab 1</TabTrigger>
@@ -160,13 +146,11 @@ const AccessibilityExample = () => {
           </TabContent>
         </Tabs>
       </section>
-
       {/* Section: Table */}
       <section aria-labelledby="table-heading">
         <h2 id="table-heading" className="text-2xl font-semibold mb-4">
           Accessible Table
         </h2>
-        
         <Table aria-label="User data table" caption="List of registered users">
           <TableHeader>
             <TableRow>
@@ -197,13 +181,11 @@ const AccessibilityExample = () => {
           </TableBody>
         </Table>
       </section>
-
       {/* Section: Form */}
       <section aria-labelledby="form-heading">
         <h2 id="form-heading" className="text-2xl font-semibold mb-4">
           Accessible Form
         </h2>
-        
         <div className="max-w-lg">
           <AccessibleForm
             formTitle="Contact Form"
@@ -212,7 +194,6 @@ const AccessibilityExample = () => {
           />
         </div>
       </section>
-
       {/* Modal Example */}
       <Modal
         isOpen={modalOpen}
@@ -246,7 +227,6 @@ const AccessibilityExample = () => {
           </div>
         </div>
       </Modal>
-
       {/* Dialog Example */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogHeader>
@@ -270,7 +250,6 @@ const AccessibilityExample = () => {
           </Button>
         </DialogFooter>
       </Dialog>
-
       {/* Keyboard Navigation Instructions */}
       <section aria-labelledby="instructions-heading" className="bg-gray-50 p-6 rounded-lg">
         <h2 id="instructions-heading" className="text-xl font-semibold mb-4">
@@ -288,5 +267,4 @@ const AccessibilityExample = () => {
     </div>
   );
 };
-
 export default AccessibilityExample;

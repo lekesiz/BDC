@@ -18,7 +18,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
-
 /**
  * ReportSchedulePage allows users to schedule automated report generation and delivery
  */
@@ -26,7 +25,6 @@ const ReportSchedulePage = () => {
   const { id } = useParams(); // Optional schedule ID for editing
   const [searchParams] = useSearchParams();
   const reportId = searchParams.get('reportId');
-  
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -49,22 +47,18 @@ const ReportSchedulePage = () => {
   const [selectedUser, setSelectedUser] = useState('');
   const [users, setUsers] = useState([]);
   const [userSearchTerm, setUserSearchTerm] = useState('');
-  
   // Fetch data for schedule creation or editing
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
         // Fetch users for recipient selection
         const usersResponse = await api.get('/api/users');
         setUsers(usersResponse.data);
-        
         // If we have a report ID from query params, fetch the report
         if (reportId && reportId !== 'new') {
           const reportResponse = await api.get(`/api/reports/${reportId}`);
           setReport(reportResponse.data);
-          
           // Pre-populate schedule name based on report
           if (!editMode) {
             setScheduleData(prev => ({
@@ -73,19 +67,15 @@ const ReportSchedulePage = () => {
             }));
           }
         }
-        
         // If ID is provided, fetch the schedule for editing
         if (id && id !== 'create') {
           const scheduleResponse = await api.get(`/api/reports/schedules/${id}`);
           setScheduleData(scheduleResponse.data);
-          
           // Also fetch the associated report
           const reportResponse = await api.get(`/api/reports/${scheduleResponse.data.reportId}`);
           setReport(reportResponse.data);
-          
           setEditMode(true);
         }
-        
       } catch (error) {
         console.error('Error fetching schedule data:', error);
         toast({
@@ -97,10 +87,8 @@ const ReportSchedulePage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchData();
   }, [id, reportId, toast, editMode]);
-  
   // Save schedule
   const saveSchedule = async () => {
     // Validate inputs
@@ -112,7 +100,6 @@ const ReportSchedulePage = () => {
       });
       return;
     }
-    
     if (scheduleData.formats.length === 0) {
       toast({
         title: 'Error',
@@ -121,7 +108,6 @@ const ReportSchedulePage = () => {
       });
       return;
     }
-    
     if (scheduleData.recipients.length === 0) {
       toast({
         title: 'Error',
@@ -130,31 +116,25 @@ const ReportSchedulePage = () => {
       });
       return;
     }
-    
     try {
       setIsSaving(true);
-      
       const dataToSubmit = {
         ...scheduleData,
         reportId: report.id
       };
-      
       let response;
       if (editMode) {
         response = await api.put(`/api/reports/schedules/${id}`, dataToSubmit);
       } else {
         response = await api.post('/api/reports/schedules', dataToSubmit);
       }
-      
       toast({
         title: 'Success',
         description: editMode ? 'Schedule updated successfully' : 'Schedule created successfully',
         type: 'success',
       });
-      
       // Navigate back to reports page
       navigate('/reports');
-      
     } catch (error) {
       console.error('Error saving schedule:', error);
       toast({
@@ -166,25 +146,19 @@ const ReportSchedulePage = () => {
       setIsSaving(false);
     }
   };
-  
   // Delete schedule
   const deleteSchedule = async () => {
     if (!confirm('Are you sure you want to delete this schedule?')) return;
-    
     try {
       setIsDeleting(true);
-      
       await api.delete(`/api/reports/schedules/${id}`);
-      
       toast({
         title: 'Success',
         description: 'Schedule deleted successfully',
         type: 'success',
       });
-      
       // Navigate back to reports page
       navigate('/reports');
-      
     } catch (error) {
       console.error('Error deleting schedule:', error);
       toast({
@@ -196,7 +170,6 @@ const ReportSchedulePage = () => {
       setIsDeleting(false);
     }
   };
-  
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -205,7 +178,6 @@ const ReportSchedulePage = () => {
       [name]: value
     });
   };
-  
   // Toggle format selection
   const toggleFormat = (format) => {
     if (scheduleData.formats.includes(format)) {
@@ -220,23 +192,18 @@ const ReportSchedulePage = () => {
       });
     }
   };
-  
   // Add a recipient
   const addRecipient = () => {
     if (!selectedUser) return;
-    
     const userToAdd = users.find(user => user.id === selectedUser);
-    
     if (userToAdd && !scheduleData.recipients.some(r => r.id === userToAdd.id)) {
       setScheduleData({
         ...scheduleData,
         recipients: [...scheduleData.recipients, userToAdd]
       });
     }
-    
     setSelectedUser('');
   };
-  
   // Remove a recipient
   const removeRecipient = (userId) => {
     setScheduleData({
@@ -244,13 +211,11 @@ const ReportSchedulePage = () => {
       recipients: scheduleData.recipients.filter(r => r.id !== userId)
     });
   };
-  
   // Filter users based on search term
   const filteredUsers = users.filter(user => 
     user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
     (user.email && user.email.toLowerCase().includes(userSearchTerm.toLowerCase()))
   );
-  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -258,7 +223,6 @@ const ReportSchedulePage = () => {
       </div>
     );
   }
-  
   if (!report && !isLoading) {
     return (
       <div className="container mx-auto py-6">
@@ -269,12 +233,10 @@ const ReportSchedulePage = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          
           <div>
             <h1 className="text-2xl font-bold">Schedule Report</h1>
           </div>
         </div>
-        
         <Card className="p-6">
           <div className="flex items-center p-4 bg-amber-50 border border-amber-200 rounded-lg">
             <AlertCircle className="w-6 h-6 text-amber-500 mr-3" />
@@ -285,7 +247,6 @@ const ReportSchedulePage = () => {
               </p>
             </div>
           </div>
-          
           <div className="mt-4 flex justify-end">
             <Button
               variant="default"
@@ -298,7 +259,6 @@ const ReportSchedulePage = () => {
       </div>
     );
   }
-  
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center mb-6">
@@ -308,7 +268,6 @@ const ReportSchedulePage = () => {
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        
         <div>
           <h1 className="text-2xl font-bold">
             {editMode ? 'Edit Schedule' : 'Schedule Report'}
@@ -318,14 +277,12 @@ const ReportSchedulePage = () => {
           </p>
         </div>
       </div>
-      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <Card className="p-6">
             <div className="space-y-6">
               <div>
                 <h2 className="text-lg font-medium mb-4">Schedule Information</h2>
-                
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -340,7 +297,6 @@ const ReportSchedulePage = () => {
                       className="w-full"
                     />
                   </div>
-                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Description (Optional)
@@ -354,7 +310,6 @@ const ReportSchedulePage = () => {
                       rows={2}
                     />
                   </div>
-                  
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -372,10 +327,8 @@ const ReportSchedulePage = () => {
                   </div>
                 </div>
               </div>
-              
               <div>
                 <h2 className="text-lg font-medium mb-4">Frequency</h2>
-                
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -393,7 +346,6 @@ const ReportSchedulePage = () => {
                       <option value="quarterly">Quarterly</option>
                     </select>
                   </div>
-                  
                   {scheduleData.frequency === 'weekly' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -415,7 +367,6 @@ const ReportSchedulePage = () => {
                       </select>
                     </div>
                   )}
-                  
                   {(scheduleData.frequency === 'monthly' || scheduleData.frequency === 'quarterly') && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -435,7 +386,6 @@ const ReportSchedulePage = () => {
                       </select>
                     </div>
                   )}
-                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Time
@@ -450,10 +400,8 @@ const ReportSchedulePage = () => {
                   </div>
                 </div>
               </div>
-              
               <div>
                 <h2 className="text-lg font-medium mb-4">Export Formats</h2>
-                
                 <div className="space-y-2">
                   <div className="flex items-center">
                     <input
@@ -467,7 +415,6 @@ const ReportSchedulePage = () => {
                       PDF
                     </label>
                   </div>
-                  
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -480,7 +427,6 @@ const ReportSchedulePage = () => {
                       Excel (XLSX)
                     </label>
                   </div>
-                  
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -495,10 +441,8 @@ const ReportSchedulePage = () => {
                   </div>
                 </div>
               </div>
-              
               <div>
                 <h2 className="text-lg font-medium mb-4">Recipients</h2>
-                
                 <div className="space-y-4">
                   <div className="flex space-x-2">
                     <div className="flex-1">
@@ -510,7 +454,6 @@ const ReportSchedulePage = () => {
                         className="w-full"
                       />
                     </div>
-                    
                     <div className="flex-1">
                       <select
                         value={selectedUser}
@@ -525,7 +468,6 @@ const ReportSchedulePage = () => {
                         ))}
                       </select>
                     </div>
-                    
                     <Button
                       variant="outline"
                       onClick={addRecipient}
@@ -534,7 +476,6 @@ const ReportSchedulePage = () => {
                       Add
                     </Button>
                   </div>
-                  
                   {scheduleData.recipients.length > 0 ? (
                     <div className="border rounded-md overflow-hidden">
                       <table className="w-full">
@@ -576,7 +517,6 @@ const ReportSchedulePage = () => {
                   )}
                 </div>
               </div>
-              
               <div className="pt-4 border-t flex justify-between">
                 {editMode ? (
                   <Button
@@ -600,7 +540,6 @@ const ReportSchedulePage = () => {
                 ) : (
                   <div></div>
                 )}
-                
                 <div className="flex space-x-3">
                   <Button
                     variant="outline"
@@ -608,7 +547,6 @@ const ReportSchedulePage = () => {
                   >
                     Cancel
                   </Button>
-                  
                   <Button
                     variant="default"
                     onClick={saveSchedule}
@@ -632,11 +570,9 @@ const ReportSchedulePage = () => {
             </div>
           </Card>
         </div>
-        
         <div className="lg:col-span-1">
           <Card className="p-6">
             <h2 className="text-lg font-medium mb-4">Report Details</h2>
-            
             {report ? (
               <div className="space-y-4">
                 <div className="flex items-center">
@@ -656,7 +592,6 @@ const ReportSchedulePage = () => {
                     <p className="text-sm text-gray-500">{report.description}</p>
                   </div>
                 </div>
-                
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-gray-500">Report Type</span>
@@ -675,10 +610,8 @@ const ReportSchedulePage = () => {
                     <span className="font-medium">{report.scheduledRuns || 0}</span>
                   </div>
                 </div>
-                
                 <div className="mt-2">
                   <h3 className="text-sm font-medium mb-2">Next Run Information</h3>
-                  
                   {scheduleData.active ? (
                     <div className="bg-green-50 p-3 rounded-md">
                       <div className="flex items-start">
@@ -724,13 +657,11 @@ const ReportSchedulePage = () => {
                     </div>
                   )}
                 </div>
-                
                 <div className="flex items-center justify-between pt-4">
                   <div className="flex items-center">
                     <Mail className="w-5 h-5 text-primary mr-2" />
                     <span className="text-sm font-medium">Email Delivery</span>
                   </div>
-                  
                   <div className="flex items-center">
                     <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
                       {scheduleData.formats.map(f => f.toUpperCase()).join(', ')}
@@ -744,7 +675,6 @@ const ReportSchedulePage = () => {
               </div>
             )}
           </Card>
-          
           <div className="mt-4 bg-amber-50 border border-amber-200 p-4 rounded-md">
             <div className="flex items-start">
               <AlertCircle className="w-5 h-5 text-amber-500 mr-2 mt-0.5" />
@@ -764,5 +694,4 @@ const ReportSchedulePage = () => {
     </div>
   );
 };
-
 export default ReportSchedulePage;

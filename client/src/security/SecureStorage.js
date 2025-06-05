@@ -2,7 +2,6 @@
  * Secure Storage Service
  * Provides encrypted local storage with security features
  */
-
 class SecureStorage {
   constructor() {
     this.encryptionKey = null;
@@ -10,10 +9,8 @@ class SecureStorage {
     this.storagePrefix = 'bdc_secure_';
     this.sessionTimeout = 30 * 60 * 1000; // 30 minutes
     this.maxRetries = 3;
-    
     this.init();
   }
-
   /**
    * Initialize secure storage
    */
@@ -21,19 +18,15 @@ class SecureStorage {
     try {
       // Generate or retrieve encryption key
       await this.initializeEncryption();
-      
       // Setup session monitoring
       this.setupSessionMonitoring();
-      
       // Cleanup expired items
       this.cleanupExpiredItems();
-      
       this.initialized = true;
     } catch (error) {
       console.error('SecureStorage initialization failed:', error);
     }
   }
-
   /**
    * Initialize encryption for storage
    */
@@ -44,11 +37,9 @@ class SecureStorage {
       this.encryptionKey = 'fallback_key';
       return;
     }
-
     try {
       // Try to get existing key from session storage
       const existingKey = sessionStorage.getItem('sec_key');
-      
       if (existingKey) {
         this.encryptionKey = await this.importKey(existingKey);
       } else {
@@ -61,7 +52,6 @@ class SecureStorage {
           true,
           ['encrypt', 'decrypt']
         );
-        
         // Store key in session storage (only for current session)
         const exportedKey = await window.crypto.subtle.exportKey('raw', this.encryptionKey);
         const keyArray = Array.from(new Uint8Array(exportedKey));
@@ -72,7 +62,6 @@ class SecureStorage {
       this.encryptionKey = 'fallback_key';
     }
   }
-
   /**
    * Import encryption key from stored data
    */
@@ -93,7 +82,6 @@ class SecureStorage {
       throw new Error('Failed to import encryption key');
     }
   }
-
   /**
    * Encrypt data using Web Crypto API
    */
@@ -102,13 +90,10 @@ class SecureStorage {
       // Fallback to base64 encoding
       return btoa(JSON.stringify(data));
     }
-
     try {
       const encoder = new TextEncoder();
       const encodedData = encoder.encode(JSON.stringify(data));
-      
       const iv = window.crypto.getRandomValues(new Uint8Array(12));
-      
       const encryptedData = await window.crypto.subtle.encrypt(
         {
           name: 'AES-GCM',
@@ -117,12 +102,10 @@ class SecureStorage {
         this.encryptionKey,
         encodedData
       );
-
       // Combine IV and encrypted data
       const combined = new Uint8Array(iv.length + encryptedData.byteLength);
       combined.set(iv);
       combined.set(new Uint8Array(encryptedData), iv.length);
-
       // Convert to base64 for storage
       return btoa(String.fromCharCode(...combined));
     } catch (error) {
@@ -131,7 +114,6 @@ class SecureStorage {
       return btoa(JSON.stringify(data));
     }
   }
-
   /**
    * Decrypt data using Web Crypto API
    */
@@ -144,7 +126,6 @@ class SecureStorage {
         throw new Error('Failed to decrypt data');
       }
     }
-
     try {
       // Convert from base64
       const combined = new Uint8Array(
@@ -152,11 +133,9 @@ class SecureStorage {
           .split('')
           .map(char => char.charCodeAt(0))
       );
-
       // Extract IV and encrypted data
       const iv = combined.slice(0, 12);
       const encrypted = combined.slice(12);
-
       const decryptedData = await window.crypto.subtle.decrypt(
         {
           name: 'AES-GCM',
@@ -165,10 +144,8 @@ class SecureStorage {
         this.encryptionKey,
         encrypted
       );
-
       const decoder = new TextDecoder();
       const decodedData = decoder.decode(decryptedData);
-      
       return JSON.parse(decodedData);
     } catch (error) {
       console.error('Decryption failed:', error);
@@ -180,7 +157,6 @@ class SecureStorage {
       }
     }
   }
-
   /**
    * Store data securely
    */
@@ -188,17 +164,14 @@ class SecureStorage {
     if (!this.initialized) {
       await this.init();
     }
-
     const config = {
       encrypt: true,
       expiry: null,
       sensitive: false,
       ...options
     };
-
     try {
       const storageKey = this.storagePrefix + key;
-      
       const storageData = {
         value: value,
         timestamp: Date.now(),
@@ -206,25 +179,21 @@ class SecureStorage {
         sensitive: config.sensitive,
         checksum: this.generateChecksum(value)
       };
-
       let dataToStore;
       if (config.encrypt) {
         dataToStore = await this.encrypt(storageData);
       } else {
         dataToStore = JSON.stringify(storageData);
       }
-
       // Choose storage type based on sensitivity
       const storage = config.sensitive ? sessionStorage : localStorage;
       storage.setItem(storageKey, dataToStore);
-
       return true;
     } catch (error) {
       console.error('SecureStorage setItem failed:', error);
       return false;
     }
   }
-
   /**
    * Retrieve data securely
    */
@@ -232,37 +201,30 @@ class SecureStorage {
     if (!this.initialized) {
       await this.init();
     }
-
     const config = {
       decrypt: true,
       checkIntegrity: true,
       ...options
     };
-
     try {
       const storageKey = this.storagePrefix + key;
-      
       // Try both storage types
       let storedData = localStorage.getItem(storageKey) || 
                       sessionStorage.getItem(storageKey);
-
       if (!storedData) {
         return null;
       }
-
       let parsedData;
       if (config.decrypt) {
         parsedData = await this.decrypt(storedData);
       } else {
         parsedData = JSON.parse(storedData);
       }
-
       // Check expiry
       if (parsedData.expiry && Date.now() > parsedData.expiry) {
         this.removeItem(key);
         return null;
       }
-
       // Check data integrity
       if (config.checkIntegrity) {
         const expectedChecksum = this.generateChecksum(parsedData.value);
@@ -272,7 +234,6 @@ class SecureStorage {
           return null;
         }
       }
-
       return parsedData.value;
     } catch (error) {
       console.error('SecureStorage getItem failed:', error);
@@ -281,7 +242,6 @@ class SecureStorage {
       return null;
     }
   }
-
   /**
    * Remove item from storage
    */
@@ -290,7 +250,6 @@ class SecureStorage {
     localStorage.removeItem(storageKey);
     sessionStorage.removeItem(storageKey);
   }
-
   /**
    * Clear all secure storage items
    */
@@ -302,7 +261,6 @@ class SecureStorage {
         localStorage.removeItem(key);
       }
     }
-
     // Clear sessionStorage items
     for (let i = sessionStorage.length - 1; i >= 0; i--) {
       const key = sessionStorage.key(i);
@@ -311,23 +269,19 @@ class SecureStorage {
       }
     }
   }
-
   /**
    * Generate checksum for data integrity
    */
   generateChecksum(data) {
     const str = JSON.stringify(data);
     let hash = 0;
-    
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
-    
     return hash.toString();
   }
-
   /**
    * Setup session monitoring for security
    */
@@ -338,34 +292,29 @@ class SecureStorage {
         this.handleStorageEvent(event);
       }
     });
-
     // Monitor for page visibility changes
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         this.handlePageHidden();
       }
     });
-
     // Monitor for beforeunload
     window.addEventListener('beforeunload', () => {
       this.handlePageUnload();
     });
   }
-
   /**
    * Handle storage events for security monitoring
    */
   handleStorageEvent(event) {
     // Log potential security event
     console.warn('External storage modification detected:', event.key);
-    
     // Could trigger security alert or re-authentication
     if (event.key.includes('auth') || event.key.includes('token')) {
       // Critical security data modified externally
       this.triggerSecurityAlert('External modification of authentication data');
     }
   }
-
   /**
    * Handle page hidden event
    */
@@ -378,7 +327,6 @@ class SecureStorage {
       }
     });
   }
-
   /**
    * Handle page unload event
    */
@@ -386,29 +334,24 @@ class SecureStorage {
     // Clear all session storage on page unload
     sessionStorage.clear();
   }
-
   /**
    * Get list of sensitive storage keys
    */
   getSensitiveKeys() {
     const keys = [];
-    
     for (let i = 0; i < sessionStorage.length; i++) {
       const key = sessionStorage.key(i);
       if (key && key.startsWith(this.storagePrefix)) {
         keys.push(key);
       }
     }
-    
     return keys;
   }
-
   /**
    * Cleanup expired items
    */
   cleanupExpiredItems() {
     const now = Date.now();
-    
     // Check localStorage
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
@@ -424,7 +367,6 @@ class SecureStorage {
         }
       }
     }
-
     // Check sessionStorage
     for (let i = sessionStorage.length - 1; i >= 0; i--) {
       const key = sessionStorage.key(i);
@@ -441,7 +383,6 @@ class SecureStorage {
       }
     }
   }
-
   /**
    * Trigger security alert
    */
@@ -454,10 +395,8 @@ class SecureStorage {
         timestamp: Date.now()
       }
     });
-    
     window.dispatchEvent(event);
   }
-
   /**
    * Check if storage is available and secure
    */
@@ -467,13 +406,10 @@ class SecureStorage {
       const test = 'security_test';
       localStorage.setItem(test, test);
       localStorage.removeItem(test);
-      
       // Check if HTTPS is being used
       const isHTTPS = window.location.protocol === 'https:';
-      
       // Check if encryption is available
       const hasEncryption = this.encryptionKey && this.encryptionKey !== 'fallback_key';
-      
       return {
         available: true,
         https: isHTTPS,
@@ -490,7 +426,6 @@ class SecureStorage {
       };
     }
   }
-
   /**
    * Get storage usage statistics
    */
@@ -505,7 +440,6 @@ class SecureStorage {
         items: 0
       }
     };
-
     // Calculate localStorage usage
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -515,7 +449,6 @@ class SecureStorage {
         info.localStorage.items++;
       }
     }
-
     // Calculate sessionStorage usage
     for (let i = 0; i < sessionStorage.length; i++) {
       const key = sessionStorage.key(i);
@@ -525,9 +458,7 @@ class SecureStorage {
         info.sessionStorage.items++;
       }
     }
-
     return info;
   }
 }
-
 export default new SecureStorage();

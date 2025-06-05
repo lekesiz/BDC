@@ -7,6 +7,8 @@ from app.models.user import User
 from app.models.user_preference import UserPreference
 from app.models.tenant import Tenant
 
+from app.utils.logging import logger
+
 settings_bp = Blueprint('settings', __name__)
 
 

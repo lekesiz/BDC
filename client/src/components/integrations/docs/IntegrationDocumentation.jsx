@@ -15,16 +15,13 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
-
 const IntegrationDocumentation = ({ integrationId }) => {
   const [activeTab, setActiveTab] = useState('quickstart');
   const [copiedCode, setCopiedCode] = useState(null);
-
   const handleCopyCode = (id) => {
     setCopiedCode(id);
     setTimeout(() => setCopiedCode(null), 2000);
   };
-
   const documentation = {
     'google-calendar': {
       quickstart: {
@@ -69,12 +66,10 @@ const IntegrationDocumentation = ({ integrationId }) => {
             code: `// Express.js webhook endpoint
 app.post('/webhooks/google-calendar', async (req, res) => {
   const { event, data } = req.body;
-  
   // Verify webhook signature
   if (!verifySignature(req)) {
     return res.status(401).send('Unauthorized');
   }
-  
   // Handle different event types
   switch (event) {
     case 'calendar.event.created':
@@ -87,7 +82,6 @@ app.post('/webhooks/google-calendar', async (req, res) => {
       await handleEventDeleted(data);
       break;
   }
-  
   res.status(200).send('OK');
 });`
           }
@@ -180,9 +174,7 @@ app.post('/webhooks/google-calendar', async (req, res) => {
             title: 'Send Slack Message',
             language: 'javascript',
             code: `const { WebClient } = require('@slack/web-api');
-
 const slack = new WebClient(process.env.SLACK_BOT_TOKEN);
-
 async function sendNotification(channel, message) {
   try {
     const result = await slack.chat.postMessage({
@@ -198,7 +190,6 @@ async function sendNotification(channel, message) {
         }
       ]
     });
-    
     return result;
   } catch (error) {
     console.error('Failed to send Slack message:', error);
@@ -280,7 +271,6 @@ async function sendNotification(channel, message) {
             title: 'Create Payment Intent',
             language: 'javascript',
             code: `const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
 async function createPayment(amount, currency = 'eur') {
   try {
     const paymentIntent = await stripe.paymentIntents.create({
@@ -292,7 +282,6 @@ async function createPayment(amount, currency = 'eur') {
         customer_email: 'customer@example.com'
       }
     });
-    
     return {
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id
@@ -309,7 +298,6 @@ async function createPayment(amount, currency = 'eur') {
             language: 'javascript',
             code: `app.post('/webhooks/stripe', express.raw({type: 'application/json'}), (req, res) => {
   const sig = req.headers['stripe-signature'];
-  
   let event;
   try {
     event = stripe.webhooks.constructEvent(
@@ -320,19 +308,14 @@ async function createPayment(amount, currency = 'eur') {
   } catch (err) {
     return res.status(400).send(\`Webhook Error: \${err.message}\`);
   }
-  
   // Handle the event
   switch (event.type) {
     case 'payment_intent.succeeded':
-      console.log('Payment succeeded:', event.data.object);
       break;
     case 'payment_intent.failed':
-      console.log('Payment failed:', event.data.object);
       break;
     default:
-      console.log(\`Unhandled event type \${event.type}\`);
   }
-  
   res.send();
 });`
           }
@@ -364,15 +347,12 @@ async function createPayment(amount, currency = 'eur') {
       ]
     }
   };
-
   const currentDocs = documentation[integrationId] || documentation['google-calendar'];
-
   const tabs = [
     { id: 'quickstart', label: 'Quick Start', icon: Book },
     { id: 'api', label: 'API Reference', icon: Code },
     { id: 'troubleshooting', label: 'Troubleshooting', icon: AlertCircle }
   ];
-
   return (
     <div className="space-y-6">
       {/* Tab Navigation */}
@@ -399,7 +379,6 @@ async function createPayment(amount, currency = 'eur') {
           })}
         </nav>
       </div>
-
       {/* Quick Start */}
       {activeTab === 'quickstart' && currentDocs.quickstart && (
         <div className="space-y-6">
@@ -431,7 +410,6 @@ async function createPayment(amount, currency = 'eur') {
               </div>
             </div>
           </Card>
-
           {currentDocs.quickstart.codeExamples && (
             <Card>
               <div className="p-6">
@@ -475,7 +453,6 @@ async function createPayment(amount, currency = 'eur') {
           )}
         </div>
       )}
-
       {/* API Reference */}
       {activeTab === 'api' && currentDocs.api && (
         <Card>
@@ -496,7 +473,6 @@ async function createPayment(amount, currency = 'eur') {
                     <code className="font-mono text-sm">{endpoint.path}</code>
                   </div>
                   <p className="text-gray-600 mb-4">{endpoint.description}</p>
-                  
                   {endpoint.request && (
                     <div>
                       <p className="font-medium text-sm mb-2">Request Body:</p>
@@ -505,7 +481,6 @@ async function createPayment(amount, currency = 'eur') {
                       </div>
                     </div>
                   )}
-                  
                   {endpoint.response && (
                     <div className="mt-4">
                       <p className="font-medium text-sm mb-2">Response:</p>
@@ -520,7 +495,6 @@ async function createPayment(amount, currency = 'eur') {
           </div>
         </Card>
       )}
-
       {/* Troubleshooting */}
       {activeTab === 'troubleshooting' && currentDocs.troubleshooting && (
         <Card>
@@ -542,7 +516,6 @@ async function createPayment(amount, currency = 'eur') {
           </div>
         </Card>
       )}
-
       {/* External Links */}
       <Card>
         <div className="p-6">
@@ -576,5 +549,4 @@ async function createPayment(amount, currency = 'eur') {
     </div>
   );
 };
-
 export default IntegrationDocumentation;

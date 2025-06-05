@@ -16,7 +16,6 @@ import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast';
-
 /**
  * Tenant Detail Page
  */
@@ -26,7 +25,6 @@ const TenantDetailPage = () => {
   const { addToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [tenant, setTenant] = useState(null);
-  
   // Fetch tenant details
   useEffect(() => {
     const fetchTenant = async () => {
@@ -45,10 +43,8 @@ const TenantDetailPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchTenant();
   }, [id, addToast]);
-  
   if (isLoading) {
     return (
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -58,7 +54,6 @@ const TenantDetailPage = () => {
       </div>
     );
   }
-  
   if (!tenant) {
     return (
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -75,7 +70,6 @@ const TenantDetailPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       {/* Header */}
@@ -100,7 +94,6 @@ const TenantDetailPage = () => {
           Edit Tenant
         </Button>
       </div>
-      
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="p-6">
@@ -120,7 +113,6 @@ const TenantDetailPage = () => {
             </div>
           </div>
         </Card>
-        
         <Card className="p-6">
           <div className="flex items-center space-x-2">
             <div className="p-2 bg-blue-100 rounded-lg">
@@ -132,7 +124,6 @@ const TenantDetailPage = () => {
             </div>
           </div>
         </Card>
-        
         <Card className="p-6">
           <div className="flex items-center space-x-2">
             <div className="p-2 bg-purple-100 rounded-lg">
@@ -144,7 +135,6 @@ const TenantDetailPage = () => {
             </div>
           </div>
         </Card>
-        
         <Card className="p-6">
           <div className="flex items-center space-x-2">
             <div className="p-2 bg-orange-100 rounded-lg">
@@ -159,7 +149,6 @@ const TenantDetailPage = () => {
           </div>
         </Card>
       </div>
-      
       {/* Details Card */}
       <Card>
         <div className="p-6">
@@ -167,7 +156,6 @@ const TenantDetailPage = () => {
             <Shield className="w-5 h-5 mr-2 text-primary" />
             Tenant Details
           </h3>
-          
           <div className="grid gap-6 md:grid-cols-2">
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Contact Information</h4>
@@ -190,7 +178,6 @@ const TenantDetailPage = () => {
                 </div>
               </div>
             </div>
-            
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Subscription Details</h4>
               <div className="space-y-2">
@@ -215,7 +202,6 @@ const TenantDetailPage = () => {
               </div>
             </div>
           </div>
-          
           <div className="mt-6">
             <h4 className="font-medium text-gray-900 mb-3">Activity</h4>
             <div className="space-y-2">
@@ -243,7 +229,6 @@ const TenantDetailPage = () => {
           </div>
         </div>
       </Card>
-      
       {/* Actions */}
       <Card>
         <div className="p-6">
@@ -251,7 +236,6 @@ const TenantDetailPage = () => {
             <Settings className="w-5 h-5 mr-2 text-primary" />
             Quick Actions
           </h3>
-          
           <div className="grid gap-4 md:grid-cols-3">
             <Button
               variant="outline"
@@ -262,7 +246,6 @@ const TenantDetailPage = () => {
               Manage Users
               <span className="absolute -top-2 -right-2 px-2 py-1 text-xs bg-gray-500 text-white rounded-full">Soon</span>
             </Button>
-            
             <Button
               variant="outline"
               disabled
@@ -272,7 +255,6 @@ const TenantDetailPage = () => {
               Tenant Settings
               <span className="absolute -top-2 -right-2 px-2 py-1 text-xs bg-gray-500 text-white rounded-full">Soon</span>
             </Button>
-            
             <Button
               variant="outline"
               disabled
@@ -288,5 +270,4 @@ const TenantDetailPage = () => {
     </div>
   );
 };
-
 export default TenantDetailPage;

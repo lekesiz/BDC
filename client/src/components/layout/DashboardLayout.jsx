@@ -5,7 +5,6 @@ import Header from './Header';
 import Footer from './Footer';
 import MobileNav from '../navigation/MobileNav';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
-
 /**
  * Main dashboard layout component
  * Contains sidebar, header, main content area, and footer
@@ -13,11 +12,9 @@ import { useBreakpoint } from '@/hooks/useMediaQuery';
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isMobile, isTablet } = useBreakpoint();
-  
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
-  
   // Add skip navigation link on mount
   useEffect(() => {
     const skipLink = document.createElement('a');
@@ -25,7 +22,6 @@ const DashboardLayout = () => {
     skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-white px-4 py-2 rounded-md z-50';
     skipLink.textContent = 'Skip to main content';
     skipLink.setAttribute('aria-label', 'Skip to main content');
-    
     skipLink.addEventListener('click', (e) => {
       e.preventDefault();
       const target = document.getElementById('main-content');
@@ -34,26 +30,21 @@ const DashboardLayout = () => {
         target.scrollIntoView();
       }
     });
-    
     document.body.insertBefore(skipLink, document.body.firstChild);
-    
     return () => {
       if (skipLink.parentNode) {
         skipLink.parentNode.removeChild(skipLink);
       }
     };
   }, []);
-  
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-      
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Header */}
         <Header onToggleSidebar={toggleSidebar} />
-        
         {/* Main content area */}
         <main 
           id="main-content"
@@ -69,17 +60,14 @@ const DashboardLayout = () => {
             </div>
           </div>
         </main>
-        
         {/* Footer - hide on mobile to save space */}
         <div className="hidden sm:block">
           <Footer />
         </div>
-        
         {/* Mobile bottom navigation */}
         {(isMobile || isTablet) && <MobileNav />}
       </div>
     </div>
   );
 };
-
 export default DashboardLayout;

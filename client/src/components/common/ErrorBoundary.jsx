@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
 /**
  * Enhanced Error Boundary component that catches JavaScript errors in child components
  */
@@ -15,29 +14,24 @@ class ErrorBoundary extends Component {
       errorCount: 0
     };
   }
-
   static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI
     return { hasError: true };
   }
-
   componentDidCatch(error, errorInfo) {
     // Log error details for debugging
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
-    
     // Update state with error details
     this.setState({
       error,
       errorInfo,
       errorCount: this.state.errorCount + 1
     });
-
     // Report to error tracking service (e.g., Sentry)
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
   }
-
   handleReset = () => {
     this.setState({
       hasError: false,
@@ -45,7 +39,6 @@ class ErrorBoundary extends Component {
       errorInfo: null
     });
   };
-
   render() {
     const { hasError, error, errorInfo, errorCount } = this.state;
     const { 
@@ -56,13 +49,11 @@ class ErrorBoundary extends Component {
       errorTitle = "Something went wrong",
       errorMessage = "An unexpected error occurred. Please try refreshing the page."
     } = this.props;
-
     if (hasError) {
       // Custom fallback component
       if (fallback) {
         return fallback(error, errorInfo, this.handleReset);
       }
-
       // Default error UI
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -71,21 +62,17 @@ class ErrorBoundary extends Component {
               <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
                 <AlertTriangle className="w-6 h-6 text-red-600" />
               </div>
-              
               <h2 className="mt-4 text-xl font-semibold text-gray-900 text-center">
                 {errorTitle}
               </h2>
-              
               <p className="mt-2 text-sm text-gray-600 text-center">
                 {errorMessage}
               </p>
-
               {errorCount > 1 && (
                 <p className="mt-2 text-xs text-gray-500 text-center">
                   This error has occurred {errorCount} times
                 </p>
               )}
-
               {showDetails && error && (
                 <details className="mt-4">
                   <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
@@ -101,7 +88,6 @@ class ErrorBoundary extends Component {
                   </div>
                 </details>
               )}
-
               <div className="mt-6 flex gap-3">
                 <Button
                   onClick={this.handleReset}
@@ -111,7 +97,6 @@ class ErrorBoundary extends Component {
                   <RefreshCw className="w-4 h-4 mr-2" />
                   {resetButtonText}
                 </Button>
-                
                 <Button
                   onClick={() => window.location.href = '/'}
                   className="flex-1"
@@ -125,11 +110,9 @@ class ErrorBoundary extends Component {
         </div>
       );
     }
-
     return children;
   }
 }
-
 /**
  * HOC to wrap any component with error boundary
  */
@@ -140,28 +123,22 @@ export const withErrorBoundary = (Component, errorBoundaryProps = {}) => {
     </ErrorBoundary>
   );
 };
-
 /**
  * Hook for error handling in functional components
  */
 export const useErrorHandler = () => {
   const [error, setError] = React.useState(null);
-
   const resetError = () => setError(null);
-
   const captureError = React.useCallback((error) => {
     setError(error);
     console.error('Error captured:', error);
   }, []);
-
   // Throw error to be caught by nearest error boundary
   if (error) {
     throw error;
   }
-
   return { captureError, resetError };
 };
-
 /**
  * Generic error display component
  */
@@ -182,7 +159,6 @@ export const ErrorDisplay = ({
           <div className="mt-2 text-sm text-red-700">
             <p>{error?.message || "An unexpected error occurred"}</p>
           </div>
-          
           {showDetails && error?.stack && (
             <details className="mt-2">
               <summary className="cursor-pointer text-xs text-red-600">
@@ -193,7 +169,6 @@ export const ErrorDisplay = ({
               </pre>
             </details>
           )}
-          
           {onRetry && (
             <button
               onClick={onRetry}
@@ -207,5 +182,4 @@ export const ErrorDisplay = ({
     </div>
   );
 };
-
 export default ErrorBoundary;

@@ -8,6 +8,8 @@ from app.models.tenant import Tenant
 from app.models.settings import GeneralSettings
 from app.schemas.settings import GeneralSettingsSchema, GeneralSettingsUpdateSchema
 
+from app.utils.logging import logger
+
 settings_general_bp = Blueprint('settings_general', __name__)
 general_settings_schema = GeneralSettingsSchema()
 general_settings_update_schema = GeneralSettingsUpdateSchema()

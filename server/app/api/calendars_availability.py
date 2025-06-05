@@ -7,6 +7,8 @@ from app.models.user import User
 from app.models.availability import AvailabilitySchedule as Availability, AvailabilitySlot
 from app.services.availability_service import AvailabilityService
 from app.schemas.availability import (
+
+from app.utils.logging import logger
     AvailabilitySchema,
     AvailabilityCreateSchema,
     AvailabilityUpdateSchema

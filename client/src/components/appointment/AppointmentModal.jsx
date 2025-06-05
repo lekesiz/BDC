@@ -4,10 +4,11 @@ import { Calendar, Clock, MapPin, Users, User, Tag, AlertTriangle, Trash2, Save,
 import { AnimatedModal } from '@/components/animations';
 import { AnimatedButton, AnimatedInput } from '@/components/animations';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/modal';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 import api from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
-
 /**
  * AppointmentModal component for creating and editing appointments
  * 
@@ -49,14 +50,12 @@ const AppointmentModal = ({
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [errors, setErrors] = useState({});
-
   // Initialize form with appointment data or defaults
   useEffect(() => {
     if (appointment) {
       // Format dates for form inputs
       const startDate = parseISO(appointment.start_time);
       const endDate = parseISO(appointment.end_time);
-      
       setFormData({
         title: appointment.title || '',
         description: appointment.description || '',
@@ -76,7 +75,6 @@ const AppointmentModal = ({
     } else if (selectedDate) {
       // Set default date and time for new appointment
       const endTime = addHours(selectedDate, 1);
-      
       setFormData(prev => ({
         ...prev,
         start_date: format(selectedDate, 'yyyy-MM-dd'),
@@ -85,12 +83,10 @@ const AppointmentModal = ({
         end_time: format(endTime, 'HH:mm'),
       }));
     }
-    
     // Reset errors when modal opens
     setErrors({});
     setShowDeleteConfirm(false);
   }, [appointment, selectedDate, isOpen]);
-
   // Handle form field changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -98,64 +94,49 @@ const AppointmentModal = ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    
     // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
     }
   };
-
   // Validate form fields
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
     }
-    
     if (!formData.start_date) {
       newErrors.start_date = 'Start date is required';
     }
-    
     if (!formData.start_time) {
       newErrors.start_time = 'Start time is required';
     }
-    
     if (!formData.end_date) {
       newErrors.end_date = 'End date is required';
     }
-    
     if (!formData.end_time) {
       newErrors.end_time = 'End time is required';
     }
-    
     // Check that end time is after start time
     const startDateTime = new Date(`${formData.start_date}T${formData.start_time}`);
     const endDateTime = new Date(`${formData.end_date}T${formData.end_time}`);
-    
     if (endDateTime <= startDateTime) {
       newErrors.end_time = 'End time must be after start time';
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) {
       return;
     }
-    
     try {
       setIsSubmitting(true);
-      
       // Format dates for API
       const startDateTime = new Date(`${formData.start_date}T${formData.start_time}`);
       const endDateTime = new Date(`${formData.end_date}T${formData.end_time}`);
-      
       const appointmentData = {
         title: formData.title,
         description: formData.description,
@@ -169,9 +150,7 @@ const AppointmentModal = ({
         is_google_synced: formData.is_google_synced,
         notes: formData.notes,
       };
-      
       let response;
-      
       if (appointment) {
         // Update existing appointment
         response = await api.put(`/api/appointments/${appointment.id}`, appointmentData);
@@ -189,12 +168,10 @@ const AppointmentModal = ({
           type: 'success',
         });
       }
-      
       // If notification is enabled, send notifications
       if (formData.notify_participants) {
         await api.post(`/api/appointments/${response.data.id}/notify`);
       }
-      
       // Call the callback with the updated/created appointment
       onAppointmentUpdated(response.data);
     } catch (error) {
@@ -208,22 +185,17 @@ const AppointmentModal = ({
       setIsSubmitting(false);
     }
   };
-
   // Handle appointment deletion
   const handleDelete = async () => {
     if (!appointment) return;
-    
     try {
       setIsSubmitting(true);
-      
       await api.delete(`/api/appointments/${appointment.id}`);
-      
       toast({
         title: 'Success',
         description: 'Appointment deleted successfully',
         type: 'success',
       });
-      
       onAppointmentDeleted(appointment.id);
     } catch (error) {
       console.error('Error deleting appointment:', error);
@@ -237,25 +209,20 @@ const AppointmentModal = ({
       setShowDeleteConfirm(false);
     }
   };
-
   // Handle cancellation (soft delete)
   const handleCancel = async () => {
     if (!appointment) return;
-    
     try {
       setIsSubmitting(true);
-      
       const response = await api.put(`/api/appointments/${appointment.id}`, {
         ...formData,
         status: 'canceled',
       });
-      
       toast({
         title: 'Success',
         description: 'Appointment canceled successfully',
         type: 'success',
       });
-      
       onAppointmentUpdated(response.data);
     } catch (error) {
       console.error('Error canceling appointment:', error);
@@ -268,7 +235,6 @@ const AppointmentModal = ({
       setIsSubmitting(false);
     }
   };
-
   return (
     <AnimatedModal
       isOpen={isOpen}
@@ -280,7 +246,6 @@ const AppointmentModal = ({
             {appointment ? 'Edit Appointment' : 'Create Appointment'}
           </h2>
         </div>
-      
         <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic info section */}
@@ -298,7 +263,6 @@ const AppointmentModal = ({
                 error={errors.title}
               />
             </div>
-            
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 Description
@@ -313,7 +277,6 @@ const AppointmentModal = ({
                 rows="2"
               />
             </div>
-            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="type" className="block text-sm font-medium text-gray-700">
@@ -335,7 +298,6 @@ const AppointmentModal = ({
                   </select>
                 </div>
               </div>
-              
               <div>
                 <label htmlFor="location" className="block text-sm font-medium text-gray-700">
                   Location
@@ -353,14 +315,12 @@ const AppointmentModal = ({
               </div>
             </div>
           </div>
-          
           {/* Date and time section */}
           <div className="space-y-4 mb-6">
             <h3 className="font-medium flex items-center text-gray-700">
               <Calendar className="w-4 h-4 mr-2" />
               Date and Time
             </h3>
-            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">
@@ -375,7 +335,6 @@ const AppointmentModal = ({
                   error={errors.start_date}
                 />
               </div>
-              
               <div>
                 <label htmlFor="start_time" className="block text-sm font-medium text-gray-700">
                   Start Time*
@@ -389,7 +348,6 @@ const AppointmentModal = ({
                   error={errors.start_time}
                 />
               </div>
-              
               <div>
                 <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">
                   End Date*
@@ -403,7 +361,6 @@ const AppointmentModal = ({
                   error={errors.end_date}
                 />
               </div>
-              
               <div>
                 <label htmlFor="end_time" className="block text-sm font-medium text-gray-700">
                   End Time*
@@ -419,14 +376,12 @@ const AppointmentModal = ({
               </div>
             </div>
           </div>
-          
           {/* Participants section */}
           <div className="space-y-4 mb-6">
             <h3 className="font-medium flex items-center text-gray-700">
               <Users className="w-4 h-4 mr-2" />
               Participants
             </h3>
-            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="beneficiary_id" className="block text-sm font-medium text-gray-700">
@@ -446,7 +401,6 @@ const AppointmentModal = ({
                   <option value="3">Robert Johnson</option>
                 </select>
               </div>
-              
               <div>
                 <label htmlFor="trainer_id" className="block text-sm font-medium text-gray-700">
                   Trainer
@@ -467,11 +421,9 @@ const AppointmentModal = ({
               </div>
             </div>
           </div>
-          
           {/* Additional options */}
           <div className="space-y-4 mb-6">
             <h3 className="font-medium text-gray-700">Additional Options</h3>
-            
             <div className="space-y-3">
               <div className="flex items-center">
                 <input
@@ -486,7 +438,6 @@ const AppointmentModal = ({
                   Sync with Google Calendar
                 </label>
               </div>
-              
               <div className="flex items-center">
                 <input
                   id="notify_participants"
@@ -501,7 +452,6 @@ const AppointmentModal = ({
                 </label>
               </div>
             </div>
-            
             <div>
               <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
                 Private Notes
@@ -517,7 +467,6 @@ const AppointmentModal = ({
               />
             </div>
           </div>
-          
           {/* Status section for existing appointments */}
           {appointment && (
             <div className="mb-6">
@@ -538,7 +487,6 @@ const AppointmentModal = ({
               </select>
             </div>
           )}
-          
           {/* Google Calendar integration info */}
           {appointment && appointment.google_event_id && (
             <div className="bg-blue-50 p-3 rounded-lg flex items-start mb-6">
@@ -562,7 +510,6 @@ const AppointmentModal = ({
               </div>
             </div>
           )}
-          
           {/* Delete confirmation */}
           {showDeleteConfirm && (
             <div className="bg-red-50 p-4 rounded-lg mb-6">
@@ -602,7 +549,6 @@ const AppointmentModal = ({
           )}
           </form>
         </div>
-      
         <div className="px-6 py-4 border-t border-gray-200">
           <div className="flex justify-between w-full">
           <div>
@@ -619,7 +565,6 @@ const AppointmentModal = ({
                     Cancel Appointment
                   </AnimatedButton>
                 ) : null}
-                
                 <Button
                   type="button"
                   variant="danger"
@@ -633,7 +578,6 @@ const AppointmentModal = ({
               </>
             )}
           </div>
-          
           <div className="flex space-x-2">
             <Button
               type="button"
@@ -644,7 +588,6 @@ const AppointmentModal = ({
               <X className="w-4 h-4 mr-2" />
               Cancel
             </Button>
-            
             <Button
               type="button"
               onClick={handleSubmit}
@@ -661,5 +604,4 @@ const AppointmentModal = ({
     </AnimatedModal>
   );
 };
-
 export default AppointmentModal;

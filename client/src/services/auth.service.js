@@ -1,5 +1,4 @@
 import api from './api';
-
 /**
  * Log in a user
  * @param {string} email - User email
@@ -14,7 +13,6 @@ export const login = async (email, password) => {
     throw new Error(error.response?.data?.message || 'Login failed');
   }
 };
-
 /**
  * Register a new user
  * @param {Object} userData - User registration data
@@ -28,7 +26,6 @@ export const register = async (userData) => {
     throw new Error(error.response?.data?.message || 'Registration failed');
   }
 };
-
 /**
  * Get the current user data
  * @returns {Promise<Object>} User data
@@ -41,7 +38,6 @@ export const getCurrentUser = async () => {
     throw new Error(error.response?.data?.message || 'Failed to get user data');
   }
 };
-
 /**
  * Update user profile
  * @param {Object} profileData - Profile data to update
@@ -55,7 +51,6 @@ export const updateProfile = async (profileData) => {
     throw new Error(error.response?.data?.message || 'Failed to update profile');
   }
 };
-
 /**
  * Request password reset
  * @param {string} email - User email
@@ -69,7 +64,6 @@ export const requestPasswordReset = async (email) => {
     throw new Error(error.response?.data?.message || 'Failed to request password reset');
   }
 };
-
 /**
  * Reset password with token
  * @param {string} token - Reset token
@@ -84,7 +78,6 @@ export const resetPassword = async (token, password) => {
     throw new Error(error.response?.data?.message || 'Failed to reset password');
   }
 };
-
 /**
  * Change password
  * @param {string} currentPassword - Current password

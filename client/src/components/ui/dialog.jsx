@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { trapFocus, handleEscapeKey, createFocusManager } from '@/utils/accessibility';
-
 /**
  * Dialog component for modal dialogs
  * 
@@ -15,31 +14,24 @@ import { trapFocus, handleEscapeKey, createFocusManager } from '@/utils/accessib
 export const Dialog = ({ open, onOpenChange, children }) => {
   const dialogRef = useRef(null);
   const focusManager = useRef(createFocusManager());
-  
   useEffect(() => {
     if (open) {
       // Save current focus
       focusManager.current.saveFocus();
-      
       // Prevent body scroll
       document.body.style.overflow = 'hidden';
-      
       // Set up focus trap and escape handler
       const cleanup = [];
-      
       if (dialogRef.current) {
         // Trap focus
         cleanup.push(trapFocus(dialogRef.current));
-        
         // Focus the dialog
         setTimeout(() => {
           dialogRef.current?.focus();
         }, 0);
       }
-      
       // Handle escape key
       cleanup.push(handleEscapeKey(() => onOpenChange?.(false)));
-      
       return () => {
         cleanup.forEach(fn => fn());
       };
@@ -49,9 +41,7 @@ export const Dialog = ({ open, onOpenChange, children }) => {
       focusManager.current.restoreFocus();
     }
   }, [open, onOpenChange]);
-  
   if (!open) return null;
-
   return (
     <div className="fixed inset-0 z-50" role="presentation">
       <div 
@@ -75,13 +65,11 @@ export const Dialog = ({ open, onOpenChange, children }) => {
     </div>
   );
 };
-
 export const DialogHeader = ({ children, className, ...props }) => (
   <div className={cn("px-6 py-4 border-b", className)} {...props}>
     {children}
   </div>
 );
-
 export const DialogTitle = ({ children, className, ...props }) => (
   <h2 
     id="dialog-title"
@@ -91,7 +79,6 @@ export const DialogTitle = ({ children, className, ...props }) => (
     {children}
   </h2>
 );
-
 export const DialogDescription = ({ children, className, ...props }) => (
   <p 
     id="dialog-description"
@@ -101,19 +88,16 @@ export const DialogDescription = ({ children, className, ...props }) => (
     {children}
   </p>
 );
-
 export const DialogContent = ({ children, className, ...props }) => (
   <div className={cn("px-6 py-4", className)} {...props}>
     {children}
   </div>
 );
-
 export const DialogFooter = ({ children, className, ...props }) => (
   <div className={cn("px-6 py-4 border-t flex justify-end space-x-2", className)} {...props}>
     {children}
   </div>
 );
-
 export const DialogClose = ({ children, onClick, className, ...props }) => (
   <button
     onClick={onClick}

@@ -1,11 +1,9 @@
 import { addDays, subDays, subHours, subMinutes } from 'date-fns';
-
 // Generate dates
 const now = new Date();
 const yesterday = subDays(now, 1);
 const twoDaysAgo = subDays(now, 2);
 const lastWeek = subDays(now, 7);
-
 // Mock conversations data
 export const mockConversations = [
   {
@@ -102,7 +100,6 @@ export const mockConversations = [
     unread_count: 0
   }
 ];
-
 // Mock messages data for each conversation
 export const mockMessages = {
   // Conversation with Michael Chen
@@ -189,7 +186,6 @@ export const mockMessages = {
       is_read: false
     }
   ],
-  
   // Training Team group
   2: [
     {
@@ -247,7 +243,6 @@ export const mockMessages = {
       is_read: true
     }
   ],
-  
   // Conversation with Emily Davis
   3: [
     {
@@ -287,7 +282,6 @@ export const mockMessages = {
       is_read: true
     }
   ],
-  
   // Software Development Course group
   4: [
     {
@@ -345,7 +339,6 @@ export const mockMessages = {
       is_read: true
     }
   ],
-  
   // Conversation with Robert Wilson
   5: [
     {
@@ -395,7 +388,6 @@ export const mockMessages = {
     }
   ]
 };
-
 // Mock notifications data
 export const mockNotifications = [
   {
@@ -508,7 +500,6 @@ export const mockNotifications = [
     action_text: 'View Document'
   }
 ];
-
 // Mock notification settings data
 export const mockNotificationSettings = {
   channels: {
@@ -550,7 +541,6 @@ export const mockNotificationSettings = {
     },
   },
 };
-
 // Mock API functions
 export const fetchConversations = () => {
   return {
@@ -558,16 +548,13 @@ export const fetchConversations = () => {
     data: mockConversations
   };
 };
-
 export const fetchMessages = (conversationId) => {
   const messages = mockMessages[conversationId] || [];
-  
   return {
     status: 200,
     data: messages
   };
 };
-
 export const sendMessage = (conversationId, message) => {
   const newMessage = {
     id: Math.floor(Math.random() * 1000) + 100, // Generate a random ID
@@ -578,13 +565,11 @@ export const sendMessage = (conversationId, message) => {
     created_at: new Date().toISOString(),
     is_read: true
   };
-  
   return {
     status: 201,
     data: newMessage
   };
 };
-
 export const markConversationAsRead = (conversationId) => {
   return {
     status: 200,
@@ -594,7 +579,6 @@ export const markConversationAsRead = (conversationId) => {
     }
   };
 };
-
 export const createConversation = (data) => {
   // Create a new conversation with the specified participants
   const newConversation = {
@@ -609,7 +593,6 @@ export const createConversation = (data) => {
           { id: 4, name: 'Robert Wilson' },
           { id: 5, name: 'Jennifer Lopez' }
         ].find(u => u.id === id);
-        
         return user || { id, name: `User ${id}` };
       })
     ],
@@ -619,16 +602,13 @@ export const createConversation = (data) => {
     last_message: null,
     unread_count: 0
   };
-  
   return {
     status: 201,
     data: newConversation
   };
 };
-
 export const fetchNotifications = (params = {}) => {
   let notifications = [...mockNotifications];
-  
   // Apply filters
   if (params.filter) {
     if (params.filter === 'unread') {
@@ -637,17 +617,14 @@ export const fetchNotifications = (params = {}) => {
       notifications = notifications.filter(n => n.type === params.filter);
     }
   }
-  
   // Sort by created_at (newest first)
   notifications.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  
   // Apply pagination
   const page = params.page || 1;
   const limit = params.limit || 10;
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
   const paginatedNotifications = notifications.slice(startIndex, endIndex);
-  
   return {
     status: 200,
     data: {
@@ -656,7 +633,6 @@ export const fetchNotifications = (params = {}) => {
     }
   };
 };
-
 export const markNotificationAsRead = (id) => {
   return {
     status: 200,
@@ -666,7 +642,6 @@ export const markNotificationAsRead = (id) => {
     }
   };
 };
-
 export const markAllNotificationsAsRead = () => {
   return {
     status: 200,
@@ -676,14 +651,12 @@ export const markAllNotificationsAsRead = () => {
     }
   };
 };
-
 export const fetchNotificationSettings = () => {
   return {
     status: 200,
     data: mockNotificationSettings
   };
 };
-
 export const updateNotificationSettings = (settings) => {
   return {
     status: 200,

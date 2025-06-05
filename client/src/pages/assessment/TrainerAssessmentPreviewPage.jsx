@@ -4,7 +4,6 @@ import {
   ArrowLeft, Clock, FileText, CheckCircle, 
   AlertCircle, ChevronLeft, ChevronRight, Eye
 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +22,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-
 /**
  * TrainerAssessmentPreviewPage allows trainers to preview assessments as students would see them
  */
@@ -33,10 +31,8 @@ const TrainerAssessmentPreviewPage = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   // Template data
   const [template, setTemplate] = useState(null);
-  
   // Preview state
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -44,33 +40,25 @@ const TrainerAssessmentPreviewPage = () => {
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [showFinishDialog, setShowFinishDialog] = useState(false);
-  
   // Project submission state
   const [projectFiles, setProjectFiles] = useState([]);
   const [projectUrl, setProjectUrl] = useState('');
   const [repositoryUrl, setRepositoryUrl] = useState('');
   const [notes, setNotes] = useState('');
-  
   // Load template data
   useEffect(() => {
     let isMounted = true;
-    
     const fetchTemplate = async () => {
       try {
         if (!isMounted) return;
-        
         setIsLoading(true);
         setError(null);
-        
         const response = await fetch(`/api/assessment/templates/${id}`);
         if (!isMounted) return;
-        
         if (!response.ok) throw new Error('Failed to fetch template');
         const templateData = await response.json();
-        
         if (!isMounted) return;
         setTemplate(templateData);
-        
         // Initialize timer if quiz has time limit
         if (templateData.type === 'quiz' && templateData.settings?.timeLimit) {
           setTimeRemaining(templateData.settings.timeLimit * 60); // Convert to seconds
@@ -78,7 +66,6 @@ const TrainerAssessmentPreviewPage = () => {
         }
       } catch (err) {
         if (!isMounted) return;
-        
         console.error('Error fetching template:', err);
         setError(err.message);
         toast({
@@ -92,18 +79,14 @@ const TrainerAssessmentPreviewPage = () => {
         }
       }
     };
-    
     fetchTemplate();
-    
     return () => {
       isMounted = false;
     };
   }, [id, toast]);
-  
   // Timer effect
   useEffect(() => {
     if (!isTimerActive || !timeRemaining) return;
-    
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
@@ -114,17 +97,14 @@ const TrainerAssessmentPreviewPage = () => {
         return prev - 1;
       });
     }, 1000);
-    
     return () => clearInterval(timer);
   }, [isTimerActive, timeRemaining]);
-  
   // Format time
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-  
   // Handle answer change
   const handleAnswerChange = (value) => {
     setAnswers({
@@ -132,14 +112,12 @@ const TrainerAssessmentPreviewPage = () => {
       [currentQuestion]: value
     });
   };
-  
   // Navigate between questions
   const goToQuestion = (index) => {
     if (index >= 0 && index < template.questions.length) {
       setCurrentQuestion(index);
     }
   };
-  
   // Calculate progress
   const calculateProgress = () => {
     if (template?.type === 'quiz') {
@@ -148,12 +126,10 @@ const TrainerAssessmentPreviewPage = () => {
     }
     return 0;
   };
-  
   // Handle assessment completion
   const handleFinishAssessment = () => {
     setShowFinishDialog(false);
     setShowResults(true);
-    
     // In a real app, this would submit the assessment
     toast({
       title: 'Preview Mode',
@@ -161,30 +137,25 @@ const TrainerAssessmentPreviewPage = () => {
       type: 'info',
     });
   };
-  
   // Calculate score (for preview only)
   const calculateScore = () => {
     let correct = 0;
     let total = 0;
-    
     template.questions.forEach((question, index) => {
       const answer = answers[index];
       total += question.points || 10;
-      
       if (question.type === 'multipleChoice' && answer === question.correctAnswer) {
         correct += question.points || 10;
       } else if (question.type === 'trueFalse' && answer === question.correctAnswer) {
         correct += question.points || 10;
       }
     });
-    
     return {
       correct,
       total,
       percentage: Math.round((correct / total) * 100)
     };
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -193,7 +164,6 @@ const TrainerAssessmentPreviewPage = () => {
       </div>
     );
   }
-  
   // Render error state
   if (error || !template) {
     return (
@@ -208,7 +178,6 @@ const TrainerAssessmentPreviewPage = () => {
             Back to Template
           </Button>
         </div>
-        
         <Card className="p-6 text-center">
           <div className="text-red-500 mb-4">
             <AlertCircle className="w-12 h-12 mx-auto" />
@@ -224,13 +193,10 @@ const TrainerAssessmentPreviewPage = () => {
       </div>
     );
   }
-  
   const isQuiz = template.type === 'quiz';
-  
   // Render results view
   if (showResults) {
     const score = isQuiz ? calculateScore() : null;
-    
     return (
       <div className="container mx-auto py-6">
         <div className="max-w-3xl mx-auto">
@@ -244,7 +210,6 @@ const TrainerAssessmentPreviewPage = () => {
                 This is how students will see their results
               </p>
             </div>
-            
             {isQuiz && score && (
               <div className="mb-8">
                 <div className="text-center mb-6">
@@ -255,9 +220,7 @@ const TrainerAssessmentPreviewPage = () => {
                     {score.correct} out of {score.total} points
                   </p>
                 </div>
-                
                 <Progress value={score.percentage} className="h-4 mb-6" />
-                
                 <div className="flex justify-center gap-4 mb-6">
                   <Badge className={score.percentage >= 70 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
                     {score.percentage >= 70 ? 'Passed' : 'Failed'}
@@ -266,7 +229,6 @@ const TrainerAssessmentPreviewPage = () => {
                 </div>
               </div>
             )}
-            
             <div className="flex justify-center gap-4">
               <Button
                 variant="outline"
@@ -289,7 +251,6 @@ const TrainerAssessmentPreviewPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -318,7 +279,6 @@ const TrainerAssessmentPreviewPage = () => {
                 </p>
               </div>
             </div>
-            
             <div className="flex items-center gap-4">
               {isQuiz && timeRemaining && (
                 <div className="flex items-center text-amber-600">
@@ -326,7 +286,6 @@ const TrainerAssessmentPreviewPage = () => {
                   <span className="font-mono font-medium">{formatTime(timeRemaining)}</span>
                 </div>
               )}
-              
               <Button
                 onClick={() => setShowFinishDialog(true)}
                 className="bg-primary"
@@ -337,7 +296,6 @@ const TrainerAssessmentPreviewPage = () => {
           </div>
         </div>
       </div>
-      
       {/* Progress bar */}
       {isQuiz && (
         <div className="bg-white border-b">
@@ -346,7 +304,6 @@ const TrainerAssessmentPreviewPage = () => {
           </div>
         </div>
       )}
-      
       {/* Main content */}
       <div className="container mx-auto py-8">
         <div className="max-w-3xl mx-auto">
@@ -365,11 +322,9 @@ const TrainerAssessmentPreviewPage = () => {
                     {template.questions[currentQuestion].points || 10} points
                   </div>
                 </div>
-                
                 <div className="mb-6">
                   <p className="text-lg">{template.questions[currentQuestion].question}</p>
                 </div>
-                
                 {/* Answer area based on question type */}
                 {template.questions[currentQuestion].type === 'multipleChoice' && (
                   <RadioGroup
@@ -386,7 +341,6 @@ const TrainerAssessmentPreviewPage = () => {
                     ))}
                   </RadioGroup>
                 )}
-                
                 {template.questions[currentQuestion].type === 'trueFalse' && (
                   <RadioGroup
                     value={String(answers[currentQuestion] || '')}
@@ -402,7 +356,6 @@ const TrainerAssessmentPreviewPage = () => {
                     </div>
                   </RadioGroup>
                 )}
-                
                 {template.questions[currentQuestion].type === 'shortAnswer' && (
                   <Textarea
                     value={answers[currentQuestion] || ''}
@@ -411,7 +364,6 @@ const TrainerAssessmentPreviewPage = () => {
                     rows={3}
                   />
                 )}
-                
                 {/* Navigation */}
                 <div className="flex justify-between items-center mt-6">
                   <Button
@@ -422,7 +374,6 @@ const TrainerAssessmentPreviewPage = () => {
                     <ChevronLeft className="w-4 h-4 mr-2" />
                     Previous
                   </Button>
-                  
                   <div className="flex gap-2">
                     {template.questions.map((_, index) => (
                       <button
@@ -440,7 +391,6 @@ const TrainerAssessmentPreviewPage = () => {
                       </button>
                     ))}
                   </div>
-                  
                   <Button
                     variant="outline"
                     onClick={() => goToQuestion(currentQuestion + 1)}
@@ -456,7 +406,6 @@ const TrainerAssessmentPreviewPage = () => {
             // Project assessment preview
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-6">Project Submission Preview</h2>
-              
               <div className="space-y-6">
                 {/* Requirements */}
                 <div>
@@ -475,11 +424,9 @@ const TrainerAssessmentPreviewPage = () => {
                     ))}
                   </div>
                 </div>
-                
                 {/* Submission form preview */}
                 <div className="border-t pt-6">
                   <h3 className="text-lg font-semibold mb-3">Submission</h3>
-                  
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="projectUrl">Project URL</Label>
@@ -491,7 +438,6 @@ const TrainerAssessmentPreviewPage = () => {
                         className="mt-1"
                       />
                     </div>
-                    
                     <div>
                       <Label htmlFor="repositoryUrl">Repository URL (optional)</Label>
                       <Input
@@ -502,7 +448,6 @@ const TrainerAssessmentPreviewPage = () => {
                         className="mt-1"
                       />
                     </div>
-                    
                     <div>
                       <Label htmlFor="notes">Additional Notes</Label>
                       <Textarea
@@ -514,7 +459,6 @@ const TrainerAssessmentPreviewPage = () => {
                         className="mt-1"
                       />
                     </div>
-                    
                     <div>
                       <Label>File Upload</Label>
                       <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
@@ -530,7 +474,6 @@ const TrainerAssessmentPreviewPage = () => {
           )}
         </div>
       </div>
-      
       {/* Finish Dialog */}
       <Dialog open={showFinishDialog} onOpenChange={setShowFinishDialog}>
         <DialogContent>
@@ -541,7 +484,6 @@ const TrainerAssessmentPreviewPage = () => {
               students would submit their answers at this point.
             </DialogDescription>
           </DialogHeader>
-          
           {isQuiz && (
             <div className="py-4">
               <p className="text-sm text-gray-600">
@@ -553,7 +495,6 @@ const TrainerAssessmentPreviewPage = () => {
               />
             </div>
           )}
-          
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowFinishDialog(false)}>
               Continue Assessment
@@ -567,5 +508,4 @@ const TrainerAssessmentPreviewPage = () => {
     </div>
   );
 };
-
 export default TrainerAssessmentPreviewPage;

@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
-
 /**
  * Mobile bottom navigation component
  * Fixed at the bottom of the screen for easy thumb access
@@ -18,7 +17,6 @@ const MobileNav = () => {
   const location = useLocation();
   const { user } = useAuth();
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-
   // Main navigation items (most important)
   const mainNavItems = user?.role === 'student' ? [
     { id: 'portal', title: 'Home', icon: Home, path: '/portal' },
@@ -31,21 +29,18 @@ const MobileNav = () => {
     { id: 'evaluations', title: 'Evaluations', icon: FileText, path: '/evaluations' },
     { id: 'reports', title: 'Reports', icon: BarChart3, path: '/reports' },
   ];
-
   const isActive = (path) => {
     if (path === '/' && user?.role !== 'student') {
       return location.pathname === '/';
     }
     return location.pathname.startsWith(path);
   };
-
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 lg:hidden">
       <div className="grid grid-cols-4 h-16">
         {mainNavItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
-          
           return (
             <Link
               key={item.id}
@@ -71,5 +66,4 @@ const MobileNav = () => {
     </nav>
   );
 };
-
 export default MobileNav;

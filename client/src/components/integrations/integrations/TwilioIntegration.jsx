@@ -18,7 +18,6 @@ import {
   Zap,
   BarChart3
 } from 'lucide-react';
-
 const TwilioIntegration = ({ integration, onBack }) => {
   const [accountInfo, setAccountInfo] = useState({
     accountSid: 'AC1234567890abcdef',
@@ -27,7 +26,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
     messagesThisMonth: 12456,
     callsThisMonth: 234
   });
-
   const [messagingSettings, setMessagingSettings] = useState({
     enableSMS: true,
     enableWhatsApp: true,
@@ -38,14 +36,12 @@ const TwilioIntegration = ({ integration, onBack }) => {
     quietHoursEnd: '08:00',
     urgentBypassQuietHours: true
   });
-
   const [messageTemplates, setMessageTemplates] = useState([
     { id: '1', name: 'Appointment Reminder', type: 'sms', usage: 1234, lastUsed: '2 hours ago' },
     { id: '2', name: 'Assignment Due', type: 'sms', usage: 567, lastUsed: '1 day ago' },
     { id: '3', name: 'Welcome Message', type: 'whatsapp', usage: 234, lastUsed: '3 days ago' },
     { id: '4', name: 'Course Completion', type: 'sms', usage: 456, lastUsed: '1 week ago' }
   ]);
-
   const [notificationTypes, setNotificationTypes] = useState({
     appointmentReminders: true,
     assignmentDeadlines: true,
@@ -54,7 +50,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
     emergencyAlerts: true,
     marketingMessages: false
   });
-
   const configFields = [
     {
       name: 'accountSid',
@@ -95,7 +90,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
       description: 'Track message delivery status'
     }
   ];
-
   const webhookEvents = [
     'message.sent',
     'message.delivered',
@@ -104,7 +98,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
     'call.initiated',
     'call.completed'
   ];
-
   const apiEndpoints = [
     {
       method: 'POST',
@@ -127,7 +120,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
       description: 'List available phone numbers'
     }
   ];
-
   const customOverview = (
     <>
       {/* Account Overview */}
@@ -148,7 +140,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
               <p className="text-xl font-bold">€{accountInfo.balance}</p>
             </div>
           </div>
-          
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <MessageSquare className="w-5 h-5 mx-auto mb-2 text-gray-600" />
@@ -171,7 +162,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
               <p className="text-sm text-gray-600">Avg Cost</p>
             </div>
           </div>
-
           <div className="mt-4 flex flex-wrap gap-2">
             <p className="text-sm text-gray-600">Phone Numbers:</p>
             {accountInfo.phoneNumbers.map((number) => (
@@ -183,7 +173,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Messaging Settings */}
       <Card>
         <div className="p-6">
@@ -208,7 +197,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                 </label>
               </div>
-
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center">
                   <MessageSquare className="w-5 h-5 text-green-500 mr-2" />
@@ -227,7 +215,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                 </label>
               </div>
-
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-purple-500 mr-2" />
@@ -247,7 +234,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
                 </label>
               </div>
             </div>
-
             <div className="border rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
@@ -297,7 +283,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Notification Types */}
       <Card>
         <div className="p-6">
@@ -335,7 +320,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Message Templates */}
       <Card>
         <div className="p-6">
@@ -370,7 +354,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Quick Actions */}
       <Card>
         <div className="p-6">
@@ -407,7 +390,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Recent Messages */}
       <Card>
         <div className="p-6">
@@ -448,7 +430,6 @@ const TwilioIntegration = ({ integration, onBack }) => {
       </Card>
     </>
   );
-
   return (
     <BaseIntegration
       integration={integration}
@@ -461,5 +442,4 @@ const TwilioIntegration = ({ integration, onBack }) => {
     </BaseIntegration>
   );
 };
-
 export default TwilioIntegration;

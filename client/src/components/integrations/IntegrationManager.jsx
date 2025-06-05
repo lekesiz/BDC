@@ -20,7 +20,6 @@ import {
   Grid,
   List
 } from 'lucide-react';
-
 // Import integration components
 import GoogleCalendarIntegration from './integrations/GoogleCalendarIntegration';
 import MicrosoftTeamsIntegration from './integrations/MicrosoftTeamsIntegration';
@@ -32,10 +31,8 @@ import MailchimpIntegration from './integrations/MailchimpIntegration';
 import TwilioIntegration from './integrations/TwilioIntegration';
 import StripeIntegration from './integrations/StripeIntegration';
 import WebhooksIntegration from './integrations/WebhooksIntegration';
-
 // Import mock data
 import { generateIntegrationsData, generateIntegrationActivity, generateIntegrationStats } from './mockIntegrationsData';
-
 const IntegrationManager = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,7 +42,6 @@ const IntegrationManager = () => {
   const [activity, setActivity] = useState([]);
   const [stats, setStats] = useState(null);
   const [selectedIntegration, setSelectedIntegration] = useState(null);
-
   useEffect(() => {
     // Load mock data
     const data = generateIntegrationsData();
@@ -53,7 +49,6 @@ const IntegrationManager = () => {
     setActivity(generateIntegrationActivity());
     setStats(generateIntegrationStats());
   }, []);
-
   const categories = [
     { id: 'all', name: 'All Integrations', count: integrations.length },
     { id: 'productivity', name: 'Productivity', count: integrations.filter(i => i.category === 'productivity').length },
@@ -63,14 +58,12 @@ const IntegrationManager = () => {
     { id: 'marketing', name: 'Marketing', count: integrations.filter(i => i.category === 'marketing').length },
     { id: 'automation', name: 'Automation', count: integrations.filter(i => i.category === 'automation').length }
   ];
-
   const filteredIntegrations = integrations.filter(integration => {
     const matchesSearch = integration.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          integration.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || integration.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
   const getIntegrationComponent = (integrationId) => {
     const components = {
       'google-calendar': GoogleCalendarIntegration,
@@ -86,15 +79,12 @@ const IntegrationManager = () => {
     };
     return components[integrationId];
   };
-
   const handleIntegrationClick = (integration) => {
     setSelectedIntegration(integration);
   };
-
   const handleBackToList = () => {
     setSelectedIntegration(null);
   };
-
   if (selectedIntegration) {
     const IntegrationComponent = getIntegrationComponent(selectedIntegration.id);
     if (IntegrationComponent) {
@@ -106,7 +96,6 @@ const IntegrationManager = () => {
       );
     }
   }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -126,7 +115,6 @@ const IntegrationManager = () => {
           </Button>
         </div>
       </div>
-
       {/* Stats Overview */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -162,7 +150,6 @@ const IntegrationManager = () => {
           </Card>
         </div>
       )}
-
       {/* Filters and Search */}
       <Card>
         <div className="p-4">
@@ -207,7 +194,6 @@ const IntegrationManager = () => {
               </Button>
             </div>
           </div>
-
           {/* Integrations Grid/List */}
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -315,7 +301,6 @@ const IntegrationManager = () => {
           )}
         </div>
       </Card>
-
       {/* Recent Activity */}
       <Card>
         <div className="p-6">
@@ -349,5 +334,4 @@ const IntegrationManager = () => {
     </div>
   );
 };
-
 export default IntegrationManager;

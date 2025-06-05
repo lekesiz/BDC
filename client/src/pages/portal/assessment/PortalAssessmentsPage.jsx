@@ -19,7 +19,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
-
 /**
  * PortalAssessmentsPage displays all available assessments for the student
  */
@@ -30,7 +29,6 @@ const PortalAssessmentsPage = () => {
   const [assessmentsData, setAssessmentsData] = useState(null);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  
   // Fetch assessments data
   useEffect(() => {
     const fetchAssessments = async () => {
@@ -49,10 +47,8 @@ const PortalAssessmentsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchAssessments();
   }, [toast]);
-  
   // Format date
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -62,7 +58,6 @@ const PortalAssessmentsPage = () => {
       day: 'numeric'
     });
   };
-  
   // Format time duration
   const formatDuration = (minutes) => {
     if (!minutes) return 'No time limit';
@@ -71,7 +66,6 @@ const PortalAssessmentsPage = () => {
     const mins = minutes % 60;
     return `${hours} ${hours === 1 ? 'hour' : 'hours'}${mins ? ` ${mins} min` : ''}`;
   };
-  
   // Get status badge
   const getStatusBadge = (status) => {
     switch (status) {
@@ -107,7 +101,6 @@ const PortalAssessmentsPage = () => {
         );
     }
   };
-  
   // Get type icon
   const getTypeIcon = (type, className = "h-5 w-5") => {
     switch (type) {
@@ -123,7 +116,6 @@ const PortalAssessmentsPage = () => {
         return <FileText className={className} />;
     }
   };
-  
   // Get color class based on assessment type
   const getTypeColorClass = (type) => {
     switch (type) {
@@ -139,13 +131,10 @@ const PortalAssessmentsPage = () => {
         return 'bg-gray-50 text-gray-600';
     }
   };
-  
   // Filter assessments
   const getFilteredAssessments = () => {
     if (!assessmentsData) return [];
-    
     let allAssessments = [];
-    
     // Handle different data structures
     if (Array.isArray(assessmentsData)) {
       // Direct array
@@ -161,12 +150,10 @@ const PortalAssessmentsPage = () => {
         ...(assessmentsData.skillAssessments || [])
       ];
     }
-    
     // Apply status filter
     if (filter !== 'all') {
       allAssessments = allAssessments.filter(assessment => assessment.status === filter);
     }
-    
     // Apply search filter
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
@@ -177,20 +164,16 @@ const PortalAssessmentsPage = () => {
         (assessment.skillName && assessment.skillName.toLowerCase().includes(search))
       );
     }
-    
     return allAssessments;
   };
-  
   // Start an assessment
   const handleStartAssessment = (assessment) => {
     navigate(`/portal/assessment/${assessment.id}`);
   };
-  
   // View assessment results
   const handleViewResults = (assessment) => {
     navigate(`/portal/assessment/${assessment.id}/results`);
   };
-  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -198,9 +181,7 @@ const PortalAssessmentsPage = () => {
       </div>
     );
   }
-  
   const filteredAssessments = getFilteredAssessments();
-  
   return (
     <div className="container mx-auto py-6">
       {/* Page header */}
@@ -210,7 +191,6 @@ const PortalAssessmentsPage = () => {
           Complete quizzes, exams, and projects to test your knowledge and track your progress
         </p>
       </div>
-      
       {/* Search and filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
@@ -223,7 +203,6 @@ const PortalAssessmentsPage = () => {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
-        
         <div className="flex space-x-2">
           <Button
             variant={filter === 'all' ? 'default' : 'outline'}
@@ -251,7 +230,6 @@ const PortalAssessmentsPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Assessment cards */}
       {filteredAssessments.length === 0 ? (
         <Card className="p-8 text-center">
@@ -295,18 +273,15 @@ const PortalAssessmentsPage = () => {
                     <p className="text-gray-600 mb-4 pl-11">
                       {assessment.description}
                     </p>
-                    
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pl-11">
                       <div className="flex items-center text-sm text-gray-500">
                         <Clock className="h-4 w-4 mr-2 text-gray-400" />
                         <span>{formatDuration(assessment.duration)}</span>
                       </div>
-                      
                       <div className="flex items-center text-sm text-gray-500">
                         <FileText className="h-4 w-4 mr-2 text-gray-400" />
                         <span>{assessment.questionCount || 'N/A'} questions</span>
                       </div>
-                      
                       <div className="flex items-center text-sm text-gray-500">
                         <Calendar className="h-4 w-4 mr-2 text-gray-400" />
                         <span>
@@ -320,7 +295,6 @@ const PortalAssessmentsPage = () => {
                       </div>
                     </div>
                   </div>
-                  
                   <div className="pl-11 md:pl-0 shrink-0">
                     {assessment.status === 'completed' && assessment.attempts?.bestScore !== null && (
                       <div className="flex flex-col items-center mb-4">
@@ -334,7 +308,6 @@ const PortalAssessmentsPage = () => {
                         <span className="text-xs text-gray-500">Best Score</span>
                       </div>
                     )}
-                    
                     {assessment.status === 'available' && (
                       <Button 
                         onClick={() => handleStartAssessment(assessment)}
@@ -343,7 +316,6 @@ const PortalAssessmentsPage = () => {
                         {assessment.attempts?.completed > 0 ? 'Attempt Again' : 'Start'}
                       </Button>
                     )}
-                    
                     {assessment.status === 'completed' && (
                       <Button 
                         variant="outline"
@@ -353,7 +325,6 @@ const PortalAssessmentsPage = () => {
                         View Results
                       </Button>
                     )}
-                    
                     {assessment.status === 'upcoming' && (
                       <Button 
                         variant="outline"
@@ -368,7 +339,6 @@ const PortalAssessmentsPage = () => {
                     )}
                   </div>
                 </div>
-                
                 {assessment.attempts && (
                   <div className="mt-4 pl-11 text-sm text-gray-500">
                     {assessment.attempts.completed}/{assessment.attempts.allowed} attempts used
@@ -387,5 +357,4 @@ const PortalAssessmentsPage = () => {
     </div>
   );
 };
-
 export default PortalAssessmentsPage;

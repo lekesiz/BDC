@@ -7,7 +7,6 @@ import {
   X 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 /**
  * Toast container for displaying toast notifications
  */
@@ -22,7 +21,6 @@ const ToastContainer = ({ className, ...props }) => {
         aria-atomic="true"
         aria-label="Notifications"
       />
-      
       {/* Visual toasts */}
       <div
         className={cn(
@@ -35,7 +33,6 @@ const ToastContainer = ({ className, ...props }) => {
     </>
   );
 };
-
 /**
  * Types of toast notifications with corresponding icons and styles
  */
@@ -61,7 +58,6 @@ const TOAST_TYPES = {
     ariaLive: "polite",
   },
 };
-
 /**
  * Toast component for displaying notifications
  * 
@@ -87,31 +83,26 @@ const Toast = ({
 }) => {
   const { icon, className: typeClassName, ariaLive } = TOAST_TYPES[type] || TOAST_TYPES.info;
   const toastRef = React.useRef(null);
-  
   // Auto-close toast after duration and announce to screen readers
   React.useEffect(() => {
     // Announce to screen readers
     const announcement = document.querySelector('[role="region"][aria-live]');
     if (announcement) {
-      const message = `${type} notification: ${title || ''} ${message || ''}`;
+      const announcementText = `${type} notification: ${title || ''} ${message || ''}`;
       announcement.setAttribute('aria-live', ariaLive);
-      announcement.textContent = message;
-      
+      announcement.textContent = announcementText;
       // Clear announcement after a delay
       setTimeout(() => {
         announcement.textContent = '';
       }, 1000);
     }
-    
     if (duration) {
       const timer = setTimeout(() => {
         onClose && onClose(id);
       }, duration);
-      
       return () => clearTimeout(timer);
     }
   }, [duration, id, onClose, type, title, message, ariaLive]);
-  
   return (
     <div
       ref={toastRef}
@@ -130,7 +121,6 @@ const Toast = ({
       <div className="flex items-center justify-center w-12">
         {icon}
       </div>
-      
       <div className="px-4 py-3 w-full">
         {title && (
           <div className="font-semibold">{title}</div>
@@ -139,7 +129,6 @@ const Toast = ({
           <div className="text-sm">{message}</div>
         )}
       </div>
-      
       <div className="flex items-center">
         <button
           onClick={() => onClose && onClose(id)}
@@ -156,7 +145,6 @@ const Toast = ({
     </div>
   );
 };
-
 /**
  * Create a toast context for managing toast notifications
  */
@@ -165,23 +153,19 @@ const ToastContext = React.createContext({
   addToast: () => {},
   removeToast: () => {},
 });
-
 /**
  * Provider component for managing toast notifications
  */
 const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = React.useState([]);
-  
   const addToast = React.useCallback((toast) => {
     const id = toast.id || Date.now().toString();
     setToasts((prevToasts) => [...prevToasts, { ...toast, id }]);
     return id;
   }, []);
-  
   const removeToast = React.useCallback((id) => {
     setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
   }, []);
-  
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
       {children}
@@ -201,28 +185,39 @@ const ToastProvider = ({ children }) => {
     </ToastContext.Provider>
   );
 };
-
 /**
  * Hook for using toast notifications
  */
 const useToast = () => {
-  const context = React.useContext(ToastContext);
-  
-  if (context === undefined) {
-    throw new Error("useToast must be used within a ToastProvider");
+  try {
+    const context = React.useContext(ToastContext);
+    if (!context || context === undefined) {
+      console.warn("useToast used outside ToastProvider, returning mock functions");
+      return {
+        addToast: () => {},
+        removeToast: () => {},
+        toast: () => {},
+        toasts: []
+      };
+    }
+    // Provide a toast method for simplified API
+    const toast = (options) => {
+      return context.addToast(options);
+    };
+    return {
+      ...context,
+      toast
+    };
+  } catch (error) {
+    console.warn("Error in useToast:", error);
+    return {
+      addToast: () => {},
+      removeToast: () => {},
+      toast: () => {},
+      toasts: []
+    };
   }
-  
-  // Provide a toast method for simplified API
-  const toast = (options) => {
-    return context.addToast(options);
-  };
-  
-  return {
-    ...context,
-    toast
-  };
 };
-
 export { 
   ToastProvider, 
   useToast,

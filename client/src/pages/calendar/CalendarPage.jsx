@@ -1,778 +1,952 @@
-import { useState, useEffect, useMemo } from 'react';
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, 
-  isSameMonth, isSameDay, addDays, parse, parseISO, isToday, getDay, addMonths, subMonths } from 'date-fns';
-import { tr } from 'date-fns/locale';
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, Filter, Users, Clock, Calendar, List, LayoutGrid } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval,
+  isSameMonth, isSameDay, addDays, parseISO, isToday, getDay, addMonths, subMonths,
+  addWeeks, subWeeks, startOfDay, endOfDay, isWithinInterval, differenceInMinutes,
+  addMinutes, setHours, setMinutes
+} from 'date-fns';
+import { tr, enUS } from 'date-fns/locale';
+import { 
+  CalendarDays, ChevronLeft, ChevronRight, Plus, Filter, Users, Clock, 
+  Calendar, List, LayoutGrid, Search, MapPin, Bell, Video, Settings,
+  Palette, Download, Upload, RefreshCw, MoreHorizontal, Tag
+} from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import api from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/toast';
-import AppointmentCard from '@/components/appointment/AppointmentCard';
-import AppointmentModal from '@/components/appointment/AppointmentModal';
-import { useAuth } from '@/hooks/useAuth';
-
+import axios from '../../lib/api';
+import { toast } from '../../hooks/useToast';
+import { Button } from '../../components/ui/button';
+import { Card } from '../../components/ui/card';
+import { Input } from '../../components/ui/input';
+import { Select } from '../../components/ui/select';
+import { Badge } from '../../components/ui/badge';
+import { Tabs } from '../../components/ui/tabs';
+import { Label } from '../../components/ui';
+import AppointmentCard from '../../components/appointment/AppointmentCard';
+import AppointmentModal from '../../components/appointment/AppointmentModal';
+import { useAuth } from '../../hooks/useAuth';
 /**
- * CalendarPage displays a calendar view of appointments and allows scheduling new ones
+ * Enhanced CalendarPage with advanced features and improved UI/UX
  */
-const CalendarPage = () => {
+const CalendarPageV2 = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
   const { user } = useAuth();
-
   // State management
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState('month'); // 'month', 'week', 'day', 'list'
+  const [viewMode, setViewMode] = useState('month'); // 'month', 'week', 'day', 'agenda', 'year'
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+  const [hoveredDate, setHoveredDate] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [draggedAppointment, setDraggedAppointment] = useState(null);
+  const [language, setLanguage] = useState('tr');
+  const [theme, setTheme] = useState('light');
+  const [calendarSettings, setCalendarSettings] = useState({
+    weekStartsOn: 1, // Monday
+    workingHours: { start: 9, end: 18 },
+    timeSlotDuration: 30, // minutes
+    defaultAppointmentDuration: 60, // minutes
+    showWeekNumbers: true,
+    enableDragDrop: true,
+    enableDoubleClick: true,
+    showWeekends: true
+  });
   const [filters, setFilters] = useState({
     searchTerm: '',
     beneficiaryId: '',
     trainerId: '',
-    status: 'all', // 'all', 'upcoming', 'past', 'canceled'
-    type: 'all', // 'all', 'session', 'evaluation', 'meeting'
+    status: 'all',
+    type: 'all',
+    tags: [],
+    dateRange: 'all'
   });
-
-  // Calculate the days to display based on view mode
+  const [quickFilters, setQuickFilters] = useState({
+    myAppointments: false,
+    upcomingOnly: false,
+    needsConfirmation: false,
+    conflicts: false
+  });
+  // Computed values
   const daysToDisplay = useMemo(() => {
     if (viewMode === 'month') {
       const monthStart = startOfMonth(currentDate);
       const monthEnd = endOfMonth(currentDate);
-      const startDate = startOfWeek(monthStart);
-      const endDate = endOfWeek(monthEnd);
-      
+      const startDate = startOfWeek(monthStart, { weekStartsOn: calendarSettings.weekStartsOn });
+      const endDate = endOfWeek(monthEnd, { weekStartsOn: calendarSettings.weekStartsOn });
       return eachDayOfInterval({ start: startDate, end: endDate });
     } else if (viewMode === 'week') {
-      const weekStart = startOfWeek(currentDate);
-      const weekEnd = endOfWeek(currentDate);
-      
+      const weekStart = startOfWeek(currentDate, { weekStartsOn: calendarSettings.weekStartsOn });
+      const weekEnd = endOfWeek(currentDate, { weekStartsOn: calendarSettings.weekStartsOn });
       return eachDayOfInterval({ start: weekStart, end: weekEnd });
-    } else {
-      // Day view - just return the current date in an array
+    } else if (viewMode === 'day') {
       return [currentDate];
     }
-  }, [currentDate, viewMode]);
-
-  // Fetch appointments
+    return [];
+  }, [currentDate, viewMode, calendarSettings.weekStartsOn]);
+  const timeSlots = useMemo(() => {
+    const slots = [];
+    const startHour = calendarSettings.workingHours.start;
+    const endHour = calendarSettings.workingHours.end;
+    const slotDuration = calendarSettings.timeSlotDuration;
+    for (let hour = startHour; hour < endHour; hour++) {
+      for (let minute = 0; minute < 60; minute += slotDuration) {
+        slots.push({ hour, minute });
+      }
+    }
+    return slots;
+  }, [calendarSettings]);
+  // Data fetching
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Define the date range for fetching appointments
-        const startDate = viewMode === 'month' 
-          ? startOfMonth(currentDate) 
-          : viewMode === 'week'
-            ? startOfWeek(currentDate)
-            : currentDate;
-            
-        const endDate = viewMode === 'month'
-          ? endOfMonth(currentDate)
-          : viewMode === 'week'
-            ? endOfWeek(currentDate)
-            : currentDate;
-        
-        // Format dates for API
-        const start = format(startDate, 'yyyy-MM-dd');
-        const end = format(endDate, 'yyyy-MM-dd');
-        
-        // Get appointments from API
-        const response = await api.get('/api/calendar/events', {
-          params: { start, end }
-        });
-        setAppointments(response.data.events || []);
-        applyFilters(response.data.events || []);
-      } catch (error) {
-        console.error('Error fetching appointments:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load appointments',
-          type: 'error',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     fetchAppointments();
-  }, [currentDate, viewMode]); // Remove toast dependency to prevent infinite loop
-
-  // Apply filters to appointments
-  const applyFilters = (appointmentsToFilter = appointments) => {
-    let filtered = [...appointmentsToFilter];
-    
-    // Apply search term filter
+  }, [currentDate, viewMode]);
+  useEffect(() => {
+    applyFilters();
+  }, [appointments, filters, quickFilters]);
+  const fetchAppointments = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/api/appointments', {
+        params: {
+          start_date: format(startOfMonth(currentDate), 'yyyy-MM-dd'),
+          end_date: format(endOfMonth(currentDate), 'yyyy-MM-dd'),
+          view_mode: viewMode
+        }
+      });
+      setAppointments(response.data);
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+      toast({
+        title: 'Hata',
+        description: 'Randevular yüklenemedi',
+        variant: 'error'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const applyFilters = () => {
+    let filtered = [...appointments];
+    // Apply search filter
     if (filters.searchTerm) {
-      const searchLower = filters.searchTerm.toLowerCase();
-      filtered = filtered.filter(appointment => 
-        appointment.title.toLowerCase().includes(searchLower) || 
-        appointment.description?.toLowerCase().includes(searchLower) ||
-        appointment.beneficiary?.name.toLowerCase().includes(searchLower) ||
-        appointment.trainer?.name.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(apt => 
+        apt.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        apt.beneficiary_name?.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        apt.trainer_name?.toLowerCase().includes(filters.searchTerm.toLowerCase())
       );
     }
-    
-    // Apply beneficiary filter
-    if (filters.beneficiaryId) {
-      filtered = filtered.filter(appointment => 
-        appointment.beneficiary_id === parseInt(filters.beneficiaryId)
+    // Apply quick filters
+    if (quickFilters.myAppointments) {
+      filtered = filtered.filter(apt => 
+        apt.trainer_id === user?.id || apt.beneficiary_id === user?.id
       );
     }
-    
-    // Apply trainer filter
-    if (filters.trainerId) {
-      filtered = filtered.filter(appointment => 
-        appointment.trainer_id === parseInt(filters.trainerId)
+    if (quickFilters.upcomingOnly) {
+      filtered = filtered.filter(apt => 
+        new Date(apt.start_time) > new Date()
       );
     }
-    
-    // Apply status filter
+    if (quickFilters.needsConfirmation) {
+      filtered = filtered.filter(apt => apt.status === 'pending');
+    }
+    // Apply other filters
     if (filters.status !== 'all') {
-      const now = new Date();
-      
-      if (filters.status === 'upcoming') {
-        filtered = filtered.filter(appointment => 
-          new Date(appointment.start_time) > now && appointment.status !== 'canceled'
-        );
-      } else if (filters.status === 'past') {
-        filtered = filtered.filter(appointment => 
-          new Date(appointment.end_time) < now && appointment.status !== 'canceled'
-        );
-      } else if (filters.status === 'canceled') {
-        filtered = filtered.filter(appointment => 
-          appointment.status === 'canceled'
-        );
-      }
+      filtered = filtered.filter(apt => apt.status === filters.status);
     }
-    
-    // Apply type filter
     if (filters.type !== 'all') {
-      filtered = filtered.filter(appointment => 
-        appointment.type === filters.type
+      filtered = filtered.filter(apt => apt.type === filters.type);
+    }
+    if (filters.tags.length > 0) {
+      filtered = filtered.filter(apt => 
+        apt.tags?.some(tag => filters.tags.includes(tag))
       );
     }
-    
     setFilteredAppointments(filtered);
   };
-
-  // Handle filter changes
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => {
-      const newFilters = { ...prev, [key]: value };
-      applyFilters(appointments);
-      return newFilters;
-    });
-  };
-
-  // Navigate to previous period
-  const handlePrevious = () => {
+  // Event handlers
+  const handleDateNavigation = (direction) => {
     if (viewMode === 'month') {
-      setCurrentDate(subMonths(currentDate, 1));
+      setCurrentDate(direction === 'prev' ? 
+        subMonths(currentDate, 1) : 
+        addMonths(currentDate, 1)
+      );
     } else if (viewMode === 'week') {
-      setCurrentDate(addDays(currentDate, -7));
-    } else {
-      setCurrentDate(addDays(currentDate, -1));
+      setCurrentDate(direction === 'prev' ? 
+        subWeeks(currentDate, 1) : 
+        addWeeks(currentDate, 1)
+      );
+    } else if (viewMode === 'day') {
+      setCurrentDate(direction === 'prev' ? 
+        subDays(currentDate, 1) : 
+        addDays(currentDate, 1)
+      );
     }
   };
-
-  // Navigate to next period
-  const handleNext = () => {
-    if (viewMode === 'month') {
-      setCurrentDate(addMonths(currentDate, 1));
-    } else if (viewMode === 'week') {
-      setCurrentDate(addDays(currentDate, 7));
-    } else {
-      setCurrentDate(addDays(currentDate, 1));
-    }
-  };
-
-  // Set view to today
-  const handleToday = () => {
-    setCurrentDate(new Date());
-    setSelectedDate(new Date());
-  };
-
-  // Change view mode
-  const handleViewChange = (mode) => {
-    setViewMode(mode);
-  };
-
-  // Open appointment modal for creating a new appointment
-  const handleCreateAppointment = (date) => {
+  const handleDateSelect = (date) => {
     setSelectedDate(date);
-    setSelectedAppointment(null);
+    if (viewMode === 'month') {
+      setViewMode('day');
+      setCurrentDate(date);
+    }
+  };
+  const handleTimeSlotClick = (date, timeSlot) => {
+    if (calendarSettings.enableDoubleClick) return;
+    const slotStart = setMinutes(setHours(date, timeSlot.hour), timeSlot.minute);
+    const slotEnd = addMinutes(slotStart, calendarSettings.defaultAppointmentDuration);
+    setSelectedTimeSlot({ start: slotStart, end: slotEnd });
     setShowModal(true);
   };
-
-  // Handle clicking on an appointment
+  const handleTimeSlotDoubleClick = (date, timeSlot) => {
+    if (!calendarSettings.enableDoubleClick) return;
+    const slotStart = setMinutes(setHours(date, timeSlot.hour), timeSlot.minute);
+    const slotEnd = addMinutes(slotStart, calendarSettings.defaultAppointmentDuration);
+    setSelectedTimeSlot({ start: slotStart, end: slotEnd });
+    setShowModal(true);
+  };
   const handleAppointmentClick = (appointment) => {
     setSelectedAppointment(appointment);
     setShowModal(true);
   };
-
-  // Get appointments for a specific day
-  const getAppointmentsForDay = (day) => {
-    return filteredAppointments.filter(appointment => {
-      const appointmentDate = parseISO(appointment.start_time);
-      return isSameDay(appointmentDate, day);
-    });
+  const handleAppointmentDragStart = (appointment) => {
+    if (!calendarSettings.enableDragDrop) return;
+    setIsDragging(true);
+    setDraggedAppointment(appointment);
   };
-
-  // Format the header text based on view mode
-  const getHeaderText = () => {
-    if (viewMode === 'month') {
-      return format(currentDate, 'MMMM yyyy', { locale: tr });
-    } else if (viewMode === 'week') {
-      const start = startOfWeek(currentDate);
-      const end = endOfWeek(currentDate);
-      const startMonth = format(start, 'MMM d', { locale: tr });
-      const endMonth = format(end, 'MMM d, yyyy', { locale: tr });
-      return `${startMonth} - ${endMonth}`;
-    } else {
-      return format(currentDate, 'EEEE, MMMM d, yyyy', { locale: tr });
+  const handleAppointmentDrop = async (date, timeSlot) => {
+    if (!draggedAppointment || !calendarSettings.enableDragDrop) return;
+    try {
+      const newStart = setMinutes(setHours(date, timeSlot.hour), timeSlot.minute);
+      const duration = differenceInMinutes(
+        new Date(draggedAppointment.end_time),
+        new Date(draggedAppointment.start_time)
+      );
+      const newEnd = addMinutes(newStart, duration);
+      await axios.put(`/api/appointments/${draggedAppointment.id}`, {
+        ...draggedAppointment,
+        start_time: newStart.toISOString(),
+        end_time: newEnd.toISOString()
+      });
+      toast({
+        title: 'Başarılı',
+        description: 'Randevu yeni zamana taşındı',
+        variant: 'success'
+      });
+      fetchAppointments();
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Randevu taşınamadı',
+        variant: 'error'
+      });
+    } finally {
+      setIsDragging(false);
+      setDraggedAppointment(null);
     }
   };
-
-  // Render day cell for the calendar
-  const renderDay = (day, index) => {
-    const dayAppointments = getAppointmentsForDay(day);
-    const isCurrentMonth = isSameMonth(day, currentDate);
-    const isSelected = isSameDay(day, selectedDate);
-    
-    return (
-      <div
-        key={index}
-        className={`border border-gray-200 min-h-[120px] ${
-          isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'
-        } ${isToday(day) ? 'border-primary' : ''} ${
-          isSelected ? 'bg-primary-50' : ''
-        }`}
-        onClick={() => setSelectedDate(day)}
-      >
-        <div className="flex justify-between items-center p-2 border-b border-gray-200">
-          <span className={`text-sm font-medium ${isToday(day) ? 'text-primary' : ''}`}>
-            {format(day, 'd')}
-          </span>
-          <button
-            className="p-1 hover:bg-gray-100 rounded-full text-gray-600"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCreateAppointment(day);
-            }}
-          >
-            <Plus className="w-3 h-3" />
-          </button>
-        </div>
-        <div className="p-1 max-h-[100px] overflow-y-auto">
-          {dayAppointments.length > 0 ? (
-            dayAppointments.map((appointment) => (
-              <div
-                key={appointment.id}
-                className={`px-2 py-1 mb-1 text-xs rounded truncate ${
-                  appointment.status === 'canceled' 
-                    ? 'bg-gray-200 text-gray-600 line-through'
-                    : `bg-${appointment.color || 'blue'}-100 text-${appointment.color || 'blue'}-800`
-                }`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAppointmentClick(appointment);
-                }}
-              >
-                {format(parseISO(appointment.start_time), 'HH:mm')} - {appointment.title}
-              </div>
-            ))
-          ) : (
-            <div className="text-xs text-gray-400 text-center mt-2">No appointments</div>
-          )}
-        </div>
-      </div>
+  const exportCalendar = async (format = 'ics') => {
+    try {
+      const response = await axios.get('/api/appointments/export', {
+        params: { format },
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `calendar-${format(new Date(), 'yyyy-MM-dd')}.${format}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast({
+        title: 'Başarılı',
+        description: 'Takvim dışa aktarıldı',
+        variant: 'success'
+      });
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Takvim dışa aktarılamadı',
+        variant: 'error'
+      });
+    }
+  };
+  const syncGoogleCalendar = async () => {
+    try {
+      await axios.post('/api/appointments/sync/google');
+      toast({
+        title: 'Başarılı',
+        description: 'Google Takvim senkronize edildi',
+        variant: 'success'
+      });
+      fetchAppointments();
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Senkronizasyon başarısız',
+        variant: 'error'
+      });
+    }
+  };
+  // Helper functions
+  const getAppointmentsForDate = (date) => {
+    return filteredAppointments.filter(apt => 
+      isSameDay(parseISO(apt.start_time), date)
     );
   };
-
-  // Render week view
-  const renderWeekView = () => {
-    const days = daysToDisplay;
-    const hours = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM
-    
-    return (
-      <div className="flex flex-col h-full">
-        <div className="grid grid-cols-8 border-b border-gray-200">
-          <div className="border-r border-gray-200 p-2 text-sm font-medium">
-            Time
-          </div>
-          {days.map((day, idx) => (
-            <div 
-              key={idx} 
-              className={`p-2 text-center text-sm font-medium ${
-                isToday(day) ? 'text-primary' : ''
-              }`}
-            >
-              <div>{format(day, 'E', { locale: tr })}</div>
-              <div>{format(day, 'd')}</div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="flex-1 overflow-y-auto">
-          {hours.map((hour) => (
-            <div key={hour} className="grid grid-cols-8 border-b border-gray-200">
-              <div className="border-r border-gray-200 p-2 text-xs text-gray-500 text-right">
-                {hour}:00
-              </div>
-              
-              {days.map((day, idx) => {
-                const currentHourAppointments = filteredAppointments.filter(appointment => {
-                  const startTime = parseISO(appointment.start_time);
-                  return isSameDay(startTime, day) && startTime.getHours() === hour;
-                });
-                
-                return (
-                  <div 
-                    key={idx} 
-                    className={`border-r border-gray-200 p-1 min-h-[60px] ${
-                      isToday(day) ? 'bg-primary-50' : ''
-                    }`}
-                    onClick={() => {
-                      const date = new Date(day);
-                      date.setHours(hour);
-                      handleCreateAppointment(date);
-                    }}
-                  >
-                    {currentHourAppointments.map((appointment) => (
-                      <div
-                        key={appointment.id}
-                        className={`px-2 py-1 mb-1 text-xs rounded truncate cursor-pointer ${
-                          appointment.status === 'canceled' 
-                            ? 'bg-gray-200 text-gray-600 line-through'
-                            : `bg-${appointment.color || 'blue'}-100 text-${appointment.color || 'blue'}-800`
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAppointmentClick(appointment);
-                        }}
-                      >
-                        {format(parseISO(appointment.start_time), 'HH:mm')} - {appointment.title}
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  const getAppointmentsForTimeSlot = (date, timeSlot) => {
+    const slotStart = setMinutes(setHours(date, timeSlot.hour), timeSlot.minute);
+    const slotEnd = addMinutes(slotStart, calendarSettings.timeSlotDuration);
+    return filteredAppointments.filter(apt => {
+      const aptStart = parseISO(apt.start_time);
+      const aptEnd = parseISO(apt.end_time);
+      return isWithinInterval(aptStart, { start: slotStart, end: slotEnd }) ||
+             isWithinInterval(slotStart, { start: aptStart, end: aptEnd });
+    });
   };
-
-  // Render day view
-  const renderDayView = () => {
-    const hours = Array.from({ length: 14 }, (_, i) => i + 7); // 7 AM to 8 PM
-    
-    return (
-      <div className="flex flex-col h-full">
-        <div className="border-b border-gray-200 p-3 text-center">
-          <div className={`font-medium ${isToday(currentDate) ? 'text-primary' : ''}`}>
-            {format(currentDate, 'EEEE', { locale: tr })}
-          </div>
-          <div className="text-sm text-gray-600">
-            {format(currentDate, 'd MMMM yyyy', { locale: tr })}
-          </div>
-        </div>
-        
-        <div className="flex-1 overflow-y-auto">
-          {hours.map((hour) => {
-            const currentHourAppointments = filteredAppointments.filter(appointment => {
-              const startTime = parseISO(appointment.start_time);
-              return isSameDay(startTime, currentDate) && startTime.getHours() === hour;
-            });
-            
-            return (
-              <div key={hour} className="flex border-b border-gray-200">
-                <div className="w-20 border-r border-gray-200 p-2 text-sm text-gray-500 text-right">
-                  {hour}:00
-                </div>
-                
-                <div 
-                  className="flex-1 p-2 min-h-[80px]"
-                  onClick={() => {
-                    const date = new Date(currentDate);
-                    date.setHours(hour);
-                    handleCreateAppointment(date);
-                  }}
-                >
-                  {currentHourAppointments.map((appointment) => (
-                    <div
-                      key={appointment.id}
-                      className={`px-3 py-2 mb-2 text-sm rounded ${
-                        appointment.status === 'canceled' 
-                          ? 'bg-gray-200 text-gray-600 line-through'
-                          : `bg-${appointment.color || 'blue'}-100 text-${appointment.color || 'blue'}-800`
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAppointmentClick(appointment);
-                      }}
-                    >
-                      <div className="font-medium">
-                        {format(parseISO(appointment.start_time), 'HH:mm')} - {format(parseISO(appointment.end_time), 'HH:mm')}
-                      </div>
-                      <div>{appointment.title}</div>
-                      <div className="text-xs mt-1">
-                        {appointment.beneficiary?.name && (
-                          <span className="inline-flex items-center mr-2">
-                            <Users className="w-3 h-3 mr-1" />
-                            {appointment.beneficiary.name}
-                          </span>
-                        )}
-                        {appointment.location && (
-                          <span className="inline-flex items-center">
-                            <Map className="w-3 h-3 mr-1" />
-                            {appointment.location}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+  const getAppointmentPosition = (appointment, timeSlot) => {
+    const aptStart = parseISO(appointment.start_time);
+    const slotStart = setMinutes(setHours(aptStart, timeSlot.hour), timeSlot.minute);
+    const minutesFromSlotStart = differenceInMinutes(aptStart, slotStart);
+    const top = (minutesFromSlotStart / calendarSettings.timeSlotDuration) * 100;
+    const duration = differenceInMinutes(
+      parseISO(appointment.end_time),
+      aptStart
     );
+    const height = (duration / calendarSettings.timeSlotDuration) * 100;
+    return { top: `${top}%`, height: `${height}%` };
   };
-
-  // Render list view
-  const renderListView = () => {
-    // Group appointments by date
-    const groupedAppointments = filteredAppointments.reduce((acc, appointment) => {
-      const date = format(parseISO(appointment.start_time), 'yyyy-MM-dd');
-      
-      if (!acc[date]) {
-        acc[date] = [];
-      }
-      
-      acc[date].push(appointment);
-      return acc;
-    }, {});
-    
-    // Sort dates
-    const sortedDates = Object.keys(groupedAppointments).sort();
-    
-    return (
-      <div className="space-y-6">
-        {sortedDates.length > 0 ? (
-          sortedDates.map((date) => (
-            <div key={date}>
-              <h3 className="text-lg font-medium mb-2">
-                {format(parseISO(date), 'EEEE, d MMMM yyyy', { locale: tr })}
-              </h3>
-              
-              <div className="space-y-2">
-                {groupedAppointments[date].map((appointment) => (
-                  <AppointmentCard
-                    key={appointment.id}
-                    appointment={appointment}
-                    onClick={() => handleAppointmentClick(appointment)}
-                  />
-                ))}
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="text-center p-8">
-            <CalendarDays className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No appointments found</h3>
-            <p className="text-gray-500 mb-4">Try adjusting your filters or create a new appointment</p>
-            <Button onClick={() => handleCreateAppointment(new Date())}>
-              Create Appointment
-            </Button>
-          </div>
-        )}
-      </div>
-    );
+  const getDayClass = (date) => {
+    const classes = [];
+    if (!isSameMonth(date, currentDate)) {
+      classes.push('text-gray-400');
+    }
+    if (isToday(date)) {
+      classes.push('bg-blue-50 font-semibold');
+    }
+    if (isSameDay(date, selectedDate)) {
+      classes.push('bg-blue-100 ring-2 ring-blue-600');
+    }
+    if (getDay(date) === 0 || getDay(date) === 6) {
+      classes.push('bg-gray-50');
+    }
+    if (hoveredDate && isSameDay(date, hoveredDate)) {
+      classes.push('bg-gray-100');
+    }
+    return classes.join(' ');
   };
-
+  const getAppointmentColor = (appointment) => {
+    const colors = {
+      session: 'bg-blue-500',
+      evaluation: 'bg-purple-500',
+      meeting: 'bg-green-500',
+      other: 'bg-gray-500'
+    };
+    return colors[appointment.type] || colors.other;
+  };
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Calendar</h1>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/calendar/availability')}
-            className="flex items-center"
-          >
-            <Clock className="w-4 h-4 mr-2" />
-            Availability
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={() => navigate('/calendar/google-sync')}
-            className="flex items-center"
-          >
-            <CalendarDays className="w-4 h-4 mr-2" />
-            Google Sync
-          </Button>
-          
-          <Button
-            onClick={() => handleCreateAppointment(selectedDate)}
-            className="flex items-center"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Create Appointment
-          </Button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b sticky top-0 z-30">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold">Takvim</h1>
+              <p className="text-sm text-gray-600">Randevularınızı yönetin</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/calendar/availability')}
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                Uygunluk Ayarları
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate('/calendar/google-sync')}
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Google Sync
+              </Button>
+              <Button
+                onClick={() => setShowModal(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Yeni Randevu
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
-      
-      {/* Filters and controls */}
-      <Card className="p-4 mb-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePrevious}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNext}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleToday}
-            >
-              Today
-            </Button>
-            
-            <h2 className="text-lg font-medium ml-2">
-              {getHeaderText()}
+      {/* Toolbar */}
+      <div className="bg-white border-b px-6 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {/* Date Navigation */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDateNavigation('prev')}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentDate(new Date())}
+              >
+                Bugün
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDateNavigation('next')}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            {/* Current Date Display */}
+            <h2 className="text-lg font-semibold">
+              {format(currentDate, viewMode === 'month' ? 'MMMM yyyy' : 'dd MMMM yyyy', {
+                locale: language === 'tr' ? tr : enUS
+              })}
             </h2>
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <div className="flex border border-gray-300 rounded-md overflow-hidden">
+          <div className="flex items-center gap-2">
+            {/* View Mode Selector */}
+            <div className="flex items-center border rounded-lg">
               <Button
                 variant={viewMode === 'month' ? 'default' : 'ghost'}
                 size="sm"
-                className="rounded-none border-0"
-                onClick={() => handleViewChange('month')}
+                onClick={() => setViewMode('month')}
               >
-                <LayoutGrid className="w-4 h-4 mr-1" />
-                Month
+                <LayoutGrid className="h-4 w-4" />
               </Button>
-              
               <Button
                 variant={viewMode === 'week' ? 'default' : 'ghost'}
                 size="sm"
-                className="rounded-none border-0"
-                onClick={() => handleViewChange('week')}
+                onClick={() => setViewMode('week')}
               >
-                <Calendar className="w-4 h-4 mr-1" />
-                Week
+                <CalendarDays className="h-4 w-4" />
               </Button>
-              
               <Button
                 variant={viewMode === 'day' ? 'default' : 'ghost'}
                 size="sm"
-                className="rounded-none border-0"
-                onClick={() => handleViewChange('day')}
+                onClick={() => setViewMode('day')}
               >
-                <Clock className="w-4 h-4 mr-1" />
-                Day
+                <Calendar className="h-4 w-4" />
               </Button>
-              
               <Button
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                variant={viewMode === 'agenda' ? 'default' : 'ghost'}
                 size="sm"
-                className="rounded-none border-0"
-                onClick={() => handleViewChange('list')}
+                onClick={() => setViewMode('agenda')}
               >
-                <List className="w-4 h-4 mr-1" />
-                List
+                <List className="h-4 w-4" />
               </Button>
             </div>
-            
+            {/* More Options */}
             <div className="relative">
-              <Input
-                type="text"
-                placeholder="Search..."
-                value={filters.searchTerm}
-                onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-                className="pl-8"
-              />
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                <Filter className="w-4 h-4 text-gray-400" />
+              <Button variant="ghost" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border p-2 hidden group-hover:block">
+                <button
+                  onClick={() => exportCalendar('ics')}
+                  className="w-full text-left px-3 py-2 rounded hover:bg-gray-100"
+                >
+                  <Download className="h-4 w-4 mr-2 inline" />
+                  Takvimi Dışa Aktar
+                </button>
+                <button
+                  onClick={syncGoogleCalendar}
+                  className="w-full text-left px-3 py-2 rounded hover:bg-gray-100"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2 inline" />
+                  Google Takvim Sync
+                </button>
+                <button
+                  onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                  className="w-full text-left px-3 py-2 rounded hover:bg-gray-100"
+                >
+                  <Palette className="h-4 w-4 mr-2 inline" />
+                  Tema Değiştir
+                </button>
+                <button
+                  onClick={() => navigate('/calendar/settings')}
+                  className="w-full text-left px-3 py-2 rounded hover:bg-gray-100"
+                >
+                  <Settings className="h-4 w-4 mr-2 inline" />
+                  Takvim Ayarları
+                </button>
               </div>
             </div>
           </div>
         </div>
-        
-        {/* Additional filters */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+      </div>
+      <div className="flex">
+        {/* Sidebar Filters */}
+        <div className="w-64 bg-white border-r p-4 space-y-6">
+          {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-              value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-            >
-              <option value="all">All</option>
-              <option value="upcoming">Upcoming</option>
-              <option value="past">Past</option>
-              <option value="canceled">Canceled</option>
-            </select>
+            <Label>Ara</Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Randevu ara..."
+                value={filters.searchTerm}
+                onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
+                className="pl-10"
+              />
+            </div>
           </div>
-          
+          {/* Quick Filters */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Appointment Type
-            </label>
-            <select
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-              value={filters.type}
-              onChange={(e) => handleFilterChange('type', e.target.value)}
-            >
-              <option value="all">All Types</option>
-              <option value="session">Training Session</option>
-              <option value="evaluation">Evaluation</option>
-              <option value="meeting">Meeting</option>
-            </select>
+            <Label>Hızlı Filtreler</Label>
+            <div className="space-y-2 mt-2">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={quickFilters.myAppointments}
+                  onChange={(e) => setQuickFilters({ ...quickFilters, myAppointments: e.target.checked })}
+                  className="mr-2"
+                />
+                <span className="text-sm">Sadece Benim Randevularım</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={quickFilters.upcomingOnly}
+                  onChange={(e) => setQuickFilters({ ...quickFilters, upcomingOnly: e.target.checked })}
+                  className="mr-2"
+                />
+                <span className="text-sm">Yaklaşan Randevular</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={quickFilters.needsConfirmation}
+                  onChange={(e) => setQuickFilters({ ...quickFilters, needsConfirmation: e.target.checked })}
+                  className="mr-2"
+                />
+                <span className="text-sm">Onay Bekleyenler</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={quickFilters.conflicts}
+                  onChange={(e) => setQuickFilters({ ...quickFilters, conflicts: e.target.checked })}
+                  className="mr-2"
+                />
+                <span className="text-sm">Çakışan Randevular</span>
+              </label>
+            </div>
           </div>
-          
+          {/* Filters */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Beneficiary
-            </label>
-            <select
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-              value={filters.beneficiaryId}
-              onChange={(e) => handleFilterChange('beneficiaryId', e.target.value)}
-            >
-              <option value="">All Beneficiaries</option>
-              {/* In a real app, this would be populated from an API */}
-              <option value="1">John Doe</option>
-              <option value="2">Jane Smith</option>
-              <option value="3">Robert Johnson</option>
-            </select>
+            <Label>Filtreler</Label>
+            <div className="space-y-3 mt-2">
+              <Select
+                value={filters.type}
+                onValueChange={(value) => setFilters({ ...filters, type: value })}
+              >
+                <Select.Option value="all">Tüm Türler</Select.Option>
+                <Select.Option value="session">Oturum</Select.Option>
+                <Select.Option value="evaluation">Değerlendirme</Select.Option>
+                <Select.Option value="meeting">Toplantı</Select.Option>
+              </Select>
+              <Select
+                value={filters.status}
+                onValueChange={(value) => setFilters({ ...filters, status: value })}
+              >
+                <Select.Option value="all">Tüm Durumlar</Select.Option>
+                <Select.Option value="confirmed">Onaylandı</Select.Option>
+                <Select.Option value="pending">Beklemede</Select.Option>
+                <Select.Option value="cancelled">İptal</Select.Option>
+              </Select>
+              <Select
+                value={filters.dateRange}
+                onValueChange={(value) => setFilters({ ...filters, dateRange: value })}
+              >
+                <Select.Option value="all">Tüm Tarihler</Select.Option>
+                <Select.Option value="today">Bugün</Select.Option>
+                <Select.Option value="week">Bu Hafta</Select.Option>
+                <Select.Option value="month">Bu Ay</Select.Option>
+              </Select>
+            </div>
           </div>
-          
+          {/* Calendar Settings */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Trainer
-            </label>
-            <select
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-              value={filters.trainerId}
-              onChange={(e) => handleFilterChange('trainerId', e.target.value)}
-            >
-              <option value="">All Trainers</option>
-              {/* In a real app, this would be populated from an API */}
-              <option value="1">Sarah Johnson</option>
-              <option value="2">Michael Chen</option>
-              <option value="3">Emily Davis</option>
-            </select>
+            <Label>Görünüm Ayarları</Label>
+            <div className="space-y-2 mt-2">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={calendarSettings.showWeekNumbers}
+                  onChange={(e) => setCalendarSettings({ 
+                    ...calendarSettings, 
+                    showWeekNumbers: e.target.checked 
+                  })}
+                  className="mr-2"
+                />
+                <span className="text-sm">Hafta Numaralarını Göster</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={calendarSettings.showWeekends}
+                  onChange={(e) => setCalendarSettings({ 
+                    ...calendarSettings, 
+                    showWeekends: e.target.checked 
+                  })}
+                  className="mr-2"
+                />
+                <span className="text-sm">Hafta Sonlarını Göster</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={calendarSettings.enableDragDrop}
+                  onChange={(e) => setCalendarSettings({ 
+                    ...calendarSettings, 
+                    enableDragDrop: e.target.checked 
+                  })}
+                  className="mr-2"
+                />
+                <span className="text-sm">Sürükle-Bırak</span>
+              </label>
+            </div>
+          </div>
+          {/* Legend */}
+          <div>
+            <Label>Renk Açıklamaları</Label>
+            <div className="space-y-2 mt-2">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                <span className="text-sm">Oturum</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                <span className="text-sm">Değerlendirme</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-500 rounded"></div>
+                <span className="text-sm">Toplantı</span>
+              </div>
+            </div>
           </div>
         </div>
-      </Card>
-      
-      {/* Calendar content */}
-      <Card className="overflow-hidden h-[calc(100vh-16rem)]">
-        {isLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        ) : (
-          <div className="h-full">
-            {viewMode === 'month' && (
-              <div className="grid grid-cols-7 h-full">
-                {/* Day headers */}
-                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => (
-                  <div key={index} className="border-b border-gray-200 p-2 text-center font-medium text-gray-700">
-                    {day}
+        {/* Calendar Content */}
+        <div className="flex-1 p-6">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-96">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+          ) : (
+            <>
+              {viewMode === 'month' && (
+                <div className="bg-white rounded-lg shadow">
+                  {/* Month View Header */}
+                  <div className="grid grid-cols-7 gap-0 border-b">
+                    {calendarSettings.showWeekNumbers && (
+                      <div className="p-3 text-sm font-medium text-gray-500 text-center border-r">
+                        Hafta
+                      </div>
+                    )}
+                    {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((day, index) => (
+                      <div
+                        key={day}
+                        className={`p-3 text-sm font-medium text-gray-700 text-center ${
+                          index < 5 ? '' : 'bg-gray-50'
+                        }`}
+                      >
+                        {day}
+                      </div>
+                    ))}
                   </div>
-                ))}
-                
-                {/* Calendar days */}
-                {daysToDisplay.map((day, index) => renderDay(day, index))}
-              </div>
-            )}
-            
-            {viewMode === 'week' && renderWeekView()}
-            
-            {viewMode === 'day' && renderDayView()}
-            
-            {viewMode === 'list' && renderListView()}
-          </div>
-        )}
-      </Card>
-      
+                  {/* Month View Grid */}
+                  <div className="grid grid-cols-7 gap-0">
+                    {daysToDisplay.map((date, index) => {
+                      const dayAppointments = getAppointmentsForDate(date);
+                      const isWeekend = getDay(date) === 0 || getDay(date) === 6;
+                      return (
+                        <div
+                          key={index}
+                          className={`min-h-[120px] border-r border-b p-2 cursor-pointer transition-colors ${
+                            getDayClass(date)
+                          } ${!calendarSettings.showWeekends && isWeekend ? 'hidden' : ''}`}
+                          onClick={() => handleDateSelect(date)}
+                          onMouseEnter={() => setHoveredDate(date)}
+                          onMouseLeave={() => setHoveredDate(null)}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className={`text-sm ${
+                              !isSameMonth(date, currentDate) ? 'text-gray-400' : ''
+                            }`}>
+                              {format(date, 'd')}
+                            </span>
+                            {dayAppointments.length > 0 && (
+                              <Badge variant="secondary" size="sm">
+                                {dayAppointments.length}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="space-y-1">
+                            {dayAppointments.slice(0, 3).map(appointment => (
+                              <div
+                                key={appointment.id}
+                                className={`text-xs p-1 rounded cursor-pointer text-white ${
+                                  getAppointmentColor(appointment)
+                                }`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAppointmentClick(appointment);
+                                }}
+                                draggable={calendarSettings.enableDragDrop}
+                                onDragStart={() => handleAppointmentDragStart(appointment)}
+                              >
+                                {format(parseISO(appointment.start_time), 'HH:mm')} {appointment.title}
+                              </div>
+                            ))}
+                            {dayAppointments.length > 3 && (
+                              <div className="text-xs text-gray-500 text-center">
+                                +{dayAppointments.length - 3} daha
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {viewMode === 'week' && (
+                <div className="bg-white rounded-lg shadow">
+                  <div className="grid grid-cols-8 gap-0">
+                    {/* Time Column */}
+                    <div className="border-r">
+                      <div className="h-12 border-b"></div>
+                      {timeSlots.map((slot, index) => (
+                        <div
+                          key={index}
+                          className="h-16 border-b px-2 py-1 text-xs text-gray-500"
+                        >
+                          {format(setMinutes(setHours(new Date(), slot.hour), slot.minute), 'HH:mm')}
+                        </div>
+                      ))}
+                    </div>
+                    {/* Days Columns */}
+                    {daysToDisplay.map((date, dayIndex) => (
+                      <div key={dayIndex} className="border-r relative">
+                        <div className="h-12 border-b p-2 text-center">
+                          <div className="font-medium">{format(date, 'EEE', { locale: tr })}</div>
+                          <div className={`text-sm ${isToday(date) ? 'text-blue-600 font-bold' : ''}`}>
+                            {format(date, 'd')}
+                          </div>
+                        </div>
+                        {timeSlots.map((slot, slotIndex) => {
+                          const slotAppointments = getAppointmentsForTimeSlot(date, slot);
+                          return (
+                            <div
+                              key={slotIndex}
+                              className="h-16 border-b relative hover:bg-gray-50 cursor-pointer"
+                              onClick={() => handleTimeSlotClick(date, slot)}
+                              onDoubleClick={() => handleTimeSlotDoubleClick(date, slot)}
+                              onDrop={() => handleAppointmentDrop(date, slot)}
+                              onDragOver={(e) => e.preventDefault()}
+                            >
+                              {slotAppointments.map(appointment => {
+                                const position = getAppointmentPosition(appointment, slot);
+                                return (
+                                  <div
+                                    key={appointment.id}
+                                    className={`absolute left-0 right-0 mx-1 p-1 rounded text-xs text-white cursor-move ${
+                                      getAppointmentColor(appointment)
+                                    }`}
+                                    style={{
+                                      top: position.top,
+                                      height: position.height,
+                                      minHeight: '20px'
+                                    }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAppointmentClick(appointment);
+                                    }}
+                                    draggable={calendarSettings.enableDragDrop}
+                                    onDragStart={() => handleAppointmentDragStart(appointment)}
+                                  >
+                                    <div className="font-medium">{appointment.title}</div>
+                                    <div>{format(parseISO(appointment.start_time), 'HH:mm')}</div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {viewMode === 'day' && (
+                <div className="bg-white rounded-lg shadow">
+                  <div className="grid grid-cols-2 gap-0">
+                    {/* Time Column */}
+                    <div className="border-r">
+                      <div className="h-12 border-b p-3 font-medium">
+                        {format(currentDate, 'EEEE, dd MMMM yyyy', { locale: tr })}
+                      </div>
+                      {timeSlots.map((slot, index) => (
+                        <div
+                          key={index}
+                          className="h-20 border-b px-3 py-2 text-sm text-gray-500"
+                        >
+                          {format(setMinutes(setHours(new Date(), slot.hour), slot.minute), 'HH:mm')}
+                        </div>
+                      ))}
+                    </div>
+                    {/* Appointments Column */}
+                    <div className="relative">
+                      <div className="h-12 border-b p-3">
+                        <Badge variant="secondary">
+                          {getAppointmentsForDate(currentDate).length} randevu
+                        </Badge>
+                      </div>
+                      {timeSlots.map((slot, index) => {
+                        const slotAppointments = getAppointmentsForTimeSlot(currentDate, slot);
+                        return (
+                          <div
+                            key={index}
+                            className="h-20 border-b relative hover:bg-gray-50 cursor-pointer"
+                            onClick={() => handleTimeSlotClick(currentDate, slot)}
+                            onDoubleClick={() => handleTimeSlotDoubleClick(currentDate, slot)}
+                            onDrop={() => handleAppointmentDrop(currentDate, slot)}
+                            onDragOver={(e) => e.preventDefault()}
+                          >
+                            {slotAppointments.map(appointment => (
+                              <div
+                                key={appointment.id}
+                                className={`absolute left-2 right-2 p-2 rounded text-white cursor-move ${
+                                  getAppointmentColor(appointment)
+                                }`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAppointmentClick(appointment);
+                                }}
+                                draggable={calendarSettings.enableDragDrop}
+                                onDragStart={() => handleAppointmentDragStart(appointment)}
+                              >
+                                <div className="font-medium">{appointment.title}</div>
+                                <div className="text-sm">
+                                  {format(parseISO(appointment.start_time), 'HH:mm')} - 
+                                  {format(parseISO(appointment.end_time), 'HH:mm')}
+                                </div>
+                                {appointment.location && (
+                                  <div className="text-sm flex items-center mt-1">
+                                    <MapPin className="h-3 w-3 mr-1" />
+                                    {appointment.location}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {viewMode === 'agenda' && (
+                <div className="bg-white rounded-lg shadow p-6">
+                  <h3 className="text-lg font-semibold mb-4">Randevu Listesi</h3>
+                  <div className="space-y-4">
+                    {filteredAppointments.map(appointment => (
+                      <Card
+                        key={appointment.id}
+                        className="p-4 cursor-pointer hover:shadow-md transition-shadow"
+                        onClick={() => handleAppointmentClick(appointment)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className={`w-3 h-3 rounded-full ${getAppointmentColor(appointment)}`}></div>
+                              <h4 className="font-medium">{appointment.title}</h4>
+                              <Badge variant={appointment.status === 'confirmed' ? 'success' : 'warning'}>
+                                {appointment.status}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4" />
+                                {format(parseISO(appointment.start_time), 'dd MMM HH:mm', { locale: tr })}
+                              </div>
+                              {appointment.location && (
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="h-4 w-4" />
+                                  {appointment.location}
+                                </div>
+                              )}
+                              {appointment.beneficiary_name && (
+                                <div className="flex items-center gap-1">
+                                  <Users className="h-4 w-4" />
+                                  {appointment.beneficiary_name}
+                                </div>
+                              )}
+                            </div>
+                            {appointment.description && (
+                              <p className="text-sm text-gray-700 mt-2">{appointment.description}</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {appointment.is_online && (
+                              <Badge variant="secondary">
+                                <Video className="h-3 w-3 mr-1" />
+                                Online
+                              </Badge>
+                            )}
+                            {appointment.has_reminder && (
+                              <Badge variant="secondary">
+                                <Bell className="h-3 w-3" />
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                    {filteredAppointments.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        Randevu bulunamadı
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
       {/* Appointment Modal */}
-      <AppointmentModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        selectedDate={selectedDate}
-        appointment={selectedAppointment}
-        onAppointmentUpdated={(updatedAppointment) => {
-          if (selectedAppointment) {
-            // Update existing appointment in the list
-            setAppointments(prev => 
-              prev.map(a => a.id === updatedAppointment.id ? updatedAppointment : a)
-            );
-          } else {
-            // Add new appointment to the list
-            setAppointments(prev => [...prev, updatedAppointment]);
-          }
-          
-          // Re-apply filters
-          setShowModal(false);
-          applyFilters();
-        }}
-        onAppointmentDeleted={(id) => {
-          setAppointments(prev => prev.filter(a => a.id !== id));
-          setShowModal(false);
-          applyFilters();
-        }}
-      />
+      {showModal && (
+        <AppointmentModal
+          appointment={selectedAppointment}
+          timeSlot={selectedTimeSlot}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedAppointment(null);
+            setSelectedTimeSlot(null);
+          }}
+          onSave={() => {
+            fetchAppointments();
+            setShowModal(false);
+            setSelectedAppointment(null);
+            setSelectedTimeSlot(null);
+          }}
+        />
+      )}
     </div>
   );
 };
-
-// Map Component referenced in the calendar views
-const Map = (props) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round"
-    {...props}
-  >
-    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-    <line x1="9" x2="9" y1="3" y2="18"/>
-    <line x1="15" x2="15" y1="6" y2="21"/>
-  </svg>
-);
-
-export default CalendarPage;
+export default CalendarPageV2;

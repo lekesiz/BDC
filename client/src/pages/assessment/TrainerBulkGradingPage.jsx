@@ -12,13 +12,11 @@ import { Table } from '../../components/ui/table';
 import { Checkbox } from '../../components/ui/checkbox';
 import { Tabs } from '../../components/ui/tabs';
 import { Textarea } from '../../components/ui';
-
 const TrainerBulkGradingPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const assessmentId = searchParams.get('assessmentId');
   const assignmentId = searchParams.get('assignmentId');
-  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [assessment, setAssessment] = useState(null);
@@ -37,11 +35,9 @@ const TrainerBulkGradingPage = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const [sortConfig, setSortConfig] = useState({ key: 'studentName', direction: 'asc' });
   const [activeTab, setActiveTab] = useState('individual');
-
   useEffect(() => {
     fetchData();
   }, [assessmentId, assignmentId]);
-
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -49,7 +45,6 @@ const TrainerBulkGradingPage = () => {
         axios.get(`/api/assessments/${assessmentId}/assignments/${assignmentId}`),
         axios.get(`/api/assessments/${assessmentId}/assignments/${assignmentId}/submissions`)
       ]);
-      
       setAssessment(assessmentRes.data);
       setSubmissions(submissionsRes.data);
     } catch (error) {
@@ -63,7 +58,6 @@ const TrainerBulkGradingPage = () => {
       setLoading(false);
     }
   };
-
   const handleSelectAll = () => {
     if (selectedSubmissions.length === filteredSubmissions.length) {
       setSelectedSubmissions([]);
@@ -71,7 +65,6 @@ const TrainerBulkGradingPage = () => {
       setSelectedSubmissions(filteredSubmissions.map(s => s.id));
     }
   };
-
   const handleSelectSubmission = (submissionId) => {
     if (selectedSubmissions.includes(submissionId)) {
       setSelectedSubmissions(selectedSubmissions.filter(id => id !== submissionId));
@@ -79,20 +72,17 @@ const TrainerBulkGradingPage = () => {
       setSelectedSubmissions([...selectedSubmissions, submissionId]);
     }
   };
-
   const handleSort = (key) => {
     setSortConfig(prev => ({
       key,
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
   };
-
   const handleQuickScore = (submissionId, score) => {
     setSubmissions(submissions.map(sub => 
       sub.id === submissionId ? { ...sub, score, gradingStatus: 'graded' } : sub
     ));
   };
-
   const handleBulkGrade = async () => {
     if (selectedSubmissions.length === 0) {
       toast({
@@ -102,7 +92,6 @@ const TrainerBulkGradingPage = () => {
       });
       return;
     }
-
     setSaving(true);
     try {
       const updates = selectedSubmissions.map(submissionId => ({
@@ -111,17 +100,14 @@ const TrainerBulkGradingPage = () => {
         feedback: bulkActions.feedback || undefined,
         status: bulkActions.status || undefined
       }));
-
       await axios.post(`/api/assessments/${assessmentId}/assignments/${assignmentId}/bulk-grade`, {
         updates
       });
-
       toast({
         title: 'Success',
         description: `${selectedSubmissions.length} submissions graded successfully`,
         variant: 'success'
       });
-
       fetchData();
       setSelectedSubmissions([]);
       setBulkActions({ score: '', feedback: '', status: '' });
@@ -136,14 +122,12 @@ const TrainerBulkGradingPage = () => {
       setSaving(false);
     }
   };
-
   const handleExportResults = async () => {
     try {
       const response = await axios.get(
         `/api/assessments/${assessmentId}/assignments/${assignmentId}/export`,
         { responseType: 'blob' }
       );
-      
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -151,7 +135,6 @@ const TrainerBulkGradingPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      
       toast({
         title: 'Success',
         description: 'Grades exported successfully',
@@ -166,27 +149,22 @@ const TrainerBulkGradingPage = () => {
       });
     }
   };
-
   const handleImportGrades = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
     const formData = new FormData();
     formData.append('file', file);
-
     try {
       await axios.post(
         `/api/assessments/${assessmentId}/assignments/${assignmentId}/import-grades`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
-      
       toast({
         title: 'Success',
         description: 'Grades imported successfully',
         variant: 'success'
       });
-      
       fetchData();
     } catch (error) {
       console.error('Error importing grades:', error);
@@ -197,14 +175,12 @@ const TrainerBulkGradingPage = () => {
       });
     }
   };
-
   const toggleRowExpansion = (submissionId) => {
     setExpandedRows(prev => ({
       ...prev,
       [submissionId]: !prev[submissionId]
     }));
   };
-
   // Filter and sort submissions
   const filteredSubmissions = submissions.filter(submission => {
     if (filters.status !== 'all' && submission.status !== filters.status) return false;
@@ -214,14 +190,12 @@ const TrainerBulkGradingPage = () => {
   }).sort((a, b) => {
     const aValue = a[sortConfig.key];
     const bValue = b[sortConfig.key];
-    
     if (sortConfig.direction === 'asc') {
       return aValue > bValue ? 1 : -1;
     } else {
       return aValue < bValue ? 1 : -1;
     }
   });
-
   if (loading) {
     return (
       <div className="p-6">
@@ -232,7 +206,6 @@ const TrainerBulkGradingPage = () => {
       </div>
     );
   }
-
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -268,7 +241,6 @@ const TrainerBulkGradingPage = () => {
           </div>
         </div>
       </div>
-
       {/* Filters */}
       <Card className="mb-6">
         <div className="p-4 flex items-center gap-4">
@@ -304,7 +276,6 @@ const TrainerBulkGradingPage = () => {
           </Button>
         </div>
       </Card>
-
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <Tabs.TabsList>
@@ -312,7 +283,6 @@ const TrainerBulkGradingPage = () => {
           <Tabs.TabTrigger value="bulk">Bulk Actions</Tabs.TabTrigger>
           <Tabs.TabTrigger value="overview">Overview</Tabs.TabTrigger>
         </Tabs.TabsList>
-
         {/* Individual Grading Tab */}
         <Tabs.TabContent value="individual">
           <Card>
@@ -427,7 +397,6 @@ const TrainerBulkGradingPage = () => {
                           </Button>
                         </Table.Cell>
                       </Table.Row>
-                      
                       {/* Expanded Row */}
                       {expandedRows[submission.id] && (
                         <Table.Row>
@@ -462,7 +431,6 @@ const TrainerBulkGradingPage = () => {
                                   </Button>
                                 </div>
                               </div>
-                              
                               {submission.answers && (
                                 <div>
                                   <h4 className="font-medium mb-2">Answer Summary</h4>
@@ -493,7 +461,6 @@ const TrainerBulkGradingPage = () => {
             </div>
           </Card>
         </Tabs.TabContent>
-
         {/* Bulk Actions Tab */}
         <Tabs.TabContent value="bulk">
           <Card className="p-6">
@@ -501,7 +468,6 @@ const TrainerBulkGradingPage = () => {
             <p className="text-gray-600 mb-6">
               {selectedSubmissions.length} submission{selectedSubmissions.length !== 1 ? 's' : ''} selected
             </p>
-            
             <div className="space-y-4 max-w-2xl">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -520,7 +486,6 @@ const TrainerBulkGradingPage = () => {
                   <span className="text-gray-600">%</span>
                 </div>
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Set Feedback
@@ -532,7 +497,6 @@ const TrainerBulkGradingPage = () => {
                   rows={4}
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Set Status
@@ -547,7 +511,6 @@ const TrainerBulkGradingPage = () => {
                   <Select.Option value="pending">Pending Review</Select.Option>
                 </Select>
               </div>
-              
               <div className="flex gap-2 pt-4">
                 <Button 
                   onClick={handleBulkGrade}
@@ -569,7 +532,6 @@ const TrainerBulkGradingPage = () => {
             </div>
           </Card>
         </Tabs.TabContent>
-
         {/* Overview Tab */}
         <Tabs.TabContent value="overview">
           <div className="grid grid-cols-3 gap-6">
@@ -592,7 +554,6 @@ const TrainerBulkGradingPage = () => {
                     />
                   </div>
                 </div>
-                
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Pending</span>
@@ -605,7 +566,6 @@ const TrainerBulkGradingPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card className="p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Score Distribution</h3>
               <div className="space-y-3">
@@ -635,7 +595,6 @@ const TrainerBulkGradingPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card className="p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Submission Status</h3>
               <div className="space-y-3">
@@ -668,5 +627,4 @@ const TrainerBulkGradingPage = () => {
     </div>
   );
 };
-
 export default TrainerBulkGradingPage;

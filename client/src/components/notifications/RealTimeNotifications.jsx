@@ -3,27 +3,22 @@ import { useSocket } from '../../contexts/SocketContext';
 import { Bell, Check, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import api from '../../lib/api';
-
 const RealTimeNotifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const { on, off } = useSocket();
-
   useEffect(() => {
     // Load initial notifications
     loadNotifications();
-
     // Subscribe to real-time notifications
     const unsubscribeNotification = on('notification', handleNewNotification);
     const unsubscribeUpdate = on('notification_update', handleNotificationUpdate);
-
     return () => {
       unsubscribeNotification();
       unsubscribeUpdate();
     };
   }, []);
-
   const loadNotifications = async () => {
     try {
       const response = await api.get('/api/notifications');
@@ -33,12 +28,9 @@ const RealTimeNotifications = () => {
       console.error('Failed to load notifications:', error);
     }
   };
-
   const handleNewNotification = (data) => {
-    console.log('New notification:', data);
     setNotifications(prev => [data, ...prev]);
     setUnreadCount(prev => prev + 1);
-    
     // Show toast notification
     toast(data.message, {
       type: data.type || 'info',
@@ -46,7 +38,6 @@ const RealTimeNotifications = () => {
       autoClose: 5000
     });
   };
-
   const handleNotificationUpdate = (data) => {
     if (data.action === 'mark_read') {
       setNotifications(prev => 
@@ -58,7 +49,6 @@ const RealTimeNotifications = () => {
       setUnreadCount(prev => Math.max(0, prev - data.notification_ids.length));
     }
   };
-
   const markAsRead = async (notificationId) => {
     try {
       await api.patch(`/notifications/${notificationId}/read`);
@@ -73,7 +63,6 @@ const RealTimeNotifications = () => {
       console.error('Failed to mark notification as read:', error);
     }
   };
-
   const markAllAsRead = async () => {
     try {
       await api.post('/notifications/mark-all-read');
@@ -83,7 +72,6 @@ const RealTimeNotifications = () => {
       console.error('Failed to mark all as read:', error);
     }
   };
-
   const dismissNotification = async (notificationId) => {
     try {
       await api.delete(`/notifications/${notificationId}`);
@@ -93,7 +81,6 @@ const RealTimeNotifications = () => {
       console.error('Failed to dismiss notification:', error);
     }
   };
-
   return (
     <div className="relative">
       <button
@@ -107,7 +94,6 @@ const RealTimeNotifications = () => {
           </span>
         )}
       </button>
-
       {showDropdown && (
         <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg z-50">
           <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
@@ -121,7 +107,6 @@ const RealTimeNotifications = () => {
               </button>
             )}
           </div>
-
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="px-4 py-8 text-center text-gray-500">
@@ -170,7 +155,6 @@ const RealTimeNotifications = () => {
               ))
             )}
           </div>
-
           {notifications.length > 0 && (
             <div className="px-4 py-3 text-center">
               <a
@@ -187,5 +171,4 @@ const RealTimeNotifications = () => {
     </div>
   );
 };
-
 export default RealTimeNotifications;

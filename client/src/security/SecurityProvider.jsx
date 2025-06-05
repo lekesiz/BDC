@@ -3,9 +3,7 @@ import InputSanitizer from './InputSanitizer';
 import XSSProtection from './XSSProtection';
 import SecurityMonitor from './SecurityMonitor';
 import CSPHelper from './CSPHelper';
-
 const SecurityContext = createContext(null);
-
 /**
  * Security Provider component that wraps the application with comprehensive security features
  */
@@ -18,7 +16,6 @@ const SecurityProvider = ({ children, config = {} }) => {
     sessionValid: true,
     lastActivity: Date.now(),
   });
-
   const defaultConfig = {
     enableXSSProtection: true,
     enableCSRFProtection: true,
@@ -32,7 +29,6 @@ const SecurityProvider = ({ children, config = {} }) => {
     },
     ...config,
   };
-
   // Initialize security components
   useEffect(() => {
     const initializeSecurity = async () => {
@@ -41,10 +37,8 @@ const SecurityProvider = ({ children, config = {} }) => {
         if (defaultConfig.enableXSSProtection) {
           XSSProtection.initialize();
         }
-
         // Initialize CSP Helper
         CSPHelper.initialize();
-
         // Initialize Security Monitor
         if (defaultConfig.enableSecurityMonitoring) {
           SecurityMonitor.initialize({
@@ -52,29 +46,23 @@ const SecurityProvider = ({ children, config = {} }) => {
             onSecurityViolation: handleSecurityViolation,
           });
         }
-
         // Setup session monitoring
         setupSessionMonitoring();
-
         // Setup CSRF protection
         if (defaultConfig.enableCSRFProtection) {
           await setupCSRFProtection();
         }
-
         setSecurityState(prev => ({
           ...prev,
           isInitialized: true,
         }));
-
       } catch (error) {
         console.error('Security initialization failed:', error);
         handleSecurityError(error);
       }
     };
-
     initializeSecurity();
   }, []);
-
   // CSRF Token management
   const setupCSRFProtection = async () => {
     try {
@@ -83,7 +71,6 @@ const SecurityProvider = ({ children, config = {} }) => {
         credentials: 'include',
         headers: defaultConfig.securityHeaders,
       });
-
       if (response.ok) {
         const data = await response.json();
         setSecurityState(prev => ({
@@ -95,33 +82,27 @@ const SecurityProvider = ({ children, config = {} }) => {
       console.error('CSRF token setup failed:', error);
     }
   };
-
   // Session monitoring
   const setupSessionMonitoring = () => {
     // Track user activity
     const activityEvents = ['mousedown', 'keypress', 'scroll', 'touchstart'];
-    
     const updateActivity = () => {
       setSecurityState(prev => ({
         ...prev,
         lastActivity: Date.now(),
       }));
     };
-
     activityEvents.forEach(event => {
       document.addEventListener(event, updateActivity, { passive: true });
     });
-
     // Check session validity periodically
     const sessionCheck = setInterval(() => {
       const now = Date.now();
       const timeSinceActivity = now - securityState.lastActivity;
-
       if (timeSinceActivity > defaultConfig.maxIdleTime) {
         handleSessionTimeout();
       }
     }, 60000); // Check every minute
-
     return () => {
       activityEvents.forEach(event => {
         document.removeEventListener(event, updateActivity);
@@ -129,7 +110,6 @@ const SecurityProvider = ({ children, config = {} }) => {
       clearInterval(sessionCheck);
     };
   };
-
   // Security event handlers
   const handleThreatDetected = useCallback((threat) => {
     setSecurityState(prev => ({
@@ -140,10 +120,8 @@ const SecurityProvider = ({ children, config = {} }) => {
         id: Math.random().toString(36).substr(2, 9),
       }],
     }));
-
     // Log security threat
     console.warn('Security threat detected:', threat);
-
     // Send to security monitoring endpoint
     if (defaultConfig.enableSecurityMonitoring) {
       fetch('/api/security/threat', {
@@ -160,10 +138,8 @@ const SecurityProvider = ({ children, config = {} }) => {
       });
     }
   }, [securityState.csrfToken, defaultConfig]);
-
   const handleSecurityViolation = useCallback((violation) => {
     console.error('Security violation:', violation);
-    
     // Increase security level based on violation severity
     if (violation.severity === 'high') {
       setSecurityState(prev => ({
@@ -172,10 +148,8 @@ const SecurityProvider = ({ children, config = {} }) => {
       }));
     }
   }, []);
-
   const handleSecurityError = useCallback((error) => {
     console.error('Security error:', error);
-    
     setSecurityState(prev => ({
       ...prev,
       threats: [...prev.threats, {
@@ -186,19 +160,16 @@ const SecurityProvider = ({ children, config = {} }) => {
       }],
     }));
   }, []);
-
   const handleSessionTimeout = useCallback(() => {
     setSecurityState(prev => ({
       ...prev,
       sessionValid: false,
     }));
-
     // Redirect to login or show session expired modal
     if (typeof window !== 'undefined') {
       window.location.href = '/login?reason=session_expired';
     }
   }, []);
-
   // Security utility functions
   const sanitizeInput = useCallback((input, options = {}) => {
     if (!defaultConfig.enableInputSanitization) {
@@ -206,18 +177,15 @@ const SecurityProvider = ({ children, config = {} }) => {
     }
     return InputSanitizer.sanitize(input, options);
   }, [defaultConfig.enableInputSanitization]);
-
   const validateInput = useCallback((input, rules = []) => {
     return InputSanitizer.validate(input, rules);
   }, []);
-
   const checkXSS = useCallback((content) => {
     if (!defaultConfig.enableXSSProtection) {
       return { safe: true };
     }
     return XSSProtection.scan(content);
   }, [defaultConfig.enableXSSProtection]);
-
   const reportSecurityIncident = useCallback((incident) => {
     handleThreatDetected({
       type: 'user_reported',
@@ -225,17 +193,13 @@ const SecurityProvider = ({ children, config = {} }) => {
       severity: incident.severity || 'medium',
     });
   }, [handleThreatDetected]);
-
   const getSecureHeaders = useCallback(() => {
     const headers = { ...defaultConfig.securityHeaders };
-    
     if (securityState.csrfToken) {
       headers['X-CSRF-Token'] = securityState.csrfToken;
     }
-
     return headers;
   }, [securityState.csrfToken, defaultConfig.securityHeaders]);
-
   const secureApiCall = useCallback(async (url, options = {}) => {
     const secureOptions = {
       ...options,
@@ -245,13 +209,11 @@ const SecurityProvider = ({ children, config = {} }) => {
         ...options.headers,
       },
     };
-
     // Input validation for request body
     if (secureOptions.body && typeof secureOptions.body === 'string') {
       try {
         const bodyData = JSON.parse(secureOptions.body);
         const sanitizedData = {};
-        
         for (const [key, value] of Object.entries(bodyData)) {
           if (typeof value === 'string') {
             sanitizedData[key] = sanitizeInput(value);
@@ -259,16 +221,13 @@ const SecurityProvider = ({ children, config = {} }) => {
             sanitizedData[key] = value;
           }
         }
-        
         secureOptions.body = JSON.stringify(sanitizedData);
       } catch (error) {
         console.warn('Failed to sanitize request body:', error);
       }
     }
-
     try {
       const response = await fetch(url, secureOptions);
-      
       // Check for security headers in response
       const securityHeaders = [
         'X-Content-Type-Options',
@@ -276,42 +235,35 @@ const SecurityProvider = ({ children, config = {} }) => {
         'X-XSS-Protection',
         'Strict-Transport-Security',
       ];
-
       securityHeaders.forEach(header => {
         if (!response.headers.get(header)) {
           console.warn(`Missing security header: ${header}`);
         }
       });
-
       return response;
     } catch (error) {
       handleSecurityError(error);
       throw error;
     }
   }, [getSecureHeaders, sanitizeInput, handleSecurityError]);
-
   const contextValue = {
     // State
     ...securityState,
     config: defaultConfig,
-    
     // Security utilities
     sanitizeInput,
     validateInput,
     checkXSS,
     secureApiCall,
     getSecureHeaders,
-    
     // Event handlers
     reportSecurityIncident,
-    
     // Security components
     InputSanitizer,
     XSSProtection,
     SecurityMonitor,
     CSPHelper,
   };
-
   // Render security warning if not initialized
   if (!securityState.isInitialized) {
     return (
@@ -320,7 +272,6 @@ const SecurityProvider = ({ children, config = {} }) => {
       </div>
     );
   }
-
   // Render session expired notice
   if (!securityState.sessionValid) {
     return (
@@ -329,14 +280,12 @@ const SecurityProvider = ({ children, config = {} }) => {
       </div>
     );
   }
-
   return (
     <SecurityContext.Provider value={contextValue}>
       {children}
     </SecurityContext.Provider>
   );
 };
-
 export const useSecurityContext = () => {
   const context = useContext(SecurityContext);
   if (!context) {
@@ -344,5 +293,4 @@ export const useSecurityContext = () => {
   }
   return context;
 };
-
 export default SecurityProvider;

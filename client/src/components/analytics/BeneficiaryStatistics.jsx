@@ -1,6 +1,5 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 /**
  * BeneficiaryStatistics component displays key statistics about beneficiaries
  * @param {Object} props - Component props
@@ -14,7 +13,6 @@ export const BeneficiaryStatistics = ({ data = [] }) => {
       </div>
     );
   }
-
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
@@ -42,5 +40,4 @@ export const BeneficiaryStatistics = ({ data = [] }) => {
     </div>
   );
 };
-
 export default BeneficiaryStatistics;

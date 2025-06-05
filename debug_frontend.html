@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDC Frontend Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>BDC Frontend Debug</h1>
+    
+    <div id="results"></div>
+    
+    <h2>Test Actions:</h2>
+    <button onclick="testBackend()">Test Backend</button>
+    <button onclick="testFrontend()">Test Frontend</button>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="clearLocalStorage()">Clear LocalStorage</button>
+    
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+        }
+        
+        async function testBackend() {
+            addResult('Testing Backend...', 'info');
+            
+            try {
+                // Test health endpoint
+                const healthResponse = await fetch('http://localhost:5001/health');
+                const healthData = await healthResponse.json();
+                addResult(`✅ Backend Health: ${JSON.stringify(healthData)}`, 'success');
+                
+                // Test API endpoint
+                const apiResponse = await fetch('http://localhost:5001/api/test');
+                const apiData = await apiResponse.json();
+                addResult(`✅ API Test: ${JSON.stringify(apiData)}`, 'success');
+                
+            } catch (error) {
+                addResult(`❌ Backend Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testFrontend() {
+            addResult('Testing Frontend...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:5173');
+                if (response.ok) {
+                    addResult('✅ Frontend is running on port 5173', 'success');
+                } else {
+                    addResult(`⚠️ Frontend responded with status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Frontend Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLogin() {
+            addResult('Testing Login...', 'info');
+            
+            const credentials = {
+                email: 'admin@bdc.com',
+                password: 'Admin123!'
+            };
+            
+            try {
+                const response = await fetch('http://localhost:5001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(credentials)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addResult(`✅ Login Success: User = ${data.user.email}, Role = ${data.user.role}`, 'success');
+                    addResult(`Token: ${data.access_token.substring(0, 50)}...`, 'info');
+                    
+                    // Store token for frontend
+                    localStorage.setItem('access_token', data.access_token);
+                    addResult('✅ Token stored in localStorage', 'success');
+                } else {
+                    addResult(`❌ Login Failed: ${data.message}`, 'error');
+                }
+                
+            } catch (error) {
+                addResult(`❌ Login Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function clearLocalStorage() {
+            localStorage.clear();
+            addResult('✅ LocalStorage cleared', 'success');
+        }
+        
+        // Auto-run tests on load
+        window.addEventListener('load', async () => {
+            addResult('<h3>Checking Services...</h3>', 'info');
+            
+            // Check current localStorage
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                addResult(`📌 Existing token found: ${token.substring(0, 30)}...`, 'info');
+            } else {
+                addResult('📌 No existing token in localStorage', 'info');
+            }
+            
+            await testBackend();
+            await testFrontend();
+        });
+    </script>
+</body>
+</html>

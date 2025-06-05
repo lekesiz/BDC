@@ -3,13 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Zap, TrendingUp, CheckCircle, Loader } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
 /**
  * Displays the student's skill development progress
  */
 const SkillsProgressWidget = ({ data, isLoading, error }) => {
   const navigate = useNavigate();
-  
   // Get skill level label
   const getSkillLevelLabel = (level) => {
     switch (level) {
@@ -21,7 +19,6 @@ const SkillsProgressWidget = ({ data, isLoading, error }) => {
       default: return 'Not Started';
     }
   };
-  
   // Get skill level color
   const getSkillLevelColor = (level, maxLevel) => {
     const ratio = level / maxLevel;
@@ -31,7 +28,6 @@ const SkillsProgressWidget = ({ data, isLoading, error }) => {
     if (ratio < 0.8) return 'bg-blue-500';
     return 'bg-green-500';
   };
-  
   if (isLoading) {
     return (
       <Card className="overflow-hidden h-full">
@@ -44,7 +40,6 @@ const SkillsProgressWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   if (error) {
     return (
       <Card className="overflow-hidden h-full">
@@ -57,13 +52,10 @@ const SkillsProgressWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   // Get top skills to display (limit to 4)
   const topSkills = data?.skills?.slice(0, 4) || [];
-  
   // Get recently improved skills
   const recentlyImproved = data?.skillGrowth?.slice(0, 3) || [];
-  
   return (
     <Card className="overflow-hidden h-full">
       <div className="p-6 flex justify-between items-center border-b">
@@ -76,7 +68,6 @@ const SkillsProgressWidget = ({ data, isLoading, error }) => {
           View All Skills
         </Button>
       </div>
-      
       <div className="p-6 space-y-5">
         {/* Current skill levels */}
         <div className="space-y-4">
@@ -103,7 +94,6 @@ const SkillsProgressWidget = ({ data, isLoading, error }) => {
             </div>
           ))}
         </div>
-        
         {/* Recently improved skills */}
         {recentlyImproved.length > 0 && (
           <div>
@@ -144,5 +134,4 @@ const SkillsProgressWidget = ({ data, isLoading, error }) => {
     </Card>
   );
 };
-
 export default SkillsProgressWidget;

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
 /**
  * DatePicker component
  * 
@@ -43,5 +42,4 @@ export const DatePicker = React.forwardRef(({
     </div>
   );
 });
-
 DatePicker.displayName = "DatePicker";

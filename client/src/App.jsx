@@ -3,7 +3,6 @@
  * Eliminates 900+ lines and 170+ imports
  * Uses centralized route configuration
  */
-
 import React from 'react';
 import { useAuth } from './hooks/useAuth';
 import { ToastProvider } from './components/ui/toast';
@@ -14,13 +13,11 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 import NotificationProviderV2 from './providers/NotificationProviderV2';
 import SimpleRouteRenderer from './components/routing/SimpleRouteRenderer';
 import LoadingSpinner from './components/ui/LoadingSpinner';
-
 /**
- * Main App component with centralized providers and routing
+ * Inner App component that uses auth context
  */
-function App() {
+function AppContent() {
   const { isLoading } = useAuth();
-
   // Show app-level loading state
   if (isLoading) {
     return (
@@ -29,7 +26,14 @@ function App() {
       </div>
     );
   }
-
+  return (
+    <SimpleRouteRenderer />
+  );
+}
+/**
+ * Main App component with centralized providers and routing
+ */
+function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
@@ -37,7 +41,7 @@ function App() {
           <GlobalErrorHandler />
           <NotificationProviderV2>
             <SocketProvider>
-              <SimpleRouteRenderer />
+              <AppContent />
             </SocketProvider>
           </NotificationProviderV2>
         </ToastProvider>
@@ -45,5 +49,4 @@ function App() {
     </ErrorBoundary>
   );
 }
-
 export default App;

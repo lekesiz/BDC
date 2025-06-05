@@ -65,9 +65,9 @@ class Program(db.Model):
             'start_date': self.start_date.isoformat() if self.start_date else None,
             'end_date': self.end_date.isoformat() if self.end_date else None,
             'max_participants': self.max_participants,
-            'enrolled_count': len(self.enrollments),
-            'module_count': len(self.modules),
-            'session_count': len(self.sessions),
+            'enrolled_count': self.enrollments.count() if hasattr(self.enrollments, 'count') else 0,
+            'module_count': self.modules.count() if hasattr(self.modules, 'count') else 0,
+            'session_count': self.sessions.count() if hasattr(self.sessions, 'count') else 0,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

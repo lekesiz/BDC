@@ -566,12 +566,12 @@ def init_performance_monitoring(app: Flask, redis_client: redis.Redis):
     def performance_summary():
         """Show performance summary"""
         summary = collector.get_performance_summary()
-        print(json.dumps(summary, indent=2))
+        logger.info(json.dumps(summary, indent=2))
     
     @app.cli.command()
     def system_metrics():
         """Show current system metrics"""
         metrics = collector.collect_system_metrics()
-        print(json.dumps(metrics, indent=2))
+        logger.info(json.dumps(metrics, indent=2))
     
     return collector 

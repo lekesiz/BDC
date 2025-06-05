@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 import { 
   Calendar, 
   Link, 
@@ -18,7 +18,6 @@ import {
   Edit,
   ExternalLink
 } from 'lucide-react';
-
 const GoogleCalendarIntegrationV2Page = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -31,7 +30,6 @@ const GoogleCalendarIntegrationV2Page = () => {
     defaultCalendar: '',
     eventTypes: ['appointments', 'meetings', 'training']
   });
-
   useEffect(() => {
     // Mock data
     const mockCalendars = [
@@ -43,7 +41,6 @@ const GoogleCalendarIntegrationV2Page = () => {
     setCalendars(mockCalendars);
     setIsConnected(true);
   }, []);
-
   const upcomingEvents = [
     { 
       id: 1, 
@@ -73,14 +70,12 @@ const GoogleCalendarIntegrationV2Page = () => {
       calendar: 'BDC Training Sessions'
     }
   ];
-
   const syncHistory = [
     { id: 1, date: '2024-11-17 3:45 PM', events: 45, status: 'success', direction: 'import' },
     { id: 2, date: '2024-11-17 2:30 PM', events: 23, status: 'success', direction: 'export' },
     { id: 3, date: '2024-11-17 1:15 PM', events: 0, status: 'failed', direction: 'import', error: 'API rate limit' },
     { id: 4, date: '2024-11-17 12:00 PM', events: 67, status: 'success', direction: 'bidirectional' }
   ];
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Calendar },
     { id: 'calendars', label: 'Calendars', icon: Calendar },
@@ -88,7 +83,6 @@ const GoogleCalendarIntegrationV2Page = () => {
     { id: 'sync', label: 'Sync History', icon: RefreshCw },
     { id: 'events', label: 'Upcoming Events', icon: Clock }
   ];
-
   const handleConnect = () => {
     setLoading(true);
     // Mock OAuth flow
@@ -97,18 +91,15 @@ const GoogleCalendarIntegrationV2Page = () => {
       setLoading(false);
     }, 2000);
   };
-
   const handleDisconnect = () => {
     setIsConnected(false);
   };
-
   const handleSync = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 3000);
   };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -131,7 +122,6 @@ const GoogleCalendarIntegrationV2Page = () => {
           </Button>
         )}
       </div>
-
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -155,7 +145,6 @@ const GoogleCalendarIntegrationV2Page = () => {
           })}
         </nav>
       </div>
-
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <Card>
@@ -185,7 +174,6 @@ const GoogleCalendarIntegrationV2Page = () => {
                   </div>
                 )}
               </div>
-
               {isConnected && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -207,7 +195,6 @@ const GoogleCalendarIntegrationV2Page = () => {
               )}
             </div>
           </Card>
-
           {!isConnected && (
             <Card>
               <div className="p-8 text-center">
@@ -227,7 +214,6 @@ const GoogleCalendarIntegrationV2Page = () => {
               </div>
             </Card>
           )}
-
           {isConnected && (
             <Card>
               <div className="p-6">
@@ -267,7 +253,6 @@ const GoogleCalendarIntegrationV2Page = () => {
           )}
         </div>
       )}
-
       {activeTab === 'calendars' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -305,7 +290,6 @@ const GoogleCalendarIntegrationV2Page = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Calendar Mapping</h3>
@@ -348,7 +332,6 @@ const GoogleCalendarIntegrationV2Page = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'settings' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -369,7 +352,6 @@ const GoogleCalendarIntegrationV2Page = () => {
                     Automatically sync events between BDC and Google Calendar
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Sync Interval
@@ -385,7 +367,6 @@ const GoogleCalendarIntegrationV2Page = () => {
                     <option value="60">Every hour</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Sync Direction
@@ -400,7 +381,6 @@ const GoogleCalendarIntegrationV2Page = () => {
                     <option value="google-to-bdc">Google to BDC only</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Event Types to Sync
@@ -419,14 +399,12 @@ const GoogleCalendarIntegrationV2Page = () => {
                     ))}
                   </div>
                 </div>
-
                 <div className="pt-4">
                   <Button variant="primary">Save Settings</Button>
                 </div>
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Event Defaults</h3>
@@ -443,7 +421,6 @@ const GoogleCalendarIntegrationV2Page = () => {
                     <option>2 hours</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Default Reminder
@@ -456,7 +433,6 @@ const GoogleCalendarIntegrationV2Page = () => {
                     <option>1 day before</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -471,7 +447,6 @@ const GoogleCalendarIntegrationV2Page = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'sync' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -531,7 +506,6 @@ const GoogleCalendarIntegrationV2Page = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Sync Statistics</h3>
@@ -557,7 +531,6 @@ const GoogleCalendarIntegrationV2Page = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'events' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -610,5 +583,4 @@ const GoogleCalendarIntegrationV2Page = () => {
     </div>
   );
 };
-
 export default GoogleCalendarIntegrationV2Page;

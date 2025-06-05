@@ -3,20 +3,17 @@ import { NodeViewWrapper } from '@tiptap/react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { Calculator, Edit3, Check, X } from 'lucide-react';
-
 const MathematicsView = ({ node, updateAttributes, deleteNode, selected }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [latex, setLatex] = useState(node.attrs.latex || '');
   const [error, setError] = useState('');
   const inputRef = useRef(null);
-
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
       inputRef.current.select();
     }
   }, [isEditing]);
-
   const renderMath = () => {
     try {
       const html = katex.renderToString(node.attrs.latex || '', {
@@ -29,7 +26,6 @@ const MathematicsView = ({ node, updateAttributes, deleteNode, selected }) => {
       return { __html: `<span class="math-error">Invalid LaTeX</span>` };
     }
   };
-
   const handleSave = () => {
     try {
       // Validate LaTeX
@@ -41,13 +37,11 @@ const MathematicsView = ({ node, updateAttributes, deleteNode, selected }) => {
       setError(e.message);
     }
   };
-
   const handleCancel = () => {
     setLatex(node.attrs.latex || '');
     setIsEditing(false);
     setError('');
   };
-
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -56,7 +50,6 @@ const MathematicsView = ({ node, updateAttributes, deleteNode, selected }) => {
       handleCancel();
     }
   };
-
   if (isEditing) {
     return (
       <NodeViewWrapper
@@ -104,7 +97,6 @@ const MathematicsView = ({ node, updateAttributes, deleteNode, selected }) => {
       </NodeViewWrapper>
     );
   }
-
   return (
     <NodeViewWrapper
       className={`math-node-wrapper ${node.attrs.display ? 'block' : 'inline'} ${
@@ -137,5 +129,4 @@ const MathematicsView = ({ node, updateAttributes, deleteNode, selected }) => {
     </NodeViewWrapper>
   );
 };
-
 export default MathematicsView;

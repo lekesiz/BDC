@@ -1,5 +1,4 @@
 // Integration Templates - Pre-configured settings for common use cases
-
 export const integrationTemplates = {
   'google-calendar': {
     educational: {
@@ -33,7 +32,6 @@ export const integrationTemplates = {
       }
     }
   },
-
   'slack': {
     smallTeam: {
       name: 'Small Team Setup',
@@ -73,7 +71,6 @@ export const integrationTemplates = {
       }
     }
   },
-
   'zoom': {
     virtualClassroom: {
       name: 'Virtual Classroom Setup',
@@ -111,7 +108,6 @@ export const integrationTemplates = {
       }
     }
   },
-
   'stripe': {
     subscription: {
       name: 'Subscription Business',
@@ -144,7 +140,6 @@ export const integrationTemplates = {
       }
     }
   },
-
   'twilio': {
     notifications: {
       name: 'Notification System',
@@ -186,7 +181,6 @@ export const integrationTemplates = {
       }
     }
   },
-
   'mailchimp': {
     newsletter: {
       name: 'Newsletter Setup',
@@ -227,7 +221,6 @@ export const integrationTemplates = {
       }
     }
   },
-
   'google-drive': {
     documentManagement: {
       name: 'Document Management',
@@ -268,7 +261,6 @@ export const integrationTemplates = {
       }
     }
   },
-
   'webhooks': {
     basic: {
       name: 'Basic Webhook Setup',
@@ -314,46 +306,38 @@ export const integrationTemplates = {
     }
   }
 };
-
 // Helper function to apply template
 export const applyTemplate = (integrationId, templateName) => {
   const templates = integrationTemplates[integrationId];
   if (!templates || !templates[templateName]) {
     return null;
   }
-  
   return templates[templateName].settings;
 };
-
 // Get all templates for an integration
 export const getTemplatesForIntegration = (integrationId) => {
   const templates = integrationTemplates[integrationId];
   if (!templates) return [];
-  
   return Object.entries(templates).map(([key, template]) => ({
     id: key,
     name: template.name,
     description: template.description
   }));
 };
-
 // Validate settings against template
 export const validateSettings = (integrationId, settings, templateName) => {
   const templates = integrationTemplates[integrationId];
   if (!templates || !templates[templateName]) {
     return { valid: true }; // No template to validate against
   }
-  
   const template = templates[templateName].settings;
   const missing = [];
-  
   // Check for missing required fields
   for (const key of Object.keys(template)) {
     if (!(key in settings)) {
       missing.push(key);
     }
   }
-  
   return {
     valid: missing.length === 0,
     missing

@@ -1,50 +1,18 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
-import { visualizer } from 'rollup-plugin-visualizer'
-import { compression } from 'vite-plugin-compression2'
+// No imports to avoid dependency resolution issues in Docker
+const path = require('path');
 
-export default defineConfig({
-  plugins: [
-    react({
-      // Enable fast refresh for development
-      fastRefresh: true,
-      // Optimize for production
-      babel: {
-        plugins: [
-          // Remove console.log in production
-          ['transform-remove-console', { exclude: ['error', 'warn'] }]
-        ]
-      }
-    }),
-    // Gzip compression
-    compression({
-      algorithm: 'gzip',
-      exclude: [/\.(br)$/, /\.(gz)$/]
-    }),
-    // Brotli compression
-    compression({
-      algorithm: 'brotliCompress',
-      exclude: [/\.(gz)$/]
-    }),
-    // Bundle analyzer
-    visualizer({
-      filename: 'dist/stats.html',
-      open: false,
-      gzipSize: true,
-      brotliSize: true
-    })
-  ],
+module.exports = {
+  plugins: [],
   
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@components': resolve(__dirname, './src/components'),
-      '@pages': resolve(__dirname, './src/pages'),
-      '@hooks': resolve(__dirname, './src/hooks'),
-      '@utils': resolve(__dirname, './src/utils'),
-      '@lib': resolve(__dirname, './src/lib'),
-      '@assets': resolve(__dirname, './src/assets')
+      '@': path.resolve(__dirname, './src'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@pages': path.resolve(__dirname, './src/pages'),
+      '@hooks': path.resolve(__dirname, './src/hooks'),
+      '@utils': path.resolve(__dirname, './src/utils'),
+      '@lib': path.resolve(__dirname, './src/lib'),
+      '@assets': path.resolve(__dirname, './src/assets')
     }
   },
 

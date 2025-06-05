@@ -1,10 +1,9 @@
 // Re-export from toast.jsx for backward compatibility
 export { useToast } from './toast';
-
 // Simple toast function
 export const toast = {
-  success: (message) => console.log('Success:', message),
+  success: (message) => ,
   error: (message) => console.error('Error:', message),
   warning: (message) => console.warn('Warning:', message),
-  info: (message) => console.info('Info:', message),
+  info: (message) => ,
 };

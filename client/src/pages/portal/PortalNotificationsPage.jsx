@@ -22,7 +22,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
-
 /**
  * PortalNotificationsPage displays system notifications, announcements,
  * and updates for the beneficiary student
@@ -37,7 +36,6 @@ const PortalNotificationsPage = () => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showSettings, setShowSettings] = useState(false);
-  
   // Fetch notifications data
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -56,19 +54,15 @@ const PortalNotificationsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchNotifications();
   }, []); // Remove toast dependency to prevent infinite loop
-  
   // Filter notifications based on filter value and search term
   const getFilteredNotifications = () => {
     let filtered = [...notifications.notifications];
-    
     // Apply type filter
     if (filter !== 'all') {
       filtered = filtered.filter(notification => notification.type === filter);
     }
-    
     // Apply search filter
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
@@ -77,43 +71,35 @@ const PortalNotificationsPage = () => {
         notification.title?.toLowerCase().includes(term)
       );
     }
-    
     return filtered;
   };
-  
   // Format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
-    
     // If it's today, show only time
     if (date.toDateString() === now.toDateString()) {
       return `Today at ${formatTime(date)}`;
     }
-    
     // If it's yesterday, show "Yesterday"
     const yesterday = new Date(now);
     yesterday.setDate(now.getDate() - 1);
     if (date.toDateString() === yesterday.toDateString()) {
       return `Yesterday at ${formatTime(date)}`;
     }
-    
     // If it's within the last 7 days, show the day of week
     const oneWeekAgo = new Date(now);
     oneWeekAgo.setDate(now.getDate() - 7);
     if (date > oneWeekAgo) {
       return `${date.toLocaleDateString(undefined, { weekday: 'long' })} at ${formatTime(date)}`;
     }
-    
     // Otherwise, show the full date
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   };
-  
   // Format time
   const formatTime = (date) => {
     return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
   };
-  
   // Get icon for notification type
   const getNotificationIcon = (type) => {
     switch (type) {
@@ -135,7 +121,6 @@ const PortalNotificationsPage = () => {
         return <Info className="h-5 w-5" />;
     }
   };
-  
   // Get color classes for notification type
   const getNotificationColorClass = (type) => {
     switch (type) {
@@ -157,20 +142,16 @@ const PortalNotificationsPage = () => {
         return 'bg-gray-50 text-gray-500 border-gray-200';
     }
   };
-  
   // Mark a notification as read
   const handleMarkAsRead = async (id) => {
     try {
       await api.put(`/api/portal/notifications/${id}/read`);
-      
       // Update local state
       setNotifications(prev => {
         const updatedNotifications = prev.notifications.map(notif => 
           notif.id === id ? { ...notif, isRead: true } : notif
         );
-        
         const newUnreadCount = prev.unreadCount > 0 ? prev.unreadCount - 1 : 0;
-        
         return {
           unreadCount: newUnreadCount,
           notifications: updatedNotifications
@@ -185,18 +166,15 @@ const PortalNotificationsPage = () => {
       });
     }
   };
-  
   // Mark all notifications as read
   const handleMarkAllAsRead = async () => {
     try {
       await api.put('/api/portal/notifications/mark-all-read');
-      
       // Update local state
       setNotifications(prev => ({
         unreadCount: 0,
         notifications: prev.notifications.map(notif => ({ ...notif, isRead: true }))
       }));
-      
       toast({
         title: 'Success',
         description: 'All notifications marked as read',
@@ -211,23 +189,19 @@ const PortalNotificationsPage = () => {
       });
     }
   };
-  
   // Delete a notification
   const handleDeleteNotification = async (id) => {
     try {
       await api.delete(`/api/portal/notifications/${id}`);
-      
       // Update local state
       setNotifications(prev => {
         const isUnread = prev.notifications.find(n => n.id === id)?.isRead === false;
         const updatedNotifications = prev.notifications.filter(notif => notif.id !== id);
-        
         return {
           unreadCount: isUnread ? prev.unreadCount - 1 : prev.unreadCount,
           notifications: updatedNotifications
         };
       });
-      
       toast({
         title: 'Success',
         description: 'Notification deleted',
@@ -242,7 +216,6 @@ const PortalNotificationsPage = () => {
       });
     }
   };
-  
   // Save notification settings
   const handleSaveSettings = async () => {
     try {
@@ -258,9 +231,7 @@ const PortalNotificationsPage = () => {
           alert: true
         }
       });
-      
       setShowSettings(false);
-      
       toast({
         title: 'Success',
         description: 'Notification settings updated',
@@ -275,7 +246,6 @@ const PortalNotificationsPage = () => {
       });
     }
   };
-  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -283,9 +253,7 @@ const PortalNotificationsPage = () => {
       </div>
     );
   }
-  
   const filteredNotifications = getFilteredNotifications();
-  
   return (
     <div className="container mx-auto py-6">
       {/* Page header */}
@@ -304,7 +272,6 @@ const PortalNotificationsPage = () => {
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </Button>
-          
           {notifications.unreadCount > 0 && (
             <Button
               onClick={handleMarkAllAsRead}
@@ -315,7 +282,6 @@ const PortalNotificationsPage = () => {
           )}
         </div>
       </div>
-      
       {/* Notification settings panel */}
       {showSettings && (
         <Card className="mb-8 overflow-hidden">
@@ -329,7 +295,6 @@ const PortalNotificationsPage = () => {
               <X className="h-4 w-4" />
             </Button>
           </div>
-          
           <div className="p-6 space-y-6">
             <div>
               <h3 className="text-base font-medium mb-3">Delivery Methods</h3>
@@ -342,7 +307,6 @@ const PortalNotificationsPage = () => {
                   />
                   <span>Email notifications</span>
                 </label>
-                
                 <label className="flex items-center space-x-2">
                   <input 
                     type="checkbox" 
@@ -353,7 +317,6 @@ const PortalNotificationsPage = () => {
                 </label>
               </div>
             </div>
-            
             <div>
               <h3 className="text-base font-medium mb-3">Notification Categories</h3>
               <div className="space-y-2 pl-2">
@@ -365,7 +328,6 @@ const PortalNotificationsPage = () => {
                   />
                   <span>Schedule updates</span>
                 </label>
-                
                 <label className="flex items-center space-x-2">
                   <input 
                     type="checkbox" 
@@ -374,7 +336,6 @@ const PortalNotificationsPage = () => {
                   />
                   <span>Messages from instructors</span>
                 </label>
-                
                 <label className="flex items-center space-x-2">
                   <input 
                     type="checkbox" 
@@ -383,7 +344,6 @@ const PortalNotificationsPage = () => {
                   />
                   <span>Progress updates</span>
                 </label>
-                
                 <label className="flex items-center space-x-2">
                   <input 
                     type="checkbox" 
@@ -392,7 +352,6 @@ const PortalNotificationsPage = () => {
                   />
                   <span>Reminders</span>
                 </label>
-                
                 <label className="flex items-center space-x-2">
                   <input 
                     type="checkbox" 
@@ -403,7 +362,6 @@ const PortalNotificationsPage = () => {
                 </label>
               </div>
             </div>
-            
             <div className="pt-4 border-t flex justify-end">
               <Button onClick={handleSaveSettings}>
                 Save Settings
@@ -412,7 +370,6 @@ const PortalNotificationsPage = () => {
           </div>
         </Card>
       )}
-      
       {/* Search and filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
@@ -425,7 +382,6 @@ const PortalNotificationsPage = () => {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
-        
         <div className="flex space-x-2">
           <Button
             variant={filter === 'all' ? 'default' : 'outline'}
@@ -456,7 +412,6 @@ const PortalNotificationsPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Notifications list */}
       {filteredNotifications.length === 0 ? (
         <Card className="p-8 text-center">
@@ -492,7 +447,6 @@ const PortalNotificationsPage = () => {
                       <p className="text-xs text-gray-500 mt-1">
                         {formatDate(notification.timestamp)}
                       </p>
-                      
                       {notification.link && (
                         <Button
                           variant="link"
@@ -504,7 +458,6 @@ const PortalNotificationsPage = () => {
                       )}
                     </div>
                   </div>
-                  
                   <div className="flex items-center">
                     {!notification.isRead && (
                       <Button
@@ -516,7 +469,6 @@ const PortalNotificationsPage = () => {
                         <CheckCircle className="h-4 w-4" />
                       </Button>
                     )}
-                    
                     <div className="relative">
                       <Dropdown 
                         trigger={(
@@ -546,7 +498,6 @@ const PortalNotificationsPage = () => {
     </div>
   );
 };
-
 // Search component (to fix missing definition)
 const Search = (props) => (
   <svg
@@ -565,17 +516,14 @@ const Search = (props) => (
     <path d="m21 21-4.3-4.3" />
   </svg>
 );
-
 // Simple Dropdown component
 const Dropdown = ({ trigger, items }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
   return (
     <div className="relative">
       <div onClick={() => setIsOpen(!isOpen)}>
         {trigger}
       </div>
-      
       {isOpen && (
         <div 
           className="absolute right-0 mt-1 w-40 bg-white border rounded-md shadow-lg z-10"
@@ -601,5 +549,4 @@ const Dropdown = ({ trigger, items }) => {
     </div>
   );
 };
-
 export default PortalNotificationsPage;

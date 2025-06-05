@@ -18,13 +18,31 @@ import {
   Copy,
   Save,
   RefreshCw,
-  Check
+  Check,
+  Lock
 } from 'lucide-react';
-
 const AIContentGenerationPage = () => {
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
   const { toast } = useToast();
-  
+  // AI Content Generation is restricted to admin and trainer roles only
+  const canAccessContentGeneration = hasRole(['super_admin', 'tenant_admin', 'trainer']);
+  // If user doesn't have permission, show access denied
+  if (!canAccessContentGeneration) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="p-8 text-center max-w-md">
+          <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h2>
+          <p className="text-gray-600 mb-4">
+            AI Content Generation is only available to administrators and trainers.
+          </p>
+          <p className="text-sm text-gray-500">
+            Current role: <span className="font-medium">{user?.role}</span>
+          </p>
+        </Card>
+      </div>
+    );
+  }
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [contentType, setContentType] = useState('feedback');
@@ -42,7 +60,6 @@ const AIContentGenerationPage = () => {
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [copied, setCopied] = useState(false);
-
   const contentTypes = [
     { value: 'feedback', label: 'Test Feedback', icon: MessageSquare },
     { value: 'report', label: 'Progress Report', icon: FileText },
@@ -51,14 +68,12 @@ const AIContentGenerationPage = () => {
     { value: 'announcement', label: 'Announcement', icon: FileText },
     { value: 'custom', label: 'Custom Content', icon: Wand2 }
   ];
-
   useEffect(() => {
     fetchBeneficiaries();
     fetchPrograms();
     fetchTests();
     fetchTemplates();
   }, []);
-
   const fetchBeneficiaries = async () => {
     try {
       const res = await fetch('/api/beneficiaries', {
@@ -66,16 +81,13 @@ const AIContentGenerationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch beneficiaries');
-
       const data = await res.json();
       setBeneficiaries(data);
     } catch (error) {
       console.error('Error fetching beneficiaries:', error);
     }
   };
-
   const fetchPrograms = async () => {
     try {
       const res = await fetch('/api/programs', {
@@ -83,16 +95,13 @@ const AIContentGenerationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch programs');
-
       const data = await res.json();
       setPrograms(data);
     } catch (error) {
       console.error('Error fetching programs:', error);
     }
   };
-
   const fetchTests = async () => {
     try {
       const res = await fetch('/api/tests', {
@@ -100,16 +109,13 @@ const AIContentGenerationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch tests');
-
       const data = await res.json();
       setTests(data);
     } catch (error) {
       console.error('Error fetching tests:', error);
     }
   };
-
   const fetchTemplates = async () => {
     try {
       const res = await fetch('/api/ai/content-templates', {
@@ -117,16 +123,13 @@ const AIContentGenerationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch templates');
-
       const data = await res.json();
       setSavedTemplates(data);
     } catch (error) {
       console.error('Error fetching templates:', error);
     }
   };
-
   const handleGenerateContent = async () => {
     if (!contentType || (contentType !== 'custom' && !context.beneficiary_id)) {
       toast({
@@ -136,7 +139,6 @@ const AIContentGenerationPage = () => {
       });
       return;
     }
-
     setGenerating(true);
     try {
       const res = await fetch('/api/ai/generate-content', {
@@ -150,13 +152,10 @@ const AIContentGenerationPage = () => {
           context
         })
       });
-
       if (!res.ok) throw new Error('Failed to generate content');
-
       const data = await res.json();
       setGeneratedContent(data.content);
       setContentTitle(data.title || '');
-
       toast({
         title: 'Success',
         description: 'Content generated successfully'
@@ -172,8 +171,16 @@ const AIContentGenerationPage = () => {
       setGenerating(false);
     }
   };
-
   const handleSaveContent = async () => {
+    // Additional permission check for content saving
+    if (!hasRole(['super_admin', 'tenant_admin', 'trainer'])) {
+      toast({
+        title: 'Access Denied',
+        description: 'Content saving is restricted to administrators and trainers only',
+        variant: 'destructive'
+      });
+      return;
+    }
     if (!contentTitle || !generatedContent) {
       toast({
         title: 'Error',
@@ -182,7 +189,6 @@ const AIContentGenerationPage = () => {
       });
       return;
     }
-
     setSaving(true);
     try {
       const res = await fetch('/api/ai/content-templates', {
@@ -198,14 +204,11 @@ const AIContentGenerationPage = () => {
           context
         })
       });
-
       if (!res.ok) throw new Error('Failed to save content');
-
       toast({
         title: 'Success',
         description: 'Content saved as template'
       });
-
       fetchTemplates();
     } catch (error) {
       console.error('Error saving content:', error);
@@ -218,7 +221,6 @@ const AIContentGenerationPage = () => {
       setSaving(false);
     }
   };
-
   const handleCopyContent = () => {
     navigator.clipboard.writeText(generatedContent);
     setCopied(true);
@@ -228,8 +230,16 @@ const AIContentGenerationPage = () => {
       description: 'Content copied to clipboard'
     });
   };
-
   const handleExportContent = () => {
+    // Additional permission check for export functionality
+    if (!hasRole(['super_admin', 'tenant_admin', 'trainer'])) {
+      toast({
+        title: 'Access Denied',
+        description: 'Export functionality is restricted to administrators and trainers only',
+        variant: 'destructive'
+      });
+      return;
+    }
     const blob = new Blob([generatedContent], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -240,7 +250,6 @@ const AIContentGenerationPage = () => {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   };
-
   const handleSelectTemplate = (templateId) => {
     const template = savedTemplates.find(t => t.id === templateId);
     if (template) {
@@ -250,7 +259,6 @@ const AIContentGenerationPage = () => {
       setContext(template.context || {});
     }
   };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -259,7 +267,6 @@ const AIContentGenerationPage = () => {
           <h1 className="text-2xl font-bold text-gray-900">AI Content Generation</h1>
         </div>
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Settings Panel */}
         <div className="lg:col-span-1">
@@ -288,7 +295,6 @@ const AIContentGenerationPage = () => {
                 })}
               </div>
             </div>
-
             {contentType !== 'custom' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -307,7 +313,6 @@ const AIContentGenerationPage = () => {
                 </Select>
               </div>
             )}
-
             {(contentType === 'feedback' || contentType === 'report') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -326,7 +331,6 @@ const AIContentGenerationPage = () => {
                 </Select>
               </div>
             )}
-
             {contentType === 'learning_path' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -345,7 +349,6 @@ const AIContentGenerationPage = () => {
                 </Select>
               </div>
             )}
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Additional Context (Optional)
@@ -357,7 +360,6 @@ const AIContentGenerationPage = () => {
                 placeholder="Provide any additional context or requirements..."
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Use Template
@@ -377,7 +379,6 @@ const AIContentGenerationPage = () => {
                 ))}
               </Select>
             </div>
-
             <Button
               onClick={handleGenerateContent}
               disabled={generating}
@@ -397,7 +398,6 @@ const AIContentGenerationPage = () => {
             </Button>
           </Card>
         </div>
-
         {/* Content Area */}
         <div className="lg:col-span-2">
           <Card className="p-6">
@@ -444,7 +444,6 @@ const AIContentGenerationPage = () => {
                   </Button>
                 </div>
               </div>
-
               <Textarea
                 value={generatedContent}
                 onChange={(e) => setGeneratedContent(e.target.value)}
@@ -452,7 +451,6 @@ const AIContentGenerationPage = () => {
                 placeholder="AI generated content will appear here..."
                 className="font-mono text-sm"
               />
-
               {generatedContent && (
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <span>{generatedContent.split(/\s+/).length} words</span>
@@ -466,5 +464,4 @@ const AIContentGenerationPage = () => {
     </div>
   );
 };
-
 export default AIContentGenerationPage;

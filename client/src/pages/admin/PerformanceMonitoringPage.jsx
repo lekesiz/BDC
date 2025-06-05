@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 import { 
   Activity, 
   Zap, 
@@ -21,7 +21,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 const PerformanceMonitoringPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -36,7 +35,6 @@ const PerformanceMonitoringPage = () => {
     diskUsage: 72,
     networkIO: 85
   });
-
   const performanceData = [
     { time: '00:00', responseTime: 120, requests: 2500, errors: 3 },
     { time: '04:00', responseTime: 110, requests: 1800, errors: 1 },
@@ -46,7 +44,6 @@ const PerformanceMonitoringPage = () => {
     { time: '20:00', responseTime: 135, requests: 3000, errors: 4 },
     { time: '24:00', responseTime: 125, requests: 2200, errors: 2 }
   ];
-
   const endpointPerformance = [
     { endpoint: '/api/users', avgTime: 85, calls: 12500, errorRate: 0.08 },
     { endpoint: '/api/beneficiaries', avgTime: 125, calls: 8900, errorRate: 0.15 },
@@ -54,21 +51,18 @@ const PerformanceMonitoringPage = () => {
     { endpoint: '/api/reports', avgTime: 520, calls: 3200, errorRate: 0.32 },
     { endpoint: '/api/analytics', avgTime: 380, calls: 2800, errorRate: 0.18 }
   ];
-
   const systemResources = [
     { resource: 'CPU', usage: 45, threshold: 80 },
     { resource: 'Memory', usage: 67, threshold: 85 },
     { resource: 'Disk I/O', usage: 72, threshold: 90 },
     { resource: 'Network', usage: 38, threshold: 75 }
   ];
-
   const alerts = [
     { id: 1, type: 'warning', message: 'High memory usage detected (>80%)', time: '10 minutes ago' },
     { id: 2, type: 'error', message: 'API endpoint /api/reports response time >500ms', time: '1 hour ago' },
     { id: 3, type: 'info', message: 'Scheduled maintenance window approaching', time: '2 hours ago' },
     { id: 4, type: 'success', message: 'Performance optimization deployed successfully', time: '3 hours ago' }
   ];
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Monitor },
     { id: 'metrics', label: 'Metrics', icon: BarChart3 },
@@ -77,9 +71,7 @@ const PerformanceMonitoringPage = () => {
     { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
     { id: 'apm', label: 'APM Setup', icon: Activity }
   ];
-
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -101,7 +93,6 @@ const PerformanceMonitoringPage = () => {
           </Button>
         </div>
       </div>
-
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -125,7 +116,6 @@ const PerformanceMonitoringPage = () => {
           })}
         </nav>
       </div>
-
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -144,7 +134,6 @@ const PerformanceMonitoringPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -157,7 +146,6 @@ const PerformanceMonitoringPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -173,7 +161,6 @@ const PerformanceMonitoringPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -187,7 +174,6 @@ const PerformanceMonitoringPage = () => {
               </div>
             </Card>
           </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <div className="p-6">
@@ -206,7 +192,6 @@ const PerformanceMonitoringPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Request Volume</h3>
@@ -226,7 +211,6 @@ const PerformanceMonitoringPage = () => {
               </div>
             </Card>
           </div>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">System Health</h3>
@@ -263,7 +247,6 @@ const PerformanceMonitoringPage = () => {
                   </div>
                   <p className="mt-2 text-sm text-gray-600">CPU Usage</p>
                 </div>
-
                 <div className="text-center">
                   <div className="relative inline-flex">
                     <div className="w-24 h-24">
@@ -296,7 +279,6 @@ const PerformanceMonitoringPage = () => {
                   </div>
                   <p className="mt-2 text-sm text-gray-600">Memory Usage</p>
                 </div>
-
                 <div className="text-center">
                   <div className="relative inline-flex">
                     <div className="w-24 h-24">
@@ -329,7 +311,6 @@ const PerformanceMonitoringPage = () => {
                   </div>
                   <p className="mt-2 text-sm text-gray-600">Disk Usage</p>
                 </div>
-
                 <div className="text-center">
                   <div className="relative inline-flex">
                     <div className="w-24 h-24">
@@ -367,7 +348,6 @@ const PerformanceMonitoringPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'metrics' && (
         <div className="space-y-6">
           <Card>
@@ -385,7 +365,6 @@ const PerformanceMonitoringPage = () => {
                     <span>+0.02 from last week</span>
                   </div>
                 </div>
-
                 <div>
                   <h4 className="text-sm font-medium text-gray-600 mb-2">First Contentful Paint</h4>
                   <div className="flex items-baseline">
@@ -397,7 +376,6 @@ const PerformanceMonitoringPage = () => {
                     <span>-0.3s improvement</span>
                   </div>
                 </div>
-
                 <div>
                   <h4 className="text-sm font-medium text-gray-600 mb-2">Time to Interactive</h4>
                   <div className="flex items-baseline">
@@ -409,7 +387,6 @@ const PerformanceMonitoringPage = () => {
                     <span>No change</span>
                   </div>
                 </div>
-
                 <div>
                   <h4 className="text-sm font-medium text-gray-600 mb-2">Core Web Vitals - LCP</h4>
                   <div className="flex items-baseline">
@@ -421,7 +398,6 @@ const PerformanceMonitoringPage = () => {
                     <span>Good</span>
                   </div>
                 </div>
-
                 <div>
                   <h4 className="text-sm font-medium text-gray-600 mb-2">Core Web Vitals - FID</h4>
                   <div className="flex items-baseline">
@@ -433,7 +409,6 @@ const PerformanceMonitoringPage = () => {
                     <span>Good</span>
                   </div>
                 </div>
-
                 <div>
                   <h4 className="text-sm font-medium text-gray-600 mb-2">Core Web Vitals - CLS</h4>
                   <div className="flex items-baseline">
@@ -448,7 +423,6 @@ const PerformanceMonitoringPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Application Metrics</h3>
@@ -498,7 +472,6 @@ const PerformanceMonitoringPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'endpoints' && (
         <div className="space-y-6">
           <Card>
@@ -537,7 +510,6 @@ const PerformanceMonitoringPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Response Time Distribution</h3>
@@ -557,7 +529,6 @@ const PerformanceMonitoringPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'resources' && (
         <div className="space-y-6">
           <Card>
@@ -593,7 +564,6 @@ const PerformanceMonitoringPage = () => {
               </div>
             </div>
           </Card>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <div className="p-6">
@@ -618,7 +588,6 @@ const PerformanceMonitoringPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Cache Performance</h3>
@@ -645,7 +614,6 @@ const PerformanceMonitoringPage = () => {
           </div>
         </div>
       )}
-
       {activeTab === 'alerts' && (
         <div className="space-y-6">
           <Card>
@@ -682,7 +650,6 @@ const PerformanceMonitoringPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Alert Rules</h3>
@@ -713,7 +680,6 @@ const PerformanceMonitoringPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'apm' && (
         <div className="space-y-6">
           <Card>
@@ -722,7 +688,6 @@ const PerformanceMonitoringPage = () => {
               <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
                 <code>{`# Install New Relic Python Agent
 pip install newrelic
-
 # newrelic.ini configuration
 [newrelic]
 license_key = YOUR_LICENSE_KEY
@@ -730,18 +695,15 @@ app_name = BDC Application
 monitor_mode = true
 log_level = info
 ssl = true
-
 # Flask Integration
 import newrelic.agent
 newrelic.agent.initialize('newrelic.ini')
-
 @newrelic.agent.wsgi_application()
 def application(environ, start_response):
     return app(environ, start_response)`}</code>
               </pre>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Datadog Setup</h3>
@@ -750,16 +712,13 @@ def application(environ, start_response):
 DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=YOUR_API_KEY \
 DD_SITE="datadoghq.com" bash -c "$(curl -L \
 https://s3.amazonaws.com/dd-agent/scripts/install_script.sh)"
-
 # Python Application Integration
 from ddtrace import patch_all
 patch_all()
-
 # Environment Variables
 export DD_ENV=production
 export DD_SERVICE=bdc-api
 export DD_VERSION=1.0.0
-
 # Custom Metrics
 from datadog import statsd
 statsd.increment('api.request.count')
@@ -767,7 +726,6 @@ statsd.histogram('api.response.time', response_time)`}</code>
               </pre>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Performance Budget</h3>
@@ -805,5 +763,4 @@ statsd.histogram('api.response.time', response_time)`}</code>
     </div>
   );
 };
-
 export default PerformanceMonitoringPage;

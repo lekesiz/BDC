@@ -23,11 +23,9 @@ import {
   Copy,
   ClipboardCheck
 } from 'lucide-react';
-
 const GDPRCompliancePage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
   const [loading, setLoading] = useState(true);
   const [personalData, setPersonalData] = useState(null);
   const [dataDeletionRequests, setDataDeletionRequests] = useState([]);
@@ -43,14 +41,12 @@ const GDPRCompliancePage = () => {
   const [showAccessLog, setShowAccessLog] = useState(false);
   const [accessLog, setAccessLog] = useState([]);
   const [deletionReason, setDeletionReason] = useState('');
-  
   useEffect(() => {
     fetchPersonalData();
     fetchDataDeletionRequests();
     fetchConsentHistory();
     fetchPrivacySettings();
   }, []);
-
   const fetchPersonalData = async () => {
     try {
       const res = await fetch('/api/gdpr/personal-data', {
@@ -58,9 +54,7 @@ const GDPRCompliancePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch personal data');
-
       const data = await res.json();
       setPersonalData(data);
     } catch (error) {
@@ -74,7 +68,6 @@ const GDPRCompliancePage = () => {
       setLoading(false);
     }
   };
-
   const fetchDataDeletionRequests = async () => {
     try {
       const res = await fetch('/api/gdpr/deletion-requests', {
@@ -82,16 +75,13 @@ const GDPRCompliancePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch deletion requests');
-
       const data = await res.json();
       setDataDeletionRequests(data);
     } catch (error) {
       console.error('Error fetching deletion requests:', error);
     }
   };
-
   const fetchConsentHistory = async () => {
     try {
       const res = await fetch('/api/gdpr/consent-history', {
@@ -99,16 +89,13 @@ const GDPRCompliancePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch consent history');
-
       const data = await res.json();
       setConsentHistory(data);
     } catch (error) {
       console.error('Error fetching consent history:', error);
     }
   };
-
   const fetchPrivacySettings = async () => {
     try {
       const res = await fetch('/api/gdpr/privacy-settings', {
@@ -116,16 +103,13 @@ const GDPRCompliancePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch privacy settings');
-
       const data = await res.json();
       setPrivacySettings(data);
     } catch (error) {
       console.error('Error fetching privacy settings:', error);
     }
   };
-
   const fetchAccessLog = async () => {
     try {
       const res = await fetch('/api/gdpr/access-log', {
@@ -133,9 +117,7 @@ const GDPRCompliancePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch access log');
-
       const data = await res.json();
       setAccessLog(data);
     } catch (error) {
@@ -147,7 +129,6 @@ const GDPRCompliancePage = () => {
       });
     }
   };
-
   const handleDataExport = async (format) => {
     try {
       const res = await fetch(`/api/gdpr/export-data?format=${format}`, {
@@ -155,9 +136,7 @@ const GDPRCompliancePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to export data');
-
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -167,7 +146,6 @@ const GDPRCompliancePage = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-
       toast({
         title: 'Success',
         description: 'Personal data exported successfully'
@@ -182,7 +160,6 @@ const GDPRCompliancePage = () => {
       });
     }
   };
-
   const handleDataDeletion = async () => {
     if (!deletionReason.trim()) {
       toast({
@@ -192,7 +169,6 @@ const GDPRCompliancePage = () => {
       });
       return;
     }
-
     try {
       const res = await fetch('/api/gdpr/request-deletion', {
         method: 'POST',
@@ -202,14 +178,11 @@ const GDPRCompliancePage = () => {
         },
         body: JSON.stringify({ reason: deletionReason })
       });
-
       if (!res.ok) throw new Error('Failed to request data deletion');
-
       toast({
         title: 'Success',
         description: 'Data deletion request submitted successfully'
       });
-      
       setShowDataDeletion(false);
       setDeletionReason('');
       fetchDataDeletionRequests();
@@ -222,11 +195,9 @@ const GDPRCompliancePage = () => {
       });
     }
   };
-
   const handlePrivacySettingsUpdate = async (setting, value) => {
     const updatedSettings = { ...privacySettings, [setting]: value };
     setPrivacySettings(updatedSettings);
-
     try {
       const res = await fetch('/api/gdpr/privacy-settings', {
         method: 'PUT',
@@ -236,9 +207,7 @@ const GDPRCompliancePage = () => {
         },
         body: JSON.stringify(updatedSettings)
       });
-
       if (!res.ok) throw new Error('Failed to update privacy settings');
-
       toast({
         title: 'Success',
         description: 'Privacy settings updated successfully'
@@ -252,12 +221,10 @@ const GDPRCompliancePage = () => {
       });
     }
   };
-
   const handleAnonymizeData = async () => {
     if (!confirm('Are you sure you want to anonymize your data? This action cannot be undone.')) {
       return;
     }
-
     try {
       const res = await fetch('/api/gdpr/anonymize', {
         method: 'POST',
@@ -265,14 +232,11 @@ const GDPRCompliancePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to anonymize data');
-
       toast({
         title: 'Success',
         description: 'Data anonymized successfully'
       });
-      
       fetchPersonalData();
     } catch (error) {
       console.error('Error anonymizing data:', error);
@@ -283,7 +247,6 @@ const GDPRCompliancePage = () => {
       });
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -291,7 +254,6 @@ const GDPRCompliancePage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -300,7 +262,6 @@ const GDPRCompliancePage = () => {
           <h1 className="text-2xl font-bold text-gray-900">GDPR Compliance</h1>
         </div>
       </div>
-
       {/* GDPR Rights Overview */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Your GDPR Rights</h2>
@@ -312,7 +273,6 @@ const GDPRCompliancePage = () => {
             </div>
             <p className="text-sm text-gray-600">View all personal data we hold about you</p>
           </div>
-          
           <div className="border rounded-lg p-4">
             <div className="flex items-center gap-3 mb-2">
               <Download className="h-5 w-5 text-green-600" />
@@ -320,7 +280,6 @@ const GDPRCompliancePage = () => {
             </div>
             <p className="text-sm text-gray-600">Export your data in standard formats</p>
           </div>
-          
           <div className="border rounded-lg p-4">
             <div className="flex items-center gap-3 mb-2">
               <Trash2 className="h-5 w-5 text-red-600" />
@@ -328,7 +287,6 @@ const GDPRCompliancePage = () => {
             </div>
             <p className="text-sm text-gray-600">Request deletion of your personal data</p>
           </div>
-          
           <div className="border rounded-lg p-4">
             <div className="flex items-center gap-3 mb-2">
               <Settings className="h-5 w-5 text-purple-600" />
@@ -338,7 +296,6 @@ const GDPRCompliancePage = () => {
           </div>
         </div>
       </Card>
-
       {/* Personal Data Overview */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
@@ -362,7 +319,6 @@ const GDPRCompliancePage = () => {
             </Button>
           </div>
         </div>
-
         {personalData && (
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -383,7 +339,6 @@ const GDPRCompliancePage = () => {
                 <p className="text-gray-900">{new Date(personalData.updated_at).toLocaleDateString()}</p>
               </div>
             </div>
-
             <div>
               <p className="text-sm font-medium text-gray-700 mb-2">Data Categories Collected</p>
               <div className="flex flex-wrap gap-2">
@@ -397,7 +352,6 @@ const GDPRCompliancePage = () => {
           </div>
         )}
       </Card>
-
       {/* Privacy Settings */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Privacy Settings</h2>
@@ -414,7 +368,6 @@ const GDPRCompliancePage = () => {
               className="rounded text-primary h-5 w-5"
             />
           </label>
-
           <label className="flex items-center justify-between">
             <div>
               <p className="font-medium">Analytics Tracking</p>
@@ -427,7 +380,6 @@ const GDPRCompliancePage = () => {
               className="rounded text-primary h-5 w-5"
             />
           </label>
-
           <label className="flex items-center justify-between">
             <div>
               <p className="font-medium">Marketing Emails</p>
@@ -440,7 +392,6 @@ const GDPRCompliancePage = () => {
               className="rounded text-primary h-5 w-5"
             />
           </label>
-
           <label className="flex items-center justify-between">
             <div>
               <p className="font-medium">Third-party Sharing</p>
@@ -455,7 +406,6 @@ const GDPRCompliancePage = () => {
           </label>
         </div>
       </Card>
-
       {/* Data Management Actions */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Data Management</h2>
@@ -473,7 +423,6 @@ const GDPRCompliancePage = () => {
               Anonymize
             </Button>
           </div>
-
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div>
               <h3 className="font-medium">Request Data Deletion</h3>
@@ -489,7 +438,6 @@ const GDPRCompliancePage = () => {
           </div>
         </div>
       </Card>
-
       {/* Consent History */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Consent History</h2>
@@ -513,7 +461,6 @@ const GDPRCompliancePage = () => {
           </div>
         )}
       </Card>
-
       {/* Deletion Requests */}
       {dataDeletionRequests.length > 0 && (
         <Card className="p-6">
@@ -542,7 +489,6 @@ const GDPRCompliancePage = () => {
           </div>
         </Card>
       )}
-
       {/* Export Data Modal */}
       <Modal
         isOpen={showDataExport}
@@ -553,7 +499,6 @@ const GDPRCompliancePage = () => {
           <p className="text-gray-600">
             Select the format in which you'd like to export your personal data:
           </p>
-          
           <div className="space-y-2">
             <Button
               variant="outline"
@@ -563,7 +508,6 @@ const GDPRCompliancePage = () => {
               <FileText className="h-4 w-4 mr-2" />
               JSON Format (Machine Readable)
             </Button>
-            
             <Button
               variant="outline"
               className="w-full justify-start"
@@ -572,7 +516,6 @@ const GDPRCompliancePage = () => {
               <FileText className="h-4 w-4 mr-2" />
               CSV Format (Spreadsheet)
             </Button>
-            
             <Button
               variant="outline"
               className="w-full justify-start"
@@ -584,7 +527,6 @@ const GDPRCompliancePage = () => {
           </div>
         </div>
       </Modal>
-
       {/* Delete Data Modal */}
       <Modal
         isOpen={showDataDeletion}
@@ -604,7 +546,6 @@ const GDPRCompliancePage = () => {
               </div>
             </div>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Reason for deletion
@@ -616,7 +557,6 @@ const GDPRCompliancePage = () => {
               placeholder="Please tell us why you want to delete your data..."
             />
           </div>
-
           <div className="flex gap-3 justify-end">
             <Button
               variant="outline"
@@ -633,7 +573,6 @@ const GDPRCompliancePage = () => {
           </div>
         </div>
       </Modal>
-
       {/* Access Log Modal */}
       <Modal
         isOpen={showAccessLog}
@@ -674,5 +613,4 @@ const GDPRCompliancePage = () => {
     </div>
   );
 };
-
 export default GDPRCompliancePage;

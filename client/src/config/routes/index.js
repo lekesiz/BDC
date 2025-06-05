@@ -2,26 +2,21 @@
  * Centralized route configuration
  * This file consolidates all routes and eliminates duplicates
  */
-
 import { lazy } from 'react';
 import { ROUTE_ACCESS, ROLES } from '../roles';
-
 // Lazy load components - using the latest/best versions
 const DashboardPageEnhanced = lazy(() => import('../../pages/dashboard/DashboardPageEnhanced'));
-
 // User Management
 const UsersPage = lazy(() => import('../../pages/users/UsersPage'));
 const UserFormPage = lazy(() => import('../../pages/users/UserFormPage'));
 const UserDetailPage = lazy(() => import('../../pages/users/UserDetailPage'));
 const ProfilePage = lazy(() => import('../../pages/profile/ProfilePage'));
-
 // Beneficiary Management - using latest versions
 const BeneficiariesPage = lazy(() => import('../../pages/beneficiaries/BeneficiariesPage'));
 const BeneficiaryDetailPage = lazy(() => import('../../pages/beneficiaries/BeneficiaryDetailPage'));
 const BeneficiaryFormPage = lazy(() => import('../../pages/beneficiaries/BeneficiaryFormPage'));
 const TrainerAssignmentPage = lazy(() => import('../../pages/beneficiaries/TrainerAssignmentPage'));
 const ProgressTrackingPage = lazy(() => import('../../pages/beneficiaries/ProgressTrackingPage'));
-
 // Evaluation System - using V2 versions where available
 const EvaluationsPage = lazy(() => import('../../pages/evaluation/EvaluationsPage'));
 const MyEvaluationsPage = lazy(() => import('../../pages/evaluation/MyEvaluationsPage'));
@@ -32,7 +27,6 @@ const AIAnalysisPageV2 = lazy(() => import('../../pages/evaluation/AIAnalysisPag
 const TrainerEvaluationPage = lazy(() => import('../../pages/evaluation/TrainerEvaluationPage'));
 const TrainerEvaluationDetailPage = lazy(() => import('../../pages/evaluation/TrainerEvaluationDetailPage'));
 const EssayGradingPage = lazy(() => import('../../pages/evaluation/EssayGradingPage'));
-
 // Assessment System (Trainer)
 const TrainerAssessmentsPage = lazy(() => import('../../pages/assessment/TrainerAssessmentsPage'));
 const TrainerAssessmentCreationPage = lazy(() => import('../../pages/assessment/TrainerAssessmentCreationPage'));
@@ -48,7 +42,6 @@ const TrainerSubmissionDetailPage = lazy(() => import('../../pages/assessment/Tr
 const TrainerBulkGradingPage = lazy(() => import('../../pages/assessment/TrainerBulkGradingPage'));
 const TrainerRubricBuilderPage = lazy(() => import('../../pages/assessment/TrainerRubricBuilderPage'));
 const TrainerQuestionBankPage = lazy(() => import('../../pages/assessment/TrainerQuestionBankPage'));
-
 // Document Management - using V2 where available
 const DocumentsPage = lazy(() => import('../../pages/document/DocumentsPage'));
 const MyDocumentsPage = lazy(() => import('../../pages/document/MyDocumentsPage'));
@@ -58,14 +51,12 @@ const DocumentViewerPageV2 = lazy(() => import('../../pages/document/DocumentVie
 const DocumentSharePageV2 = lazy(() => import('../../pages/document/DocumentSharePageV2'));
 const DocumentCategoriesPageV2 = lazy(() => import('../../pages/document/DocumentCategoriesPageV2'));
 const DocumentTemplatesPage = lazy(() => import('../../pages/document/DocumentTemplatesPage'));
-
 // Calendar System - using V2 versions
 const CalendarPageV2 = lazy(() => import('../../pages/calendar/CalendarPageV2'));
 const AvailabilitySettingsPageV2 = lazy(() => import('../../pages/calendar/AvailabilitySettingsPageV2'));
 const GoogleCalendarSyncPageV2 = lazy(() => import('../../pages/calendar/GoogleCalendarSyncPageV2'));
 const GoogleCalendarIntegrationPage = lazy(() => import('../../pages/calendar/GoogleCalendarIntegrationPage'));
 const EmailRemindersPage = lazy(() => import('../../pages/calendar/EmailRemindersPage'));
-
 // Programs
 const ProgramsListPage = lazy(() => import('../../pages/programs/ProgramsListPage'));
 const CreateProgramPage = lazy(() => import('../../pages/programs/CreateProgramPage'));
@@ -73,27 +64,22 @@ const EditProgramPage = lazy(() => import('../../pages/programs/EditProgramPage'
 const ProgramDetailPage = lazy(() => import('../../pages/programs/ProgramDetailPage'));
 const AssignBeneficiariesPage = lazy(() => import('../../pages/programs/AssignBeneficiariesPage'));
 const ProgramSchedulePage = lazy(() => import('../../pages/programs/ProgramSchedulePage'));
-
 // Messaging & Notifications - using V2 versions
 const MessagingPageV2 = lazy(() => import('../../pages/messaging/MessagingPageV2'));
 const NotificationCenterV2 = lazy(() => import('../../pages/notifications/NotificationCenterV2'));
-
 // Analytics
 const AnalyticsDashboardPage = lazy(() => import('../../pages/analytics/AnalyticsDashboardPage'));
 const TrainerAnalyticsPage = lazy(() => import('../../pages/analytics/TrainerAnalyticsPage'));
 const ProgramAnalyticsPageV2 = lazy(() => import('../../pages/analytics/ProgramAnalyticsPageV2'));
 const BeneficiaryAnalyticsPage = lazy(() => import('../../pages/analytics/BeneficiaryAnalyticsPage'));
-
 // Reports
 const ReportsDashboardPage = lazy(() => import('../../pages/reports/ReportsDashboardPage'));
 const ReportCreationPage = lazy(() => import('../../pages/reports/ReportCreationPage'));
 const ReportSchedulePage = lazy(() => import('../../pages/reports/ReportSchedulePage'));
-
 // Settings - consolidated
 const SettingsPage = lazy(() => import('../../pages/settings/SettingsPage'));
 const ThemeSettingsPage = lazy(() => import('../../pages/settings/ThemeSettingsPage'));
 const NotificationPreferencesPageV2 = lazy(() => import('../../pages/settings/NotificationPreferencesPageV2'));
-
 // Admin Pages
 const TenantsPage = lazy(() => import('../../pages/admin/TenantsPage'));
 const TenantDetailPage = lazy(() => import('../../pages/admin/TenantDetailPage'));
@@ -106,7 +92,6 @@ const LazyLoadingPage = lazy(() => import('../../pages/admin/LazyLoadingPage'));
 const CompressionPage = lazy(() => import('../../pages/admin/CompressionPage'));
 const CDNSetupPage = lazy(() => import('../../pages/admin/CDNSetupPage'));
 const PerformanceMonitoringPage = lazy(() => import('../../pages/admin/PerformanceMonitoringPage'));
-
 // Integrations
 const GoogleCalendarIntegrationV2Page = lazy(() => import('../../pages/integrations/GoogleCalendarIntegrationV2Page'));
 const WedofIntegrationPage = lazy(() => import('../../pages/integrations/WedofIntegrationPage'));
@@ -116,7 +101,6 @@ const SMSIntegrationPage = lazy(() => import('../../pages/integrations/SMSIntegr
 const PaymentIntegrationPage = lazy(() => import('../../pages/integrations/PaymentIntegrationPage'));
 const WebhooksPage = lazy(() => import('../../pages/integrations/WebhooksPage'));
 const ZapierIntegrationPage = lazy(() => import('../../pages/integrations/ZapierIntegrationPage'));
-
 // AI Features
 const AIInsightsPage = lazy(() => import('../../pages/ai/AIInsightsPage'));
 const AIRecommendationsPage = lazy(() => import('../../pages/ai/AIRecommendationsPage'));
@@ -126,14 +110,12 @@ const AILearningPathPage = lazy(() => import('../../pages/ai/AILearningPathPage'
 const AIAutomatedFeedbackPage = lazy(() => import('../../pages/ai/AIAutomatedFeedbackPage'));
 const AIChatbotPage = lazy(() => import('../../pages/ai/AIChatbotPage'));
 const NaturalLanguageProcessingPage = lazy(() => import('../../pages/ai/NaturalLanguageProcessingPage'));
-
 // Compliance
 const GDPRCompliancePage = lazy(() => import('../../pages/compliance/GDPRCompliancePage'));
 const DataBackupPage = lazy(() => import('../../pages/compliance/DataBackupPage'));
 const AuditLogsPage = lazy(() => import('../../pages/compliance/AuditLogsPage'));
 const SecurityHeadersPage = lazy(() => import('../../pages/compliance/SecurityHeadersPage'));
 const InputValidationPage = lazy(() => import('../../pages/compliance/InputValidationPage'));
-
 // Student Portal - using V3 dashboard
 const PortalDashboardV3 = lazy(() => import('../../pages/portal/PortalDashboardV3'));
 const PortalCoursesPage = lazy(() => import('../../pages/portal/PortalCoursesPage'));
@@ -149,12 +131,10 @@ const PortalAssessmentsPage = lazy(() => import('../../pages/portal/assessment/P
 const PortalQuizPage = lazy(() => import('../../pages/portal/assessment/PortalQuizPage'));
 const PortalAssessmentResultsPage = lazy(() => import('../../pages/portal/assessment/PortalAssessmentResultsPage'));
 const PortalAssessmentSubmissionPage = lazy(() => import('../../pages/portal/assessment/PortalAssessmentSubmissionPage'));
-
 // Test Pages
 const WebSocketTestPage = lazy(() => import('../../pages/test/WebSocketTestPage'));
 const NotificationTestPage = lazy(() => import('../../pages/test/NotificationTestPage'));
 const DebugPage = lazy(() => import('../../pages/debug/DebugPage'));
-
 /**
  * Consolidated route configuration
  * Eliminates all duplicate routes and uses latest component versions
@@ -167,7 +147,6 @@ export const ROUTE_CONFIG = {
     access: ROUTE_ACCESS.AUTHENTICATED,
     exact: true
   },
-
   // User Management Routes
   users: {
     base: '/users',
@@ -179,14 +158,12 @@ export const ROUTE_CONFIG = {
       edit: { path: ':id/edit', component: UserFormPage }
     }
   },
-
   // Profile (accessible to all users)
   profile: {
     path: '/profile',
     component: ProfilePage,
     access: ROUTE_ACCESS.AUTHENTICATED
   },
-
   // Beneficiary Management Routes
   beneficiaries: {
     base: '/beneficiaries',
@@ -201,7 +178,6 @@ export const ROUTE_CONFIG = {
       evaluate: { path: ':id/evaluate', component: TrainerEvaluationPage }
     }
   },
-
   // Student-specific routes
   student: {
     myEvaluations: {
@@ -215,7 +191,6 @@ export const ROUTE_CONFIG = {
       access: ROUTE_ACCESS.STUDENT_ONLY
     }
   },
-
   // Trainer Assessment Management Routes
   assessment: {
     base: '/assessment',
@@ -238,7 +213,6 @@ export const ROUTE_CONFIG = {
       questionBank: { path: 'questions', component: TrainerQuestionBankPage }
     }
   },
-
   // Evaluation System Routes
   evaluations: {
     base: '/evaluations',
@@ -255,7 +229,6 @@ export const ROUTE_CONFIG = {
       trainerEvaluation: { path: 'trainer-evaluations/:id', component: TrainerEvaluationDetailPage, access: ROUTE_ACCESS.MANAGEMENT }
     }
   },
-
   // Calendar Routes
   calendar: {
     base: '/calendar',
@@ -268,7 +241,6 @@ export const ROUTE_CONFIG = {
       emailReminders: { path: 'email-reminders', component: EmailRemindersPage }
     }
   },
-
   // Document Management Routes
   documents: {
     base: '/documents',
@@ -282,20 +254,17 @@ export const ROUTE_CONFIG = {
       templates: { path: 'templates', component: DocumentTemplatesPage }
     }
   },
-
   // Messaging & Notifications
   messaging: {
     path: '/messaging',
     component: MessagingPageV2,
     access: ROUTE_ACCESS.AUTHENTICATED
   },
-  
   notifications: {
     path: '/notifications',
     component: NotificationCenterV2,
     access: ROUTE_ACCESS.AUTHENTICATED
   },
-
   // Analytics Routes
   analytics: {
     base: '/analytics',
@@ -310,7 +279,6 @@ export const ROUTE_CONFIG = {
       beneficiaryDetail: { path: 'beneficiaries/:id', component: BeneficiaryAnalyticsPage }
     }
   },
-
   // Admin Routes (Super Admin and Tenant Admin only)
   admin: {
     base: '/admin',
@@ -330,7 +298,6 @@ export const ROUTE_CONFIG = {
       performanceMonitoring: { path: 'performance-monitoring', component: PerformanceMonitoringPage }
     }
   },
-
   // Reports Routes
   reports: {
     base: '/reports',
@@ -346,7 +313,6 @@ export const ROUTE_CONFIG = {
       scheduleEdit: { path: 'schedules/:id/edit', component: ReportSchedulePage }
     }
   },
-
   // Integrations Routes
   integrations: {
     base: '/integrations',
@@ -362,7 +328,6 @@ export const ROUTE_CONFIG = {
       zapier: { path: 'zapier', component: ZapierIntegrationPage }
     }
   },
-
   // Programs Routes
   programs: {
     base: '/programs',
@@ -376,7 +341,6 @@ export const ROUTE_CONFIG = {
       schedule: { path: ':id/schedule', component: ProgramSchedulePage }
     }
   },
-
   // AI Features Routes
   ai: {
     base: '/ai',
@@ -392,7 +356,6 @@ export const ROUTE_CONFIG = {
       nlp: { path: 'nlp', component: NaturalLanguageProcessingPage }
     }
   },
-
   // Compliance Routes
   compliance: {
     base: '/compliance',
@@ -405,7 +368,6 @@ export const ROUTE_CONFIG = {
       inputValidation: { path: 'input-validation', component: InputValidationPage, access: ROUTE_ACCESS.ADMIN_ONLY }
     }
   },
-
   // Student Portal Routes
   portal: {
     base: '/portal',
@@ -429,7 +391,6 @@ export const ROUTE_CONFIG = {
       results: { path: 'assessment/results/:assessmentId/:assignmentId', component: PortalAssessmentResultsPage }
     }
   },
-
   // Settings Routes
   settings: {
     base: '/settings',
@@ -440,7 +401,6 @@ export const ROUTE_CONFIG = {
       notifications: { path: 'notifications', component: NotificationPreferencesPageV2 }
     }
   },
-
   // Test Routes (for development)
   test: {
     base: '/test',
@@ -450,7 +410,6 @@ export const ROUTE_CONFIG = {
       notifications: { path: 'notifications', component: NotificationTestPage }
     }
   },
-
   // Debug Route (for development)
   debug: {
     path: '/debug',
@@ -458,13 +417,11 @@ export const ROUTE_CONFIG = {
     access: ROUTE_ACCESS.AUTHENTICATED
   }
 };
-
 /**
  * Helper function to flatten route configuration for React Router
  */
 export const getFlattenedRoutes = () => {
   const routes = [];
-  
   Object.entries(ROUTE_CONFIG).forEach(([key, config]) => {
     if (config.routes) {
       // Nested routes
@@ -486,8 +443,6 @@ export const getFlattenedRoutes = () => {
       });
     }
   });
-  
   return routes;
 };
-
 export default ROUTE_CONFIG;

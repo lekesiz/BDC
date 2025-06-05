@@ -15,6 +15,8 @@ from app.models.user import User
 from app.models.report import Report, ReportSchedule
 from app.models.tenant import Tenant
 
+from app.utils.logging import logger
+
 reports_bp = Blueprint('reports', __name__)
 
 # Demo data için değişkenler

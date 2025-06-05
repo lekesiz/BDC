@@ -15,7 +15,6 @@ import {
   Filler
 } from 'chart.js';
 import { Radar, Pie, Bar, Line } from 'react-chartjs-2';
-
 // Register ChartJS components
 ChartJS.register(
   RadialLinearScale,
@@ -30,7 +29,6 @@ ChartJS.register(
   Legend,
   Filler
 );
-
 const SkillIdentification = ({ noteId, beneficiaryId }) => {
   const [skillData, setSkillData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,11 +37,9 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
   const [timeRange, setTimeRange] = useState('last30days');
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
-
   useEffect(() => {
     fetchSkillData();
   }, [noteId, beneficiaryId, timeRange]);
-
   const fetchSkillData = async () => {
     try {
       setLoading(true);
@@ -53,7 +49,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
         timeRange,
         includeHistory: true
       });
-
       const response = await fetch(`/api/skills/analysis?${params}`);
       const data = await response.json();
       setSkillData(data);
@@ -63,17 +58,13 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       setLoading(false);
     }
   };
-
   const getSkillRadarData = () => {
     if (!skillData) return null;
-
     const categories = selectedCategory === 'all' 
       ? Object.keys(skillData.currentSkills)
       : [selectedCategory];
-
     const labels = [];
     const values = [];
-
     categories.forEach(category => {
       if (skillData.currentSkills[category]) {
         skillData.currentSkills[category].forEach(skill => {
@@ -82,7 +73,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
         });
       }
     });
-
     return {
       labels: labels.slice(0, 8), // Limit to 8 for readability
       datasets: [{
@@ -97,15 +87,12 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       }]
     };
   };
-
   const getSkillDistribution = () => {
     if (!skillData) return null;
-
     const distribution = {};
     Object.entries(skillData.currentSkills).forEach(([category, skills]) => {
       distribution[category] = skills.length;
     });
-
     return {
       labels: Object.keys(distribution).map(cat => 
         cat.replace('_', ' ').split(' ').map(word => 
@@ -130,10 +117,8 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       }]
     };
   };
-
   const getSkillTimeline = () => {
     if (!skillData?.skillHistory) return null;
-
     const skillGroups = {};
     skillData.skillHistory.forEach(entry => {
       const date = new Date(entry.date).toLocaleDateString();
@@ -147,10 +132,8 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
         skillGroups[date][skill.category]++;
       });
     });
-
     const dates = Object.keys(skillGroups).sort();
     const categories = ['technical_skills', 'soft_skills', 'cognitive_skills', 'subject_knowledge'];
-    
     const datasets = categories.map((category, index) => ({
       label: category.replace('_', ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
       data: dates.map(date => skillGroups[date][category] || 0),
@@ -168,13 +151,11 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       ][index],
       fill: true
     }));
-
     return {
       labels: dates,
       datasets
     };
   };
-
   const SkillCard = ({ skill, category }) => {
     const categoryColors = {
       technical_skills: 'blue',
@@ -182,10 +163,8 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       cognitive_skills: 'purple',
       subject_knowledge: 'yellow'
     };
-
     const color = categoryColors[category] || 'gray';
     const proficiency = skill.proficiency || 50;
-
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -200,11 +179,9 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
             {skill.confidence || 'Medium'}
           </span>
         </div>
-
         {skill.context && (
           <p className="text-sm text-gray-600 mb-3 line-clamp-2">{skill.context}</p>
         )}
-
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Proficiency</span>
@@ -217,7 +194,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
             />
           </div>
         </div>
-
         {skill.lastDemonstrated && (
           <p className="text-xs text-gray-500 mt-2">
             Last demonstrated: {new Date(skill.lastDemonstrated).toLocaleDateString()}
@@ -226,13 +202,10 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       </motion.div>
     );
   };
-
   const SkillComparisonChart = ({ skills }) => {
     if (!skills || skills.length === 0) return null;
-
     const sortedSkills = [...skills].sort((a, b) => (b.proficiency || 0) - (a.proficiency || 0));
     const topSkills = sortedSkills.slice(0, 10);
-
     const data = {
       labels: topSkills.map(s => s.skill),
       datasets: [{
@@ -255,7 +228,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
         borderWidth: 2
       }]
     };
-
     return (
       <Bar
         data={data}
@@ -289,16 +261,13 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       />
     );
   };
-
   const SkillDevelopmentPlan = ({ skill }) => {
     const plan = skillData?.developmentPlans?.[skill.skill] || {};
-
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           Development Plan: {skill.skill}
         </h3>
-        
         <div className="space-y-4">
           <div>
             <h4 className="font-medium text-gray-700 mb-2">Current Level</h4>
@@ -314,7 +283,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
               <span className="text-sm font-medium">{skill.proficiency || 50}%</span>
             </div>
           </div>
-
           <div>
             <h4 className="font-medium text-gray-700 mb-2">Target Level</h4>
             <div className="flex items-center space-x-4">
@@ -329,7 +297,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
               <span className="text-sm font-medium">{plan.targetLevel || 80}%</span>
             </div>
           </div>
-
           {plan.recommendations && plan.recommendations.length > 0 && (
             <div>
               <h4 className="font-medium text-gray-700 mb-2">Recommendations</h4>
@@ -343,7 +310,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
               </ul>
             </div>
           )}
-
           {plan.resources && plan.resources.length > 0 && (
             <div>
               <h4 className="font-medium text-gray-700 mb-2">Learning Resources</h4>
@@ -365,7 +331,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
               </div>
             </div>
           )}
-
           <div>
             <h4 className="font-medium text-gray-700 mb-2">Estimated Timeline</h4>
             <p className="text-sm text-gray-600">{plan.timeline || '4-6 weeks'}</p>
@@ -374,14 +339,11 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       </div>
     );
   };
-
   const SkillInsights = ({ insights }) => {
     if (!insights) return null;
-
     return (
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-md p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">AI Insights</h3>
-        
         <div className="space-y-4">
           {insights.strengths && insights.strengths.length > 0 && (
             <div>
@@ -395,7 +357,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
               </div>
             </div>
           )}
-
           {insights.emerging && insights.emerging.length > 0 && (
             <div>
               <h4 className="font-medium text-gray-700 mb-2">Emerging Skills</h4>
@@ -408,7 +369,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
               </div>
             </div>
           )}
-
           {insights.recommendations && insights.recommendations.length > 0 && (
             <div>
               <h4 className="font-medium text-gray-700 mb-2">Recommendations</h4>
@@ -424,7 +384,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
               </ul>
             </div>
           )}
-
           {insights.careerPaths && insights.careerPaths.length > 0 && (
             <div>
               <h4 className="font-medium text-gray-700 mb-2">Potential Career Paths</h4>
@@ -446,7 +405,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       </div>
     );
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -454,7 +412,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       </div>
     );
   }
-
   if (!skillData) {
     return (
       <div className="text-center py-8">
@@ -462,7 +419,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {/* Controls */}
@@ -483,7 +439,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
               <option value="comparison">Comparison</option>
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Category
@@ -500,7 +455,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
               <option value="subject_knowledge">Subject Knowledge</option>
             </select>
           </div>
-
           {viewMode === 'timeline' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -520,7 +474,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
             </div>
           )}
         </div>
-
         <button
           onClick={() => window.print()}
           className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
@@ -528,7 +481,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
           Export Report
         </button>
       </div>
-
       {/* Main Content */}
       <AnimatePresence mode="wait">
         {viewMode === 'overview' && (
@@ -558,7 +510,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
                 <p className="text-2xl font-bold text-purple-600">{skillData.topCategory}</p>
               </div>
             </div>
-
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg shadow-md p-6">
@@ -579,7 +530,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
                   />
                 </div>
               </div>
-
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Skill Distribution</h3>
                 <div className="h-80">
@@ -598,12 +548,10 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
                 </div>
               </div>
             </div>
-
             {/* AI Insights */}
             <SkillInsights insights={skillData.aiInsights} />
           </motion.div>
         )}
-
         {viewMode === 'detailed' && (
           <motion.div
             key="detailed"
@@ -630,7 +578,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
             ))}
           </motion.div>
         )}
-
         {viewMode === 'timeline' && (
           <motion.div
             key="timeline"
@@ -665,7 +612,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
                 />
               </div>
             </div>
-
             {/* Milestone Events */}
             {skillData.milestones && skillData.milestones.length > 0 && (
               <div className="bg-white rounded-lg shadow-md p-6">
@@ -708,7 +654,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
             )}
           </motion.div>
         )}
-
         {viewMode === 'comparison' && (
           <motion.div
             key="comparison"
@@ -725,7 +670,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
                 />
               </div>
             </div>
-
             {/* Skill Gap Analysis */}
             {skillData.skillGaps && skillData.skillGaps.length > 0 && (
               <div className="bg-white rounded-lg shadow-md p-6">
@@ -764,7 +708,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Selected Skill Modal */}
       <AnimatePresence>
         {selectedSkill && (
@@ -793,7 +736,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
                   </svg>
                 </button>
               </div>
-
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                   <h3 className="font-semibold text-gray-700 mb-3">Skill Details</h3>
@@ -822,10 +764,8 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
                     )}
                   </div>
                 </div>
-
                 <SkillDevelopmentPlan skill={selectedSkill} />
               </div>
-
               {/* Skill History */}
               {selectedSkill.history && selectedSkill.history.length > 0 && (
                 <div className="mt-6">
@@ -845,7 +785,6 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
                   </div>
                 </div>
               )}
-
               <div className="mt-6 flex justify-end space-x-4">
                 <button
                   onClick={() => setSelectedSkill(null)}
@@ -866,5 +805,4 @@ const SkillIdentification = ({ noteId, beneficiaryId }) => {
     </div>
   );
 };
-
 export default SkillIdentification;

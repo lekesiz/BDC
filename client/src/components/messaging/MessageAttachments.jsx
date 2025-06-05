@@ -6,21 +6,16 @@ import { Label } from '../ui/label';
 import { X, Upload, File, Image, FileText, Download, Eye } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
 import LoadingSpinner from '../ui/LoadingSpinner';
-
 const MessageAttachments = ({ onAttachmentsChange, existingAttachments = [] }) => {
   const [attachments, setAttachments] = useState(existingAttachments);
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
-
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files || []);
-    
     if (files.length === 0) return;
-
     // Check file size (max 10MB)
     const MAX_SIZE = 10 * 1024 * 1024; // 10MB
     const oversizedFiles = files.filter(file => file.size > MAX_SIZE);
-    
     if (oversizedFiles.length > 0) {
       toast({
         title: "File too large",
@@ -29,13 +24,10 @@ const MessageAttachments = ({ onAttachmentsChange, existingAttachments = [] }) =
       });
       return;
     }
-
     setUploading(true);
-
     try {
       // Simulate file upload
       await new Promise(resolve => setTimeout(resolve, 1000));
-
       const newAttachments = files.map(file => ({
         id: Date.now() + Math.random(),
         name: file.name,
@@ -44,14 +36,11 @@ const MessageAttachments = ({ onAttachmentsChange, existingAttachments = [] }) =
         url: URL.createObjectURL(file),
         uploadedAt: new Date().toISOString()
       }));
-
       const updatedAttachments = [...attachments, ...newAttachments];
       setAttachments(updatedAttachments);
-      
       if (onAttachmentsChange) {
         onAttachmentsChange(updatedAttachments);
       }
-
       toast({
         title: "Files uploaded",
         description: `${files.length} file(s) uploaded successfully.`
@@ -66,16 +55,13 @@ const MessageAttachments = ({ onAttachmentsChange, existingAttachments = [] }) =
       setUploading(false);
     }
   };
-
   const handleRemoveAttachment = (id) => {
     const updatedAttachments = attachments.filter(att => att.id !== id);
     setAttachments(updatedAttachments);
-    
     if (onAttachmentsChange) {
       onAttachmentsChange(updatedAttachments);
     }
   };
-
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -83,13 +69,11 @@ const MessageAttachments = ({ onAttachmentsChange, existingAttachments = [] }) =
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
-
   const getFileIcon = (type) => {
     if (type.startsWith('image/')) return <Image className="h-4 w-4" />;
     if (type.includes('pdf')) return <FileText className="h-4 w-4" />;
     return <File className="h-4 w-4" />;
   };
-
   return (
     <div className="space-y-4">
       <div>
@@ -125,7 +109,6 @@ const MessageAttachments = ({ onAttachmentsChange, existingAttachments = [] }) =
           </p>
         </div>
       </div>
-
       {attachments.length > 0 && (
         <div className="space-y-2">
           <Label>Attached Files ({attachments.length})</Label>
@@ -178,5 +161,4 @@ const MessageAttachments = ({ onAttachmentsChange, existingAttachments = [] }) =
     </div>
   );
 };
-
 export default MessageAttachments;

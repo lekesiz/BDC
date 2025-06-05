@@ -4,7 +4,6 @@ import {
   Search, Plus, Filter, Archive, Edit2, Copy, Upload, Download,
   Tag, Brain, ChevronRight, Trash2, FolderOpen, FileText
 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +23,6 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup } from '@/components/ui/radio-group';
-
 /**
  * TrainerQuestionBankPage manages a central repository of reusable questions
  */
@@ -33,14 +31,12 @@ const TrainerQuestionBankPage = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   // State for questions
   const [questions, setQuestions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedQuestions, setSelectedQuestions] = useState([]);
-  
   // Filters
   const [filters, setFilters] = useState({
     type: 'all',
@@ -48,13 +44,11 @@ const TrainerQuestionBankPage = () => {
     skills: [],
     tags: []
   });
-  
   // Dialogs
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
-  
   // Form state for new/edit question
   const [formData, setFormData] = useState({
     question: '',
@@ -69,40 +63,30 @@ const TrainerQuestionBankPage = () => {
     tags: [],
     skills: []
   });
-  
   // Load questions and categories
   useEffect(() => {
     let isMounted = true;
-    
     const fetchData = async () => {
       try {
         if (!isMounted) return;
-        
         setIsLoading(true);
         setError(null);
-        
         // Fetch questions
         const questionsResponse = await fetch('/api/assessment/questions');
         if (!isMounted) return;
-        
         if (!questionsResponse.ok) throw new Error('Failed to fetch questions');
         const questionsData = await questionsResponse.json();
-        
         if (!isMounted) return;
         setQuestions(questionsData);
-        
         // Fetch categories
         const categoriesResponse = await fetch('/api/assessment/categories');
         if (!isMounted) return;
-        
         if (!categoriesResponse.ok) throw new Error('Failed to fetch categories');
         const categoriesData = await categoriesResponse.json();
-        
         if (!isMounted) return;
         setCategories(categoriesData);
       } catch (err) {
         if (!isMounted) return;
-        
         console.error('Error fetching data:', err);
         setError(err.message);
         toast({
@@ -116,49 +100,39 @@ const TrainerQuestionBankPage = () => {
         }
       }
     };
-    
     fetchData();
-    
     return () => {
       isMounted = false;
     };
   }, [toast]);
-  
   // Filter questions
   const filteredQuestions = questions.filter(question => {
     // Category filter
     if (selectedCategory !== 'all' && question.category !== selectedCategory) {
       return false;
     }
-    
     // Search filter
     if (searchTerm && !question.question.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
-    
     // Type filter
     if (filters.type !== 'all' && question.type !== filters.type) {
       return false;
     }
-    
     // Difficulty filter
     if (filters.difficulty !== 'all' && question.difficulty !== filters.difficulty) {
       return false;
     }
-    
     // Skills filter
     if (filters.skills.length > 0 && !filters.skills.some(skill => question.skills?.includes(skill))) {
       return false;
     }
-    
     // Tags filter
     if (filters.tags.length > 0 && !filters.tags.some(tag => question.tags?.includes(tag))) {
       return false;
     }
-    
     return true;
   });
-  
   // Handle question selection
   const handleSelectQuestion = (questionId) => {
     setSelectedQuestions(prev => {
@@ -169,7 +143,6 @@ const TrainerQuestionBankPage = () => {
       }
     });
   };
-  
   // Handle select all
   const handleSelectAll = () => {
     if (selectedQuestions.length === filteredQuestions.length) {
@@ -178,7 +151,6 @@ const TrainerQuestionBankPage = () => {
       setSelectedQuestions(filteredQuestions.map(q => q.id));
     }
   };
-  
   // Add new question
   const handleAddQuestion = async () => {
     try {
@@ -191,7 +163,6 @@ const TrainerQuestionBankPage = () => {
         });
         return;
       }
-      
       if (!formData.category) {
         toast({
           title: 'Error',
@@ -200,13 +171,11 @@ const TrainerQuestionBankPage = () => {
         });
         return;
       }
-      
       // Prepare question data
       const questionData = {
         ...formData,
         created_at: new Date().toISOString()
       };
-      
       const response = await fetch('/api/assessment/questions', {
         method: 'POST',
         headers: {
@@ -214,18 +183,14 @@ const TrainerQuestionBankPage = () => {
         },
         body: JSON.stringify(questionData),
       });
-      
       if (!response.ok) throw new Error('Failed to add question');
-      
       const newQuestion = await response.json();
       setQuestions([...questions, newQuestion]);
-      
       toast({
         title: 'Success',
         description: 'Question added to bank',
         type: 'success',
       });
-      
       setShowAddDialog(false);
       resetForm();
     } catch (err) {
@@ -237,11 +202,9 @@ const TrainerQuestionBankPage = () => {
       });
     }
   };
-  
   // Update question
   const handleUpdateQuestion = async () => {
     if (!editingQuestion) return;
-    
     try {
       const response = await fetch(`/api/assessment/questions/${editingQuestion.id}`, {
         method: 'PUT',
@@ -250,18 +213,14 @@ const TrainerQuestionBankPage = () => {
         },
         body: JSON.stringify(formData),
       });
-      
       if (!response.ok) throw new Error('Failed to update question');
-      
       const updatedQuestion = await response.json();
       setQuestions(questions.map(q => q.id === editingQuestion.id ? updatedQuestion : q));
-      
       toast({
         title: 'Success',
         description: 'Question updated',
         type: 'success',
       });
-      
       setShowEditDialog(false);
       setEditingQuestion(null);
       resetForm();
@@ -274,11 +233,9 @@ const TrainerQuestionBankPage = () => {
       });
     }
   };
-  
   // Delete questions
   const handleDeleteQuestions = async () => {
     if (selectedQuestions.length === 0) return;
-    
     try {
       const response = await fetch('/api/assessment/questions/delete', {
         method: 'POST',
@@ -287,12 +244,9 @@ const TrainerQuestionBankPage = () => {
         },
         body: JSON.stringify({ ids: selectedQuestions }),
       });
-      
       if (!response.ok) throw new Error('Failed to delete questions');
-      
       setQuestions(questions.filter(q => !selectedQuestions.includes(q.id)));
       setSelectedQuestions([]);
-      
       toast({
         title: 'Success',
         description: `${selectedQuestions.length} questions deleted`,
@@ -307,19 +261,16 @@ const TrainerQuestionBankPage = () => {
       });
     }
   };
-  
   // Export questions
   const handleExportQuestions = () => {
     const questionsToExport = selectedQuestions.length > 0 
       ? questions.filter(q => selectedQuestions.includes(q.id))
       : filteredQuestions;
-    
     const exportData = {
       questions: questionsToExport,
       exportDate: new Date().toISOString(),
       count: questionsToExport.length
     };
-    
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -327,14 +278,12 @@ const TrainerQuestionBankPage = () => {
     a.download = `question-bank-export-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    
     toast({
       title: 'Success',
       description: `Exported ${questionsToExport.length} questions`,
       type: 'success',
     });
   };
-  
   // Start edit
   const startEdit = (question) => {
     setEditingQuestion(question);
@@ -353,7 +302,6 @@ const TrainerQuestionBankPage = () => {
     });
     setShowEditDialog(true);
   };
-  
   // Reset form
   const resetForm = () => {
     setFormData({
@@ -370,7 +318,6 @@ const TrainerQuestionBankPage = () => {
       skills: []
     });
   };
-  
   // Get difficulty color
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
@@ -384,7 +331,6 @@ const TrainerQuestionBankPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-  
   // Get type color
   const getTypeColor = (type) => {
     switch (type) {
@@ -400,7 +346,6 @@ const TrainerQuestionBankPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -408,7 +353,6 @@ const TrainerQuestionBankPage = () => {
       </div>
     );
   }
-  
   if (error) {
     return (
       <div className="container mx-auto py-6">
@@ -420,7 +364,6 @@ const TrainerQuestionBankPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -429,7 +372,6 @@ const TrainerQuestionBankPage = () => {
           <h1 className="text-2xl font-bold mb-2">Question Bank</h1>
           <p className="text-gray-600">Central repository of reusable assessment questions</p>
         </div>
-        
         <div className="mt-4 md:mt-0 flex gap-3">
           <Button
             variant="outline"
@@ -457,7 +399,6 @@ const TrainerQuestionBankPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card className="p-4">
@@ -469,7 +410,6 @@ const TrainerQuestionBankPage = () => {
             <FileText className="w-8 h-8 text-primary opacity-20" />
           </div>
         </Card>
-        
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -479,7 +419,6 @@ const TrainerQuestionBankPage = () => {
             <FolderOpen className="w-8 h-8 text-primary opacity-20" />
           </div>
         </Card>
-        
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -491,7 +430,6 @@ const TrainerQuestionBankPage = () => {
             <Brain className="w-8 h-8 text-primary opacity-20" />
           </div>
         </Card>
-        
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -502,7 +440,6 @@ const TrainerQuestionBankPage = () => {
           </div>
         </Card>
       </div>
-      
       {/* Filters and Search */}
       <Card className="p-4 mb-6">
         <div className="flex flex-wrap items-center gap-4">
@@ -522,7 +459,6 @@ const TrainerQuestionBankPage = () => {
               ))}
             </Select>
           </div>
-          
           {/* Search */}
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
@@ -535,7 +471,6 @@ const TrainerQuestionBankPage = () => {
               />
             </div>
           </div>
-          
           {/* Type Filter */}
           <Select
             value={filters.type}
@@ -548,7 +483,6 @@ const TrainerQuestionBankPage = () => {
             <Select.Option value="shortAnswer">Short Answer</Select.Option>
             <Select.Option value="matching">Matching</Select.Option>
           </Select>
-          
           {/* Difficulty Filter */}
           <Select
             value={filters.difficulty}
@@ -560,7 +494,6 @@ const TrainerQuestionBankPage = () => {
             <Select.Option value="medium">Medium</Select.Option>
             <Select.Option value="hard">Hard</Select.Option>
           </Select>
-          
           {/* Clear Filters */}
           <Button
             variant="ghost"
@@ -579,7 +512,6 @@ const TrainerQuestionBankPage = () => {
           </Button>
         </div>
       </Card>
-      
       {/* Actions Bar */}
       {selectedQuestions.length > 0 && (
         <Card className="p-4 mb-6 bg-blue-50">
@@ -613,7 +545,6 @@ const TrainerQuestionBankPage = () => {
           </div>
         </Card>
       )}
-      
       {/* Questions Table */}
       <Card className="p-0 overflow-hidden">
         <Table>
@@ -702,7 +633,6 @@ const TrainerQuestionBankPage = () => {
             ))}
           </Table.Body>
         </Table>
-        
         {filteredQuestions.length === 0 && (
           <div className="text-center py-12">
             <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -710,7 +640,6 @@ const TrainerQuestionBankPage = () => {
           </div>
         )}
       </Card>
-      
       {/* Add/Edit Question Dialog */}
       <Dialog open={showAddDialog || showEditDialog} onOpenChange={(open) => {
         if (!open) {
@@ -731,7 +660,6 @@ const TrainerQuestionBankPage = () => {
                 : 'Add a new question to the bank'}
             </DialogDescription>
           </DialogHeader>
-          
           <div className="space-y-4 py-4">
             {/* Question Text */}
             <div>
@@ -745,7 +673,6 @@ const TrainerQuestionBankPage = () => {
                 className="mt-1"
               />
             </div>
-            
             {/* Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -762,7 +689,6 @@ const TrainerQuestionBankPage = () => {
                   <Select.Option value="matching">Matching</Select.Option>
                 </Select>
               </div>
-              
               <div>
                 <Label htmlFor="category">Category *</Label>
                 <Select
@@ -779,7 +705,6 @@ const TrainerQuestionBankPage = () => {
                   ))}
                 </Select>
               </div>
-              
               <div>
                 <Label htmlFor="difficulty">Difficulty</Label>
                 <Select
@@ -794,7 +719,6 @@ const TrainerQuestionBankPage = () => {
                 </Select>
               </div>
             </div>
-            
             {/* Points */}
             <div>
               <Label htmlFor="points">Points</Label>
@@ -808,7 +732,6 @@ const TrainerQuestionBankPage = () => {
                 className="mt-1"
               />
             </div>
-            
             {/* Type-specific fields */}
             {formData.type === 'multipleChoice' && (
               <div>
@@ -836,7 +759,6 @@ const TrainerQuestionBankPage = () => {
                 </div>
               </div>
             )}
-            
             {formData.type === 'trueFalse' && (
               <div>
                 <Label>Correct Answer</Label>
@@ -856,7 +778,6 @@ const TrainerQuestionBankPage = () => {
                 </RadioGroup>
               </div>
             )}
-            
             {formData.type === 'shortAnswer' && (
               <div>
                 <Label htmlFor="correctAnswer">Correct Answer(s)</Label>
@@ -869,7 +790,6 @@ const TrainerQuestionBankPage = () => {
                 />
               </div>
             )}
-            
             {/* Explanation */}
             <div>
               <Label htmlFor="explanation">Explanation (Optional)</Label>
@@ -882,7 +802,6 @@ const TrainerQuestionBankPage = () => {
                 className="mt-1"
               />
             </div>
-            
             {/* Tags and Skills */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -898,7 +817,6 @@ const TrainerQuestionBankPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               <div>
                 <Label htmlFor="skills">Skills</Label>
                 <Input
@@ -914,7 +832,6 @@ const TrainerQuestionBankPage = () => {
               </div>
             </div>
           </div>
-          
           <DialogFooter>
             <Button variant="outline" onClick={() => {
               setShowAddDialog(false);
@@ -930,7 +847,6 @@ const TrainerQuestionBankPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
       {/* Import Dialog */}
       <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
         <DialogContent>
@@ -940,7 +856,6 @@ const TrainerQuestionBankPage = () => {
               Upload a JSON file containing questions to import
             </DialogDescription>
           </DialogHeader>
-          
           <div className="py-4">
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
               <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -963,7 +878,6 @@ const TrainerQuestionBankPage = () => {
                       try {
                         const data = JSON.parse(event.target.result);
                         // Process imported questions
-                        console.log('Imported questions:', data);
                         toast({
                           title: 'Success',
                           description: `Imported ${data.questions?.length || 0} questions`,
@@ -984,7 +898,6 @@ const TrainerQuestionBankPage = () => {
               />
             </div>
           </div>
-          
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowImportDialog(false)}>
               Cancel
@@ -995,5 +908,4 @@ const TrainerQuestionBankPage = () => {
     </div>
   );
 };
-
 export default TrainerQuestionBankPage;

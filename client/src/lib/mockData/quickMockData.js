@@ -2,7 +2,6 @@
  * Quick Mock Data for All Remaining Components
  * Comprehensive demo data for testing all pages
  */
-
 // Documents Mock Data
 export const mockDocuments = Array.from({ length: 30 }, (_, i) => ({
   id: i + 1,
@@ -26,7 +25,6 @@ export const mockDocuments = Array.from({ length: 30 }, (_, i) => ({
   isPublic: Math.random() > 0.7,
   tags: ['Önemli', 'Arşiv', 'Güncel'].filter(() => Math.random() > 0.7)
 }));
-
 // Programs Mock Data
 export const mockPrograms = Array.from({ length: 15 }, (_, i) => ({
   id: i + 1,
@@ -58,7 +56,6 @@ export const mockPrograms = Array.from({ length: 15 }, (_, i) => ({
     status: ['completed', 'active', 'upcoming'][Math.floor(Math.random() * 3)]
   }))
 }));
-
 // Calendar/Events Mock Data
 export const mockEvents = Array.from({ length: 20 }, (_, i) => ({
   id: i + 1,
@@ -76,7 +73,6 @@ export const mockEvents = Array.from({ length: 20 }, (_, i) => ({
   description: 'Etkinlik açıklaması buraya gelecek.',
   status: ['scheduled', 'ongoing', 'completed', 'cancelled'][Math.floor(Math.random() * 4)]
 }));
-
 // Messages Mock Data
 export const mockMessages = Array.from({ length: 25 }, (_, i) => ({
   id: i + 1,
@@ -100,7 +96,6 @@ export const mockMessages = Array.from({ length: 25 }, (_, i) => ({
   hasAttachment: Math.random() > 0.7,
   type: ['inbox', 'sent', 'draft'][Math.floor(Math.random() * 3)]
 }));
-
 // Notifications Mock Data
 export const mockNotifications = Array.from({ length: 15 }, (_, i) => ({
   id: i + 1,
@@ -116,7 +111,6 @@ export const mockNotifications = Array.from({ length: 15 }, (_, i) => ({
   actionUrl: Math.random() > 0.5 ? '/evaluations' : null,
   icon: ['📚', '✅', '⚠️', '📧', '📅'][Math.floor(Math.random() * 5)]
 }));
-
 // Analytics Mock Data
 export const mockAnalytics = {
   overview: {
@@ -141,7 +135,6 @@ export const mockAnalytics = {
     }))
   }
 };
-
 // Reports Mock Data
 export const mockReports = Array.from({ length: 10 }, (_, i) => ({
   id: i + 1,
@@ -161,7 +154,6 @@ export const mockReports = Array.from({ length: 10 }, (_, i) => ({
     metrics: ['Enrollment', 'Completion', 'Scores']
   }
 }));
-
 // Settings Mock Data
 export const mockSettings = {
   general: {
@@ -192,14 +184,12 @@ export const mockSettings = {
     sidebar: 'expanded'
   }
 };
-
 // Quick setup function for all mock APIs
 export const setupQuickMockAPIs = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const get = originalGet || api.get;
   const post = originalPost || api.post;
   const put = originalPut || api.put;
   const del = originalDelete || api.delete;
-
   // Documents API
   const originalGetMethod = api.get;
   api.get = function(url, config) {
@@ -210,7 +200,6 @@ export const setupQuickMockAPIs = (api, originalGet, originalPost, originalPut, 
         }, 300);
       });
     }
-    
     if (url.includes('/api/programs')) {
       return new Promise(resolve => {
         setTimeout(() => {
@@ -218,7 +207,6 @@ export const setupQuickMockAPIs = (api, originalGet, originalPost, originalPut, 
         }, 300);
       });
     }
-    
     if (url.includes('/api/calendar') || url.includes('/api/events')) {
       return new Promise(resolve => {
         setTimeout(() => {
@@ -226,7 +214,6 @@ export const setupQuickMockAPIs = (api, originalGet, originalPost, originalPut, 
         }, 300);
       });
     }
-    
     if (url.includes('/api/messages')) {
       return new Promise(resolve => {
         setTimeout(() => {
@@ -234,7 +221,6 @@ export const setupQuickMockAPIs = (api, originalGet, originalPost, originalPut, 
         }, 300);
       });
     }
-    
     if (url.includes('/api/notifications')) {
       return new Promise(resolve => {
         setTimeout(() => {
@@ -242,7 +228,6 @@ export const setupQuickMockAPIs = (api, originalGet, originalPost, originalPut, 
         }, 300);
       });
     }
-    
     if (url.includes('/api/analytics')) {
       return new Promise(resolve => {
         setTimeout(() => {
@@ -250,7 +235,6 @@ export const setupQuickMockAPIs = (api, originalGet, originalPost, originalPut, 
         }, 300);
       });
     }
-    
     if (url.includes('/api/reports')) {
       return new Promise(resolve => {
         setTimeout(() => {
@@ -258,7 +242,6 @@ export const setupQuickMockAPIs = (api, originalGet, originalPost, originalPut, 
         }, 300);
       });
     }
-    
     if (url.includes('/api/settings')) {
       return new Promise(resolve => {
         setTimeout(() => {
@@ -266,9 +249,6 @@ export const setupQuickMockAPIs = (api, originalGet, originalPost, originalPut, 
         }, 300);
       });
     }
-    
     return originalGetMethod.call(this, url, config);
   };
-  
-  console.log('🚀 Quick Mock APIs setup completed');
 };

@@ -121,7 +121,6 @@ export const generateAnalyticsData = (userRole) => {
       ]
     }
   };
-
   // Add role-specific analytics
   if (userRole === "trainer") {
     return {
@@ -160,7 +159,6 @@ export const generateAnalyticsData = (userRole) => {
       }
     };
   }
-
   if (userRole === "student") {
     return {
       ...baseAnalytics,
@@ -201,10 +199,8 @@ export const generateAnalyticsData = (userRole) => {
       }
     };
   }
-
   return baseAnalytics;
 };
-
 // Generate detailed analytics reports
 export const generateAnalyticsReports = () => {
   return [
@@ -253,7 +249,6 @@ export const generateAnalyticsReports = () => {
     }
   ];
 };
-
 // Generate analytics filters
 export const generateAnalyticsFilters = () => {
   return {
@@ -289,7 +284,6 @@ export const generateAnalyticsFilters = () => {
     ]
   };
 };
-
 // Generate real-time analytics data
 export const generateRealTimeAnalytics = () => {
   return {

@@ -1,25 +1,20 @@
 import React, { lazy, Suspense } from 'react';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
-
 /**
  * Bundle Optimizer - Utility components for code splitting and lazy loading
  */
-
 // Error boundary for lazy loaded components
 export class LazyBoundary extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false, error: null };
   }
-
   static getDerivedStateFromError(error) {
     return { hasError: true, error };
   }
-
   componentDidCatch(error, errorInfo) {
     console.error('Lazy loading error:', error, errorInfo);
   }
-
   render() {
     if (this.state.hasError) {
       return (
@@ -34,18 +29,15 @@ export class LazyBoundary extends React.Component {
         </div>
       );
     }
-
     return this.props.children;
   }
 }
-
 // Lazy load wrapper with retry logic
 export function lazyWithRetry(componentImport) {
   return lazy(async () => {
     const pageHasAlreadyBeenForceRefreshed = JSON.parse(
       window.sessionStorage.getItem('page-has-been-force-refreshed') || 'false'
     );
-
     try {
       const component = await componentImport();
       window.sessionStorage.setItem('page-has-been-force-refreshed', 'false');
@@ -59,19 +51,16 @@ export function lazyWithRetry(componentImport) {
     }
   });
 }
-
 // Preload component function
 export function preloadComponent(componentImport) {
   componentImport();
 }
-
 // Loading fallback component
 export const PageLoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen">
     <LoadingSpinner size="lg" />
   </div>
 );
-
 // Optimized lazy imports for all major routes
 export const LazyComponents = {
   // Auth pages
@@ -79,67 +68,52 @@ export const LazyComponents = {
   RegisterPage: lazyWithRetry(() => import('../../pages/auth/RegisterPage')),
   ForgotPasswordPage: lazyWithRetry(() => import('../../pages/auth/ForgotPasswordPage')),
   ResetPasswordPage: lazyWithRetry(() => import('../../pages/auth/ResetPasswordPage')),
-  
   // Dashboard pages
   DashboardPage: lazyWithRetry(() => import('../../pages/dashboard/DashboardPage')),
-  
   // Beneficiary pages
   BeneficiariesPage: lazyWithRetry(() => import('../../pages/beneficiaries/BeneficiariesPage')),
   BeneficiaryDetailPage: lazyWithRetry(() => import('../../pages/beneficiaries/BeneficiaryDetailPage')),
   BeneficiaryFormPage: lazyWithRetry(() => import('../../pages/beneficiaries/BeneficiaryFormPage')),
-  
   // Program pages
   ProgramsListPage: lazyWithRetry(() => import('../../pages/programs/ProgramsListPage')),
   ProgramDetailPage: lazyWithRetry(() => import('../../pages/programs/ProgramDetailPage')),
   CreateProgramPage: lazyWithRetry(() => import('../../pages/programs/CreateProgramPage')),
   EditProgramPage: lazyWithRetry(() => import('../../pages/programs/EditProgramPage')),
-  
   // Evaluation pages
   EvaluationsPage: lazyWithRetry(() => import('../../pages/evaluation/EvaluationsPage')),
   TestCreationPage: lazyWithRetry(() => import('../../pages/evaluation/TestCreationPage')),
   TestResultsPage: lazyWithRetry(() => import('../../pages/evaluation/TestResultsPage')),
-  
   // Document pages
   DocumentsPage: lazyWithRetry(() => import('../../pages/document/DocumentsPage')),
   DocumentUploadPage: lazyWithRetry(() => import('../../pages/document/DocumentUploadPage')),
   DocumentDetailPage: lazyWithRetry(() => import('../../pages/document/DocumentDetailPage')),
-  
   // Calendar pages
   CalendarPage: lazyWithRetry(() => import('../../pages/calendar/CalendarPage')),
-  
   // Messaging pages
   MessagingPage: lazyWithRetry(() => import('../../pages/messaging/MessagingPage')),
-  
   // Notification pages
   NotificationsPage: lazyWithRetry(() => import('../../pages/notifications/NotificationsPage')),
-  
   // Settings pages
   SettingsPage: lazyWithRetry(() => import('../../pages/settings/SettingsPage')),
-  
   // User pages
   UsersPage: lazyWithRetry(() => import('../../pages/users/UsersPage')),
   UserDetailPage: lazyWithRetry(() => import('../../pages/users/UserDetailPage')),
   UserFormPage: lazyWithRetry(() => import('../../pages/users/UserFormPage')),
-  
   // Profile pages
   ProfilePage: lazyWithRetry(() => import('../../pages/profile/ProfilePage')),
-  
   // Analytics pages
   AnalyticsDashboardPage: lazyWithRetry(() => import('../../pages/analytics/AnalyticsDashboardPage')),
   BeneficiaryAnalyticsPage: lazyWithRetry(() => import('../../pages/analytics/BeneficiaryAnalyticsPage')),
   ProgramAnalyticsPage: lazyWithRetry(() => import('../../pages/analytics/ProgramAnalyticsPage')),
-  
   // Reports pages
   ReportsDashboardPage: lazyWithRetry(() => import('../../pages/reports/ReportsDashboardPage')),
   ReportCreationPage: lazyWithRetry(() => import('../../pages/reports/ReportCreationPage')),
-  
   // Portal pages
   PortalDashboardPage: lazyWithRetry(() => import('../../pages/portal/PortalDashboardPage')),
   PortalCoursesPage: lazyWithRetry(() => import('../../pages/portal/PortalCoursesPage')),
   PortalProgressPage: lazyWithRetry(() => import('../../pages/portal/PortalProgressPage')),
   PortalResourcesPage: lazyWithRetry(() => import('../../pages/portal/PortalResourcesPage')),
 };
-
 // Route-based code splitting wrapper
 export const LazyRoute = ({ component: Component, ...props }) => (
   <LazyBoundary>
@@ -148,7 +122,6 @@ export const LazyRoute = ({ component: Component, ...props }) => (
     </Suspense>
   </LazyBoundary>
 );
-
 // Preload critical routes
 export const preloadCriticalRoutes = () => {
   // Preload dashboard and common pages
@@ -156,17 +129,14 @@ export const preloadCriticalRoutes = () => {
   preloadComponent(() => import('../../pages/beneficiaries/BeneficiariesPage'));
   preloadComponent(() => import('../../pages/programs/ProgramsListPage'));
 };
-
 // Resource hints for critical assets
 export const ResourceHints = () => (
   <>
     {/* Preconnect to API server */}
     <link rel="preconnect" href={import.meta.env.VITE_API_URL || 'http://localhost:5000'} />
-    
     {/* DNS prefetch for external resources */}
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-    
     {/* Preload critical fonts */}
     <link
       rel="preload"
@@ -177,7 +147,6 @@ export const ResourceHints = () => (
     />
   </>
 );
-
 // Performance observer for monitoring
 export const setupPerformanceObserver = () => {
   if ('PerformanceObserver' in window) {
@@ -198,7 +167,6 @@ export const setupPerformanceObserver = () => {
     } catch (e) {
       console.error('Failed to setup performance observer:', e);
     }
-
     // Monitor layout shifts
     try {
       const observer = new PerformanceObserver((list) => {
@@ -216,7 +184,6 @@ export const setupPerformanceObserver = () => {
     } catch (e) {
       console.error('Failed to setup CLS observer:', e);
     }
-
     // Monitor largest contentful paint
     try {
       const observer = new PerformanceObserver((list) => {
@@ -229,7 +196,6 @@ export const setupPerformanceObserver = () => {
     }
   }
 };
-
 // Export utility to measure component render time
 export const measureComponentPerformance = (componentName) => {
   if (process.env.NODE_ENV === 'development') {
@@ -237,7 +203,7 @@ export const measureComponentPerformance = (componentName) => {
       onRender: (id, phase, actualDuration, baseDuration, startTime, commitTime) => {
         // Performance timing for development
         if (process.env.NODE_ENV === 'development') {
-            console.log(`${componentName} (${phase}):`, {
+            :`, {
             actualDuration,
             baseDuration,
             startTime,

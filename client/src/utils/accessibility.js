@@ -1,7 +1,6 @@
 /**
  * Accessibility utility functions and helpers
  */
-
 /**
  * Trap focus within a container element
  * @param {HTMLElement} container - The container element to trap focus within
@@ -11,10 +10,8 @@ export function trapFocus(container) {
   const focusableElements = container.querySelectorAll(
     'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select, [tabindex]:not([tabindex="-1"])'
   );
-  
   const firstFocusableElement = focusableElements[0];
   const lastFocusableElement = focusableElements[focusableElements.length - 1];
-
   function handleKeyDown(e) {
     if (e.key === 'Tab') {
       if (e.shiftKey) {
@@ -32,20 +29,16 @@ export function trapFocus(container) {
       }
     }
   }
-
   container.addEventListener('keydown', handleKeyDown);
-  
   // Focus first element
   if (firstFocusableElement) {
     firstFocusableElement.focus();
   }
-
   // Return cleanup function
   return () => {
     container.removeEventListener('keydown', handleKeyDown);
   };
 }
-
 /**
  * Announce message to screen readers
  * @param {string} message - Message to announce
@@ -58,15 +51,12 @@ export function announceToScreenReader(message, priority = 'polite') {
   announcement.setAttribute('aria-atomic', 'true');
   announcement.classList.add('sr-only');
   announcement.textContent = message;
-  
   document.body.appendChild(announcement);
-  
   // Remove after announcement
   setTimeout(() => {
     document.body.removeChild(announcement);
   }, 1000);
 }
-
 /**
  * Generate unique ID for form elements
  * @param {string} prefix - Prefix for the ID
@@ -75,7 +65,6 @@ export function announceToScreenReader(message, priority = 'polite') {
 export function generateId(prefix = 'element') {
   return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
 }
-
 /**
  * Handle escape key for closing modals/dropdowns
  * @param {Function} onClose - Function to call when escape is pressed
@@ -87,21 +76,17 @@ export function handleEscapeKey(onClose) {
       onClose();
     }
   }
-  
   document.addEventListener('keydown', handleKeyDown);
-  
   return () => {
     document.removeEventListener('keydown', handleKeyDown);
   };
 }
-
 /**
  * Manage focus restoration after modal/dialog closes
  * @returns {Object} Object with saveFocus and restoreFocus methods
  */
 export function createFocusManager() {
   let previouslyFocusedElement = null;
-  
   return {
     saveFocus() {
       previouslyFocusedElement = document.activeElement;
@@ -113,7 +98,6 @@ export function createFocusManager() {
     }
   };
 }
-
 /**
  * Check if user prefers reduced motion
  * @returns {boolean} True if user prefers reduced motion
@@ -121,7 +105,6 @@ export function createFocusManager() {
 export function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
-
 /**
  * Add keyboard navigation to list items
  * @param {HTMLElement} container - Container element with list items
@@ -132,7 +115,6 @@ export function prefersReducedMotion() {
 export function addListKeyboardNavigation(container, itemSelector, onSelect) {
   const items = container.querySelectorAll(itemSelector);
   let currentIndex = -1;
-
   function handleKeyDown(e) {
     switch (e.key) {
       case 'ArrowDown':
@@ -164,7 +146,6 @@ export function addListKeyboardNavigation(container, itemSelector, onSelect) {
         break;
     }
   }
-
   function focusItem(index) {
     items.forEach((item, i) => {
       item.setAttribute('tabindex', i === index ? '0' : '-1');
@@ -173,19 +154,15 @@ export function addListKeyboardNavigation(container, itemSelector, onSelect) {
       }
     });
   }
-
   container.addEventListener('keydown', handleKeyDown);
-
   // Initialize first item as focusable
   if (items.length > 0) {
     items[0].setAttribute('tabindex', '0');
   }
-
   return () => {
     container.removeEventListener('keydown', handleKeyDown);
   };
 }
-
 /**
  * Debounce function for live regions
  * @param {Function} func - Function to debounce
@@ -203,7 +180,6 @@ export function debounceAnnouncement(func, wait = 500) {
     timeout = setTimeout(later, wait);
   };
 }
-
 /**
  * Create skip navigation link
  * @param {string} targetId - ID of the main content element
@@ -215,7 +191,6 @@ export function createSkipLink(targetId = 'main-content') {
   skipLink.className = 'skip-link';
   skipLink.textContent = 'Skip to main content';
   skipLink.setAttribute('aria-label', 'Skip to main content');
-  
   skipLink.addEventListener('click', (e) => {
     e.preventDefault();
     const target = document.getElementById(targetId);
@@ -224,10 +199,8 @@ export function createSkipLink(targetId = 'main-content') {
       target.scrollIntoView();
     }
   });
-  
   return skipLink;
 }
-
 /**
  * Format text for screen readers
  * @param {string} visualText - Text shown visually

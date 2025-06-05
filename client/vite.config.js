@@ -25,6 +25,11 @@ export default defineConfig(({ mode }) => ({
       ext: '.br',
     }),
   ],
+  server: {
+    // Serve service worker from public directory in development
+    middlewareMode: false,
+  },
+  publicDir: 'public',
   build: {
     target: 'es2015',
     cssCodeSplit: true,
@@ -140,7 +145,7 @@ export default defineConfig(({ mode }) => ({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:5001',
+        target: 'http://backend:5000',
         changeOrigin: true,
       },
     },

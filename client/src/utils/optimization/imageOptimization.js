@@ -1,9 +1,7 @@
 /**
  * Image optimization utilities
  */
-
 import React, { useState, useEffect } from 'react';
-
 /**
  * Image formats and quality settings
  */
@@ -26,7 +24,6 @@ export const imageFormats = {
     supported: true
   }
 };
-
 /**
  * Responsive image sizes
  */
@@ -38,7 +35,6 @@ export const imageSizes = {
   xlarge: { width: 1920, height: 1080 },
   xxlarge: { width: 2560, height: 1440 }
 };
-
 /**
  * Image optimization utilities
  */
@@ -54,13 +50,11 @@ export const imageOptimizationUtils = {
       })
       .join(', ');
   },
-
   /**
    * Generate picture element with multiple formats
    */
   generatePictureElement: (basePath, alt, sizes = ['small', 'medium', 'large']) => {
     const formats = ['avif', 'webp', 'jpg'];
-    
     return {
       sources: formats.slice(0, -1).map(format => ({
         type: `image/${format}`,
@@ -73,50 +67,40 @@ export const imageOptimizationUtils = {
       }
     };
   },
-
   /**
    * Calculate optimal image dimensions
    */
   calculateDimensions: (originalWidth, originalHeight, maxWidth, maxHeight) => {
     const aspectRatio = originalWidth / originalHeight;
-    
     let width = originalWidth;
     let height = originalHeight;
-    
     if (width > maxWidth) {
       width = maxWidth;
       height = width / aspectRatio;
     }
-    
     if (height > maxHeight) {
       height = maxHeight;
       width = height * aspectRatio;
     }
-    
     return {
       width: Math.round(width),
       height: Math.round(height)
     };
   },
-
   /**
    * Convert image to different format
    */
   convertImageFormat: async (file, targetFormat = 'webp', quality = 0.85) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
       reader.onload = (e) => {
         const img = new Image();
-        
         img.onload = () => {
           const canvas = document.createElement('canvas');
           canvas.width = img.width;
           canvas.height = img.height;
-          
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0);
-          
           canvas.toBlob(
             (blob) => {
               if (blob) {
@@ -131,26 +115,21 @@ export const imageOptimizationUtils = {
             quality
           );
         };
-        
         img.onerror = () => reject(new Error('Failed to load image'));
         img.src = e.target.result;
       };
-      
       reader.onerror = () => reject(new Error('Failed to read file'));
       reader.readAsDataURL(file);
     });
   },
-
   /**
    * Resize image
    */
   resizeImage: async (file, maxWidth, maxHeight, quality = 0.85) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
       reader.onload = (e) => {
         const img = new Image();
-        
         img.onload = () => {
           const dimensions = imageOptimizationUtils.calculateDimensions(
             img.width,
@@ -158,19 +137,14 @@ export const imageOptimizationUtils = {
             maxWidth,
             maxHeight
           );
-          
           const canvas = document.createElement('canvas');
           canvas.width = dimensions.width;
           canvas.height = dimensions.height;
-          
           const ctx = canvas.getContext('2d');
-          
           // Use better image scaling algorithm
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
-          
           ctx.drawImage(img, 0, 0, dimensions.width, dimensions.height);
-          
           canvas.toBlob(
             (blob) => {
               if (blob) {
@@ -183,16 +157,13 @@ export const imageOptimizationUtils = {
             quality
           );
         };
-        
         img.onerror = () => reject(new Error('Failed to load image'));
         img.src = e.target.result;
       };
-      
       reader.onerror = () => reject(new Error('Failed to read file'));
       reader.readAsDataURL(file);
     });
   },
-
   /**
    * Optimize image for web
    */
@@ -204,20 +175,16 @@ export const imageOptimizationUtils = {
       quality = 0.85,
       generateSizes = true
     } = options;
-    
     try {
       // Resize if needed
       let optimizedFile = file;
-      
       const img = new Image();
       const imageUrl = URL.createObjectURL(file);
-      
       await new Promise((resolve, reject) => {
         img.onload = resolve;
         img.onerror = reject;
         img.src = imageUrl;
       });
-      
       if (img.width > maxWidth || img.height > maxHeight) {
         optimizedFile = await imageOptimizationUtils.resizeImage(
           file,
@@ -226,7 +193,6 @@ export const imageOptimizationUtils = {
           quality
         );
       }
-      
       // Convert format if needed
       if (file.type !== `image/${targetFormat}` && imageFormats[targetFormat].supported) {
         optimizedFile = await imageOptimizationUtils.convertImageFormat(
@@ -235,33 +201,26 @@ export const imageOptimizationUtils = {
           quality
         );
       }
-      
       // Generate multiple sizes if requested
       if (generateSizes) {
         const sizes = await imageOptimizationUtils.generateResponsiveSizes(
           optimizedFile,
           ['thumbnail', 'small', 'medium', 'large']
         );
-        
         return { original: optimizedFile, sizes };
       }
-      
       URL.revokeObjectURL(imageUrl);
-      
       return optimizedFile;
-      
     } catch (error) {
       console.error('Image optimization failed:', error);
       return file; // Return original file if optimization fails
     }
   },
-
   /**
    * Generate responsive image sizes
    */
   generateResponsiveSizes: async (file, sizeNames = ['small', 'medium', 'large']) => {
     const sizes = {};
-    
     for (const sizeName of sizeNames) {
       const size = imageSizes[sizeName];
       if (size) {
@@ -276,20 +235,16 @@ export const imageOptimizationUtils = {
         }
       }
     }
-    
     return sizes;
   },
-
   /**
    * Extract image metadata
    */
   extractMetadata: async (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
-      
       reader.onload = (e) => {
         const img = new Image();
-        
         img.onload = () => {
           resolve({
             width: img.width,
@@ -300,17 +255,14 @@ export const imageOptimizationUtils = {
             name: file.name
           });
         };
-        
         img.onerror = () => resolve(null);
         img.src = e.target.result;
       };
-      
       reader.onerror = () => resolve(null);
       reader.readAsDataURL(file);
     });
   }
 };
-
 /**
  * Optimized image component
  */
@@ -330,24 +282,19 @@ export const OptimizedImage = ({
   const [currentSrc, setCurrentSrc] = useState(placeholder || src);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-
   useEffect(() => {
     const img = new Image();
-    
     img.onload = () => {
       setCurrentSrc(src);
       setIsLoaded(true);
       onLoad && onLoad();
     };
-    
     img.onerror = () => {
       setHasError(true);
       onError && onError();
     };
-    
     img.src = src;
   }, [src, onLoad, onError]);
-
   const imgProps = {
     src: currentSrc,
     alt,
@@ -362,7 +309,6 @@ export const OptimizedImage = ({
       transition: 'filter 0.3s ease-in-out'
     }
   };
-
   if (hasError) {
     return (
       <div 
@@ -382,12 +328,10 @@ export const OptimizedImage = ({
       </div>
     );
   }
-
   // Use picture element for better format support
   const formats = ['avif', 'webp'];
   const basePath = src.replace(/\.[^/.]+$/, '');
   const extension = src.split('.').pop();
-
   return (
     <picture>
       {formats.map(format => (
@@ -403,7 +347,6 @@ export const OptimizedImage = ({
     </picture>
   );
 };
-
 /**
  * Image upload optimizer
  */
@@ -418,20 +361,17 @@ export const ImageUploadOptimizer = ({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = React.useRef(null);
-
   const handleFile = async (file) => {
     // Validate file type
     if (!acceptedFormats.includes(file.type)) {
       console.error('Invalid file type');
       return;
     }
-
     // Validate file size
     if (file.size > maxFileSize) {
       console.error('File size exceeds limit');
       return;
     }
-
     try {
       const optimizedFile = await imageOptimizationUtils.optimizeForWeb(file, {
         maxWidth,
@@ -439,38 +379,30 @@ export const ImageUploadOptimizer = ({
         targetFormat,
         quality
       });
-
       const metadata = await imageOptimizationUtils.extractMetadata(optimizedFile);
-      
       onUpload(optimizedFile, metadata);
     } catch (error) {
       console.error('Failed to optimize image:', error);
       onUpload(file); // Upload original if optimization fails
     }
   };
-
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-
     const files = Array.from(e.dataTransfer.files);
     files.forEach(handleFile);
   };
-
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
   };
-
   const handleDragLeave = () => {
     setIsDragging(false);
   };
-
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     files.forEach(handleFile);
   };
-
   return (
     <div
       onDrop={handleDrop}
@@ -494,11 +426,9 @@ export const ImageUploadOptimizer = ({
         onChange={handleFileSelect}
         style={{ display: 'none' }}
       />
-      
       <p>
         {isDragging ? 'Drop images here' : 'Drag & drop images or click to upload'}
       </p>
-      
       <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
         Max size: {maxFileSize / (1024 * 1024)}MB | 
         Formats: {acceptedFormats.map(f => f.split('/')[1]).join(', ')}
@@ -506,7 +436,6 @@ export const ImageUploadOptimizer = ({
     </div>
   );
 };
-
 /**
  * Image performance monitor
  */
@@ -518,34 +447,27 @@ export const imagePerformanceMonitor = {
     totalSize: 0,
     formatBreakdown: {}
   },
-
   trackImageLoad: (src, loadTime, size, format) => {
     imagePerformanceMonitor.metrics.imagesLoaded++;
     imagePerformanceMonitor.metrics.totalLoadTime += loadTime;
     imagePerformanceMonitor.metrics.totalSize += size;
-    
     if (!imagePerformanceMonitor.metrics.formatBreakdown[format]) {
       imagePerformanceMonitor.metrics.formatBreakdown[format] = 0;
     }
     imagePerformanceMonitor.metrics.formatBreakdown[format]++;
   },
-
   trackImageError: (src) => {
     imagePerformanceMonitor.metrics.imagesFailed++;
   },
-
   getMetrics: () => imagePerformanceMonitor.metrics,
-
   getAverageLoadTime: () => {
     const { imagesLoaded, totalLoadTime } = imagePerformanceMonitor.metrics;
     return imagesLoaded > 0 ? totalLoadTime / imagesLoaded : 0;
   },
-
   getAverageSize: () => {
     const { imagesLoaded, totalSize } = imagePerformanceMonitor.metrics;
     return imagesLoaded > 0 ? totalSize / imagesLoaded : 0;
   },
-
   reset: () => {
     imagePerformanceMonitor.metrics = {
       imagesLoaded: 0,
@@ -556,7 +478,6 @@ export const imagePerformanceMonitor = {
     };
   }
 };
-
 export default {
   imageFormats,
   imageSizes,

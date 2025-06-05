@@ -1,7 +1,6 @@
 /**
  * Enhanced route renderer with centralized protection and lazy loading
  */
-
 import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -12,46 +11,35 @@ import RoleBasedRedirect from '../common/RoleBasedRedirect';
 import DashboardLayout from '../layout/DashboardLayout';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import LazyWrapper from '../common/LazyWrapper';
-
 // Auth pages (not lazy-loaded for faster auth flow)
 import LoginPage from '../../pages/auth/LoginPage';
 import RegisterPage from '../../pages/auth/RegisterPage';
 import ForgotPasswordPage from '../../pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from '../../pages/auth/ResetPasswordPage';
 import SimpleLoginPage from '../../pages/auth/SimpleLoginPage';
-
-// Test pages
-import TestLogin from '../../TestLogin';
-import TestAuth from '../../TestAuth';
-
+// Test pages - removed for production build
 /**
  * Component that renders a protected route with role checking
  */
 const ProtectedRouteWrapper = ({ route }) => {
   const { user } = useAuth();
-  
   // Check if user can access this route
   const canAccess = canAccessRoute(user?.role, route.access);
-  
   if (!canAccess) {
     return <Navigate to="/unauthorized" replace />;
   }
-  
   const Component = route.component;
-  
   return (
     <LazyWrapper>
       <Component />
     </LazyWrapper>
   );
 };
-
 /**
  * Main route renderer component
  */
 const RouteRenderer = () => {
   const { isLoading } = useAuth();
-  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -59,23 +47,17 @@ const RouteRenderer = () => {
       </div>
     );
   }
-  
   // Get all flattened routes from configuration
   const routes = getFlattenedRoutes();
-  
   return (
     <Routes>
-      {/* Test routes */}
-      <Route path="/test-login" element={<TestLogin />} />
-      <Route path="/test-auth" element={<TestAuth />} />
+      {/* Test routes - removed for production build */}
       <Route path="/simple-login" element={<SimpleLoginPage />} />
-      
       {/* Public auth routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
-      
       {/* Protected routes within dashboard layout */}
       <Route
         path="/"
@@ -90,7 +72,6 @@ const RouteRenderer = () => {
         {/* Dashboard root with role-based redirection */}
         <Route index element={<RoleBasedRedirect />} />
         <Route path="dashboard" element={<Navigate to="/" replace />} />
-        
         {/* Dynamically render all configured routes */}
         {routes.map((route) => (
           <Route
@@ -100,7 +81,6 @@ const RouteRenderer = () => {
           />
         ))}
       </Route>
-      
       {/* Error routes */}
       <Route 
         path="/unauthorized" 
@@ -119,7 +99,6 @@ const RouteRenderer = () => {
           </div>
         } 
       />
-      
       <Route 
         path="*" 
         element={
@@ -140,5 +119,4 @@ const RouteRenderer = () => {
     </Routes>
   );
 };
-
 export default RouteRenderer;

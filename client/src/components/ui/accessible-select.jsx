@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { generateId } from '@/utils/accessibility';
-
 /**
  * Accessible Select component with proper ARIA attributes and keyboard navigation
  * 
@@ -33,24 +32,19 @@ export const AccessibleSelect = React.forwardRef(({
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTimeout, setSearchTimeout] = useState(null);
-  
   const buttonRef = useRef(null);
   const listRef = useRef(null);
   const optionRefs = useRef([]);
-  
   const id = props.id || generateId('select');
   const labelId = `${id}-label`;
   const listboxId = `${id}-listbox`;
   const errorId = error ? `${id}-error` : undefined;
-  
   const selectedOption = options.find(opt => opt.value === value);
   const selectedIndex = options.findIndex(opt => opt.value === value);
-  
   // Filter options based on search
   const filteredOptions = options.filter(option => 
     option.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -64,20 +58,17 @@ export const AccessibleSelect = React.forwardRef(({
         setSearchQuery('');
       }
     };
-    
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [isOpen]);
-  
   // Focus management
   useEffect(() => {
     if (isOpen && focusedIndex >= 0 && optionRefs.current[focusedIndex]) {
       optionRefs.current[focusedIndex].focus();
     }
   }, [focusedIndex, isOpen]);
-  
   // Keyboard navigation
   const handleKeyDown = (event) => {
     if (!isOpen && (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Enter' || event.key === ' ')) {
@@ -86,9 +77,7 @@ export const AccessibleSelect = React.forwardRef(({
       setFocusedIndex(selectedIndex >= 0 ? selectedIndex : 0);
       return;
     }
-    
     if (!isOpen) return;
-    
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
@@ -96,22 +85,18 @@ export const AccessibleSelect = React.forwardRef(({
           prev < filteredOptions.length - 1 ? prev + 1 : prev
         );
         break;
-        
       case 'ArrowUp':
         event.preventDefault();
         setFocusedIndex(prev => prev > 0 ? prev - 1 : prev);
         break;
-        
       case 'Home':
         event.preventDefault();
         setFocusedIndex(0);
         break;
-        
       case 'End':
         event.preventDefault();
         setFocusedIndex(filteredOptions.length - 1);
         break;
-        
       case 'Enter':
       case ' ':
         event.preventDefault();
@@ -119,42 +104,35 @@ export const AccessibleSelect = React.forwardRef(({
           selectOption(filteredOptions[focusedIndex]);
         }
         break;
-        
       case 'Escape':
         event.preventDefault();
         setIsOpen(false);
         setSearchQuery('');
         buttonRef.current?.focus();
         break;
-        
       case 'Tab':
         setIsOpen(false);
         setSearchQuery('');
         break;
-        
       default:
         // Type-ahead search
         if (event.key.length === 1) {
           clearTimeout(searchTimeout);
           const newQuery = searchQuery + event.key;
           setSearchQuery(newQuery);
-          
           // Find first matching option
           const matchIndex = options.findIndex(opt => 
             opt.label.toLowerCase().startsWith(newQuery.toLowerCase())
           );
-          
           if (matchIndex >= 0) {
             setFocusedIndex(matchIndex);
           }
-          
           // Clear search after delay
           const timeout = setTimeout(() => setSearchQuery(''), 1000);
           setSearchTimeout(timeout);
         }
     }
   };
-  
   const selectOption = (option) => {
     if (!option.disabled) {
       onValueChange(option.value);
@@ -163,7 +141,6 @@ export const AccessibleSelect = React.forwardRef(({
       buttonRef.current?.focus();
     }
   };
-  
   const toggleOpen = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
@@ -174,7 +151,6 @@ export const AccessibleSelect = React.forwardRef(({
       }
     }
   };
-  
   return (
     <div className="w-full space-y-2">
       {label && (
@@ -190,7 +166,6 @@ export const AccessibleSelect = React.forwardRef(({
           {required && <span className="text-red-500 ml-1" aria-label="required">*</span>}
         </label>
       )}
-      
       <div className="relative" ref={ref}>
         <button
           ref={buttonRef}
@@ -228,7 +203,6 @@ export const AccessibleSelect = React.forwardRef(({
             aria-hidden="true"
           />
         </button>
-        
         {isOpen && (
           <ul
             ref={listRef}
@@ -275,13 +249,11 @@ export const AccessibleSelect = React.forwardRef(({
           </ul>
         )}
       </div>
-      
       {error && (
         <p id={errorId} className="text-sm text-red-500 mt-1" role="alert">
           {error}
         </p>
       )}
-      
       {/* Screen reader only live region for search */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {searchQuery && `Searching for ${searchQuery}`}
@@ -289,7 +261,5 @@ export const AccessibleSelect = React.forwardRef(({
     </div>
   );
 });
-
 AccessibleSelect.displayName = "AccessibleSelect";
-
 export default AccessibleSelect;

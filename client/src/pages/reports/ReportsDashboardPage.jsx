@@ -23,7 +23,6 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
 import { mockReports } from './mockReportsData';
-
 /**
  * ReportsDashboardPage provides a central hub for accessing and generating reports
  */
@@ -38,13 +37,11 @@ const ReportsDashboardPage = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [reportType, setReportType] = useState('all');
-  
   // Fetch report data
   useEffect(() => {
     const fetchReportData = async () => {
       try {
         setIsLoading(true);
-        
         // Use mock data for development
         if (process.env.NODE_ENV === 'development') {
           setRecentReports(mockReports.recent);
@@ -57,7 +54,6 @@ const ReportsDashboardPage = () => {
             api.get('/api/reports/saved'),
             api.get('/api/reports/scheduled')
           ]);
-          
           setRecentReports(recentResponse.data);
           setSavedReports(savedResponse.data);
           setScheduledReports(scheduledResponse.data);
@@ -73,10 +69,8 @@ const ReportsDashboardPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchReportData();
   }, [toast]);
-  
   // Filter reports based on search term and report type
   const filteredRecentReports = recentReports.filter(report => {
     const matchesSearch = report.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -84,14 +78,12 @@ const ReportsDashboardPage = () => {
     const matchesType = reportType === 'all' || report.type === reportType;
     return matchesSearch && matchesType;
   });
-  
   const filteredSavedReports = savedReports.filter(report => {
     const matchesSearch = report.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          (report.description && report.description.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesType = reportType === 'all' || report.type === reportType;
     return matchesSearch && matchesType;
   });
-  
   // Handle report download
   const handleDownloadReport = async (reportId, format = 'pdf') => {
     try {
@@ -99,7 +91,6 @@ const ReportsDashboardPage = () => {
         params: { format },
         responseType: 'blob'
       });
-      
       // Create a URL for the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -108,7 +99,6 @@ const ReportsDashboardPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      
       toast({
         title: 'Success',
         description: `Report downloaded successfully as ${format.toUpperCase()}`,
@@ -123,7 +113,6 @@ const ReportsDashboardPage = () => {
       });
     }
   };
-  
   // Handle report type icon
   const getReportTypeIcon = (type) => {
     switch(type) {
@@ -141,7 +130,6 @@ const ReportsDashboardPage = () => {
         return <FileText className="w-5 h-5 text-gray-500" />;
     }
   };
-  
   // Format date for display
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -151,7 +139,6 @@ const ReportsDashboardPage = () => {
       day: 'numeric' 
     });
   };
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -159,12 +146,10 @@ const ReportsDashboardPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Reports Dashboard</h1>
-        
         <div className="flex space-x-2">
           <div className="relative">
             <Button
@@ -176,7 +161,6 @@ const ReportsDashboardPage = () => {
               Filter
               <ChevronDown className="w-4 h-4 ml-2" />
             </Button>
-            
             {filterOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-10 border p-4">
                 <h3 className="text-sm font-medium mb-2">Report Type</h3>
@@ -260,7 +244,6 @@ const ReportsDashboardPage = () => {
                     </label>
                   </div>
                 </div>
-                
                 <div className="flex justify-end mt-4">
                   <Button
                     variant="default"
@@ -273,7 +256,6 @@ const ReportsDashboardPage = () => {
               </div>
             )}
           </div>
-          
           <Button
             variant="default"
             onClick={() => navigate('/reports/create')}
@@ -284,7 +266,6 @@ const ReportsDashboardPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Search Bar */}
       <div className="mb-6 flex">
         <div className="relative flex-1">
@@ -297,7 +278,6 @@ const ReportsDashboardPage = () => {
           />
         </div>
       </div>
-      
       {/* Report Type Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-6">
         <Card 
@@ -311,7 +291,6 @@ const ReportsDashboardPage = () => {
             <h3 className="font-medium">All Reports</h3>
           </div>
         </Card>
-        
         <Card 
           className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${reportType === 'beneficiary' ? 'border-primary border-2' : ''}`}
           onClick={() => setReportType('beneficiary')}
@@ -323,7 +302,6 @@ const ReportsDashboardPage = () => {
             <h3 className="font-medium">Beneficiary</h3>
           </div>
         </Card>
-        
         <Card 
           className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${reportType === 'program' ? 'border-primary border-2' : ''}`}
           onClick={() => setReportType('program')}
@@ -335,7 +313,6 @@ const ReportsDashboardPage = () => {
             <h3 className="font-medium">Program</h3>
           </div>
         </Card>
-        
         <Card 
           className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${reportType === 'trainer' ? 'border-primary border-2' : ''}`}
           onClick={() => setReportType('trainer')}
@@ -347,7 +324,6 @@ const ReportsDashboardPage = () => {
             <h3 className="font-medium">Trainer</h3>
           </div>
         </Card>
-        
         <Card 
           className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${reportType === 'analytics' ? 'border-primary border-2' : ''}`}
           onClick={() => setReportType('analytics')}
@@ -360,7 +336,6 @@ const ReportsDashboardPage = () => {
           </div>
         </Card>
       </div>
-      
       {/* Recent Reports */}
       <h2 className="text-xl font-semibold mb-4">Recent Reports</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -379,7 +354,6 @@ const ReportsDashboardPage = () => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="mt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Generated</span>
@@ -391,7 +365,6 @@ const ReportsDashboardPage = () => {
                   </div>
                 </div>
               </div>
-              
               <div className="bg-gray-50 px-5 py-3 flex justify-between items-center">
                 <Button
                   variant="ghost"
@@ -400,7 +373,6 @@ const ReportsDashboardPage = () => {
                 >
                   View
                 </Button>
-                
                 <div className="relative">
                   <Button
                     variant="ghost"
@@ -412,7 +384,6 @@ const ReportsDashboardPage = () => {
                     Download
                     <ChevronDown className="w-3 h-3 ml-1" />
                   </Button>
-                  
                   <div className="absolute right-0 bottom-full mb-1 w-32 bg-white rounded-md shadow-lg z-10 border p-1 hidden group-hover:block">
                     <button
                       className="block w-full text-left px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded"
@@ -447,7 +418,6 @@ const ReportsDashboardPage = () => {
           </div>
         )}
       </div>
-      
       {/* Saved Reports */}
       <h2 className="text-xl font-semibold mb-4">Saved Reports</h2>
       <div className="overflow-x-auto">
@@ -544,7 +514,6 @@ const ReportsDashboardPage = () => {
           </tbody>
         </table>
       </div>
-      
       {/* Scheduled Reports */}
       <h2 className="text-xl font-semibold mt-8 mb-4">Scheduled Reports</h2>
       <Card className="p-6">
@@ -622,7 +591,6 @@ const ReportsDashboardPage = () => {
             </tbody>
           </table>
         </div>
-        
         {scheduledReports.length > 0 && (
           <div className="mt-4 flex justify-end">
             <Button
@@ -637,5 +605,4 @@ const ReportsDashboardPage = () => {
     </div>
   );
 };
-
 export default ReportsDashboardPage;

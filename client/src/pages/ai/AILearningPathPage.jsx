@@ -17,13 +17,31 @@ import {
   RotateCcw,
   Download,
   Share2,
-  BookOpen
+  BookOpen,
+  Lock
 } from 'lucide-react';
-
 const AILearningPathPage = () => {
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
   const { toast } = useToast();
-  
+  // AI Learning Path is restricted to admin and trainer roles only
+  const canAccessLearningPath = hasRole(['super_admin', 'tenant_admin', 'trainer']);
+  // If user doesn't have permission, show access denied
+  if (!canAccessLearningPath) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="p-8 text-center max-w-md">
+          <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h2>
+          <p className="text-gray-600 mb-4">
+            AI Learning Path Optimization is only available to administrators and trainers.
+          </p>
+          <p className="text-sm text-gray-500">
+            Current role: <span className="font-medium">{user?.role}</span>
+          </p>
+        </Card>
+      </div>
+    );
+  }
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [learningPaths, setLearningPaths] = useState([]);
@@ -36,7 +54,6 @@ const AILearningPathPage = () => {
     focus_areas: [],
     learning_style: 'balanced'
   });
-
   const focusAreas = [
     'technical_skills',
     'soft_skills',
@@ -47,7 +64,6 @@ const AILearningPathPage = () => {
     'time_management',
     'teamwork'
   ];
-
   const learningStyles = [
     { value: 'visual', label: 'Visual Learning' },
     { value: 'auditory', label: 'Auditory Learning' },
@@ -55,12 +71,10 @@ const AILearningPathPage = () => {
     { value: 'reading', label: 'Reading/Writing' },
     { value: 'balanced', label: 'Balanced Approach' }
   ];
-
   useEffect(() => {
     fetchBeneficiaries();
     fetchLearningPaths();
   }, []);
-
   const fetchBeneficiaries = async () => {
     try {
       const res = await fetch('/api/beneficiaries', {
@@ -68,16 +82,13 @@ const AILearningPathPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch beneficiaries');
-
       const data = await res.json();
       setBeneficiaries(data);
     } catch (error) {
       console.error('Error fetching beneficiaries:', error);
     }
   };
-
   const fetchLearningPaths = async () => {
     try {
       const res = await fetch('/api/ai/learning-paths', {
@@ -85,9 +96,7 @@ const AILearningPathPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch learning paths');
-
       const data = await res.json();
       setLearningPaths(data);
     } catch (error) {
@@ -101,8 +110,16 @@ const AILearningPathPage = () => {
       setLoading(false);
     }
   };
-
   const handleGeneratePath = async () => {
+    // Additional permission check for path generation
+    if (!hasRole(['super_admin', 'tenant_admin', 'trainer'])) {
+      toast({
+        title: 'Access Denied',
+        description: 'Learning path generation is restricted to administrators and trainers only',
+        variant: 'destructive'
+      });
+      return;
+    }
     if (!selectedBeneficiary) {
       toast({
         title: 'Error',
@@ -111,7 +128,6 @@ const AILearningPathPage = () => {
       });
       return;
     }
-
     setGenerating(true);
     try {
       const res = await fetch('/api/ai/learning-paths/generate', {
@@ -125,13 +141,10 @@ const AILearningPathPage = () => {
           settings: pathSettings
         })
       });
-
       if (!res.ok) throw new Error('Failed to generate learning path');
-
       const data = await res.json();
       setSelectedPath(data);
       fetchLearningPaths();
-
       toast({
         title: 'Success',
         description: 'Learning path generated successfully'
@@ -147,8 +160,16 @@ const AILearningPathPage = () => {
       setGenerating(false);
     }
   };
-
   const handleStartPath = async (pathId) => {
+    // Additional permission check for starting paths
+    if (!hasRole(['super_admin', 'tenant_admin', 'trainer'])) {
+      toast({
+        title: 'Access Denied',
+        description: 'Starting learning paths is restricted to administrators and trainers only',
+        variant: 'destructive'
+      });
+      return;
+    }
     try {
       const res = await fetch(`/api/ai/learning-paths/${pathId}/start`, {
         method: 'POST',
@@ -156,14 +177,11 @@ const AILearningPathPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to start learning path');
-
       toast({
         title: 'Success',
         description: 'Learning path started'
       });
-
       fetchLearningPaths();
     } catch (error) {
       console.error('Error starting path:', error);
@@ -174,17 +192,23 @@ const AILearningPathPage = () => {
       });
     }
   };
-
   const handleExportPath = async (pathId) => {
+    // Additional permission check for export functionality
+    if (!hasRole(['super_admin', 'tenant_admin', 'trainer'])) {
+      toast({
+        title: 'Access Denied',
+        description: 'Export functionality is restricted to administrators and trainers only',
+        variant: 'destructive'
+      });
+      return;
+    }
     try {
       const res = await fetch(`/api/ai/learning-paths/${pathId}/export`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to export path');
-
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -203,7 +227,6 @@ const AILearningPathPage = () => {
       });
     }
   };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed':
@@ -218,7 +241,6 @@ const AILearningPathPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
       case 'easy':
@@ -231,7 +253,6 @@ const AILearningPathPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -239,7 +260,6 @@ const AILearningPathPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -248,11 +268,9 @@ const AILearningPathPage = () => {
           <h1 className="text-2xl font-bold text-gray-900">AI Learning Path Optimization</h1>
         </div>
       </div>
-
       {/* Generate New Path */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Generate New Learning Path</h2>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -271,7 +289,6 @@ const AILearningPathPage = () => {
               ))}
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Duration
@@ -287,7 +304,6 @@ const AILearningPathPage = () => {
               <option value="1_year">1 Year</option>
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Intensity
@@ -302,7 +318,6 @@ const AILearningPathPage = () => {
               <option value="intensive">Intensive (10+ hrs/week)</option>
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Learning Style
@@ -320,7 +335,6 @@ const AILearningPathPage = () => {
             </select>
           </div>
         </div>
-
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Focus Areas
@@ -353,7 +367,6 @@ const AILearningPathPage = () => {
             ))}
           </div>
         </div>
-
         <Button
           onClick={handleGeneratePath}
           disabled={generating || !selectedBeneficiary}
@@ -372,7 +385,6 @@ const AILearningPathPage = () => {
           )}
         </Button>
       </Card>
-
       {/* Selected Path Details */}
       {selectedPath && (
         <Card className="p-6">
@@ -382,23 +394,26 @@ const AILearningPathPage = () => {
               <p className="text-sm text-gray-600">{selectedPath.description}</p>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleExportPath(selectedPath.id)}
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => handleStartPath(selectedPath.id)}
-              >
-                <Play className="h-4 w-4 mr-1" />
-                Start Path
-              </Button>
+              {hasRole(['super_admin', 'tenant_admin', 'trainer']) && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleExportPath(selectedPath.id)}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => handleStartPath(selectedPath.id)}
+                  >
+                    <Play className="h-4 w-4 mr-1" />
+                    Start Path
+                  </Button>
+                </>
+              )}
             </div>
           </div>
-
           {/* Learning Milestones */}
           <div className="space-y-4">
             <h3 className="font-medium text-gray-900">Learning Milestones</h3>
@@ -421,7 +436,6 @@ const AILearningPathPage = () => {
                       <div className="absolute top-10 left-1/2 w-0.5 h-16 bg-gray-300 -translate-x-1/2" />
                     )}
                   </div>
-                  
                   <div className="flex-1">
                     <div className="bg-gray-50 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
@@ -431,7 +445,6 @@ const AILearningPathPage = () => {
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 mb-3">{milestone.description}</p>
-                      
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <div className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
@@ -445,7 +458,6 @@ const AILearningPathPage = () => {
                           {milestone.difficulty}
                         </Badge>
                       </div>
-                      
                       {milestone.resources && milestone.resources.length > 0 && (
                         <div className="mt-3 pt-3 border-t">
                           <p className="text-sm font-medium text-gray-700 mb-2">Resources:</p>
@@ -473,11 +485,9 @@ const AILearningPathPage = () => {
           </div>
         </Card>
       )}
-
       {/* Existing Learning Paths */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Active Learning Paths</h2>
-        
         {learningPaths.length === 0 ? (
           <div className="text-center py-8">
             <Map className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -502,9 +512,7 @@ const AILearningPathPage = () => {
                         {path.beneficiary_name}
                       </Badge>
                     </div>
-                    
                     <p className="text-sm text-gray-600 mb-3">{path.description}</p>
-                    
                     {/* Progress Bar */}
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
@@ -512,13 +520,11 @@ const AILearningPathPage = () => {
                         style={{ width: `${path.progress}%` }}
                       />
                     </div>
-                    
                     <div className="flex items-center justify-between mt-3">
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>{path.completed_milestones}/{path.total_milestones} milestones</span>
                         <span>{path.duration}</span>
                       </div>
-                      
                       <div className="flex items-center gap-2">
                         {path.status === 'in_progress' && (
                           <Button
@@ -557,7 +563,6 @@ const AILearningPathPage = () => {
                       </div>
                     </div>
                   </div>
-                  
                   <ChevronRight className="h-5 w-5 text-gray-400 ml-4" />
                 </div>
               </div>
@@ -568,5 +573,4 @@ const AILearningPathPage = () => {
     </div>
   );
 };
-
 export default AILearningPathPage;

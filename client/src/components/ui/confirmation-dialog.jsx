@@ -1,7 +1,6 @@
 import { AlertCircle, X } from 'lucide-react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from './modal';
 import { Button } from './button';
-
 /**
  * ConfirmationDialog component for showing confirmations with cancel/confirm options
  * 
@@ -38,7 +37,6 @@ const ConfirmationDialog = ({
           <X className="h-5 w-5" />
         </button>
       </div>
-
       <ModalBody className="pt-2 pb-4">
         {isDanger && (
           <div className="flex items-center text-amber-500 mb-2">
@@ -48,7 +46,6 @@ const ConfirmationDialog = ({
         )}
         <p className="text-sm text-gray-500">{description}</p>
       </ModalBody>
-
       <ModalFooter>
         <Button variant="outline" onClick={onClose}>
           {cancelText}
@@ -66,5 +63,4 @@ const ConfirmationDialog = ({
     </Modal>
   );
 };
-
 export default ConfirmationDialog;

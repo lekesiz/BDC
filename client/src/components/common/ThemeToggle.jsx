@@ -1,11 +1,9 @@
 import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { motion } from 'framer-motion';
-
 const ThemeToggle = ({ className }) => {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
-
   return (
     <motion.button
       onClick={toggleTheme}
@@ -34,5 +32,4 @@ const ThemeToggle = ({ className }) => {
     </motion.button>
   );
 };
-
 export default ThemeToggle;

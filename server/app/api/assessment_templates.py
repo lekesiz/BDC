@@ -6,6 +6,8 @@ from app.extensions import db
 from app.models.user import User
 from app.models.assessment import AssessmentTemplate, AssessmentSection, AssessmentQuestion
 from app.schemas.assessment import (
+
+from app.utils.logging import logger
     AssessmentTemplateSchema,
     AssessmentTemplateCreateSchema,
     AssessmentTemplateUpdateSchema

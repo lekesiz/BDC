@@ -4,11 +4,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Select } from '../../components/ui/select';
-
 const ZapierIntegrationPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isConnected, setIsConnected] = useState(false);
-  
   const tabs = [
     { id: 'overview', name: 'Overview', icon: <FaBolt /> },
     { id: 'connect', name: 'Connection', icon: <FaPlug /> },
@@ -18,14 +16,12 @@ const ZapierIntegrationPage = () => {
     { id: 'history', name: 'History', icon: <FaClock /> },
     { id: 'analytics', name: 'Analytics', icon: <FaChartBar /> },
   ];
-
   // Zapier connection state
   const [zapierAuth, setZapierAuth] = useState({
     apiKey: '',
     accountEmail: '',
     webhookUrl: ''
   });
-
   // Active Zaps
   const [activeZaps, setActiveZaps] = useState([
     {
@@ -59,7 +55,6 @@ const ZapierIntegrationPage = () => {
       app: 'Google Calendar'
     }
   ]);
-
   // Available triggers
   const availableTriggers = [
     { event: 'beneficiary.created', name: 'New Beneficiary', description: 'Triggered when a new beneficiary is created' },
@@ -73,7 +68,6 @@ const ZapierIntegrationPage = () => {
     { event: 'email.sent', name: 'Email Sent', description: 'Triggered when an email is sent' },
     { event: 'sms.sent', name: 'SMS Sent', description: 'Triggered when an SMS is sent' }
   ];
-
   // Available actions
   const availableActions = [
     { action: 'create_beneficiary', name: 'Create Beneficiary', description: 'Create a new beneficiary' },
@@ -87,7 +81,6 @@ const ZapierIntegrationPage = () => {
     { action: 'update_contact', name: 'Update Contact', description: 'Update contact information' },
     { action: 'create_subscription', name: 'Create Subscription', description: 'Create a new subscription' }
   ];
-
   // Zap history
   const [zapHistory] = useState([
     {
@@ -115,7 +108,6 @@ const ZapierIntegrationPage = () => {
       error: 'Google Calendar authentication expired'
     }
   ]);
-
   // Analytics data
   const analytics = {
     totalZaps: 12,
@@ -127,7 +119,6 @@ const ZapierIntegrationPage = () => {
     mostUsedAction: 'Create contact in CRM',
     topApps: ['Salesforce', 'Gmail', 'Google Calendar', 'Slack', 'Mailchimp']
   };
-
   const renderOverview = () => (
     <div>
       <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
@@ -158,7 +149,6 @@ const ZapierIntegrationPage = () => {
           </ul>
         </div>
       </div>
-
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <h3 className="text-lg font-semibold mb-4">Usage Statistics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -182,11 +172,9 @@ const ZapierIntegrationPage = () => {
       </div>
     </div>
   );
-
   const renderConnect = () => (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <h3 className="text-lg font-semibold mb-4">Connect to Zapier</h3>
-      
       {!isConnected ? (
         <div>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -198,7 +186,6 @@ const ZapierIntegrationPage = () => {
               <li>Paste the API key below to establish connection</li>
             </ol>
           </div>
-
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">Zapier API Key</label>
@@ -209,7 +196,6 @@ const ZapierIntegrationPage = () => {
                 placeholder="Enter your Zapier API key"
               />
             </div>
-            
             <div>
               <label className="block text-sm font-medium mb-1">Account Email</label>
               <Input
@@ -219,7 +205,6 @@ const ZapierIntegrationPage = () => {
                 placeholder="email@example.com"
               />
             </div>
-            
             <div>
               <label className="block text-sm font-medium mb-1">Webhook URL</label>
               <Input
@@ -229,7 +214,6 @@ const ZapierIntegrationPage = () => {
                 placeholder="https://hooks.zapier.com/..."
               />
             </div>
-
             <Button
               onClick={() => setIsConnected(true)}
               className="bg-primary text-white"
@@ -249,7 +233,6 @@ const ZapierIntegrationPage = () => {
               </div>
             </div>
           </div>
-
           <div className="space-y-4">
             <div className="p-4 border rounded-lg">
               <h4 className="font-medium mb-2">Connection Details</h4>
@@ -259,7 +242,6 @@ const ZapierIntegrationPage = () => {
                 <p>Last Connected: {new Date().toLocaleDateString()}</p>
               </div>
             </div>
-
             <Button
               onClick={() => setIsConnected(false)}
               variant="destructive"
@@ -271,7 +253,6 @@ const ZapierIntegrationPage = () => {
       )}
     </div>
   );
-
   const renderZaps = () => (
     <div>
       <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
@@ -281,7 +262,6 @@ const ZapierIntegrationPage = () => {
             Create Zap
           </Button>
         </div>
-
         <div className="space-y-4">
           {activeZaps.map(zap => (
             <div key={zap.id} className="border rounded-lg p-4">
@@ -322,7 +302,6 @@ const ZapierIntegrationPage = () => {
           ))}
         </div>
       </div>
-
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <h3 className="text-lg font-semibold mb-4">Popular Templates</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -354,14 +333,12 @@ const ZapierIntegrationPage = () => {
       </div>
     </div>
   );
-
   const renderTriggers = () => (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <h3 className="text-lg font-semibold mb-4">Available Triggers</h3>
       <p className="text-gray-600 mb-6">
         Triggers allow you to start your Zaps based on events in your CRM.
       </p>
-
       <div className="space-y-4">
         {availableTriggers.map((trigger, index) => (
           <div key={index} className="border rounded-lg p-4 hover:border-primary">
@@ -382,14 +359,12 @@ const ZapierIntegrationPage = () => {
       </div>
     </div>
   );
-
   const renderActions = () => (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <h3 className="text-lg font-semibold mb-4">Available Actions</h3>
       <p className="text-gray-600 mb-6">
         Actions allow your Zaps to perform operations in your CRM.
       </p>
-
       <div className="space-y-4">
         {availableActions.map((action, index) => (
           <div key={index} className="border rounded-lg p-4 hover:border-primary">
@@ -410,11 +385,9 @@ const ZapierIntegrationPage = () => {
       </div>
     </div>
   );
-
   const renderHistory = () => (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <h3 className="text-lg font-semibold mb-4">Execution History</h3>
-      
       <div className="space-y-3">
         {zapHistory.map(entry => (
           <div key={entry.id} className="border rounded-lg p-4">
@@ -446,7 +419,6 @@ const ZapierIntegrationPage = () => {
           </div>
         ))}
       </div>
-
       <div className="mt-4 flex justify-center">
         <Button variant="outline">
           Load More
@@ -454,12 +426,10 @@ const ZapierIntegrationPage = () => {
       </div>
     </div>
   );
-
   const renderAnalytics = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <h3 className="text-lg font-semibold mb-4">Performance Analytics</h3>
-        
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="text-center">
             <div className="text-2xl font-bold text-primary">{analytics.totalRuns}</div>
@@ -478,7 +448,6 @@ const ZapierIntegrationPage = () => {
             <div className="text-sm text-gray-600">Active Zaps</div>
           </div>
         </div>
-
         <div className="border-t pt-4">
           <h4 className="font-medium mb-3">Usage by Trigger</h4>
           <div className="space-y-2">
@@ -512,7 +481,6 @@ const ZapierIntegrationPage = () => {
           </div>
         </div>
       </div>
-
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <h3 className="text-lg font-semibold mb-4">Most Used Apps</h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -528,7 +496,6 @@ const ZapierIntegrationPage = () => {
       </div>
     </div>
   );
-
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -546,7 +513,6 @@ const ZapierIntegrationPage = () => {
           </Button>
         </div>
       </div>
-
       <div className="flex space-x-1 mb-6 border-b">
         {tabs.map(tab => (
           <button
@@ -563,7 +529,6 @@ const ZapierIntegrationPage = () => {
           </button>
         ))}
       </div>
-
       <div>
         {activeTab === 'overview' && renderOverview()}
         {activeTab === 'connect' && renderConnect()}
@@ -576,5 +541,4 @@ const ZapierIntegrationPage = () => {
     </div>
   );
 };
-
 export default ZapierIntegrationPage;

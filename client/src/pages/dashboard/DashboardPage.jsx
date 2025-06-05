@@ -18,424 +18,485 @@ import {
   BookOpen,
   TrendingUp,
   Award,
-  Loader
+  Loader2,
+  UserCheck,
+  Target,
+  GraduationCap
 } from 'lucide-react';
-
-/**
- * Dashboard page component - shows different content based on user role
- */
-const DashboardPage = () => {
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  AreaChart,
+  Area
+} from 'recharts';
+const DashboardPageV3 = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState({});
+  const [chartData, setChartData] = useState({});
   const [recentTests, setRecentTests] = useState([]);
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [recentReports, setRecentReports] = useState([]);
-  const [programs, setPrograms] = useState([]);
-  const [activities, setActivities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
+  const [timeRange, setTimeRange] = useState('7days');
   // Fetch dashboard data
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
-        setError(null);
-        
-        // Get dashboard analytics
-        const analyticsResponse = await api.get(API_ENDPOINTS.ANALYTICS.DASHBOARD);
-        const statistics = analyticsResponse.data.statistics || {};
-        
-        // Map backend response to frontend format
-        const mappedStats = {
-          totalBeneficiaries: statistics.total_beneficiaries || statistics.assigned_beneficiaries || 0,
-          activeEvaluations: statistics.total_evaluations || statistics.completed_evaluations || 0,
-          documentsGenerated: statistics.documents_generated || 0,
-          upcomingAppointments: statistics.upcoming_sessions || statistics.upcoming_appointments || 0,
-          completedEvaluations: statistics.completed_evaluations || 0,
-          ...statistics
-        };
-        
-        setStats(mappedStats);
-        
+        // Get dashboard analytics with time range
+        const analyticsResponse = await api.get(API_ENDPOINTS.ANALYTICS.DASHBOARD, {
+          params: { range: timeRange }
+        });
+        const data = analyticsResponse.data;
+        setStats(data.statistics || {});
+        setChartData(data.charts || {});
         // Get recent reports
-        const reportsResponse = await api.get(API_ENDPOINTS.REPORTS.RECENT);
-        setRecentReports(reportsResponse.data || []);
-        
-        // Get upcoming appointments
-        const appointmentsResponse = await api.get('/api/calendar/events', {
-          params: {
-            start: new Date().toISOString().split('T')[0],
-            end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-          }
-        });
-        setUpcomingAppointments(appointmentsResponse.data.events || []);
-        
-        // Get programs for students
-        if (user?.role === 'student' || user?.role === 'trainee') {
-          const programsResponse = await api.get('/api/programs');
-          setPrograms(programsResponse.data || []);
+        try {
+          const reportsResponse = await api.get(API_ENDPOINTS.REPORTS.RECENT);
+          setRecentReports(reportsResponse.data.reports || []);
+        } catch (error) {
+          console.error('Error fetching reports:', error);
         }
-        
+        // Get upcoming appointments
+        try {
+          const appointmentsResponse = await api.get('/api/appointments', {
+            params: {
+              start_date: new Date().toISOString().split('T')[0],
+              end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+              status: 'scheduled'
+            }
+          });
+          setUpcomingAppointments(appointmentsResponse.data.appointments || []);
+        } catch (error) {
+          console.error('Error fetching appointments:', error);
+        }
         // Get recent tests
-        const testsResponse = await api.get('/api/tests', {
-          params: { per_page: 4 }
-        });
-        setRecentTests(testsResponse.data.tests || []);
-        
+        try {
+          const testsResponse = await api.get('/api/tests/sessions', {
+            params: { 
+              per_page: 5,
+              sort: 'created_at',
+              order: 'desc'
+            }
+          });
+          setRecentTests(testsResponse.data.sessions || []);
+        } catch (error) {
+          console.error('Error fetching tests:', error);
+        }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        setError('Error fetching dashboard data. Please try again later.');
       } finally {
         setIsLoading(false);
       }
     };
-    
     fetchDashboardData();
-  }, [user]);
-  
-  // Render different dashboard based on user role
+  }, [user, timeRange]);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  // Render different content based on role
+  if (user?.role === 'super_admin' || user?.role === 'tenant_admin') {
+    return <AdminDashboard stats={stats} chartData={chartData} timeRange={timeRange} setTimeRange={setTimeRange} />;
+  } else if (user?.role === 'trainer') {
+    return <TrainerDashboard stats={stats} chartData={chartData} recentTests={recentTests} upcomingAppointments={upcomingAppointments} />;
+  } else {
+    return <StudentDashboard stats={stats} recentTests={recentTests} upcomingAppointments={upcomingAppointments} />;
+  }
+};
+// Admin Dashboard Component
+const AdminDashboard = ({ stats, chartData, timeRange, setTimeRange }) => {
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  return (
+    <div className="space-y-6">
+      {/* Page header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            System overview and analytics
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setTimeRange('7days')}
+            variant={timeRange === '7days' ? 'primary' : 'secondary'}
+            size="sm"
+          >
+            7 Days
+          </Button>
+          <Button
+            onClick={() => setTimeRange('30days')}
+            variant={timeRange === '30days' ? 'primary' : 'secondary'}
+            size="sm"
+          >
+            30 Days
+          </Button>
+          <Button
+            onClick={() => setTimeRange('90days')}
+            variant={timeRange === '90days' ? 'primary' : 'secondary'}
+            size="sm"
+          >
+            90 Days
+          </Button>
+        </div>
+      </div>
+      {/* Stats cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatsCard
+          title="Total Users"
+          value={stats.total_users || 0}
+          change={stats.recent_activity?.new_users_week || 0}
+          changeText="new this week"
+          icon={<Users className="w-6 h-6" />}
+          color="bg-blue-500"
+        />
+        <StatsCard
+          title="Total Beneficiaries"
+          value={stats.total_beneficiaries || 0}
+          change={stats.recent_activity?.new_beneficiaries_week || 0}
+          changeText="new this week"
+          icon={<GraduationCap className="w-6 h-6" />}
+          color="bg-green-500"
+        />
+        <StatsCard
+          title="Active Trainers"
+          value={stats.total_trainers || 0}
+          icon={<UserCheck className="w-6 h-6" />}
+          color="bg-purple-500"
+        />
+        <StatsCard
+          title="Evaluations"
+          value={stats.total_evaluations || 0}
+          change={stats.recent_activity?.evaluations_completed_week || 0}
+          changeText="completed this week"
+          icon={<ClipboardList className="w-6 h-6" />}
+          color="bg-orange-500"
+        />
+      </div>
+      {/* Charts */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* User Growth Chart */}
+        <Card className="p-6">
+          <h3 className="text-lg font-medium mb-4">User Growth</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData.user_growth || []}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="count" stroke="#8884d8" name="New Users" />
+            </LineChart>
+          </ResponsiveContainer>
+        </Card>
+        {/* Evaluation Completion Chart */}
+        <Card className="p-6">
+          <h3 className="text-lg font-medium mb-4">Evaluation Completions</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={chartData.evaluation_completion || []}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Area type="monotone" dataKey="count" stroke="#82ca9d" fill="#82ca9d" name="Completed" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </Card>
+      </div>
+      {/* Role Distribution */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card className="p-6">
+          <h3 className="text-lg font-medium mb-4">User Role Distribution</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie
+                data={[
+                  { name: 'Students', value: stats.student_count || 0 },
+                  { name: 'Trainers', value: stats.total_trainers || 0 },
+                  { name: 'Admins', value: stats.admin_count || 0 }
+                ]}
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {COLORS.map((color, index) => (
+                  <Cell key={`cell-${index}`} fill={color} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </Card>
+        {/* Recent Activity */}
+        <Card className="p-6 col-span-2">
+          <h3 className="text-lg font-medium mb-4">Recent Activity</h3>
+          <div className="space-y-4">
+            <ActivityItem
+              title="New Users"
+              count={stats.recent_activity?.new_users_week || 0}
+              description="registered this week"
+              icon={<Users className="w-5 h-5" />}
+              trend="up"
+            />
+            <ActivityItem
+              title="New Beneficiaries"
+              count={stats.recent_activity?.new_beneficiaries_week || 0}
+              description="enrolled this week"
+              icon={<GraduationCap className="w-5 h-5" />}
+              trend="up"
+            />
+            <ActivityItem
+              title="Evaluations Completed"
+              count={stats.recent_activity?.evaluations_completed_week || 0}
+              description="finished this week"
+              icon={<CheckCircle2 className="w-5 h-5" />}
+              trend="up"
+            />
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+};
+// Trainer Dashboard Component
+const TrainerDashboard = ({ stats, chartData, recentTests, upcomingAppointments }) => {
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Trainer Dashboard</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Welcome back, {user?.first_name}! Here's what's happening today.
+          Manage your beneficiaries and track progress
         </p>
       </div>
-      
-      {/* Loading state */}
-      {isLoading && (
-        <div className="flex justify-center items-center p-10">
-          <Loader className="animate-spin h-10 w-10 text-primary" />
-          <span className="ml-2">Loading dashboard data...</span>
-        </div>
-      )}
-      
-      {/* Error state */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4 mt-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{error}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Main content - only show when not loading and no error */}
-      {!isLoading && !error && (
-        <>
-          {/* Stats cards */}
-          {(user?.role === 'super_admin' || user?.role === 'tenant_admin' || user?.role === 'trainer') && (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            title="Beneficiaries"
-            value={stats.totalBeneficiaries}
-            icon={<Users className="w-6 h-6" />}
-            linkTo="/beneficiaries"
-          />
-          <StatsCard
-            title="Active Evaluations"
-            value={stats.activeEvaluations}
-            icon={<ClipboardList className="w-6 h-6" />}
-            linkTo="/evaluations"
-          />
-          <StatsCard
-            title="Documents Generated"
-            value={stats.documentsGenerated}
-            icon={<FileText className="w-6 h-6" />}
-            linkTo="/documents"
-          />
-          <StatsCard
-            title="Upcoming Appointments"
-            value={stats.upcomingAppointments}
-            icon={<Calendar className="w-6 h-6" />}
-            linkTo="/appointments"
-          />
-        </div>
-      )}
-      
-      {/* Student-specific stats */}
-      {user?.role === 'student' && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <StatsCard
-            title="Active Evaluations"
-            value={stats.activeEvaluations}
-            icon={<ClipboardList className="w-6 h-6" />}
-            linkTo="/my-evaluations"
-          />
-          <StatsCard
-            title="Completed Evaluations"
-            value={stats.completedEvaluations}
-            icon={<CheckCircle2 className="w-6 h-6" />}
-            linkTo="/my-evaluations?status=completed"
-          />
-          <StatsCard
-            title="Upcoming Appointments"
-            value={stats.upcomingAppointments}
-            icon={<Calendar className="w-6 h-6" />}
-            linkTo="/my-appointments"
-          />
-        </div>
-      )}
-      
-      {/* Main content area */}
+      {/* Stats cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatsCard
+          title="Assigned Beneficiaries"
+          value={stats.assigned_beneficiaries || 0}
+          icon={<Users className="w-6 h-6" />}
+          color="bg-blue-500"
+        />
+        <StatsCard
+          title="Total Sessions"
+          value={stats.total_sessions || 0}
+          icon={<Calendar className="w-6 h-6" />}
+          color="bg-green-500"
+        />
+        <StatsCard
+          title="Completed Evaluations"
+          value={stats.completed_evaluations || 0}
+          icon={<CheckCircle2 className="w-6 h-6" />}
+          color="bg-purple-500"
+        />
+        <StatsCard
+          title="Upcoming Sessions"
+          value={stats.upcoming_sessions || 0}
+          icon={<Clock className="w-6 h-6" />}
+          color="bg-orange-500"
+        />
+      </div>
+      {/* Session Activity Chart */}
+      <Card className="p-6">
+        <h3 className="text-lg font-medium mb-4">Session Activity</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData.session_completion || []}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="count" fill="#8884d8" name="Completed Sessions" />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+      {/* Recent Evaluations and Appointments */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Recent tests/evaluations */}
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-            <h3 className="text-lg font-medium text-gray-900">Recent Evaluations</h3>
-            <Link
-              to={user?.role === 'student' ? '/my-evaluations' : '/evaluations'}
-              className="text-sm font-medium text-primary hover:text-primary-dark flex items-center"
-            >
-              View all
-              <ArrowRight className="ml-1 w-4 h-4" />
-            </Link>
-          </div>
-          <div className="border-t border-gray-200 divide-y divide-gray-200">
-            {recentTests.length > 0 ? (
-              (recentTests || []).map((test) => (
-                <div key={test.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <Link 
-                      to={`/evaluations/${test.id}`}
-                      className="text-sm font-medium text-primary hover:text-primary-dark truncate"
-                    >
-                      {test.title}
-                    </Link>
-                    <div className="ml-2 flex-shrink-0 flex">
-                      <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${test.status === 'completed' 
-                          ? 'bg-green-100 text-green-800' 
-                          : test.status === 'in_progress' 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : 'bg-yellow-100 text-yellow-800'}`}
-                      >
-                        {test.status === 'completed' 
-                          ? 'Completed' 
-                          : test.status === 'in_progress' 
-                            ? 'In Progress' 
-                            : 'Pending'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-2 sm:flex sm:justify-between">
-                    <div className="sm:flex">
-                      <p className="flex items-center text-sm text-gray-500">
-                        {test.status === 'completed' ? (
-                          <>
-                            <Activity className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
-                            Score: {test.score}%
-                          </>
-                        ) : (
-                          <>
-                            <Clock className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
-                            Continue test
-                          </>
-                        )}
-                      </p>
-                    </div>
-                    <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                      <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
-                      <p>
-                        {new Date(test.date).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="px-4 py-5 sm:px-6 text-center text-sm text-gray-500">
-                No recent evaluations found.
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* Upcoming appointments */}
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-            <h3 className="text-lg font-medium text-gray-900">Upcoming Appointments</h3>
-            <Link
-              to={user?.role === 'student' ? '/my-appointments' : '/appointments'}
-              className="text-sm font-medium text-primary hover:text-primary-dark flex items-center"
-            >
-              View all
-              <ArrowRight className="ml-1 w-4 h-4" />
-            </Link>
-          </div>
-          <div className="border-t border-gray-200 divide-y divide-gray-200">
-            {upcomingAppointments.length > 0 ? (
-              (upcomingAppointments || []).map((appointment) => (
-                <div key={appointment.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {appointment.title}
-                    </p>
-                  </div>
-                  <div className="mt-2 sm:flex sm:justify-between">
-                    <div className="sm:flex">
-                      <p className="flex items-center text-sm text-gray-500">
-                        <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
-                        {new Date(appointment.date).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                        {' at '}
-                        {appointment.time}
-                      </p>
-                    </div>
-                    {user?.role !== 'student' && (
-                      <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                        <Users className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
-                        <p>{appointment.beneficiary}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="px-4 py-5 sm:px-6 text-center text-sm text-gray-500">
-                No upcoming appointments found.
-              </div>
-            )}
-          </div>
-        </div>
+        <RecentTestsCard tests={recentTests} />
+        <UpcomingAppointmentsCard appointments={upcomingAppointments} />
       </div>
-      
-      {/* Quick actions */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
-        </div>
-        <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {user?.role === 'student' ? (
-              <>
-                <QuickActionButton
-                  title="Take Evaluation"
-                  description="Start a new evaluation"
-                  icon={<ClipboardList className="w-5 h-5" />}
-                  to="/evaluations"
-                />
-                <QuickActionButton
-                  title="Schedule Appointment"
-                  description="Book time with your trainer"
-                  icon={<Calendar className="w-5 h-5" />}
-                  to="/schedule"
-                />
-                <QuickActionButton
-                  title="View Documents"
-                  description="Access your reports"
-                  icon={<FileText className="w-5 h-5" />}
-                  to="/my-documents"
-                />
-                <QuickActionButton
-                  title="Update Profile"
-                  description="Edit your information"
-                  icon={<Users className="w-5 h-5" />}
-                  to="/profile"
-                />
-              </>
-            ) : (
-              <>
-                <QuickActionButton
-                  title="Create Evaluation"
-                  description="Design a new test"
-                  icon={<ClipboardList className="w-5 h-5" />}
-                  to="/evaluations/create"
-                />
-                <QuickActionButton
-                  title="Add Beneficiary"
-                  description="Register a new student"
-                  icon={<Users className="w-5 h-5" />}
-                  to="/beneficiaries/create"
-                />
-                <QuickActionButton
-                  title="Schedule Appointment"
-                  description="Book time with a beneficiary"
-                  icon={<Calendar className="w-5 h-5" />}
-                  to="/appointments/create"
-                />
-                <QuickActionButton
-                  title="Generate Report"
-                  description="Create a new document"
-                  icon={<FileText className="w-5 h-5" />}
-                  to="/documents/create"
-                />
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-      </>
-      )}
     </div>
   );
 };
-
-// Stats card component
-const StatsCard = ({ title, value, icon, linkTo }) => {
+// Student Dashboard Component
+const StudentDashboard = ({ stats, recentTests, upcomingAppointments }) => {
   return (
-    <Link
-      to={linkTo}
-      className="bg-white overflow-hidden shadow rounded-lg transition duration-200 hover:shadow-md"
-    >
-      <div className="p-5">
+    <div className="space-y-6">
+      {/* Page header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">My Dashboard</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Track your progress and upcoming activities
+        </p>
+      </div>
+      {/* Stats cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <StatsCard
+          title="Completed Tests"
+          value={stats.completed_tests || 0}
+          icon={<CheckCircle2 className="w-6 h-6" />}
+          color="bg-green-500"
+        />
+        <StatsCard
+          title="Upcoming Sessions"
+          value={stats.upcoming_sessions || 0}
+          icon={<Calendar className="w-6 h-6" />}
+          color="bg-blue-500"
+        />
+        <StatsCard
+          title="Average Score"
+          value={`${Math.round(stats.average_score || 0)}%`}
+          icon={<TrendingUp className="w-6 h-6" />}
+          color="bg-purple-500"
+        />
+      </div>
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <RecentTestsCard tests={recentTests} userRole="student" />
+        <UpcomingAppointmentsCard appointments={upcomingAppointments} userRole="student" />
+      </div>
+    </div>
+  );
+};
+// Reusable Components
+const StatsCard = ({ title, value, change, changeText, icon, color }) => {
+  return (
+    <Card className="overflow-hidden">
+      <div className="p-6">
         <div className="flex items-center">
-          <div className="flex-shrink-0 bg-primary-50 rounded-md p-3">
-            {icon}
+          <div className={`p-3 rounded-lg ${color} bg-opacity-10`}>
+            <div className={`${color} text-white`}>{icon}</div>
           </div>
-          <div className="ml-5 w-0 flex-1">
-            <dl>
-              <dt className="text-sm font-medium text-gray-500 truncate">{title}</dt>
-              <dd>
-                <div className="text-lg font-medium text-gray-900">{value}</div>
-              </dd>
-            </dl>
-          </div>
-          <div className="ml-4 flex-shrink-0">
-            <ArrowUpRight className="h-5 w-5 text-gray-400" />
+          <div className="ml-4 flex-1">
+            <p className="text-sm font-medium text-gray-500">{title}</p>
+            <p className="text-2xl font-semibold text-gray-900">{value}</p>
+            {change !== undefined && (
+              <p className="text-sm text-green-600">
+                +{change} {changeText}
+              </p>
+            )}
           </div>
         </div>
       </div>
-    </Link>
+    </Card>
   );
 };
-
-// Quick action button component
-const QuickActionButton = ({ title, description, icon, to }) => {
+const ActivityItem = ({ title, count, description, icon, trend }) => {
   return (
-    <Link
-      to={to}
-      className="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-primary hover:bg-primary-50 transition duration-200"
-    >
-      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white">
-        {icon}
+    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center">
+        <div className="p-2 bg-white rounded-lg">
+          {icon}
+        </div>
+        <div className="ml-4">
+          <p className="text-sm font-medium text-gray-900">{title}</p>
+          <p className="text-sm text-gray-500">{description}</p>
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
-        <span className="absolute inset-0" aria-hidden="true" />
-        <p className="text-sm font-medium text-gray-900">{title}</p>
-        <p className="text-sm text-gray-500 truncate">{description}</p>
+      <div className="text-right">
+        <p className="text-2xl font-semibold text-gray-900">{count}</p>
+        {trend === 'up' && (
+          <ArrowUpRight className="w-4 h-4 text-green-500 inline" />
+        )}
       </div>
-    </Link>
+    </div>
   );
 };
-
-export default DashboardPage;
+const RecentTestsCard = ({ tests, userRole }) => {
+  return (
+    <Card className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-medium">Recent Evaluations</h3>
+        <Link to="/evaluations" className="text-sm text-primary hover:underline">
+          View all
+        </Link>
+      </div>
+      <div className="space-y-3">
+        {tests.length > 0 ? (
+          tests.map((test) => (
+            <div key={test.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div>
+                <p className="font-medium text-gray-900">{test.title || test.evaluation?.title}</p>
+                <p className="text-sm text-gray-500">
+                  {new Date(test.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="text-right">
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                  ${test.status === 'completed' ? 'bg-green-100 text-green-800' :
+                    test.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-gray-100 text-gray-800'}`}>
+                  {test.status}
+                </span>
+                {test.score !== null && (
+                  <p className="text-sm font-medium text-gray-900 mt-1">{test.score}%</p>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500 text-center py-4">No recent evaluations</p>
+        )}
+      </div>
+    </Card>
+  );
+};
+const UpcomingAppointmentsCard = ({ appointments, userRole }) => {
+  return (
+    <Card className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-medium">Upcoming Appointments</h3>
+        <Link to="/appointments" className="text-sm text-primary hover:underline">
+          View all
+        </Link>
+      </div>
+      <div className="space-y-3">
+        {appointments.length > 0 ? (
+          appointments.map((appointment) => (
+            <div key={appointment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div>
+                <p className="font-medium text-gray-900">{appointment.title}</p>
+                <p className="text-sm text-gray-500">
+                  {userRole !== 'student' && appointment.beneficiary && (
+                    <span>{appointment.beneficiary.first_name} {appointment.beneficiary.last_name} • </span>
+                  )}
+                  {new Date(appointment.datetime).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900">
+                  {new Date(appointment.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                  {appointment.status}
+                </span>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500 text-center py-4">No upcoming appointments</p>
+        )}
+      </div>
+    </Card>
+  );
+};
+export default DashboardPageV3;

@@ -23,7 +23,6 @@ import {
   Copy,
   ExternalLink
 } from 'lucide-react';
-
 const WebhooksIntegration = ({ integration, onBack }) => {
   const [webhooks, setWebhooks] = useState([
     {
@@ -57,7 +56,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
       attempts: 234
     }
   ]);
-
   const [availableEvents] = useState([
     { category: 'User Events', events: ['user.enrolled', 'user.updated', 'user.deleted', 'user.activated'] },
     { category: 'Course Events', events: ['course.started', 'course.completed', 'course.dropped'] },
@@ -65,7 +63,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
     { category: 'Payment Events', events: ['payment.success', 'payment.failed', 'subscription.created', 'subscription.updated'] },
     { category: 'System Events', events: ['system.maintenance', 'system.alert', 'system.update'] }
   ]);
-
   const [newWebhook, setNewWebhook] = useState({
     name: '',
     url: '',
@@ -73,10 +70,8 @@ const WebhooksIntegration = ({ integration, onBack }) => {
     secret: '',
     headers: {}
   });
-
   const [showNewWebhook, setShowNewWebhook] = useState(false);
   const [testResults, setTestResults] = useState({});
-
   const configFields = [
     {
       name: 'signingSecret',
@@ -111,16 +106,13 @@ const WebhooksIntegration = ({ integration, onBack }) => {
       description: 'Log all webhook attempts and responses'
     }
   ];
-
   const handleTestWebhook = async (webhookId) => {
     setTestResults({ ...testResults, [webhookId]: 'testing' });
-    
     // Simulate test
     setTimeout(() => {
       setTestResults({ ...testResults, [webhookId]: 'success' });
     }, 2000);
   };
-
   const handleToggleWebhook = (webhookId) => {
     setWebhooks(webhooks.map(webhook => 
       webhook.id === webhookId 
@@ -128,7 +120,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
         : webhook
     ));
   };
-
   const customOverview = (
     <>
       {/* Webhook Statistics */}
@@ -149,7 +140,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
             </p>
           </div>
         </Card>
-        
         <Card>
           <div className="p-4">
             <div className="flex items-center justify-between">
@@ -162,7 +152,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
             <p className="text-xs text-green-600 mt-2">↑ 12% from yesterday</p>
           </div>
         </Card>
-        
         <Card>
           <div className="p-4">
             <div className="flex items-center justify-between">
@@ -175,7 +164,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
             <p className="text-xs text-gray-500 mt-2">Last 24 hours</p>
           </div>
         </Card>
-        
         <Card>
           <div className="p-4">
             <div className="flex items-center justify-between">
@@ -189,7 +177,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
           </div>
         </Card>
       </div>
-
       {/* Configured Webhooks */}
       <Card>
         <div className="p-6">
@@ -204,7 +191,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
               Add Webhook
             </Button>
           </div>
-          
           <div className="space-y-4">
             {webhooks.map((webhook) => (
               <div key={webhook.id} className="border rounded-lg p-4">
@@ -233,7 +219,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
                     </Button>
                   </div>
                 </div>
-                
                 <div className="flex flex-wrap gap-2 mb-3">
                   {webhook.events.map((event) => (
                     <Badge key={event} variant="secondary" size="sm">
@@ -241,7 +226,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
                     </Badge>
                   ))}
                 </div>
-                
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
                     <p className="text-gray-500">Last triggered</p>
@@ -284,7 +268,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Add New Webhook Form */}
       {showNewWebhook && (
         <Card>
@@ -302,7 +285,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
                   onChange={(e) => setNewWebhook({ ...newWebhook, name: e.target.value })}
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Webhook URL
@@ -314,7 +296,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
                   onChange={(e) => setNewWebhook({ ...newWebhook, url: e.target.value })}
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Events to Subscribe
@@ -352,7 +333,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
                   ))}
                 </div>
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Secret Key (optional)
@@ -364,7 +344,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
                   onChange={(e) => setNewWebhook({ ...newWebhook, secret: e.target.value })}
                 />
               </div>
-              
               <div className="flex space-x-2">
                 <Button variant="primary">Create Webhook</Button>
                 <Button variant="secondary" onClick={() => setShowNewWebhook(false)}>
@@ -375,7 +354,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
           </div>
         </Card>
       )}
-
       {/* Webhook Payload Example */}
       <Card>
         <div className="p-6">
@@ -407,7 +385,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Recent Webhook Activity */}
       <Card>
         <div className="p-6">
@@ -444,7 +421,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Documentation Link */}
       <Alert variant="info">
         <Code className="w-4 h-4" />
@@ -461,7 +437,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
       </Alert>
     </>
   );
-
   return (
     <BaseIntegration
       integration={integration}
@@ -472,8 +447,6 @@ const WebhooksIntegration = ({ integration, onBack }) => {
     </BaseIntegration>
   );
 };
-
 // Add missing icon import
 const Plus = require('lucide-react').Plus;
-
 export default WebhooksIntegration;

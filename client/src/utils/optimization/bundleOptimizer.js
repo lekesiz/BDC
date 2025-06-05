@@ -1,9 +1,7 @@
 /**
  * Bundle optimization utilities
  */
-
 import { lazy } from 'react';
-
 /**
  * Dynamically import React components
  * @param {string} componentPath - Path to the component
@@ -12,7 +10,6 @@ import { lazy } from 'react';
 export const lazyLoadComponent = (componentPath) => {
   return lazy(() => import(componentPath));
 };
-
 /**
  * Bundle size analysis utilities
  */
@@ -24,7 +21,6 @@ export const bundleAnalysis = {
     return process.env.NODE_ENV === 'development' && 
            process.env.ANALYZE === 'true';
   },
-
   /**
    * Get bundle size limit recommendations
    */
@@ -39,7 +35,6 @@ export const bundleAnalysis = {
       perRoute: 20 // KB
     }
   }),
-
   /**
    * Optimize imports for tree shaking
    */
@@ -61,7 +56,6 @@ export const bundleAnalysis = {
         'CircularProgress'
       ]
     },
-    
     // Lodash optimized imports
     lodash: {
       // Instead of: import _ from 'lodash';
@@ -78,7 +72,6 @@ export const bundleAnalysis = {
         'omit'
       ]
     },
-
     // Date-fns optimized imports
     dateFns: {
       // Instead of: import * as dateFns from 'date-fns';
@@ -96,7 +89,6 @@ export const bundleAnalysis = {
     }
   }
 };
-
 /**
  * Webpack optimization configuration
  */
@@ -109,14 +101,12 @@ export const webpackOptimizations = {
     cacheGroups: {
       default: false,
       vendors: false,
-      
       // Vendor splitting
       vendor: {
         name: 'vendor',
         test: /[\\/]node_modules[\\/]/,
         priority: 1
       },
-      
       // Common components
       common: {
         name: 'common',
@@ -125,21 +115,18 @@ export const webpackOptimizations = {
         reuseExistingChunk: true,
         enforce: true
       },
-      
       // React ecosystem
       react: {
         name: 'react',
         test: /[\\/]node_modules[\\/](react|react-dom|react-router)[\\/]/,
         priority: 3
       },
-      
       // Material-UI
       mui: {
         name: 'mui',
         test: /[\\/]node_modules[\\/](@mui)[\\/]/,
         priority: 4
       },
-      
       // Charts and visualizations
       charts: {
         name: 'charts',
@@ -148,7 +135,6 @@ export const webpackOptimizations = {
       }
     }
   },
-
   /**
    * Optimization settings
    */
@@ -157,13 +143,11 @@ export const webpackOptimizations = {
     sideEffects: false, // Mark packages as side-effect free
     concatenateModules: true, // Module concatenation
     minimize: true, // Minification
-    
     // Runtime chunk
     runtimeChunk: {
       name: 'runtime'
     }
   },
-
   /**
    * Performance hints
    */
@@ -173,7 +157,6 @@ export const webpackOptimizations = {
     maxEntrypointSize: 512000 // 500 KB
   }
 };
-
 /**
  * Image optimization utilities
  */
@@ -182,19 +165,16 @@ export const imageOptimization = {
    * Supported formats in priority order
    */
   formats: ['webp', 'avif', 'jpg', 'png'],
-
   /**
    * Generate responsive image srcset
    */
   generateSrcSet: (imagePath, sizes = [320, 640, 1024, 1920]) => {
     const basePath = imagePath.replace(/\.[^/.]+$/, '');
     const extension = imagePath.split('.').pop();
-    
     return sizes
       .map(size => `${basePath}-${size}w.${extension} ${size}w`)
       .join(', ');
   },
-
   /**
    * Get optimized image component props
    */
@@ -208,7 +188,6 @@ export const imageOptimization = {
     ...options
   })
 };
-
 /**
  * CSS optimization utilities
  */
@@ -219,7 +198,6 @@ export const cssOptimization = {
   extractCritical: {
     // Paths to extract critical CSS from
     paths: ['/', '/login', '/dashboard'],
-    
     // Options for critical CSS
     options: {
       minify: true,
@@ -228,7 +206,6 @@ export const cssOptimization = {
       height: 900
     }
   },
-
   /**
    * PurgeCSS configuration
    */
@@ -252,7 +229,6 @@ export const cssOptimization = {
     ]
   }
 };
-
 /**
  * Font optimization utilities
  */
@@ -267,12 +243,10 @@ export const fontOptimization = {
       crossOrigin: 'anonymous'
     }
   ],
-
   /**
    * Font display strategy
    */
   fontDisplay: 'swap', // Show fallback immediately
-
   /**
    * Subset fonts for specific character sets
    */
@@ -282,7 +256,6 @@ export const fontOptimization = {
     turkish: 'U+011E-011F, U+0130-0131, U+015E-015F'
   }
 };
-
 /**
  * Service Worker caching strategies
  */
@@ -295,7 +268,6 @@ export const cachingStrategies = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
     maxEntries: 100
   },
-
   /**
    * API responses caching
    */
@@ -304,7 +276,6 @@ export const cachingStrategies = {
     maxAge: 5 * 60, // 5 minutes
     maxEntries: 50
   },
-
   /**
    * Image caching
    */
@@ -314,7 +285,6 @@ export const cachingStrategies = {
     maxEntries: 200
   }
 };
-
 /**
  * Performance monitoring
  */
@@ -327,7 +297,6 @@ export const performanceMonitoring = {
     FID: { good: 100, poor: 300 },   // First Input Delay
     CLS: { good: 0.1, poor: 0.25 }   // Cumulative Layout Shift
   },
-
   /**
    * Custom performance metrics
    */
@@ -346,7 +315,6 @@ export const performanceMonitoring = {
         observer.observe({ entryTypes: ['paint'] });
       }
     },
-
     // Bundle load time
     bundleLoadTime: (callback) => {
       window.addEventListener('load', () => {
@@ -356,7 +324,6 @@ export const performanceMonitoring = {
       });
     }
   },
-
   /**
    * Report performance metrics
    */
@@ -366,7 +333,6 @@ export const performanceMonitoring = {
     }
   }
 };
-
 /**
  * Development utilities
  */
@@ -377,17 +343,14 @@ export const developmentUtils = {
   checkBundleSize: async () => {
     if (process.env.NODE_ENV === 'development') {
       const { exec } = require('child_process');
-      
       exec('npm run build -- --stats', (error, stdout, stderr) => {
         if (error) {
           console.error('Bundle size check failed:', error);
           return;
         }
-        
         // Parse stats and check against limits
         const stats = JSON.parse(stdout);
         const limits = bundleAnalysis.getSizeLimits();
-        
         // Check main bundle
         const mainSize = stats.assets.find(a => a.name.includes('main'))?.size;
         if (mainSize > limits.js.main * 1024) {
@@ -396,16 +359,13 @@ export const developmentUtils = {
       });
     }
   },
-
   /**
    * Generate bundle report
    */
   generateReport: () => {
-    if (process.env.NODE_ENV === 'development') {
-    }
+    if (process.env.NODE_ENV === 'development') {}
   }
 };
-
 export default {
   lazyLoadComponent,
   bundleAnalysis,

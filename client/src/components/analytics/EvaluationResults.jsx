@@ -1,6 +1,5 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 /**
  * EvaluationResults component displays test score distributions and evaluation results
  * @param {Object} props - Component props
@@ -14,21 +13,17 @@ export const EvaluationResults = ({ data = {} }) => {
       </div>
     );
   }
-  
   const { scoreDistribution, competencyAverages, insights } = data;
-  
   // Prepare score distribution data
   const scoreData = Object.entries(scoreDistribution).map(([range, count]) => ({
     range,
     count
   }));
-  
   // Prepare competency data if available
   const competencyData = competencyAverages ? Object.entries(competencyAverages).map(([name, score]) => ({
     name,
     score
   })) : [];
-  
   return (
     <div className="space-y-6">
       <div>
@@ -57,7 +52,6 @@ export const EvaluationResults = ({ data = {} }) => {
           </ResponsiveContainer>
         </div>
       </div>
-      
       {competencyData.length > 0 && (
         <div>
           <h3 className="text-base font-medium mb-2">Competency Averages</h3>
@@ -85,7 +79,6 @@ export const EvaluationResults = ({ data = {} }) => {
           </div>
         </div>
       )}
-      
       {insights && (
         <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="text-base font-medium mb-2">Key Insights</h3>
@@ -116,5 +109,4 @@ export const EvaluationResults = ({ data = {} }) => {
     </div>
   );
 };
-
 export default EvaluationResults;

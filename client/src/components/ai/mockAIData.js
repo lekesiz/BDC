@@ -181,7 +181,6 @@ export const generateAIData = (userRole) => {
       }
     }
   };
-
   // Role-specific AI features
   if (userRole === "trainer") {
     return {
@@ -240,7 +239,6 @@ export const generateAIData = (userRole) => {
       }
     };
   }
-
   if (userRole === "admin" || userRole === "tenant_admin") {
     return {
       ...baseAIData,
@@ -288,10 +286,8 @@ export const generateAIData = (userRole) => {
       }
     };
   }
-
   return baseAIData;
 };
-
 // Generate AI model performance metrics
 export const generateAIModelMetrics = () => {
   return {
@@ -329,7 +325,6 @@ export const generateAIModelMetrics = () => {
     }
   };
 };
-
 // Generate AI training history
 export const generateAITrainingHistory = () => {
   return [
@@ -366,7 +361,6 @@ export const generateAITrainingHistory = () => {
     }
   ];
 };
-
 // Generate AI configuration options
 export const generateAIConfigOptions = () => {
   return {

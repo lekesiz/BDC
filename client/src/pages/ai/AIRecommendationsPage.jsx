@@ -17,13 +17,31 @@ import {
   RefreshCw,
   Search,
   Filter,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Lock
 } from 'lucide-react';
-
 const AIRecommendationsPage = () => {
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
   const { toast } = useToast();
-  
+  // AI Recommendations are restricted to admin and trainer roles only
+  const canAccessRecommendations = hasRole(['super_admin', 'tenant_admin', 'trainer']);
+  // If user doesn't have permission, show access denied
+  if (!canAccessRecommendations) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="p-8 text-center max-w-md">
+          <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h2>
+          <p className="text-gray-600 mb-4">
+            AI Recommendations are only available to administrators and trainers.
+          </p>
+          <p className="text-sm text-gray-500">
+            Current role: <span className="font-medium">{user?.role}</span>
+          </p>
+        </Card>
+      </div>
+    );
+  }
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
@@ -38,16 +56,13 @@ const AIRecommendationsPage = () => {
     priorityThreshold: 'high',
     maxRecommendations: 10
   });
-
   useEffect(() => {
     fetchBeneficiaries();
     fetchRecommendations();
   }, []);
-
   useEffect(() => {
     filterRecommendations();
   }, [recommendations, selectedBeneficiary, selectedType, searchTerm]);
-
   const fetchBeneficiaries = async () => {
     try {
       const res = await fetch('/api/beneficiaries', {
@@ -55,16 +70,13 @@ const AIRecommendationsPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch beneficiaries');
-
       const data = await res.json();
       setBeneficiaries(data);
     } catch (error) {
       console.error('Error fetching beneficiaries:', error);
     }
   };
-
   const fetchRecommendations = async () => {
     try {
       const res = await fetch('/api/ai/recommendations', {
@@ -72,9 +84,7 @@ const AIRecommendationsPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch recommendations');
-
       const data = await res.json();
       setRecommendations(data);
     } catch (error) {
@@ -89,34 +99,36 @@ const AIRecommendationsPage = () => {
       setRefreshing(false);
     }
   };
-
   const handleRefresh = () => {
     setRefreshing(true);
     fetchRecommendations();
   };
-
   const filterRecommendations = () => {
     let filtered = [...recommendations];
-
     if (selectedBeneficiary !== 'all') {
       filtered = filtered.filter(rec => rec.beneficiary_id === selectedBeneficiary);
     }
-
     if (selectedType !== 'all') {
       filtered = filtered.filter(rec => rec.type === selectedType);
     }
-
     if (searchTerm) {
       filtered = filtered.filter(rec => 
         rec.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         rec.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     setFilteredRecommendations(filtered);
   };
-
   const handleApproveRecommendation = async (recommendationId) => {
+    // Additional permission check for approval functionality
+    if (!hasRole(['super_admin', 'tenant_admin', 'trainer'])) {
+      toast({
+        title: 'Access Denied',
+        description: 'Recommendation approval is restricted to administrators and trainers only',
+        variant: 'destructive'
+      });
+      return;
+    }
     try {
       const res = await fetch(`/api/ai/recommendations/${recommendationId}/approve`, {
         method: 'POST',
@@ -124,14 +136,11 @@ const AIRecommendationsPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to approve recommendation');
-
       toast({
         title: 'Success',
         description: 'Recommendation approved successfully'
       });
-
       fetchRecommendations();
     } catch (error) {
       console.error('Error approving recommendation:', error);
@@ -142,8 +151,16 @@ const AIRecommendationsPage = () => {
       });
     }
   };
-
   const handleRejectRecommendation = async (recommendationId) => {
+    // Additional permission check for rejection functionality
+    if (!hasRole(['super_admin', 'tenant_admin', 'trainer'])) {
+      toast({
+        title: 'Access Denied',
+        description: 'Recommendation rejection is restricted to administrators and trainers only',
+        variant: 'destructive'
+      });
+      return;
+    }
     try {
       const res = await fetch(`/api/ai/recommendations/${recommendationId}/reject`, {
         method: 'POST',
@@ -151,14 +168,11 @@ const AIRecommendationsPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to reject recommendation');
-
       toast({
         title: 'Success',
         description: 'Recommendation rejected'
       });
-
       fetchRecommendations();
     } catch (error) {
       console.error('Error rejecting recommendation:', error);
@@ -169,7 +183,6 @@ const AIRecommendationsPage = () => {
       });
     }
   };
-
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'high':
@@ -182,7 +195,6 @@ const AIRecommendationsPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
   const getTypeIcon = (type) => {
     switch (type) {
       case 'learning_path':
@@ -195,7 +207,6 @@ const AIRecommendationsPage = () => {
         return <Sparkles className="h-4 w-4" />;
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -203,7 +214,6 @@ const AIRecommendationsPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -214,7 +224,6 @@ const AIRecommendationsPage = () => {
             {filteredRecommendations.filter(r => r.status === 'pending').length} pending
           </Badge>
         </div>
-        
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
@@ -233,7 +242,6 @@ const AIRecommendationsPage = () => {
           </Button>
         </div>
       </div>
-
       {/* Settings Panel */}
       {showSettings && (
         <Card className="p-6">
@@ -253,7 +261,6 @@ const AIRecommendationsPage = () => {
                 </p>
               </div>
             </label>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Priority Threshold
@@ -268,7 +275,6 @@ const AIRecommendationsPage = () => {
                 <option value="low">All priorities</option>
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Max recommendations per beneficiary
@@ -285,7 +291,6 @@ const AIRecommendationsPage = () => {
           </div>
         </Card>
       )}
-
       {/* Filters */}
       <Card className="p-4">
         <div className="flex flex-col sm:flex-row gap-4">
@@ -299,7 +304,6 @@ const AIRecommendationsPage = () => {
               className="pl-9"
             />
           </div>
-          
           <select
             value={selectedBeneficiary}
             onChange={(e) => setSelectedBeneficiary(e.target.value)}
@@ -312,7 +316,6 @@ const AIRecommendationsPage = () => {
               </option>
             ))}
           </select>
-
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
@@ -326,7 +329,6 @@ const AIRecommendationsPage = () => {
           </select>
         </div>
       </Card>
-
       {/* Recommendations List */}
       {filteredRecommendations.length === 0 ? (
         <Card className="p-8 text-center">
@@ -360,9 +362,7 @@ const AIRecommendationsPage = () => {
                       <Badge variant="destructive">Rejected</Badge>
                     )}
                   </div>
-                  
                   <p className="text-gray-600 mb-4">{recommendation.description}</p>
-
                   <div className="flex items-center gap-6 text-sm text-gray-500">
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
@@ -377,7 +377,6 @@ const AIRecommendationsPage = () => {
                       <span>{recommendation.confidence}% confidence</span>
                     </div>
                   </div>
-
                   {recommendation.reasoning && (
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-blue-800">
@@ -386,8 +385,7 @@ const AIRecommendationsPage = () => {
                     </div>
                   )}
                 </div>
-
-                {recommendation.status === 'pending' && (
+                {recommendation.status === 'pending' && hasRole(['super_admin', 'tenant_admin', 'trainer']) && (
                   <div className="flex gap-2 ml-4">
                     <Button
                       size="sm"
@@ -414,5 +412,4 @@ const AIRecommendationsPage = () => {
     </div>
   );
 };
-
 export default AIRecommendationsPage;

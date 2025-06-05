@@ -10,3 +10,5 @@ from . import trainer_routes  # noqa: E402, F401
 from . import notes_routes  # noqa: E402, F401
 from . import documents_routes  # noqa: E402, F401
 from . import evaluations_routes  # noqa: E402, F401 
+
+from app.utils.logging import logger

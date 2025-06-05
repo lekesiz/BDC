@@ -20,21 +20,18 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useToast } from '../../components/ui/use-toast';
-
 const backupTypes = [
   { id: 'full', name: 'Full Backup', description: 'Complete system backup including all data' },
   { id: 'incremental', name: 'Incremental Backup', description: 'Only changed data since last backup' },
   { id: 'differential', name: 'Differential Backup', description: 'All changes since last full backup' },
   { id: 'selective', name: 'Selective Backup', description: 'Backup specific modules or data types' }
 ];
-
 const storageLocations = [
   { id: 'local', name: 'Local Storage', icon: HardDrive, available: true },
   { id: 'cloud', name: 'Cloud Storage', icon: Cloud, available: true },
   { id: 'network', name: 'Network Drive', icon: Database, available: false },
   { id: 'external', name: 'External Drive', icon: Archive, available: false }
 ];
-
 const DataBackupPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -64,12 +61,10 @@ const DataBackupPage = () => {
   });
   const [backupProgress, setBackupProgress] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
-
   useEffect(() => {
     fetchBackups();
     fetchBackupSettings();
   }, []);
-
   const fetchBackups = async () => {
     try {
       const response = await fetch('/api/admin/backups', {
@@ -77,7 +72,6 @@ const DataBackupPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setBackups(data.backups || []);
@@ -86,7 +80,6 @@ const DataBackupPage = () => {
       console.error('Error fetching backups:', error);
     }
   };
-
   const fetchBackupSettings = async () => {
     try {
       const response = await fetch('/api/admin/backup-settings', {
@@ -94,7 +87,6 @@ const DataBackupPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setBackupSettings(data.settings);
@@ -103,11 +95,9 @@ const DataBackupPage = () => {
       console.error('Error fetching backup settings:', error);
     }
   };
-
   const createBackup = async (type = 'manual') => {
     setLoading(true);
     setBackupProgress(0);
-    
     try {
       const response = await fetch('/api/admin/backups/create', {
         method: 'POST',
@@ -121,7 +111,6 @@ const DataBackupPage = () => {
           settings: backupSettings
         })
       });
-      
       if (response.ok) {
         // Simulate progress
         const progressInterval = setInterval(() => {
@@ -147,12 +136,10 @@ const DataBackupPage = () => {
       setLoading(false);
     }
   };
-
   const restoreBackup = async (backupId) => {
     if (!confirm('Are you sure you want to restore this backup? This will overwrite current data.')) {
       return;
     }
-    
     setLoading(true);
     try {
       const response = await fetch(`/api/admin/backups/${backupId}/restore`, {
@@ -161,7 +148,6 @@ const DataBackupPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         showToast('Restore initiated successfully', 'success');
         // In a real app, would show restore progress
@@ -174,7 +160,6 @@ const DataBackupPage = () => {
       setLoading(false);
     }
   };
-
   const downloadBackup = async (backupId) => {
     try {
       const response = await fetch(`/api/admin/backups/${backupId}/download`, {
@@ -182,7 +167,6 @@ const DataBackupPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -198,7 +182,6 @@ const DataBackupPage = () => {
       showToast('Error downloading backup', 'error');
     }
   };
-
   const updateSettings = async (newSettings) => {
     try {
       const response = await fetch('/api/admin/backup-settings', {
@@ -209,7 +192,6 @@ const DataBackupPage = () => {
         },
         body: JSON.stringify(newSettings)
       });
-      
       if (response.ok) {
         setBackupSettings(newSettings);
         showToast('Settings updated successfully', 'success');
@@ -218,7 +200,6 @@ const DataBackupPage = () => {
       showToast('Error updating settings', 'error');
     }
   };
-
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Quick Actions */}
@@ -235,7 +216,6 @@ const DataBackupPage = () => {
             Backup Now
           </Button>
         </Card>
-        
         <Card>
           <h3 className="font-medium mb-2">Last Backup</h3>
           <p className="text-sm text-gray-600 mb-2">
@@ -248,7 +228,6 @@ const DataBackupPage = () => {
             </span>
           </p>
         </Card>
-        
         <Card>
           <h3 className="font-medium mb-2">Auto-Backup</h3>
           <p className="text-sm text-gray-600 mb-4">
@@ -263,7 +242,6 @@ const DataBackupPage = () => {
           </Button>
         </Card>
       </div>
-
       {/* Backup Progress */}
       {backupProgress !== null && (
         <Card>
@@ -282,7 +260,6 @@ const DataBackupPage = () => {
           </div>
         </Card>
       )}
-
       {/* Recent Backups */}
       <Card>
         <h3 className="font-medium mb-4">Recent Backups</h3>
@@ -329,7 +306,6 @@ const DataBackupPage = () => {
       </Card>
     </div>
   );
-
   const renderSettings = () => (
     <div className="space-y-6">
       <Card>
@@ -351,7 +327,6 @@ const DataBackupPage = () => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           {/* Frequency */}
           <div>
             <label className="block text-sm font-medium mb-1">Backup Frequency</label>
@@ -367,7 +342,6 @@ const DataBackupPage = () => {
               <option value="monthly">Monthly</option>
             </select>
           </div>
-
           {/* Retention */}
           <div>
             <label className="block text-sm font-medium mb-1">Retention Period (days)</label>
@@ -380,7 +354,6 @@ const DataBackupPage = () => {
               max="365"
             />
           </div>
-
           {/* Compression */}
           <div className="flex items-center justify-between">
             <div>
@@ -397,7 +370,6 @@ const DataBackupPage = () => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           {/* Encryption */}
           <div className="flex items-center justify-between">
             <div>
@@ -416,7 +388,6 @@ const DataBackupPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Storage Location */}
       <Card>
         <h3 className="font-medium mb-4">Storage Location</h3>
@@ -444,7 +415,6 @@ const DataBackupPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Modules Selection */}
       <Card>
         <h3 className="font-medium mb-4">Modules to Backup</h3>
@@ -467,7 +437,6 @@ const DataBackupPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Notifications */}
       <Card>
         <h3 className="font-medium mb-4">Notification Settings</h3>
@@ -504,14 +473,12 @@ const DataBackupPage = () => {
       </Card>
     </div>
   );
-
   // Spinner component definition
   const Spinner = () => (
     <div className="flex justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
   );
-
   const renderHistory = () => (
     <Card>
       <h3 className="font-medium mb-4">Backup History</h3>
@@ -575,7 +542,6 @@ const DataBackupPage = () => {
       )}
     </Card>
   );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -587,7 +553,6 @@ const DataBackupPage = () => {
           Back to Settings
         </Button>
       </div>
-
       {/* Tabs */}
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
@@ -606,7 +571,6 @@ const DataBackupPage = () => {
           ))}
         </nav>
       </div>
-
       {/* Tab Content */}
       {loading ? (
         <div className="flex justify-center py-12">
@@ -622,5 +586,4 @@ const DataBackupPage = () => {
     </div>
   );
 };
-
 export default DataBackupPage;

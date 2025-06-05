@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Avatar component for displaying user profile images
  * Falls back to initials when image fails to load
@@ -25,23 +24,19 @@ const Avatar = ({
   ...props 
 }) => {
   const [imageError, setImageError] = React.useState(false);
-  
   const sizeClasses = {
     sm: "h-8 w-8 text-xs",
     md: "h-10 w-10 text-sm",
     lg: "h-12 w-12 text-base",
     xl: "h-16 w-16 text-lg"
   };
-  
   const shapeClasses = {
     circle: "rounded-full",
     square: "rounded-md"
   };
-  
   const handleError = () => {
     setImageError(true);
   };
-  
   return (
     <div 
       className={cn(
@@ -67,7 +62,6 @@ const Avatar = ({
     </div>
   );
 };
-
 /**
  * Avatar group component to display multiple avatars with overlap
  * 
@@ -87,7 +81,6 @@ const AvatarGroup = ({
   const showCount = max > 0 && childrenArray.length > max;
   const visibleAvatars = showCount ? childrenArray.slice(0, max) : childrenArray;
   const remainingAvatars = showCount ? childrenArray.length - max : 0;
-  
   return (
     <div 
       className={cn("flex -space-x-2", className)} 
@@ -98,7 +91,6 @@ const AvatarGroup = ({
           {child}
         </div>
       ))}
-      
       {showCount && (
         <div 
           className={cn(
@@ -111,5 +103,4 @@ const AvatarGroup = ({
     </div>
   );
 };
-
 export { Avatar, AvatarGroup };

@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
-
 /**
  * EvaluationsPage displays a list of all evaluations/tests
  */
@@ -20,7 +19,6 @@ const EvaluationsPage = () => {
     status: 'all',
     search: '',
   });
-
   // Fetch evaluations from the API
   useEffect(() => {
     const fetchEvaluations = async () => {
@@ -39,10 +37,8 @@ const EvaluationsPage = () => {
         setIsLoading(false);
       }
     };
-
     fetchEvaluations();
   }, []); // Remove toast dependency to prevent infinite loop
-
   // Handle filter changes
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({
@@ -50,22 +46,18 @@ const EvaluationsPage = () => {
       [key]: value,
     }));
   };
-
   // Filter evaluations based on current filters
   const filteredEvaluations = (evaluations || []).filter(evaluation => {
     // Status filter
     if (filters.status !== 'all' && evaluation.status !== filters.status) {
       return false;
     }
-
     // Search filter
     if (filters.search && !evaluation.title.toLowerCase().includes(filters.search.toLowerCase())) {
       return false;
     }
-
     return true;
   });
-
   // Delete an evaluation
   const handleDelete = async (id) => {
     if (confirm('Are you sure you want to delete this evaluation? This action cannot be undone.')) {
@@ -87,7 +79,6 @@ const EvaluationsPage = () => {
       }
     }
   };
-
   // Get the label and color for a status
   const getStatusLabel = (status) => {
     switch (status) {
@@ -101,7 +92,6 @@ const EvaluationsPage = () => {
         return { label: 'Unknown', color: 'bg-gray-100 text-gray-800' };
     }
   };
-
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
@@ -114,7 +104,6 @@ const EvaluationsPage = () => {
           Create New Test
         </Button>
       </div>
-
       <Card className="p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
@@ -129,7 +118,6 @@ const EvaluationsPage = () => {
               onChange={(e) => handleFilterChange('search', e.target.value)}
             />
           </div>
-          
           <div className="flex items-center space-x-2">
             <Filter className="h-4 w-4 text-gray-500" />
             <span className="text-sm font-medium">Status:</span>
@@ -146,7 +134,6 @@ const EvaluationsPage = () => {
           </div>
         </div>
       </Card>
-
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
@@ -155,7 +142,6 @@ const EvaluationsPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(filteredEvaluations || []).map((evaluation) => {
             const { label, color } = getStatusLabel(evaluation.status);
-            
             return (
               <Card key={evaluation.id} className="overflow-hidden flex flex-col">
                 <div className="p-5 flex-1">
@@ -168,10 +154,8 @@ const EvaluationsPage = () => {
                       <span>{evaluation.time_limit ? `${evaluation.time_limit} min` : 'No time limit'}</span>
                     </div>
                   </div>
-                  
                   <h2 className="text-lg font-semibold mb-2 line-clamp-2">{evaluation.title}</h2>
                   <p className="text-gray-600 text-sm mb-3 line-clamp-3">{evaluation.description}</p>
-                  
                   <div className="flex items-center space-x-4 text-sm mb-4">
                     <div className="flex items-center text-gray-600">
                       <FilePlus className="w-3 h-3 mr-1" />
@@ -182,7 +166,6 @@ const EvaluationsPage = () => {
                       <span>{evaluation.passing_score || 0}% to Pass</span>
                     </div>
                   </div>
-                  
                   <div className="flex flex-wrap gap-2 mb-3">
                     {evaluation.skills?.map((skill, index) => (
                       <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -191,7 +174,6 @@ const EvaluationsPage = () => {
                     ))}
                   </div>
                 </div>
-                
                 <div className="bg-gray-50 p-3 border-t border-gray-100 flex justify-between">
                   <Button
                     variant="ghost"
@@ -248,5 +230,4 @@ const EvaluationsPage = () => {
     </div>
   );
 };
-
 export default EvaluationsPage;

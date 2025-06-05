@@ -20,7 +20,6 @@ import {
   Code
 } from 'lucide-react';
 import { LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 const CDNSetupPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -32,7 +31,6 @@ const CDNSetupPage = () => {
     requests: '145M',
     avgLatency: '45ms'
   });
-
   useEffect(() => {
     const mockProviders = [
       { name: 'CloudFlare', status: 'active', price: '$20/month', features: ['DDoS Protection', 'SSL', 'Analytics'] },
@@ -43,7 +41,6 @@ const CDNSetupPage = () => {
     setCdnProviders(mockProviders);
     setCurrentProvider(mockProviders[0]);
   }, []);
-
   const performanceData = [
     { time: '00:00', cdn: 45, origin: 250 },
     { time: '04:00', cdn: 38, origin: 220 },
@@ -53,7 +50,6 @@ const CDNSetupPage = () => {
     { time: '20:00', cdn: 48, origin: 280 },
     { time: '24:00', cdn: 42, origin: 240 }
   ];
-
   const edgeLocations = [
     { region: 'North America', servers: 45, coverage: 98 },
     { region: 'Europe', servers: 38, coverage: 95 },
@@ -62,7 +58,6 @@ const CDNSetupPage = () => {
     { region: 'Africa', servers: 8, coverage: 70 },
     { region: 'Middle East', servers: 12, coverage: 80 }
   ];
-
   const contentTypes = [
     { type: 'Images', size: '5.8GB', percentage: 45 },
     { type: 'JavaScript', size: '2.1GB', percentage: 18 },
@@ -70,7 +65,6 @@ const CDNSetupPage = () => {
     { type: 'Videos', size: '3.1GB', percentage: 25 },
     { type: 'Others', size: '0.3GB', percentage: 2 }
   ];
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'providers', label: 'CDN Providers', icon: Globe },
@@ -79,9 +73,7 @@ const CDNSetupPage = () => {
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'implementation', label: 'Implementation', icon: Code }
   ];
-
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -91,7 +83,6 @@ const CDNSetupPage = () => {
           Configure CDN
         </Button>
       </div>
-
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -115,7 +106,6 @@ const CDNSetupPage = () => {
           })}
         </nav>
       </div>
-
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -130,7 +120,6 @@ const CDNSetupPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -142,7 +131,6 @@ const CDNSetupPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -154,7 +142,6 @@ const CDNSetupPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -167,7 +154,6 @@ const CDNSetupPage = () => {
               </div>
             </Card>
           </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <div className="p-6">
@@ -187,7 +173,6 @@ const CDNSetupPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Content Type Distribution</h3>
@@ -215,7 +200,6 @@ const CDNSetupPage = () => {
               </div>
             </Card>
           </div>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Edge Server Locations</h3>
@@ -261,7 +245,6 @@ const CDNSetupPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'providers' && (
         <div className="space-y-6">
           <Card>
@@ -304,7 +287,6 @@ const CDNSetupPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'configuration' && (
         <div className="space-y-6">
           <Card>
@@ -317,21 +299,18 @@ const CDNSetupPage = () => {
                   </label>
                   <Input type="text" defaultValue="cdn.yourdomain.com" />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Origin Server
                   </label>
                   <Input type="text" defaultValue="origin.yourdomain.com" />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Cache TTL (seconds)
                   </label>
                   <Input type="number" defaultValue="3600" />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     File Types to Cache
@@ -341,7 +320,6 @@ const CDNSetupPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Purge Cache</h3>
@@ -356,14 +334,12 @@ const CDNSetupPage = () => {
                     <option>Purge by Tag</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     URL Pattern (optional)
                   </label>
                   <Input type="text" placeholder="/assets/images/*" />
                 </div>
-
                 <Button variant="danger">
                   Purge Cache
                 </Button>
@@ -372,7 +348,6 @@ const CDNSetupPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'performance' && (
         <div className="space-y-6">
           <Card>
@@ -393,7 +368,6 @@ const CDNSetupPage = () => {
               </div>
             </div>
           </Card>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <div className="p-6">
@@ -414,7 +388,6 @@ const CDNSetupPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <h4 className="text-sm font-medium text-gray-600">Bandwidth Usage</h4>
@@ -434,7 +407,6 @@ const CDNSetupPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <h4 className="text-sm font-medium text-gray-600">Request Statistics</h4>
@@ -457,7 +429,6 @@ const CDNSetupPage = () => {
           </div>
         </div>
       )}
-
       {activeTab === 'security' && (
         <div className="space-y-6">
           <Card>
@@ -470,21 +441,18 @@ const CDNSetupPage = () => {
                     <span className="text-sm font-medium text-gray-700">Enable DDoS Protection</span>
                   </label>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
                     <span className="text-sm font-medium text-gray-700">Always Use HTTPS</span>
                   </label>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
                     <span className="text-sm font-medium text-gray-700">Enable Web Application Firewall (WAF)</span>
                   </label>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" />
@@ -494,7 +462,6 @@ const CDNSetupPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">SSL/TLS Configuration</h3>
@@ -510,7 +477,6 @@ const CDNSetupPage = () => {
                     <option>Off</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Minimum TLS Version
@@ -526,7 +492,6 @@ const CDNSetupPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'implementation' && (
         <div className="space-y-6">
           <Card>
@@ -535,26 +500,21 @@ const CDNSetupPage = () => {
               <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
                 <code>{`# DNS Configuration
 cdn.yourdomain.com  CNAME  yourdomain.cdn.cloudflare.com
-
 # Page Rules
 *.css -> Cache Everything, Edge Cache TTL: 1 month
 *.js -> Cache Everything, Edge Cache TTL: 1 month
 *.jpg|*.png|*.webp -> Cache Everything, Edge Cache TTL: 1 year
 /api/* -> Cache Bypass
-
 # Cloudflare Workers Script
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
 })
-
 async function handleRequest(request) {
   const response = await fetch(request)
   const newHeaders = new Headers(response.headers)
-  
   // Add security headers
   newHeaders.set('X-Content-Type-Options', 'nosniff')
   newHeaders.set('X-Frame-Options', 'DENY')
-  
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -564,7 +524,6 @@ async function handleRequest(request) {
               </pre>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">AWS CloudFront Setup</h3>
@@ -591,7 +550,6 @@ Resources:
               </pre>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">React CDN Integration</h3>
@@ -611,10 +569,8 @@ export default {
     ? 'https://cdn.yourdomain.com/' 
     : '/'
 }
-
 // .env.production
 VITE_CDN_URL=https://cdn.yourdomain.com
-
 // Asset helper
 export const getCDNUrl = (path) => {
   const baseUrl = import.meta.env.VITE_CDN_URL || ''
@@ -628,5 +584,4 @@ export const getCDNUrl = (path) => {
     </div>
   );
 };
-
 export default CDNSetupPage;

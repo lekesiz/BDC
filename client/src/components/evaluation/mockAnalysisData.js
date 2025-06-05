@@ -7,10 +7,8 @@ export const mockAnalysisData = {
   created_at: '2023-06-15T16:30:00Z',
   status: 'draft', // 'draft', 'approved', 'rejected'
   trainer_feedback: '',
-  
   // Overview information
   summary: "The student demonstrated good overall understanding of core communication concepts, with particular strength in active listening principles. Performance was above the class average for non-verbal communication but showed some gaps in complex communication scenarios. Response patterns indicate a methodical approach with careful consideration of options before selection.",
-  
   key_observations: [
     "Consistently strong performance on active listening questions (100% accuracy)",
     "Demonstrated understanding of non-verbal communication importance",
@@ -18,25 +16,20 @@ export const mockAnalysisData = {
     "Showed confidence in answering fundamental principles questions",
     "Applied theoretical knowledge effectively to practical scenarios"
   ],
-  
   strengths: [
     "Strong grasp of active listening principles and techniques",
     "Good understanding of non-verbal communication importance",
     "Ability to identify effective communication strategies in basic scenarios",
     "Recognition of communication barriers and how to overcome them"
   ],
-  
   areas_for_improvement: [
     "Understanding complex multi-stakeholder communication scenarios",
     "Applying communication strategies in high-pressure situations",
     "Identifying subtle non-verbal cues in challenging contexts",
     "Adapting communication style for different audiences"
   ],
-  
   learning_style_analysis: "Based on response patterns, the student appears to have a reflective learning style, taking time to analyze information before making decisions. They perform better on questions that allow thoughtful consideration rather than requiring quick responses. This suggests they would benefit from learning materials that provide opportunities for reflection and application, such as case studies and scenarios with guidance.",
-  
   peer_comparison: "The student's performance places them in the 75th percentile compared to peers taking the same assessment. They scored significantly above the average in questions related to active listening (92nd percentile) but closer to the median for questions about communication adaptation (58th percentile).",
-  
   // Skills analysis
   skills_analysis: {
     "Communication": {
@@ -53,7 +46,6 @@ export const mockAnalysisData = {
         "Identifying subtle non-verbal cues"
       ]
     },
-    
     "Leadership": {
       proficiency: 72,
       analysis: "Good understanding of basic leadership communication with room for growth in more advanced concepts. Can recognize effective leadership communication styles but has some gaps in applying them to challenging scenarios.",
@@ -68,7 +60,6 @@ export const mockAnalysisData = {
         "Handling difficult conversations as a leader"
       ]
     },
-    
     "Critical Thinking": {
       proficiency: 68,
       analysis: "Developing critical thinking skills applied to communication contexts. Shows good analytical ability when given time to process but occasionally misses connections between communication concepts.",
@@ -84,11 +75,9 @@ export const mockAnalysisData = {
       ]
     }
   },
-  
   // Response patterns
   response_patterns: {
     answer_strategy: "The student shows a methodical approach to answering questions, spending more time on complex scenarios and less on factual recall questions. There's evidence of careful consideration before selecting answers, particularly on multiple-choice questions where similar options are presented.",
-    
     key_patterns: [
       "Consistently selects 'active listening' as an important factor across different scenarios",
       "Takes significantly more time on questions involving conflict resolution",
@@ -96,7 +85,6 @@ export const mockAnalysisData = {
       "More confident (faster response time) on questions about verbal versus non-verbal communication",
       "Performs better on questions with practical examples rather than theoretical concepts"
     ],
-    
     question_types: {
       "Multiple Choice": {
         accuracy: 82,
@@ -111,7 +99,6 @@ export const mockAnalysisData = {
         analysis: "Some difficulty with matching questions, particularly when concepts are closely related. Shows good understanding of main concepts but sometimes confuses nuanced distinctions."
       }
     },
-    
     time_management: {
       analysis: "Good overall time management with appropriate allocation of time to different question types. Spends more time on complex questions and less on straightforward factual recall, showing good prioritization.",
       avg_time_per_question: 42,
@@ -119,11 +106,9 @@ export const mockAnalysisData = {
       slowest_question_type: "Matching (68 seconds average)"
     }
   },
-  
   // Growth trends (comparing to previous assessments)
   growth_trends: {
     longitudinal_analysis: "Comparing to the previous two communication assessments, the student has shown steady improvement in active listening concepts (+15% over 3 months) but progress has plateaued somewhat in adapting communication styles (+5% over the same period). Overall, their growth trajectory is positive but could benefit from targeted intervention in specific areas.",
-    
     skill_progress: {
       "Communication": {
         previous: 70,
@@ -141,7 +126,6 @@ export const mockAnalysisData = {
         change: 6
       }
     },
-    
     mastery_path: {
       description: "Based on current performance and growth rate, the student is on track to achieve mastery in core communication concepts within 3-4 months, but may require additional support to reach advanced proficiency in leadership communication.",
       milestones: [
@@ -172,7 +156,6 @@ export const mockAnalysisData = {
         }
       ]
     },
-    
     learning_velocity: {
       analysis: "The student is learning at an above-average pace compared to peers, particularly in fundamental concepts. Their learning velocity has increased 15% since the previous assessment cycle, suggesting effective engagement with materials and practice.",
       current_velocity: 8.5,
@@ -180,7 +163,6 @@ export const mockAnalysisData = {
       peer_comparison: 72
     }
   },
-  
   // Recommendations
   recommendations: {
     next_steps: [
@@ -201,7 +183,6 @@ export const mockAnalysisData = {
         description: "Analyze real-world communication breakdowns to identify what went wrong and how to improve outcomes."
       }
     ],
-    
     resources: [
       {
         title: "Navigating Difficult Conversations",
@@ -232,7 +213,6 @@ export const mockAnalysisData = {
         skill: "Communication"
       }
     ],
-    
     learning_plan: {
       description: "The following 4-week plan is designed to address key development areas while building on existing strengths in active listening and basic communication concepts.",
       weekly_focus: [
@@ -268,7 +248,6 @@ export const mockAnalysisData = {
     }
   }
 };
-
 // Mock API response for analysis
 export const getMockAnalysis = (id) => {
   return {
@@ -276,7 +255,6 @@ export const getMockAnalysis = (id) => {
     data: mockAnalysisData
   };
 };
-
 // Mock API response for generating analysis
 export const generateMockAnalysis = () => {
   return {
@@ -287,7 +265,6 @@ export const generateMockAnalysis = () => {
     }
   };
 };
-
 // Mock API response for updating analysis status
 export const updateMockAnalysisStatus = (id, data) => {
   return {
@@ -300,7 +277,6 @@ export const updateMockAnalysisStatus = (id, data) => {
     }
   };
 };
-
 // Mock API response for updating trainer feedback
 export const updateMockTrainerFeedback = (id, data) => {
   return {

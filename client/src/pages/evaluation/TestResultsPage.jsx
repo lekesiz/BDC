@@ -1,721 +1,828 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, CheckCircle, XCircle, Award, Clock, BarChart2, FileText, Info, Brain } from 'lucide-react';
-import { API_ENDPOINTS, QUESTION_TYPES } from '@/lib/constants';
-import api from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Tabs } from '@/components/ui/tabs';
-import { useToast } from '@/components/ui/toast';
-
-/**
- * TestResultsPage displays the results of a completed test session
- */
-const TestResultsPage = () => {
-  const { id } = useParams();
+import { 
+  ArrowLeft, Download, Share2, RefreshCw, Eye, Trophy, Target,
+  TrendingUp, TrendingDown, Award, Clock, CheckCircle, XCircle,
+  AlertCircle, BarChart2, PieChart, LineChart, Brain, BookOpen
+} from 'lucide-react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  RadialLinearScale
+} from 'chart.js';
+import { Line, Bar, Pie, Doughnut, Radar } from 'react-chartjs-2';
+import axios from '../../lib/api';
+import { toast } from '../../hooks/useToast';
+import { Button } from '../../components/ui/button';
+import { Card } from '../../components/ui/card';
+import { Tabs } from '../../components/ui/tabs';
+import { Badge } from '../../components/ui/badge';
+import { Alert } from '../../components/ui/alert';
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  RadialLinearScale,
+  Title,
+  Tooltip,
+  Legend
+);
+const TestResultsPageV2 = () => {
+  const { sessionId } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [test, setTest] = useState(null);
-  const [feedback, setFeedback] = useState(null);
+  const [analysis, setAnalysis] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [comparisons, setComparisons] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
-
-  // Fetch session details
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   useEffect(() => {
-    const fetchSessionData = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Fetch session data
-        const sessionResponse = await api.get(API_ENDPOINTS.EVALUATIONS.SESSION(id));
-        setSession(sessionResponse.data);
-        
-        // Fetch test data
-        const testResponse = await api.get(API_ENDPOINTS.EVALUATIONS.DETAIL(sessionResponse.data.test_id));
-        setTest(testResponse.data);
-        
-        // Fetch AI feedback if available
-        try {
-          const feedbackResponse = await api.get(API_ENDPOINTS.EVALUATIONS.FEEDBACK(id));
-          setFeedback(feedbackResponse.data);
-        } catch (error) {
-          console.log('Feedback not available yet');
-        }
-      } catch (error) {
-        console.error('Error fetching session data:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load test results',
-          type: 'error',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSessionData();
-  }, [id, toast]);
-
-  // Calculate score and statistics
-  const calculateStats = () => {
-    if (!session || !test) return null;
-    
-    const totalQuestions = test.questions.length;
-    const totalPoints = test.questions.reduce((sum, q) => sum + q.points, 0);
-    const correctAnswers = session.responses.filter(r => r.is_correct).length;
-    const earnedPoints = session.responses.reduce((sum, r) => sum + (r.is_correct ? r.points : 0), 0);
-    const scorePercentage = Math.round((earnedPoints / totalPoints) * 100);
-    const isPassing = scorePercentage >= test.passing_score;
-    
-    // Calculate time taken
-    const startTime = new Date(session.started_at);
-    const endTime = new Date(session.completed_at);
-    const timeTakenMs = endTime - startTime;
-    const timeTakenMinutes = Math.floor(timeTakenMs / 60000);
-    const timeTakenSeconds = Math.floor((timeTakenMs % 60000) / 1000);
-    
-    // Calculate per skill performance
-    const skillPerformance = {};
-    
-    test.skills.forEach(skill => {
-      skillPerformance[skill] = {
-        total: 0,
-        earned: 0,
-        percentage: 0,
-      };
-    });
-    
-    // Assume each question has skills assigned to it
-    test.questions.forEach((question, index) => {
-      const response = session.responses[index];
-      const questionSkills = question.skills || test.skills; // Fallback to test skills if question doesn't have specific skills
-      
-      questionSkills.forEach(skill => {
-        if (skillPerformance[skill]) {
-          skillPerformance[skill].total += question.points;
-          if (response && response.is_correct) {
-            skillPerformance[skill].earned += question.points;
-          }
-        }
-      });
-    });
-    
-    // Calculate percentages for each skill
-    Object.keys(skillPerformance).forEach(skill => {
-      if (skillPerformance[skill].total > 0) {
-        skillPerformance[skill].percentage = Math.round(
-          (skillPerformance[skill].earned / skillPerformance[skill].total) * 100
-        );
-      }
-    });
-    
-    return {
-      totalQuestions,
-      totalPoints,
-      correctAnswers,
-      earnedPoints,
-      scorePercentage,
-      isPassing,
-      timeTakenMinutes,
-      timeTakenSeconds,
-      skillPerformance,
-    };
-  };
-
-  const stats = calculateStats();
-
-  // Handle downloading certificate
-  const handleDownloadCertificate = async () => {
+    fetchResults();
+  }, [sessionId]);
+  const fetchResults = async () => {
     try {
-      const response = await api.get(`/api/evaluations/sessions/${id}/certificate`, {
-        responseType: 'blob',
+      setLoading(true);
+      const [sessionRes, historyRes, comparisonsRes] = await Promise.all([
+        axios.get(`/api/evaluations/sessions/${sessionId}/detailed`),
+        axios.get(`/api/evaluations/sessions/${sessionId}/history`),
+        axios.get(`/api/evaluations/sessions/${sessionId}/comparisons`)
+      ]);
+      setSession(sessionRes.data.session);
+      setTest(sessionRes.data.test);
+      setAnalysis(sessionRes.data.analysis);
+      setHistory(historyRes.data);
+      setComparisons(comparisonsRes.data);
+    } catch (error) {
+      console.error('Error fetching results:', error);
+      toast({
+        title: 'Hata',
+        description: 'Sonuçlar yüklenemedi',
+        variant: 'error'
       });
-      
+    } finally {
+      setLoading(false);
+    }
+  };
+  const exportResults = async (format = 'pdf') => {
+    try {
+      const response = await axios.get(
+        `/api/evaluations/sessions/${sessionId}/export?format=${format}`,
+        { responseType: 'blob' }
+      );
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `certificate-${id}.pdf`);
+      link.setAttribute('download', `test-results-${sessionId}.${format}`);
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (error) {
-      console.error('Error downloading certificate:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to download certificate',
-        type: 'error',
+        title: 'Başarılı',
+        description: 'Sonuçlar indirildi',
+        variant: 'success'
+      });
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Sonuçlar indirilemedi',
+        variant: 'error'
       });
     }
   };
-
-  // Handle downloading full report
-  const handleDownloadReport = async () => {
+  const shareResults = async (method) => {
     try {
-      const response = await api.get(`/api/evaluations/sessions/${id}/report`, {
-        responseType: 'blob',
+      await axios.post(`/api/evaluations/sessions/${sessionId}/share`, {
+        method,
+        includeAnalysis: true
       });
-      
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `test-report-${id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error('Error downloading report:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to download report',
-        type: 'error',
+        title: 'Başarılı',
+        description: 'Sonuçlar paylaşıldı',
+        variant: 'success'
+      });
+      setShareModalOpen(false);
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Sonuçlar paylaşılamadı',
+        variant: 'error'
       });
     }
   };
-
-  // Render loading state
-  if (isLoading) {
+  const getStatusBadge = (status) => {
+    const statusMap = {
+      passed: { label: 'Başarılı', variant: 'success' },
+      failed: { label: 'Başarısız', variant: 'error' },
+      pending: { label: 'Değerlendiriliyor', variant: 'warning' }
+    };
+    const { label, variant } = statusMap[status] || statusMap.pending;
+    return <Badge variant={variant}>{label}</Badge>;
+  };
+  const getSkillLevel = (score) => {
+    if (score >= 90) return { label: 'Uzman', color: 'text-green-600' };
+    if (score >= 75) return { label: 'İleri', color: 'text-blue-600' };
+    if (score >= 60) return { label: 'Orta', color: 'text-yellow-600' };
+    if (score >= 40) return { label: 'Başlangıç', color: 'text-orange-600' };
+    return { label: 'Acemi', color: 'text-red-600' };
+  };
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
       </div>
     );
   }
-
-  // Render error state if no session or test data
-  if (!session || !test) {
-    return (
-      <div className="container mx-auto py-6">
-        <Card className="p-6 text-center">
-          <div className="text-red-500 mb-4">
-            <XCircle className="w-12 h-12 mx-auto" />
-          </div>
-          <h2 className="text-xl font-semibold mb-2">Results Not Found</h2>
-          <p className="text-gray-600 mb-4">The requested test results could not be found or have been deleted.</p>
-          <Button onClick={() => navigate('/evaluations')}>Back to Tests</Button>
-        </Card>
-      </div>
-    );
-  }
-
+  // Chart configurations
+  const scoreProgressChart = {
+    labels: history.map(h => new Date(h.completed_at).toLocaleDateString()),
+    datasets: [
+      {
+        label: 'Puanlar',
+        data: history.map(h => h.score),
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+        tension: 0.4
+      }
+    ]
+  };
+  const skillPerformanceChart = {
+    labels: analysis?.skill_analysis?.map(s => s.skill_name) || [],
+    datasets: [
+      {
+        label: 'Performans',
+        data: analysis?.skill_analysis?.map(s => s.score) || [],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.5)',
+          'rgba(54, 162, 235, 0.5)',
+          'rgba(255, 206, 86, 0.5)',
+          'rgba(75, 192, 192, 0.5)',
+          'rgba(153, 102, 255, 0.5)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)'
+        ],
+        borderWidth: 1
+      }
+    ]
+  };
+  const questionsOverviewChart = {
+    labels: ['Doğru', 'Yanlış', 'Boş'],
+    datasets: [
+      {
+        data: [
+          session.correct_answers,
+          session.wrong_answers,
+          session.unanswered_questions
+        ],
+        backgroundColor: [
+          'rgba(34, 197, 94, 0.5)',
+          'rgba(239, 68, 68, 0.5)',
+          'rgba(156, 163, 175, 0.5)'
+        ],
+        borderColor: [
+          'rgb(34, 197, 94)',
+          'rgb(239, 68, 68)',
+          'rgb(156, 163, 175)'
+        ],
+        borderWidth: 1
+      }
+    ]
+  };
+  const topicPerformanceChart = {
+    labels: analysis?.topic_analysis?.map(t => t.topic) || [],
+    datasets: [
+      {
+        label: 'Konu Performansı',
+        data: analysis?.topic_analysis?.map(t => t.score) || [],
+        backgroundColor: 'rgba(99, 102, 241, 0.5)',
+        borderColor: 'rgb(99, 102, 241)',
+        borderWidth: 1
+      }
+    ]
+  };
+  const difficultyAnalysisChart = {
+    labels: ['Kolay', 'Orta', 'Zor'],
+    datasets: [
+      {
+        label: 'Başarı Oranı',
+        data: [
+          analysis?.difficulty_analysis?.easy || 0,
+          analysis?.difficulty_analysis?.medium || 0,
+          analysis?.difficulty_analysis?.hard || 0
+        ],
+        backgroundColor: 'rgba(34, 197, 94, 0.5)',
+        borderColor: 'rgb(34, 197, 94)',
+        borderWidth: 1
+      }
+    ]
+  };
+  const comparisonRadarChart = {
+    labels: comparisons?.dimensions || [],
+    datasets: [
+      {
+        label: 'Sizin Skorunuz',
+        data: comparisons?.your_scores || [],
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+      },
+      {
+        label: 'Grup Ortalaması',
+        data: comparisons?.average_scores || [],
+        borderColor: 'rgb(34, 197, 94)',
+        backgroundColor: 'rgba(34, 197, 94, 0.2)',
+      }
+    ]
+  };
   return (
-    <div className="container mx-auto py-6 max-w-5xl">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/evaluations')}
-            className="flex items-center"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Tests
-          </Button>
-          <h1 className="text-2xl font-bold">{test.title} - Results</h1>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          {stats && stats.isPassing && (
-            <Button
-              variant="outline"
-              onClick={handleDownloadCertificate}
-              className="flex items-center"
-            >
-              <Award className="w-4 h-4 mr-2" />
-              Certificate
-            </Button>
-          )}
-          
-          <Button
-            variant="outline"
-            onClick={handleDownloadReport}
-            className="flex items-center"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Download Report
-          </Button>
-          
-          {/* Only show for trainers and admins */}
-          {/* In a real app, this would be conditionally rendered based on user role */}
-          <Button
-            onClick={() => navigate(`/evaluations/sessions/${id}/analysis`)}
-            className="flex items-center"
-          >
-            <Brain className="w-4 h-4 mr-2" />
-            AI Analysis
-          </Button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b sticky top-0 z-30">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/evaluations')}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Değerlendirmeler
+              </Button>
+              <div>
+                <h1 className="text-xl font-semibold">{test.title}</h1>
+                <p className="text-sm text-gray-600">
+                  Test Sonuçları - {new Date(session.completed_at).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShareModalOpen(true)}
+              >
+                <Share2 className="h-4 w-4 mr-2" />
+                Paylaş
+              </Button>
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  onClick={() => exportResults('pdf')}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  İndir
+                </Button>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border p-2 hidden group-hover:block">
+                  <button
+                    onClick={() => exportResults('pdf')}
+                    className="w-full text-left px-3 py-2 rounded hover:bg-gray-100"
+                  >
+                    PDF olarak indir
+                  </button>
+                  <button
+                    onClick={() => exportResults('excel')}
+                    className="w-full text-left px-3 py-2 rounded hover:bg-gray-100"
+                  >
+                    Excel olarak indir
+                  </button>
+                  <button
+                    onClick={() => exportResults('csv')}
+                    className="w-full text-left px-3 py-2 rounded hover:bg-gray-100"
+                  >
+                    CSV olarak indir
+                  </button>
+                </div>
+              </div>
+              <Button
+                onClick={() => navigate(`/evaluations/sessions/${sessionId}/analysis`)}
+              >
+                <Brain className="h-4 w-4 mr-2" />
+                AI Analizi
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
-      
-      {/* Result overview card */}
-      {stats && (
-        <Card className="mb-6 overflow-hidden">
-          <div className={`p-4 text-white ${stats.isPassing ? 'bg-green-600' : 'bg-amber-600'}`}>
-            <div className="flex items-center">
-              {stats.isPassing ? (
-                <CheckCircle className="w-6 h-6 mr-2" />
-              ) : (
-                <Info className="w-6 h-6 mr-2" />
-              )}
-              <h2 className="text-lg font-semibold">
-                {stats.isPassing
-                  ? `Congratulations! You passed with ${stats.scorePercentage}%`
-                  : `You scored ${stats.scorePercentage}%. The passing score is ${test.passing_score}%`}
-              </h2>
+      {/* Content */}
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* Overview Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <Trophy className="h-6 w-6 text-blue-600" />
+              </div>
+              {getStatusBadge(session.status)}
             </div>
-          </div>
-          
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="flex items-center">
-                <Award className="w-8 h-8 text-primary mr-4" />
-                <div>
-                  <p className="text-sm text-gray-600">Score</p>
-                  <p className="text-xl font-bold">
-                    {stats.earnedPoints} / {stats.totalPoints} points
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {stats.scorePercentage}%
-                  </p>
-                </div>
+            <h3 className="text-2xl font-bold">{session.score}%</h3>
+            <p className="text-gray-600">Toplam Puan</p>
+            <div className="mt-2">
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className={`h-2 rounded-full ${
+                    session.score >= test.passing_score 
+                      ? 'bg-green-600' 
+                      : 'bg-red-600'
+                  }`}
+                  style={{ width: `${session.score}%` }}
+                />
               </div>
-              
-              <div className="flex items-center">
-                <CheckCircle className="w-8 h-8 text-green-500 mr-4" />
-                <div>
-                  <p className="text-sm text-gray-600">Correct Answers</p>
-                  <p className="text-xl font-bold">
-                    {stats.correctAnswers} / {stats.totalQuestions}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {Math.round((stats.correctAnswers / stats.totalQuestions) * 100)}%
-                  </p>
-                </div>
+              <p className="text-sm text-gray-600 mt-1">
+                Geçme notu: {test.passing_score}%
+              </p>
+            </div>
+          </Card>
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-green-100 rounded-lg">
+                <Target className="h-6 w-6 text-green-600" />
               </div>
-              
-              <div className="flex items-center">
-                <Clock className="w-8 h-8 text-blue-500 mr-4" />
-                <div>
-                  <p className="text-sm text-gray-600">Time Taken</p>
-                  <p className="text-xl font-bold">
-                    {stats.timeTakenMinutes}m {stats.timeTakenSeconds}s
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {test.time_limit ? `Out of ${test.time_limit}m limit` : 'No time limit'}
-                  </p>
-                </div>
+              <Badge variant="secondary">
+                {((session.correct_answers / test.total_questions) * 100).toFixed(0)}%
+              </Badge>
+            </div>
+            <h3 className="text-2xl font-bold">{session.correct_answers}/{test.total_questions}</h3>
+            <p className="text-gray-600">Doğru Cevap</p>
+            <div className="flex items-center gap-4 mt-2 text-sm">
+              <div className="flex items-center gap-1">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span>{session.correct_answers} Doğru</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <XCircle className="h-4 w-4 text-red-600" />
+                <span>{session.wrong_answers} Yanlış</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <AlertCircle className="h-4 w-4 text-gray-600" />
+                <span>{session.unanswered_questions} Boş</span>
               </div>
             </div>
-          </div>
-        </Card>
-      )}
-      
-      {/* Tabs for results */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="mb-6"
-      >
-        <Tabs.TabsList>
-          <Tabs.TabTrigger value="overview">
-            <BarChart2 className="w-4 h-4 mr-2" />
-            Performance Overview
-          </Tabs.TabTrigger>
-          <Tabs.TabTrigger value="questions">
-            <FileText className="w-4 h-4 mr-2" />
-            Question Review
-          </Tabs.TabTrigger>
-          {feedback && (
-            <Tabs.TabTrigger value="feedback">
-              <Info className="w-4 h-4 mr-2" />
-              AI Feedback
-            </Tabs.TabTrigger>
-          )}
-        </Tabs.TabsList>
-        
-        <Tabs.TabContent value="overview">
-          {stats && (
-            <div className="space-y-6">
-              {/* Skills performance */}
+          </Card>
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <Clock className="h-6 w-6 text-purple-600" />
+              </div>
+              <Badge variant="secondary">
+                {Math.round((session.time_spent / test.time_limit) * 100)}%
+              </Badge>
+            </div>
+            <h3 className="text-2xl font-bold">{Math.floor(session.time_spent / 60)} dk</h3>
+            <p className="text-gray-600">Tamamlama Süresi</p>
+            <p className="text-sm text-gray-600 mt-2">
+              Ayrılan süre: {test.time_limit} dk
+            </p>
+          </Card>
+        </div>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs.TabsList>
+            <Tabs.TabTrigger value="overview">Genel Bakış</Tabs.TabTrigger>
+            <Tabs.TabTrigger value="questions">Sorular</Tabs.TabTrigger>
+            <Tabs.TabTrigger value="analysis">Detaylı Analiz</Tabs.TabTrigger>
+            <Tabs.TabTrigger value="comparison">Karşılaştırma</Tabs.TabTrigger>
+            <Tabs.TabTrigger value="history">Geçmiş</Tabs.TabTrigger>
+          </Tabs.TabsList>
+          {/* Overview Tab */}
+          <Tabs.TabContent value="overview">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Score Progress Chart */}
               <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Skills Performance</h3>
-                <div className="space-y-4">
-                  {Object.entries(stats.skillPerformance).map(([skill, data]) => (
-                    <div key={skill}>
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-sm font-medium">{skill}</span>
-                        <span className="text-sm text-gray-500">
-                          {data.earned} / {data.total} points ({data.percentage}%)
+                <h3 className="text-lg font-semibold mb-4">Puan Gelişimi</h3>
+                <div className="h-64">
+                  <Line 
+                    data={scoreProgressChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          display: false
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Card>
+              {/* Questions Overview Chart */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Cevap Dağılımı</h3>
+                <div className="h-64">
+                  <Doughnut 
+                    data={questionsOverviewChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          position: 'bottom'
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Card>
+              {/* Skill Performance Chart */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Beceri Performansı</h3>
+                <div className="h-64">
+                  <Bar 
+                    data={skillPerformanceChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          display: false
+                        }
+                      },
+                      scales: {
+                        y: {
+                          beginAtZero: true,
+                          max: 100
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Card>
+              {/* Topic Performance Chart */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Konu Performansı</h3>
+                <div className="h-64">
+                  <Bar 
+                    data={topicPerformanceChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          display: false
+                        }
+                      },
+                      scales: {
+                        y: {
+                          beginAtZero: true,
+                          max: 100
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Card>
+            </div>
+          </Tabs.TabContent>
+          {/* Questions Tab */}
+          <Tabs.TabContent value="questions">
+            <Card className="p-6">
+              <div className="space-y-4">
+                {session.responses?.map((response, index) => {
+                  const question = test.questions[index];
+                  const isCorrect = response.is_correct;
+                  return (
+                    <div
+                      key={response.id}
+                      className={`p-4 rounded-lg border ${
+                        isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-full ${
+                            isCorrect ? 'bg-green-100' : 'bg-red-100'
+                          }`}>
+                            {isCorrect ? (
+                              <CheckCircle className="h-5 w-5 text-green-600" />
+                            ) : (
+                              <XCircle className="h-5 w-5 text-red-600" />
+                            )}
+                          </div>
+                          <span className="font-semibold">Soru {index + 1}</span>
+                          <Badge variant="secondary">{question.points} puan</Badge>
+                          <Badge variant="secondary">{question.difficulty}</Badge>
+                        </div>
+                        <span className={`font-semibold ${
+                          isCorrect ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {isCorrect ? `+${question.points}` : '0'} puan
                         </span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className={`h-2 rounded-full ${
-                            data.percentage >= 80
-                              ? 'bg-green-500'
-                              : data.percentage >= 60
-                              ? 'bg-blue-500'
-                              : data.percentage >= 40
-                              ? 'bg-amber-500'
-                              : 'bg-red-500'
-                          }`}
-                          style={{ width: `${data.percentage}%` }}
-                        ></div>
+                      <p className="mb-3">{question.question_text}</p>
+                      <div className="space-y-2">
+                        <div>
+                          <span className="font-medium">Verilen Cevap:</span>
+                          <p className="text-gray-700">{response.answer}</p>
+                        </div>
+                        {!isCorrect && (
+                          <div>
+                            <span className="font-medium">Doğru Cevap:</span>
+                            <p className="text-green-700">{question.correct_answer}</p>
+                          </div>
+                        )}
+                        {question.explanation && (
+                          <div className="mt-2 p-3 bg-blue-50 rounded">
+                            <span className="font-medium text-blue-900">Açıklama:</span>
+                            <p className="text-blue-800">{question.explanation}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
+              </div>
+            </Card>
+          </Tabs.TabContent>
+          {/* Analysis Tab */}
+          <Tabs.TabContent value="analysis">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Difficulty Analysis */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Zorluk Analizi</h3>
+                <div className="h-64">
+                  <Bar 
+                    data={difficultyAnalysisChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          display: false
+                        }
+                      },
+                      scales: {
+                        y: {
+                          beginAtZero: true,
+                          max: 100
+                        }
+                      }
+                    }}
+                  />
                 </div>
               </Card>
-              
-              {/* Time analysis */}
+              {/* Time Analysis */}
               <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Time Analysis</h3>
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">Total time: {stats.timeTakenMinutes}m {stats.timeTakenSeconds}s</p>
-                  <p className="text-sm text-gray-600">Average time per question: {Math.round((stats.timeTakenMinutes * 60 + stats.timeTakenSeconds) / stats.totalQuestions)} seconds</p>
-                </div>
-                
-                {/* Time bar chart could be added here */}
-                <div className="p-6 bg-gray-50 rounded-lg text-center text-gray-500">
-                  <p>Detailed time analysis available in the downloaded report</p>
+                <h3 className="text-lg font-semibold mb-4">Zaman Analizi</h3>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm text-gray-600">Ortalama Soru Süresi</span>
+                      <span className="font-medium">
+                        {Math.floor(session.time_spent / test.total_questions)} sn
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full"
+                        style={{ width: '60%' }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm text-gray-600">En Hızlı Cevap</span>
+                      <span className="font-medium">5 sn</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm text-gray-600">En Yavaş Cevap</span>
+                      <span className="font-medium">3 dk 45 sn</span>
+                    </div>
+                  </div>
                 </div>
               </Card>
-              
-              {/* Performance summary */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Performance Summary</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-medium mb-2">Strengths</h4>
-                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                      {Object.entries(stats.skillPerformance)
-                        .filter(([_, data]) => data.percentage >= 70)
-                        .map(([skill]) => (
-                          <li key={skill}>{skill}</li>
-                        ))}
-                      {Object.entries(stats.skillPerformance).filter(([_, data]) => data.percentage >= 70).length === 0 && (
-                        <li>No particular strengths identified</li>
-                      )}
-                    </ul>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">Areas for Improvement</h4>
-                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                      {Object.entries(stats.skillPerformance)
-                        .filter(([_, data]) => data.percentage < 70)
-                        .map(([skill]) => (
-                          <li key={skill}>{skill}</li>
-                        ))}
-                      {Object.entries(stats.skillPerformance).filter(([_, data]) => data.percentage < 70).length === 0 && (
-                        <li>No significant areas for improvement identified</li>
-                      )}
-                    </ul>
-                  </div>
+              {/* Skill Details */}
+              <Card className="p-6 lg:col-span-2">
+                <h3 className="text-lg font-semibold mb-4">Beceri Detayları</h3>
+                <div className="space-y-4">
+                  {analysis?.skill_analysis?.map((skill, index) => {
+                    const { label, color } = getSkillLevel(skill.score);
+                    return (
+                      <div key={index} className="p-4 border rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <h4 className="font-semibold">{skill.skill_name}</h4>
+                            <p className="text-sm text-gray-600">{skill.description}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className={`font-bold text-lg ${color}`}>
+                              {skill.score}%
+                            </p>
+                            <p className={`text-sm ${color}`}>{label}</p>
+                          </div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full ${
+                              skill.score >= 60 ? 'bg-green-600' : 'bg-red-600'
+                            }`}
+                            style={{ width: `${skill.score}%` }}
+                          />
+                        </div>
+                        {skill.recommendations && (
+                          <div className="mt-3 p-3 bg-blue-50 rounded">
+                            <p className="text-sm text-blue-900 font-medium">Öneriler:</p>
+                            <ul className="text-sm text-blue-800 mt-1 list-disc list-inside">
+                              {skill.recommendations.map((rec, idx) => (
+                                <li key={idx}>{rec}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </Card>
             </div>
-          )}
-        </Tabs.TabContent>
-        
-        <Tabs.TabContent value="questions">
-          <div className="space-y-6">
-            {test.questions.map((question, index) => {
-              const response = session.responses[index];
-              const isCorrect = response?.is_correct || false;
-              
-              return (
-                <Card key={index} className="p-6 border-l-4 border-l-solid border-l-gray-300">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-medium">Question {index + 1}</h3>
-                    <div className="flex items-center">
-                      {isCorrect ? (
-                        <div className="flex items-center text-green-600">
-                          <CheckCircle className="w-5 h-5 mr-1" />
-                          <span className="font-medium">Correct</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center text-red-600">
-                          <XCircle className="w-5 h-5 mr-1" />
-                          <span className="font-medium">Incorrect</span>
-                        </div>
-                      )}
-                      <span className="ml-3 text-sm text-gray-500">
-                        {isCorrect ? response.points : 0} / {question.points} points
+          </Tabs.TabContent>
+          {/* Comparison Tab */}
+          <Tabs.TabContent value="comparison">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Radar Comparison */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Performans Karşılaştırması</h3>
+                <div className="h-64">
+                  <Radar 
+                    data={comparisonRadarChart}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      scales: {
+                        r: {
+                          beginAtZero: true,
+                          max: 100
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Card>
+              {/* Group Statistics */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Grup İstatistikleri</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span className="text-gray-600">Sıralama</span>
+                    <span className="font-bold text-lg">
+                      {comparisons?.rank} / {comparisons?.total_participants}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span className="text-gray-600">Grup Ortalaması</span>
+                    <span className="font-bold text-lg">
+                      {comparisons?.group_average}%
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span className="text-gray-600">En Yüksek Puan</span>
+                    <span className="font-bold text-lg">
+                      {comparisons?.highest_score}%
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span className="text-gray-600">En Düşük Puan</span>
+                    <span className="font-bold text-lg">
+                      {comparisons?.lowest_score}%
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span className="text-gray-600">Başarı Oranı</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-lg">
+                        {comparisons?.success_rate}%
                       </span>
+                      {comparisons?.success_rate > 50 ? (
+                        <TrendingUp className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <TrendingDown className="h-5 w-5 text-red-600" />
+                      )}
                     </div>
                   </div>
-                  
-                  <p className="text-gray-800 mb-4">{question.question_text}</p>
-                  
-                  {/* Multiple choice */}
-                  {question.question_type === QUESTION_TYPES.MULTIPLE_CHOICE && (
-                    <div className="space-y-2">
-                      {question.options.map((option, optionIndex) => {
-                        const isSelected = response?.response_data === optionIndex;
-                        const isOptionCorrect = option.is_correct;
-                        
-                        let optionClassName = "flex items-start p-3 rounded-lg border ";
-                        if (isSelected && isOptionCorrect) {
-                          optionClassName += "border-green-300 bg-green-50";
-                        } else if (isSelected && !isOptionCorrect) {
-                          optionClassName += "border-red-300 bg-red-50";
-                        } else if (!isSelected && isOptionCorrect) {
-                          optionClassName += "border-green-300 bg-green-50 opacity-60";
-                        } else {
-                          optionClassName += "border-gray-200";
-                        }
-                        
-                        return (
-                          <div key={optionIndex} className={optionClassName}>
-                            <div className="flex items-center h-5">
-                              {isSelected ? (
-                                isOptionCorrect ? (
-                                  <CheckCircle className="w-5 h-5 text-green-600" />
-                                ) : (
-                                  <XCircle className="w-5 h-5 text-red-600" />
-                                )
-                              ) : isOptionCorrect ? (
-                                <CheckCircle className="w-5 h-5 text-green-600 opacity-60" />
-                              ) : (
-                                <div className="w-5 h-5 rounded-full border border-gray-300"></div>
-                              )}
-                            </div>
-                            <span className="ml-3">{option.text}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                  
-                  {/* Text answer */}
-                  {question.question_type === QUESTION_TYPES.TEXT && (
-                    <div className="space-y-2">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-1">Your Answer:</h4>
-                        <div className="p-3 rounded-lg border border-gray-200 bg-gray-50">
-                          {response?.response_data || <span className="text-gray-400">No answer provided</span>}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-1">Correct Answer:</h4>
-                        <div className="p-3 rounded-lg border border-green-200 bg-green-50">
-                          {question.correct_answer}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* True/False */}
-                  {question.question_type === QUESTION_TYPES.TRUE_FALSE && (
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-4">
-                        <div className={`flex items-center p-2 rounded-lg ${
-                          response?.response_data === true
-                            ? (question.options[0].is_correct ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")
-                            : "bg-gray-100 text-gray-800"
-                        }`}>
-                          <span className="font-medium">True</span>
-                          {response?.response_data === true && (
-                            question.options[0].is_correct
-                              ? <CheckCircle className="w-4 h-4 ml-2" />
-                              : <XCircle className="w-4 h-4 ml-2" />
-                          )}
-                        </div>
-                        
-                        <div className={`flex items-center p-2 rounded-lg ${
-                          response?.response_data === false
-                            ? (question.options[1].is_correct ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")
-                            : "bg-gray-100 text-gray-800"
-                        }`}>
-                          <span className="font-medium">False</span>
-                          {response?.response_data === false && (
-                            question.options[1].is_correct
-                              ? <CheckCircle className="w-4 h-4 ml-2" />
-                              : <XCircle className="w-4 h-4 ml-2" />
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="text-sm text-gray-600 mt-2">
-                        <span className="font-medium">Correct answer: </span>
-                        {question.options[0].is_correct ? "True" : "False"}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Matching */}
-                  {question.question_type === QUESTION_TYPES.MATCHING && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {question.matches.map((match, matchIndex) => {
-                        const userMatchedIndex = response?.response_data?.[matchIndex];
-                        const isMatchCorrect = userMatchedIndex === matchIndex;
-                        
-                        return (
-                          <div key={matchIndex} className="flex items-center space-x-2">
-                            <div className="flex-1 p-3 rounded-lg border border-gray-200">
-                              {match.left}
-                            </div>
-                            <div className="flex items-center">
-                              <div className="w-10 h-0.5 bg-gray-300"></div>
-                              {isMatchCorrect ? (
-                                <CheckCircle className="w-5 h-5 text-green-600" />
-                              ) : (
-                                <XCircle className="w-5 h-5 text-red-600" />
-                              )}
-                              <div className="w-10 h-0.5 bg-gray-300"></div>
-                            </div>
-                            <div className="flex-1 p-3 rounded-lg border border-gray-200">
-                              {userMatchedIndex !== undefined
-                                ? question.matches[userMatchedIndex]?.right || "Not matched"
-                                : "Not matched"}
-                            </div>
-                          </div>
-                        );
-                      })}
-                      
-                      <div className="col-span-1 md:col-span-2 mt-2">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Correct Matches:</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {question.matches.map((match, matchIndex) => (
-                            <div key={matchIndex} className="flex items-center space-x-2">
-                              <div className="flex-1 p-2 rounded-lg bg-green-50 border border-green-200">
-                                {match.left}
-                              </div>
-                              <div className="flex-none">→</div>
-                              <div className="flex-1 p-2 rounded-lg bg-green-50 border border-green-200">
-                                {match.right}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Ordering */}
-                  {question.question_type === QUESTION_TYPES.ORDERING && (
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Your Order:</h4>
-                        <div className="space-y-2">
-                          {response?.response_data?.map((itemIndex, position) => (
-                            <div key={position} className="flex items-center">
-                              <span className="flex-none w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2">
-                                {position + 1}
-                              </span>
-                              <div className="flex-1 p-3 rounded-lg border border-gray-200">
-                                {itemIndex !== undefined && itemIndex !== null
-                                  ? question.order_items[itemIndex]?.text || "Item not selected"
-                                  : "Item not selected"}
-                              </div>
-                              <div className="flex-none ml-2">
-                                {position === question.order_items[itemIndex]?.position ? (
-                                  <CheckCircle className="w-5 h-5 text-green-600" />
-                                ) : (
-                                  <XCircle className="w-5 h-5 text-red-600" />
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Correct Order:</h4>
-                        <div className="space-y-2">
-                          {question.order_items
-                            .sort((a, b) => a.position - b.position)
-                            .map((item, position) => (
-                              <div key={position} className="flex items-center">
-                                <span className="flex-none w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-2">
-                                  {position + 1}
-                                </span>
-                                <div className="flex-1 p-3 rounded-lg border border-green-200 bg-green-50">
-                                  {item.text}
-                                </div>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {response?.explanation && (
-                    <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
-                      <h4 className="text-sm font-medium text-blue-700 mb-1">Explanation:</h4>
-                      <p className="text-sm text-blue-800">{response.explanation}</p>
-                    </div>
-                  )}
-                </Card>
-              );
-            })}
-          </div>
-        </Tabs.TabContent>
-        
-        {feedback && (
-          <Tabs.TabContent value="feedback">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">AI-Generated Feedback</h3>
-              
-              {/* Overall Assessment */}
-              <div className="mb-6">
-                <h4 className="text-md font-medium text-gray-800 mb-2">Overall Assessment</h4>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-gray-700">{feedback.overall_assessment}</p>
                 </div>
-              </div>
-              
-              {/* Strengths */}
-              <div className="mb-6">
-                <h4 className="text-md font-medium text-gray-800 mb-2">Strengths</h4>
-                <ul className="list-disc list-inside space-y-2 p-4 bg-green-50 rounded-lg">
-                  {feedback.strengths?.map((strength, index) => (
-                    <li key={index} className="text-gray-700">{strength}</li>
-                  ))}
-                </ul>
-              </div>
-              
-              {/* Areas for Improvement */}
-              <div className="mb-6">
-                <h4 className="text-md font-medium text-gray-800 mb-2">Areas for Improvement</h4>
-                <ul className="list-disc list-inside space-y-2 p-4 bg-amber-50 rounded-lg">
-                  {feedback.areas_for_improvement?.map((area, index) => (
-                    <li key={index} className="text-gray-700">{area}</li>
-                  ))}
-                </ul>
-              </div>
-              
-              {/* Recommendations */}
-              <div className="mb-6">
-                <h4 className="text-md font-medium text-gray-800 mb-2">Recommendations</h4>
-                <ul className="list-disc list-inside space-y-2 p-4 bg-blue-50 rounded-lg">
-                  {feedback.recommendations?.map((recommendation, index) => (
-                    <li key={index} className="text-gray-700">{recommendation}</li>
-                  ))}
-                </ul>
-              </div>
-              
-              {/* Skill-Specific Feedback */}
-              {feedback.skill_feedback && (
-                <div>
-                  <h4 className="text-md font-medium text-gray-800 mb-2">Skill-Specific Feedback</h4>
-                  <div className="space-y-4">
-                    {Object.entries(feedback.skill_feedback).map(([skill, feedbackText]) => (
-                      <div key={skill} className="p-4 bg-purple-50 rounded-lg">
-                        <h5 className="font-medium text-purple-800 mb-2">{skill}</h5>
-                        <p className="text-gray-700">{feedbackText}</p>
-                      </div>
+              </Card>
+              {/* Performance Badge */}
+              <Card className="p-6 lg:col-span-2">
+                <h3 className="text-lg font-semibold mb-4">Başarı Rozeti</h3>
+                <div className="text-center">
+                  <div className="inline-flex p-6 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full mb-4">
+                    <Award className="h-16 w-16 text-white" />
+                  </div>
+                  <h4 className="text-2xl font-bold mb-2">{comparisons?.achievement_title}</h4>
+                  <p className="text-gray-600 mb-4">{comparisons?.achievement_description}</p>
+                  <div className="flex items-center justify-center gap-2">
+                    {comparisons?.badges?.map((badge, index) => (
+                      <Badge key={index} variant="secondary" size="lg">
+                        {badge}
+                      </Badge>
                     ))}
                   </div>
                 </div>
-              )}
+              </Card>
+            </div>
+          </Tabs.TabContent>
+          {/* History Tab */}
+          <Tabs.TabContent value="history">
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Test Geçmişi</h3>
+              <div className="space-y-4">
+                {history.map((attempt, index) => (
+                  <div
+                    key={attempt.id}
+                    className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                    onClick={() => navigate(`/evaluations/sessions/${attempt.id}/results`)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`p-2 rounded-full ${
+                          attempt.status === 'passed' ? 'bg-green-100' : 'bg-red-100'
+                        }`}>
+                          {attempt.status === 'passed' ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-red-600" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-semibold">Deneme #{index + 1}</p>
+                          <p className="text-sm text-gray-600">
+                            {new Date(attempt.completed_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-lg">{attempt.score}%</p>
+                        <p className="text-sm text-gray-600">
+                          {attempt.correct_answers}/{attempt.total_questions} doğru
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </Card>
           </Tabs.TabContent>
-        )}
-      </Tabs>
+        </Tabs>
+      </div>
+      {/* Share Modal */}
+      {shareModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Sonuçları Paylaş</h3>
+            <div className="space-y-4">
+              <button
+                onClick={() => shareResults('email')}
+                className="w-full p-3 border rounded-lg hover:bg-gray-50 text-left"
+              >
+                <p className="font-medium">E-posta ile Gönder</p>
+                <p className="text-sm text-gray-600">Detaylı rapor e-postanıza gönderilecek</p>
+              </button>
+              <button
+                onClick={() => shareResults('link')}
+                className="w-full p-3 border rounded-lg hover:bg-gray-50 text-left"
+              >
+                <p className="font-medium">Link Oluştur</p>
+                <p className="text-sm text-gray-600">Paylaşılabilir link oluştur</p>
+              </button>
+              <button
+                onClick={() => shareResults('social')}
+                className="w-full p-3 border rounded-lg hover:bg-gray-50 text-left"
+              >
+                <p className="font-medium">Sosyal Medyada Paylaş</p>
+                <p className="text-sm text-gray-600">Başarınızı paylaşın</p>
+              </button>
+            </div>
+            <div className="flex justify-end mt-6 gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShareModalOpen(false)}
+              >
+                İptal
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
-
-export default TestResultsPage;
+export default TestResultsPageV2;

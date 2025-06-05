@@ -1,0 +1,32 @@
+# Development dependencies
+-r requirements.txt
+
+# Testing
+pytest==7.4.3
+pytest-flask==1.3.0
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+factory-boy==3.3.0
+coverage==7.3.2
+faker==20.1.0
+
+# Code Quality (actively used)
+flake8==7.0.0
+
+# Development Tools - Removed unused:
+# black==23.12.1  # Code formatter - not actively used
+# isort==5.13.2  # Import sorter - not actively used
+# mypy==1.8.0  # Type checker - not actively used
+# pylint==3.0.3  # Linter - not actively used
+# bandit==1.7.6  # Security linter - not actively used
+# ipython==8.18.1  # Interactive shell - not actively used
+# ipdb==0.13.13  # Debugger - not actively used
+# pre-commit==3.6.0  # Git hooks - not actively used
+# watchdog==3.0.0  # File monitoring - not actively used
+# sphinx==7.2.6  # Documentation - not actively used
+# sphinx-rtd-theme==2.0.0  # Documentation theme - not actively used
+# locust==2.20.1  # Performance testing - not actively used
+# memory-profiler==0.61.0  # Memory profiling - not actively used
+# line-profiler==4.1.1  # Line profiling - not actively used
+# pytest-asyncio==0.23.2  # Async testing - not actively used
+# pytest-env==1.1.3  # Env testing - not actively used

@@ -16,11 +16,9 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
-
 const EmailRemindersPage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [reminderSettings, setReminderSettings] = useState({
@@ -33,16 +31,13 @@ const EmailRemindersPage = () => {
     email_template_id: 'default',
     include_calendar_attachment: true
   });
-  
   const [emailTemplates, setEmailTemplates] = useState([]);
   const [testEmail, setTestEmail] = useState('');
   const [sendingTest, setSendingTest] = useState(false);
-
   useEffect(() => {
     fetchReminderSettings();
     fetchEmailTemplates();
   }, []);
-
   const fetchReminderSettings = async () => {
     try {
       const res = await fetch('/api/settings/email-reminders', {
@@ -50,9 +45,7 @@ const EmailRemindersPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch reminder settings');
-
       const data = await res.json();
       setReminderSettings(data);
     } catch (error) {
@@ -66,7 +59,6 @@ const EmailRemindersPage = () => {
       setLoading(false);
     }
   };
-
   const fetchEmailTemplates = async () => {
     try {
       const res = await fetch('/api/email-templates', {
@@ -74,23 +66,19 @@ const EmailRemindersPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch email templates');
-
       const data = await res.json();
       setEmailTemplates(data);
     } catch (error) {
       console.error('Error fetching email templates:', error);
     }
   };
-
   const handleSettingChange = (field, value) => {
     setReminderSettings({
       ...reminderSettings,
       [field]: value
     });
   };
-
   const handleReminderTimeChange = (index, value) => {
     const newTimes = [...reminderSettings.default_reminder_times];
     newTimes[index] = parseInt(value);
@@ -99,14 +87,12 @@ const EmailRemindersPage = () => {
       default_reminder_times: newTimes.filter(t => t > 0).sort((a, b) => b - a)
     });
   };
-
   const addReminderTime = () => {
     setReminderSettings({
       ...reminderSettings,
       default_reminder_times: [...reminderSettings.default_reminder_times, 1]
     });
   };
-
   const removeReminderTime = (index) => {
     const newTimes = reminderSettings.default_reminder_times.filter((_, i) => i !== index);
     setReminderSettings({
@@ -114,7 +100,6 @@ const EmailRemindersPage = () => {
       default_reminder_times: newTimes
     });
   };
-
   const handleSaveSettings = async () => {
     setSaving(true);
     try {
@@ -126,9 +111,7 @@ const EmailRemindersPage = () => {
         },
         body: JSON.stringify(reminderSettings)
       });
-
       if (!res.ok) throw new Error('Failed to save settings');
-
       toast({
         title: 'Success',
         description: 'Email reminder settings saved successfully'
@@ -144,7 +127,6 @@ const EmailRemindersPage = () => {
       setSaving(false);
     }
   };
-
   const sendTestReminder = async () => {
     if (!testEmail) {
       toast({
@@ -154,7 +136,6 @@ const EmailRemindersPage = () => {
       });
       return;
     }
-
     setSendingTest(true);
     try {
       const res = await fetch('/api/settings/email-reminders/test', {
@@ -165,9 +146,7 @@ const EmailRemindersPage = () => {
         },
         body: JSON.stringify({ email: testEmail })
       });
-
       if (!res.ok) throw new Error('Failed to send test email');
-
       toast({
         title: 'Success',
         description: 'Test reminder email sent successfully'
@@ -184,7 +163,6 @@ const EmailRemindersPage = () => {
       setSendingTest(false);
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -192,13 +170,11 @@ const EmailRemindersPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Email Reminders</h1>
       </div>
-
       {/* Main Settings */}
       <Card className="p-6">
         <div className="space-y-6">
@@ -217,12 +193,10 @@ const EmailRemindersPage = () => {
               onCheckedChange={(checked) => handleSettingChange('enabled', checked)}
             />
           </div>
-
           {reminderSettings.enabled && (
             <>
               <div className="border-t pt-6 space-y-4">
                 <h3 className="font-medium text-gray-900">Event Types</h3>
-                
                 <label className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Appointment Reminders</p>
@@ -235,7 +209,6 @@ const EmailRemindersPage = () => {
                     onCheckedChange={(checked) => handleSettingChange('appointment_reminders', checked)}
                   />
                 </label>
-
                 <label className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Session Reminders</p>
@@ -248,7 +221,6 @@ const EmailRemindersPage = () => {
                     onCheckedChange={(checked) => handleSettingChange('session_reminders', checked)}
                   />
                 </label>
-
                 <label className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Test Reminders</p>
@@ -262,13 +234,11 @@ const EmailRemindersPage = () => {
                   />
                 </label>
               </div>
-
               <div className="border-t pt-6 space-y-4">
                 <h3 className="font-medium text-gray-900">Reminder Times</h3>
                 <p className="text-sm text-gray-600">
                   Set when to send reminder emails before each event
                 </p>
-                
                 <div className="space-y-3">
                   {reminderSettings.default_reminder_times.map((time, index) => (
                     <div key={index} className="flex items-center gap-3">
@@ -292,7 +262,6 @@ const EmailRemindersPage = () => {
                       )}
                     </div>
                   ))}
-                  
                   <Button
                     variant="outline"
                     size="sm"
@@ -302,10 +271,8 @@ const EmailRemindersPage = () => {
                   </Button>
                 </div>
               </div>
-
               <div className="border-t pt-6 space-y-4">
                 <h3 className="font-medium text-gray-900">Email Template</h3>
-                
                 <Select
                   value={reminderSettings.email_template_id}
                   onChange={(e) => handleSettingChange('email_template_id', e.target.value)}
@@ -317,7 +284,6 @@ const EmailRemindersPage = () => {
                     </option>
                   ))}
                 </Select>
-
                 <label className="flex items-center gap-3">
                   <input
                     type="checkbox"
@@ -335,7 +301,6 @@ const EmailRemindersPage = () => {
               </div>
             </>
           )}
-
           <div className="flex justify-end pt-4">
             <Button 
               onClick={handleSaveSettings}
@@ -356,7 +321,6 @@ const EmailRemindersPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Test Email */}
       <Card className="p-6">
         <div className="space-y-4">
@@ -364,7 +328,6 @@ const EmailRemindersPage = () => {
           <p className="text-sm text-gray-600">
             Send a test reminder email to verify your settings
           </p>
-          
           <div className="flex gap-3">
             <Input
               type="email"
@@ -390,7 +353,6 @@ const EmailRemindersPage = () => {
               )}
             </Button>
           </div>
-          
           {!reminderSettings.enabled && (
             <div className="flex items-center gap-2 text-amber-600">
               <AlertCircle className="h-4 w-4" />
@@ -399,18 +361,15 @@ const EmailRemindersPage = () => {
           )}
         </div>
       </Card>
-
       {/* Email Service Status */}
       <Card className="p-6">
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Email Service Status</h3>
-          
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Service Provider</span>
               <Badge variant="secondary">SendGrid</Badge>
             </div>
-            
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Status</span>
               <Badge variant="success">
@@ -418,12 +377,10 @@ const EmailRemindersPage = () => {
                 Connected
               </Badge>
             </div>
-            
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Daily Limit</span>
               <span className="text-sm font-medium">1,000 / 10,000</span>
             </div>
-            
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Today's Sent</span>
               <span className="text-sm font-medium">127</span>
@@ -431,7 +388,6 @@ const EmailRemindersPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Info Box */}
       <Card className="p-6 bg-blue-50 border-blue-200">
         <div className="flex gap-3">
@@ -448,5 +404,4 @@ const EmailRemindersPage = () => {
     </div>
   );
 };
-
 export default EmailRemindersPage;

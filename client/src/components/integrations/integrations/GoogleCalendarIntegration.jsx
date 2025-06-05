@@ -13,7 +13,6 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
-
 const GoogleCalendarIntegration = ({ integration, onBack }) => {
   const [calendars, setCalendars] = useState([
     { id: '1', name: 'Primary Calendar', color: '#4285F4', selected: true, events: 45 },
@@ -21,7 +20,6 @@ const GoogleCalendarIntegration = ({ integration, onBack }) => {
     { id: '3', name: 'Team Meetings', color: '#FBBC04', selected: false, events: 12 },
     { id: '4', name: 'Personal', color: '#EA4335', selected: false, events: 8 }
   ]);
-
   const configFields = [
     {
       name: 'clientId',
@@ -69,7 +67,6 @@ const GoogleCalendarIntegration = ({ integration, onBack }) => {
       description: 'Automatically add video call links to online events'
     }
   ];
-
   const oauthConfig = {
     authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
     tokenUrl: 'https://oauth2.googleapis.com/token',
@@ -81,7 +78,6 @@ const GoogleCalendarIntegration = ({ integration, onBack }) => {
       'https://www.googleapis.com/auth/userinfo.email'
     ]
   };
-
   const webhookEvents = [
     'calendar.event.created',
     'calendar.event.updated',
@@ -89,7 +85,6 @@ const GoogleCalendarIntegration = ({ integration, onBack }) => {
     'calendar.event.reminder',
     'calendar.sync.completed'
   ];
-
   const apiEndpoints = [
     {
       method: 'GET',
@@ -112,7 +107,6 @@ const GoogleCalendarIntegration = ({ integration, onBack }) => {
       description: 'Trigger manual synchronization'
     }
   ];
-
   const customOverview = (
     <>
       {/* Statistics */}
@@ -154,7 +148,6 @@ const GoogleCalendarIntegration = ({ integration, onBack }) => {
           </div>
         </Card>
       </div>
-
       {/* Quick Actions */}
       <Card>
         <div className="p-6">
@@ -191,7 +184,6 @@ const GoogleCalendarIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Calendar Selection */}
       <Card>
         <div className="p-6">
@@ -232,7 +224,6 @@ const GoogleCalendarIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Recent Sync Activity */}
       <Card>
         <div className="p-6">
@@ -268,7 +259,6 @@ const GoogleCalendarIntegration = ({ integration, onBack }) => {
       </Card>
     </>
   );
-
   return (
     <BaseIntegration
       integration={integration}
@@ -282,5 +272,4 @@ const GoogleCalendarIntegration = ({ integration, onBack }) => {
     </BaseIntegration>
   );
 };
-
 export default GoogleCalendarIntegration;

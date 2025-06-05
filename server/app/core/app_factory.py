@@ -108,9 +108,11 @@ class ApplicationFactory:
         """Register authentication blueprints."""
         from app.api.auth import auth_bp
         from app.api.simple_auth import simple_auth_bp
+        from app.api.two_factor_auth import two_fa_bp
         
         app.register_blueprint(auth_bp, url_prefix='/api/auth')
         app.register_blueprint(simple_auth_bp, url_prefix='/api/auth')
+        app.register_blueprint(two_fa_bp, url_prefix='/api/auth/2fa')
     
     def _register_api_blueprints(self, app: Flask) -> None:
         """Register main API blueprints."""
@@ -141,11 +143,18 @@ class ApplicationFactory:
             ('app.api.assessment', 'assessment_bp', '/api'),
             ('app.api.assessment_templates', 'assessment_templates_bp', '/api'),
             ('app.api.health', 'health_bp', '/api'),
+            ('app.api.settings_routes', 'settings_bp', None),  # Routes already have /api prefix
+            ('app.api.recurring_appointments', 'bp', '/api/recurring-appointments'),
+            ('app.api.ai_reports', 'bp', None),
+            ('app.api.sms', 'sms_bp', None),  # SMS API endpoints
+            ('app.api.adaptive_tests', 'adaptive_test_bp', None),  # Adaptive test endpoints
+            ('app.api.question_randomization', 'randomization_bp', '/api/randomization'),  # Question randomization endpoints
         ]
         
         # Additional blueprints that might cause import issues
         problematic_blueprints = [
             ('app.api.evaluations', 'evaluations_bp', '/api/evaluations'),
+            ('app.api.tests_simple', 'tests_simple_bp', '/api/evaluations'),  # Map to same endpoint
         ]
         
         # Register safe blueprints first

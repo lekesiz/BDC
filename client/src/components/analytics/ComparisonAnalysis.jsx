@@ -16,7 +16,6 @@ import {
 import { Line, Bar, Radar, Scatter } from 'react-chartjs-2';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
-
 // Register ChartJS components
 ChartJS.register(
   CategoryScale,
@@ -31,7 +30,6 @@ ChartJS.register(
   Legend,
   Filler
 );
-
 const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
   const { user } = useAuth();
   const [comparisonData, setComparisonData] = useState(null);
@@ -45,11 +43,9 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
     'improvement'
   ]);
   const [viewMode, setViewMode] = useState('overview'); // overview, detailed, timeline
-
   useEffect(() => {
     fetchComparisonData();
   }, [beneficiaryId, assessmentId, comparisonType, timeRange]);
-
   const fetchComparisonData = async () => {
     try {
       setLoading(true);
@@ -59,7 +55,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
         assessmentId: assessmentId || '',
         includeMetrics: selectedMetrics.join(',')
       });
-
       const response = await fetch(
         `/api/analytics/comparison/${beneficiaryId}?${params}`
       );
@@ -71,17 +66,13 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
       setLoading(false);
     }
   };
-
   const getPeerComparisonChart = () => {
     if (!comparisonData?.peerComparison) return null;
-
     const { userMetrics, peerMetrics, percentile } = comparisonData.peerComparison;
-
     const labels = Object.keys(userMetrics);
     const userData = Object.values(userMetrics);
     const peerAvgData = Object.values(peerMetrics.average);
     const peerBestData = Object.values(peerMetrics.best);
-
     return {
       labels,
       datasets: [
@@ -115,18 +106,14 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
       ]
     };
   };
-
   const getTimelineComparisonChart = () => {
     if (!comparisonData?.timeline) return null;
-
     const { userProgress, peerProgress } = comparisonData.timeline;
-
     const labels = userProgress.map(point => 
       new Date(point.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     );
     const userData = userProgress.map(point => point.score);
     const peerData = peerProgress.map(point => point.avgScore);
-
     return {
       labels,
       datasets: [
@@ -149,16 +136,13 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
       ]
     };
   };
-
   const getCategoryComparisonChart = () => {
     if (!comparisonData?.categoryComparison) return null;
-
     const categories = comparisonData.categoryComparison;
     const labels = Object.keys(categories);
     const userScores = labels.map(cat => categories[cat].userScore);
     const peerScores = labels.map(cat => categories[cat].peerAverage);
     const gaps = labels.map(cat => categories[cat].gap);
-
     return {
       labels,
       datasets: [
@@ -192,19 +176,15 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
       ]
     };
   };
-
   const getDistributionChart = () => {
     if (!comparisonData?.distribution) return null;
-
     const { bins, userPosition, frequencies } = comparisonData.distribution;
-
     const backgroundColor = bins.map((bin, index) => {
       if (index === userPosition) {
         return 'rgba(59, 130, 246, 0.8)';
       }
       return 'rgba(156, 163, 175, 0.6)';
     });
-
     return {
       labels: bins.map(bin => `${bin.min}-${bin.max}%`),
       datasets: [
@@ -220,11 +200,9 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
       ]
     };
   };
-
   const MetricCard = ({ title, value, comparison, trend, percentile }) => {
     const isPositive = comparison >= 0;
     const trendIcon = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→';
-
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -246,10 +224,8 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
       </motion.div>
     );
   };
-
   const DetailedComparisonTable = ({ data }) => {
     if (!data) return null;
-
     return (
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
@@ -276,7 +252,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
             {Object.entries(data).map(([metric, values]) => {
               const difference = values.userScore - values.peerAverage;
               const isPositive = difference >= 0;
-
               return (
                 <tr key={metric}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -312,10 +287,8 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
       </div>
     );
   };
-
   const InsightsPanel = ({ insights }) => {
     if (!insights || insights.length === 0) return null;
-
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -349,7 +322,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
       </motion.div>
     );
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -357,7 +329,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
       </div>
     );
   }
-
   if (!comparisonData) {
     return (
       <div className="text-center py-8">
@@ -365,7 +336,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {/* Controls */}
@@ -387,7 +357,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
               <option value="historical">Past Performance</option>
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Time Range
@@ -405,7 +374,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
             </select>
           </div>
         </div>
-
         <div className="flex gap-2">
           <button
             onClick={() => setViewMode('overview')}
@@ -439,7 +407,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
           </button>
         </div>
       </div>
-
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
@@ -468,7 +435,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
           trend={comparisonData.summary.consistencyTrend}
         />
       </div>
-
       {/* Main Content based on View Mode */}
       {viewMode === 'overview' && (
         <>
@@ -501,7 +467,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
                 />
               </div>
             </div>
-
             {/* Distribution Chart */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -547,7 +512,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
               </div>
             </div>
           </div>
-
           {/* Category Comparison */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -590,12 +554,10 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
           </div>
         </>
       )}
-
       {viewMode === 'detailed' && (
         <>
           {/* Detailed Comparison Table */}
           <DetailedComparisonTable data={comparisonData.detailedMetrics} />
-
           {/* Strengths and Weaknesses */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-lg shadow-md p-6">
@@ -618,7 +580,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
                 ))}
               </ul>
             </div>
-
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Areas for Improvement
@@ -645,7 +606,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
           </div>
         </>
       )}
-
       {viewMode === 'timeline' && (
         <>
           {/* Timeline Progress Chart */}
@@ -692,7 +652,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
               />
             </div>
           </div>
-
           {/* Growth Rate Comparison */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-lg shadow-md p-6">
@@ -730,7 +689,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
                 </div>
               </div>
             </div>
-
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Milestone Achievements
@@ -761,10 +719,8 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
           </div>
         </>
       )}
-
       {/* Insights Panel */}
       <InsightsPanel insights={comparisonData.insights} />
-
       {/* Action Recommendations */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -802,7 +758,6 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
           ))}
         </div>
       </motion.div>
-
       {/* Export Options */}
       <div className="flex justify-end gap-4">
         <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
@@ -815,5 +770,4 @@ const ComparisonAnalysis = ({ beneficiaryId, assessmentId }) => {
     </div>
   );
 };
-
 export default ComparisonAnalysis;

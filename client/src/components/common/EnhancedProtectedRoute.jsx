@@ -1,12 +1,10 @@
 /**
  * Enhanced ProtectedRoute component with centralized role and permission checking
  */
-
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { canAccessRoute, hasRole, hasPermission } from '../../config/roles';
 import LoadingSpinner from '../ui/LoadingSpinner';
-
 /**
  * Enhanced ProtectedRoute that supports:
  * - Authentication checking
@@ -39,7 +37,6 @@ const EnhancedProtectedRoute = ({
 }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
-  
   // Show loading state
   if (isLoading) {
     return (
@@ -48,21 +45,17 @@ const EnhancedProtectedRoute = ({
       </div>
     );
   }
-  
   // Check authentication requirement
   if (requireAuth && !isAuthenticated) {
     return <Navigate to={redirectTo} state={{ from: location.pathname }} replace />;
   }
-  
   // Skip authorization checks if no authentication required and user not authenticated
   if (!requireAuth && !isAuthenticated) {
     return children;
   }
-  
   // Perform authorization checks for authenticated users
   if (isAuthenticated && user) {
     let authorized = true;
-    
     // Check access configuration (new centralized approach)
     if (access) {
       authorized = canAccessRoute(user.role, access);
@@ -79,22 +72,18 @@ const EnhancedProtectedRoute = ({
         authorized = hasPermission(user.role, requiredPermission);
       }
     }
-    
     // Apply custom access check if provided
     if (authorized && customAccessCheck) {
       authorized = customAccessCheck(user);
     }
-    
     // Redirect if not authorized
     if (!authorized) {
       return <Navigate to={unauthorizedRedirect} replace />;
     }
   }
-  
   // Render children if all checks pass
   return children;
 };
-
 /**
  * Convenience wrapper for role-based protection
  */
@@ -103,7 +92,6 @@ export const RoleProtectedRoute = ({ children, roles, ...props }) => (
     {children}
   </EnhancedProtectedRoute>
 );
-
 /**
  * Convenience wrapper for permission-based protection
  */
@@ -112,7 +100,6 @@ export const PermissionProtectedRoute = ({ children, permissions, ...props }) =>
     {children}
   </EnhancedProtectedRoute>
 );
-
 /**
  * Convenience wrapper for admin-only routes
  */
@@ -124,7 +111,6 @@ export const AdminRoute = ({ children, ...props }) => (
     {children}
   </EnhancedProtectedRoute>
 );
-
 /**
  * Convenience wrapper for management routes (admin + trainer)
  */
@@ -136,7 +122,6 @@ export const ManagementRoute = ({ children, ...props }) => (
     {children}
   </EnhancedProtectedRoute>
 );
-
 /**
  * Convenience wrapper for student-only routes
  */
@@ -148,7 +133,6 @@ export const StudentRoute = ({ children, ...props }) => (
     {children}
   </EnhancedProtectedRoute>
 );
-
 /**
  * Public route wrapper (no authentication required)
  */
@@ -160,5 +144,4 @@ export const PublicRoute = ({ children, ...props }) => (
     {children}
   </EnhancedProtectedRoute>
 );
-
 export default EnhancedProtectedRoute;

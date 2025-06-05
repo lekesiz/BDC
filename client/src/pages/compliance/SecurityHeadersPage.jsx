@@ -18,7 +18,6 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useToast } from '../../components/ui/use-toast';
-
 const securityHeaders = [
   {
     name: 'Content-Security-Policy',
@@ -70,7 +69,6 @@ const securityHeaders = [
     docs: 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Feature-Policy'
   }
 ];
-
 const SecurityHeadersPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -80,12 +78,10 @@ const SecurityHeadersPage = () => {
   const [testResults, setTestResults] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedHeader, setSelectedHeader] = useState(null);
-
   useEffect(() => {
     fetchCurrentHeaders();
     fetchHeaderConfig();
   }, []);
-
   const fetchCurrentHeaders = async () => {
     try {
       const response = await fetch('/api/admin/security/headers', {
@@ -93,7 +89,6 @@ const SecurityHeadersPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setCurrentHeaders(data.headers || {});
@@ -102,7 +97,6 @@ const SecurityHeadersPage = () => {
       console.error('Error fetching headers:', error);
     }
   };
-
   const fetchHeaderConfig = async () => {
     try {
       const response = await fetch('/api/admin/security/headers/config', {
@@ -110,7 +104,6 @@ const SecurityHeadersPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setHeaderConfig(data.config || {});
@@ -119,7 +112,6 @@ const SecurityHeadersPage = () => {
       console.error('Error fetching config:', error);
     }
   };
-
   const updateHeaderConfig = async (headerName, value) => {
     try {
       const response = await fetch('/api/admin/security/headers/config', {
@@ -133,7 +125,6 @@ const SecurityHeadersPage = () => {
           [headerName]: value
         })
       });
-      
       if (response.ok) {
         setHeaderConfig({ ...headerConfig, [headerName]: value });
         showToast('Header configuration updated', 'success');
@@ -142,7 +133,6 @@ const SecurityHeadersPage = () => {
       showToast('Error updating configuration', 'error');
     }
   };
-
   const testHeaders = async (url = window.location.origin) => {
     setLoading(true);
     try {
@@ -154,7 +144,6 @@ const SecurityHeadersPage = () => {
         },
         body: JSON.stringify({ url })
       });
-      
       if (response.ok) {
         const data = await response.json();
         setTestResults(data.results);
@@ -166,13 +155,11 @@ const SecurityHeadersPage = () => {
       setLoading(false);
     }
   };
-
   const applyRecommendedSettings = async () => {
     const recommendedConfig = {};
     securityHeaders.forEach(header => {
       recommendedConfig[header.name] = header.recommended;
     });
-    
     try {
       const response = await fetch('/api/admin/security/headers/config', {
         method: 'PUT',
@@ -182,7 +169,6 @@ const SecurityHeadersPage = () => {
         },
         body: JSON.stringify(recommendedConfig)
       });
-      
       if (response.ok) {
         setHeaderConfig(recommendedConfig);
         showToast('Applied recommended security settings', 'success');
@@ -191,23 +177,19 @@ const SecurityHeadersPage = () => {
       showToast('Error applying settings', 'error');
     }
   };
-
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     showToast('Copied to clipboard', 'success');
   };
-
   // Spinner component definition
   const Spinner = () => (
     <div className="flex justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
   );
-
   const getStatusIcon = (header) => {
     const current = currentHeaders[header.name];
     const configured = headerConfig[header.name];
-    
     if (!current && !configured) {
       return <XCircle className="w-5 h-5 text-red-500" />;
     } else if (current === header.recommended || configured === header.recommended) {
@@ -216,7 +198,6 @@ const SecurityHeadersPage = () => {
       return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
     }
   };
-
   const getSeverityColor = (level) => {
     switch (level) {
       case 'critical':
@@ -229,7 +210,6 @@ const SecurityHeadersPage = () => {
         return 'text-gray-600 bg-gray-100';
     }
   };
-
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Summary Cards */}
@@ -245,7 +225,6 @@ const SecurityHeadersPage = () => {
             <Shield className="w-8 h-8 text-primary" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -255,7 +234,6 @@ const SecurityHeadersPage = () => {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -267,7 +245,6 @@ const SecurityHeadersPage = () => {
             <XCircle className="w-8 h-8 text-red-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -280,7 +257,6 @@ const SecurityHeadersPage = () => {
           </div>
         </Card>
       </div>
-
       {/* Headers List */}
       <Card>
         <div className="flex justify-between items-center mb-4">
@@ -303,7 +279,6 @@ const SecurityHeadersPage = () => {
             </Button>
           </div>
         </div>
-
         <div className="space-y-4">
           {securityHeaders.map(header => (
             <div key={header.name} className="border rounded-lg p-4">
@@ -317,7 +292,6 @@ const SecurityHeadersPage = () => {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-3">{header.description}</p>
-                  
                   {/* Current Value */}
                   <div className="space-y-2">
                     <div>
@@ -326,7 +300,6 @@ const SecurityHeadersPage = () => {
                         {currentHeaders[header.name] || 'Not set'}
                       </p>
                     </div>
-                    
                     {/* Recommended Value */}
                     <div>
                       <p className="text-xs font-medium text-gray-500">Recommended:</p>
@@ -345,7 +318,6 @@ const SecurityHeadersPage = () => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="ml-4 space-x-2">
                   <Button
                     size="sm"
@@ -369,7 +341,6 @@ const SecurityHeadersPage = () => {
       </Card>
     </div>
   );
-
   const renderConfiguration = () => (
     <div className="space-y-6">
       <Card>
@@ -383,7 +354,6 @@ const SecurityHeadersPage = () => {
                   {header.level}
                 </span>
               </div>
-              
               <div className="space-y-2">
                 <label className="block text-sm font-medium">Value</label>
                 <textarea
@@ -415,7 +385,6 @@ const SecurityHeadersPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Implementation Guide */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Implementation Guide</h3>
@@ -442,7 +411,6 @@ ${securityHeaders.map(header =>
               Copy Nginx Config
             </Button>
           </div>
-
           <div>
             <h4 className="font-medium mb-2">Apache Configuration</h4>
             <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
@@ -465,7 +433,6 @@ ${securityHeaders.map(header =>
               Copy Apache Config
             </Button>
           </div>
-
           <div>
             <h4 className="font-medium mb-2">Express.js Middleware</h4>
             <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
@@ -495,7 +462,6 @@ ${securityHeaders.map(header =>
       </Card>
     </div>
   );
-
   const renderTestResults = () => (
     <div className="space-y-6">
       {testResults ? (
@@ -521,7 +487,6 @@ ${securityHeaders.map(header =>
                   <p className="text-2xl font-bold">{testResults.grade}</p>
                 </div>
               </div>
-
               <div className="border-t pt-4">
                 <h4 className="font-medium mb-3">Header Analysis</h4>
                 <div className="space-y-3">
@@ -542,7 +507,6 @@ ${securityHeaders.map(header =>
                   ))}
                 </div>
               </div>
-
               <div className="border-t pt-4">
                 <h4 className="font-medium mb-3">Recommendations</h4>
                 <ul className="space-y-2">
@@ -574,7 +538,6 @@ ${securityHeaders.map(header =>
       )}
     </div>
   );
-
   const renderSelectedHeader = () => (
     selectedHeader && (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -589,34 +552,29 @@ ${securityHeaders.map(header =>
               <XCircle className="w-4 h-4" />
             </Button>
           </div>
-
           <div className="space-y-4">
             <div>
               <p className="font-medium mb-1">Description</p>
               <p className="text-sm text-gray-600">{selectedHeader.description}</p>
             </div>
-
             <div>
               <p className="font-medium mb-1">Security Level</p>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(selectedHeader.level)}`}>
                 {selectedHeader.level}
               </span>
             </div>
-
             <div>
               <p className="font-medium mb-1">Current Value</p>
               <pre className="bg-gray-50 p-3 rounded text-sm">
                 {currentHeaders[selectedHeader.name] || 'Not set'}
               </pre>
             </div>
-
             <div>
               <p className="font-medium mb-1">Recommended Value</p>
               <pre className="bg-green-50 p-3 rounded text-sm">
                 {selectedHeader.recommended}
               </pre>
             </div>
-
             <div>
               <p className="font-medium mb-1">Documentation</p>
               <a
@@ -628,7 +586,6 @@ ${securityHeaders.map(header =>
                 Read more <ExternalLink className="w-3 h-3 ml-1" />
               </a>
             </div>
-
             <div className="pt-4 border-t space-x-2">
               <Button
                 onClick={() => {
@@ -650,7 +607,6 @@ ${securityHeaders.map(header =>
       </div>
     )
   );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -662,7 +618,6 @@ ${securityHeaders.map(header =>
           Back to Settings
         </Button>
       </div>
-
       {/* Tabs */}
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
@@ -681,7 +636,6 @@ ${securityHeaders.map(header =>
           ))}
         </nav>
       </div>
-
       {/* Tab Content */}
       {loading ? (
         <div className="flex justify-center py-12">
@@ -694,10 +648,8 @@ ${securityHeaders.map(header =>
           {activeTab === 'test-results' && renderTestResults()}
         </>
       )}
-
       {renderSelectedHeader()}
     </div>
   );
 };
-
 export default SecurityHeadersPage;

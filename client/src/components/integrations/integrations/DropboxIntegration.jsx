@@ -18,7 +18,6 @@ import {
   Users,
   RefreshCw
 } from 'lucide-react';
-
 const DropboxIntegration = ({ integration, onBack }) => {
   const [accountInfo, setAccountInfo] = useState({
     email: 'admin@bdcacademy.com',
@@ -27,14 +26,12 @@ const DropboxIntegration = ({ integration, onBack }) => {
     storageTotal: 1000,
     teamMembers: 45
   });
-
   const [syncedFolders, setSyncedFolders] = useState([
     { id: '1', name: 'Training Resources', path: '/Training Resources', status: 'synced', size: '45.2 GB', files: 1234 },
     { id: '2', name: 'Student Submissions', path: '/Student Submissions', status: 'syncing', size: '23.8 GB', files: 567 },
     { id: '3', name: 'Administrative Docs', path: '/Administrative Docs', status: 'synced', size: '12.4 GB', files: 234 },
     { id: '4', name: 'Course Materials', path: '/Course Materials', status: 'error', size: '67.9 GB', files: 2345 }
   ]);
-
   const [backupSettings, setBackupSettings] = useState({
     autoBackup: true,
     backupFrequency: 'daily',
@@ -43,7 +40,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
     includeDeleted: false,
     compression: true
   });
-
   const configFields = [
     {
       name: 'accessToken',
@@ -82,7 +78,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
       description: 'Enable Dropbox Business team folders'
     }
   ];
-
   const oauthConfig = {
     authUrl: 'https://www.dropbox.com/oauth2/authorize',
     tokenUrl: 'https://api.dropboxapi.com/oauth2/token',
@@ -90,7 +85,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
     redirectUri: `${window.location.origin}/integrations/dropbox/callback`,
     scopes: []
   };
-
   const webhookEvents = [
     'file.added',
     'file.modified',
@@ -99,7 +93,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
     'share.created',
     'member.added'
   ];
-
   const apiEndpoints = [
     {
       method: 'GET',
@@ -122,9 +115,7 @@ const DropboxIntegration = ({ integration, onBack }) => {
       description: 'Create a shared link'
     }
   ];
-
   const storagePercentage = (accountInfo.storageUsed / accountInfo.storageTotal) * 100;
-
   const customOverview = (
     <>
       {/* Account Overview */}
@@ -142,7 +133,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
             </div>
             <Badge variant="success">Active</Badge>
           </div>
-          
           <div className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-2">
@@ -153,7 +143,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
               </div>
               <Progress value={storagePercentage} className="h-3" />
             </div>
-            
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center p-3 bg-gray-50 rounded-lg">
                 <HardDrive className="w-6 h-6 mx-auto mb-2 text-gray-600" />
@@ -174,7 +163,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Synced Folders */}
       <Card>
         <div className="p-6">
@@ -216,7 +204,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Backup Settings */}
       <Card>
         <div className="p-6">
@@ -240,7 +227,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Backup Frequency
@@ -259,7 +245,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
                 <option value="monthly">Monthly</option>
               </select>
             </div>
-
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Version Control</p>
@@ -278,7 +263,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Compression</p>
@@ -300,7 +284,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Quick Actions */}
       <Card>
         <div className="p-6">
@@ -337,7 +320,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Recent Activity */}
       <Card>
         <div className="p-6">
@@ -369,7 +351,6 @@ const DropboxIntegration = ({ integration, onBack }) => {
       </Card>
     </>
   );
-
   return (
     <BaseIntegration
       integration={integration}
@@ -383,5 +364,4 @@ const DropboxIntegration = ({ integration, onBack }) => {
     </BaseIntegration>
   );
 };
-
 export default DropboxIntegration;

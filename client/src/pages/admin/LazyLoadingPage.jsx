@@ -25,24 +25,20 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useToast } from '../../components/ui/use-toast';
-
 // Example of lazy loaded component
 const LazyComponentExample = lazy(() => import('../../components/examples/LazyExample'));
-
 // Spinner component definition
 const Spinner = () => (
   <div className="flex justify-center">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
   </div>
 );
-
 const componentTypes = [
   { id: 'routes', name: 'Route Components', icon: FileCode, count: 0 },
   { id: 'modals', name: 'Modal Components', icon: Layers, count: 0 },
   { id: 'heavy', name: 'Heavy Components', icon: Package, count: 0 },
   { id: 'images', name: 'Image Components', icon: ImageIcon, count: 0 }
 ];
-
 const loadingStrategies = [
   {
     id: 'on_demand',
@@ -69,7 +65,6 @@ const loadingStrategies = [
     recommended: ['routes']
   }
 ];
-
 const LazyLoadingPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -101,13 +96,11 @@ const LazyLoadingPage = () => {
     withoutLazy: { size: 0, loadTime: 0 },
     withLazy: { size: 0, loadTime: 0 }
   });
-
   useEffect(() => {
     fetchComponents();
     fetchMetrics();
     fetchPerformance();
   }, []);
-
   const fetchComponents = async () => {
     setLoading(true);
     try {
@@ -116,7 +109,6 @@ const LazyLoadingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setComponents(data.components || []);
@@ -127,7 +119,6 @@ const LazyLoadingPage = () => {
       setLoading(false);
     }
   };
-
   const fetchMetrics = async () => {
     try {
       const response = await fetch('/api/admin/lazy-loading/metrics', {
@@ -135,7 +126,6 @@ const LazyLoadingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setMetrics(data.metrics);
@@ -144,7 +134,6 @@ const LazyLoadingPage = () => {
       console.error('Error fetching metrics:', error);
     }
   };
-
   const fetchPerformance = async () => {
     try {
       const response = await fetch('/api/admin/lazy-loading/performance', {
@@ -152,7 +141,6 @@ const LazyLoadingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setPerformance(data.performance);
@@ -161,7 +149,6 @@ const LazyLoadingPage = () => {
       console.error('Error fetching performance:', error);
     }
   };
-
   const enableLazyLoading = async (componentId, strategy) => {
     try {
       const response = await fetch(`/api/admin/components/${componentId}/lazy`, {
@@ -172,7 +159,6 @@ const LazyLoadingPage = () => {
         },
         body: JSON.stringify({ strategy })
       });
-      
       if (response.ok) {
         showToast('Lazy loading enabled successfully', 'success');
         fetchComponents();
@@ -182,7 +168,6 @@ const LazyLoadingPage = () => {
       showToast('Error enabling lazy loading', 'error');
     }
   };
-
   const updateConfig = async (newConfig) => {
     try {
       const response = await fetch('/api/admin/lazy-loading/config', {
@@ -193,7 +178,6 @@ const LazyLoadingPage = () => {
         },
         body: JSON.stringify(newConfig)
       });
-      
       if (response.ok) {
         setConfig(newConfig);
         showToast('Configuration updated', 'success');
@@ -202,7 +186,6 @@ const LazyLoadingPage = () => {
       showToast('Error updating configuration', 'error');
     }
   };
-
   const generateReport = async () => {
     try {
       const response = await fetch('/api/admin/lazy-loading/report', {
@@ -210,7 +193,6 @@ const LazyLoadingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -226,7 +208,6 @@ const LazyLoadingPage = () => {
       showToast('Error generating report', 'error');
     }
   };
-
   const formatBytes = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -234,7 +215,6 @@ const LazyLoadingPage = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
-
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Metrics Cards */}
@@ -251,7 +231,6 @@ const LazyLoadingPage = () => {
             <Layers className="w-8 h-8 text-primary" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -264,7 +243,6 @@ const LazyLoadingPage = () => {
             <TrendingDown className="w-8 h-8 text-green-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -275,7 +253,6 @@ const LazyLoadingPage = () => {
             <Clock className="w-8 h-8 text-blue-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -289,7 +266,6 @@ const LazyLoadingPage = () => {
           </div>
         </Card>
       </div>
-
       {/* Performance Comparison */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Performance Impact</h3>
@@ -325,7 +301,6 @@ const LazyLoadingPage = () => {
             </div>
           </div>
         </div>
-        
         <div className="mt-4 p-4 bg-green-50 rounded-lg">
           <p className="text-green-800 font-medium">
             {((1 - performance.withLazy.size / performance.withoutLazy.size) * 100).toFixed(1)}% reduction in initial bundle size
@@ -335,7 +310,6 @@ const LazyLoadingPage = () => {
           </p>
         </div>
       </Card>
-
       {/* Live Demo */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Live Demo</h3>
@@ -343,7 +317,6 @@ const LazyLoadingPage = () => {
           <p className="text-gray-600">
             Click the button below to see lazy loading in action. Watch the network tab to see the component being loaded on demand.
           </p>
-          
           <div className="flex space-x-4">
             <Button
               onClick={() => setShowExample(!showExample)}
@@ -361,7 +334,6 @@ const LazyLoadingPage = () => {
                 </>
               )}
             </Button>
-            
             {showExample && (
               <Button
                 variant="secondary"
@@ -372,7 +344,6 @@ const LazyLoadingPage = () => {
               </Button>
             )}
           </div>
-          
           {showExample && (
             <Suspense fallback={
               <div className="p-4 border rounded-lg">
@@ -389,7 +360,6 @@ const LazyLoadingPage = () => {
           )}
         </div>
       </Card>
-
       {/* Top Components */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Components for Lazy Loading</h3>
@@ -420,7 +390,6 @@ const LazyLoadingPage = () => {
       </Card>
     </div>
   );
-
   const renderComponents = () => (
     <div className="space-y-6">
       {/* Component Types */}
@@ -439,7 +408,6 @@ const LazyLoadingPage = () => {
           </Card>
         ))}
       </div>
-
       {/* Component List */}
       <Card>
         <div className="flex justify-between items-center mb-4">
@@ -462,7 +430,6 @@ const LazyLoadingPage = () => {
             </Button>
           </div>
         </div>
-
         {loading ? (
           <div className="flex justify-center py-8">
             <Spinner />
@@ -534,18 +501,15 @@ const LazyLoadingPage = () => {
       </Card>
     </div>
   );
-
   const renderStrategies = () => (
     <div className="space-y-6">
       <Card>
         <h3 className="font-semibold text-lg mb-4">Loading Strategies</h3>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {loadingStrategies.map(strategy => (
             <div key={strategy.id} className="border rounded-lg p-4">
               <h4 className="font-medium mb-2">{strategy.name}</h4>
               <p className="text-sm text-gray-600 mb-3">{strategy.description}</p>
-              
               <div>
                 <p className="text-xs font-medium text-gray-500 mb-1">Recommended for:</p>
                 <div className="flex flex-wrap gap-2">
@@ -560,11 +524,9 @@ const LazyLoadingPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Implementation Examples */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Implementation Examples</h3>
-        
         <div className="space-y-6">
           {/* Route-based Lazy Loading */}
           <div>
@@ -572,11 +534,9 @@ const LazyLoadingPage = () => {
             <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
               <code>{`import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-
 // Lazy load route components
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Settings = lazy(() => import('./pages/Settings'));
-
 function App() {
   return (
     <Suspense fallback={<LoadingSpinner />}>
@@ -589,24 +549,19 @@ function App() {
 }`}</code>
             </pre>
           </div>
-
           {/* Component-based Lazy Loading */}
           <div>
             <h4 className="font-medium mb-2">Component-based Lazy Loading</h4>
             <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
               <code>{`import React, { lazy, Suspense, useState } from 'react';
-
 const HeavyComponent = lazy(() => import('./HeavyComponent'));
-
 function MyComponent() {
   const [showHeavy, setShowHeavy] = useState(false);
-
   return (
     <div>
       <button onClick={() => setShowHeavy(true)}>
         Load Heavy Component
       </button>
-      
       {showHeavy && (
         <Suspense fallback={<div>Loading...</div>}>
           <HeavyComponent />
@@ -617,17 +572,14 @@ function MyComponent() {
 }`}</code>
             </pre>
           </div>
-
           {/* Intersection Observer */}
           <div>
             <h4 className="font-medium mb-2">Intersection Observer for Visibility</h4>
             <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
               <code>{`import React, { useEffect, useRef, useState } from 'react';
-
 const LazyImage = ({ src, alt }) => {
   const [isVisible, setIsVisible] = useState(false);
   const imgRef = useRef();
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -638,14 +590,11 @@ const LazyImage = ({ src, alt }) => {
       },
       { threshold: 0.1 }
     );
-
     if (imgRef.current) {
       observer.observe(imgRef.current);
     }
-
     return () => observer.disconnect();
   }, []);
-
   return (
     <div ref={imgRef}>
       {isVisible ? (
@@ -658,7 +607,6 @@ const LazyImage = ({ src, alt }) => {
 };`}</code>
             </pre>
           </div>
-
           {/* Error Boundary */}
           <div>
             <h4 className="font-medium mb-2">Error Boundary for Lazy Components</h4>
@@ -668,15 +616,12 @@ const LazyImage = ({ src, alt }) => {
     super(props);
     this.state = { hasError: false };
   }
-
   static getDerivedStateFromError(error) {
     return { hasError: true };
   }
-
   componentDidCatch(error, errorInfo) {
     console.error('Lazy loading error:', error, errorInfo);
   }
-
   render() {
     if (this.state.hasError) {
       return (
@@ -688,7 +633,6 @@ const LazyImage = ({ src, alt }) => {
         </div>
       );
     }
-
     return this.props.children;
   }
 }`}</code>
@@ -698,12 +642,10 @@ const LazyImage = ({ src, alt }) => {
       </Card>
     </div>
   );
-
   const renderSettings = () => (
     <div className="space-y-6">
       <Card>
         <h3 className="font-semibold text-lg mb-4">Lazy Loading Configuration</h3>
-        
         <div className="space-y-4">
           {/* Global Enable/Disable */}
           <div className="flex items-center justify-between">
@@ -724,7 +666,6 @@ const LazyImage = ({ src, alt }) => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           {/* Default Strategy */}
           <div>
             <label className="block text-sm font-medium mb-1">Default Loading Strategy</label>
@@ -743,7 +684,6 @@ const LazyImage = ({ src, alt }) => {
               ))}
             </select>
           </div>
-
           {/* Loading Timeout */}
           <div>
             <label className="block text-sm font-medium mb-1">Loading Timeout (ms)</label>
@@ -757,7 +697,6 @@ const LazyImage = ({ src, alt }) => {
               })}
             />
           </div>
-
           {/* Retry Attempts */}
           <div>
             <label className="block text-sm font-medium mb-1">Retry Attempts</label>
@@ -773,7 +712,6 @@ const LazyImage = ({ src, alt }) => {
               max="5"
             />
           </div>
-
           {/* Error Boundary */}
           <div className="flex items-center justify-between">
             <div>
@@ -793,7 +731,6 @@ const LazyImage = ({ src, alt }) => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           {/* Suspense Fallback */}
           <div>
             <label className="block text-sm font-medium mb-1">Loading Fallback</label>
@@ -811,7 +748,6 @@ const LazyImage = ({ src, alt }) => {
               <option value="custom">Custom Component</option>
             </select>
           </div>
-
           {/* Image Loading */}
           <div>
             <label className="block text-sm font-medium mb-1">Image Loading</label>
@@ -828,7 +764,6 @@ const LazyImage = ({ src, alt }) => {
               <option value="auto">Auto</option>
             </select>
           </div>
-
           {/* Preload Links */}
           <div className="flex items-center justify-between">
             <div>
@@ -848,7 +783,6 @@ const LazyImage = ({ src, alt }) => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           <div className="flex space-x-2 pt-4">
             <Button
               onClick={() => updateConfig(config)}
@@ -864,11 +798,9 @@ const LazyImage = ({ src, alt }) => {
           </div>
         </div>
       </Card>
-
       {/* Performance Metrics */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Performance Metrics</h3>
-        
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-gray-600">Time to First Byte (TTFB)</p>
@@ -890,7 +822,6 @@ const LazyImage = ({ src, alt }) => {
       </Card>
     </div>
   );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -902,7 +833,6 @@ const LazyImage = ({ src, alt }) => {
           Back to Settings
         </Button>
       </div>
-
       {/* Tabs */}
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
@@ -921,7 +851,6 @@ const LazyImage = ({ src, alt }) => {
           ))}
         </nav>
       </div>
-
       {/* Tab Content */}
       {activeTab === 'overview' && renderOverview()}
       {activeTab === 'components' && renderComponents()}
@@ -930,5 +859,4 @@ const LazyImage = ({ src, alt }) => {
     </div>
   );
 };
-
 export default LazyLoadingPage;

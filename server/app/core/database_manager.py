@@ -1,5 +1,6 @@
 """Database management and migration system."""
 
+import os
 import logging
 from typing import Optional, Dict, Any, List
 from abc import ABC, abstractmethod
@@ -137,11 +138,20 @@ class DatabaseInitializer:
             return
         
         # Define test users
+        # Get passwords from environment variables or generate random ones
+        import secrets
+        import string
+        
+        def generate_password():
+            """Generate a secure random password"""
+            alphabet = string.ascii_letters + string.digits + string.punctuation
+            return ''.join(secrets.choice(alphabet) for _ in range(16))
+        
         test_users = [
             {
                 'email': 'admin@bdc.com',
                 'username': 'admin',
-                'password': 'Admin123!',
+                'password': os.getenv('ADMIN_PASSWORD', generate_password()),
                 'first_name': 'Admin',
                 'last_name': 'User',
                 'role': 'super_admin'
@@ -149,7 +159,7 @@ class DatabaseInitializer:
             {
                 'email': 'tenant@bdc.com',
                 'username': 'tenant',
-                'password': 'Tenant123!',
+                'password': os.getenv('TENANT_PASSWORD', generate_password()),
                 'first_name': 'Tenant',
                 'last_name': 'Admin',
                 'role': 'tenant_admin'
@@ -157,7 +167,7 @@ class DatabaseInitializer:
             {
                 'email': 'trainer@bdc.com',
                 'username': 'trainer',
-                'password': 'Trainer123!',
+                'password': os.getenv('TRAINER_PASSWORD', generate_password()),
                 'first_name': 'Trainer',
                 'last_name': 'User',
                 'role': 'trainer'
@@ -165,7 +175,7 @@ class DatabaseInitializer:
             {
                 'email': 'student@bdc.com',
                 'username': 'student',
-                'password': 'Student123!',
+                'password': os.getenv('STUDENT_PASSWORD', generate_password()),
                 'first_name': 'Student',
                 'last_name': 'User',
                 'role': 'student'
@@ -319,7 +329,7 @@ class AdminUserMigration(IDatabaseMigration):
                 is_active=True,
                 tenant_id=tenant.id
             )
-            admin_user.password = 'Admin123!'
+            admin_user.password = os.getenv('ADMIN_PASSWORD', generate_password())
             
             db.session.add(admin_user)
             db.session.commit()

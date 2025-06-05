@@ -23,7 +23,6 @@ import {
   Tag
 } from 'lucide-react';
 import { LineChart, Line, BarChart as RechartsBarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 const EmailIntegrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -34,7 +33,6 @@ const EmailIntegrationPage = () => {
     clientId: '',
     clientSecret: ''
   });
-
   const emailStats = {
     totalSent: 15342,
     delivered: 14989,
@@ -45,7 +43,6 @@ const EmailIntegrationPage = () => {
     avgOpenRate: 73.2,
     avgClickRate: 22.5
   };
-
   const emailActivity = [
     { day: 'Mon', sent: 2345, opened: 1876, clicked: 423 },
     { day: 'Tue', sent: 2156, opened: 1654, clicked: 367 },
@@ -55,7 +52,6 @@ const EmailIntegrationPage = () => {
     { day: 'Sat', sent: 1567, opened: 1234, clicked: 267 },
     { day: 'Sun', sent: 1873, opened: 1456, clicked: 324 }
   ];
-
   const emailTemplates = [
     { id: 1, name: 'Welcome Email', type: 'Onboarding', used: 456, openRate: 82 },
     { id: 2, name: 'Course Reminder', type: 'Notification', used: 1234, openRate: 76 },
@@ -63,21 +59,18 @@ const EmailIntegrationPage = () => {
     { id: 4, name: 'Certificate Ready', type: 'Achievement', used: 345, openRate: 91 },
     { id: 5, name: 'Monthly Newsletter', type: 'Newsletter', used: 567, openRate: 64 }
   ];
-
   const campaigns = [
     { id: 1, name: 'New Python Course Launch', date: '2024-11-15', recipients: 2456, status: 'sent' },
     { id: 2, name: 'Q4 Training Schedule', date: '2024-11-10', recipients: 3234, status: 'sent' },
     { id: 3, name: 'Early Bird Registration', date: '2024-11-08', recipients: 1876, status: 'scheduled' },
     { id: 4, name: 'Success Stories Newsletter', date: '2024-11-05', recipients: 4567, status: 'draft' }
   ];
-
   const automations = [
     { id: 1, name: 'Welcome Series', trigger: 'User Registration', status: 'active', sent: 1234 },
     { id: 2, name: 'Course Completion', trigger: 'Course Finished', status: 'active', sent: 567 },
     { id: 3, name: 'Re-engagement', trigger: '30 Days Inactive', status: 'paused', sent: 234 },
     { id: 4, name: 'Birthday Wishes', trigger: 'Birthday', status: 'active', sent: 89 }
   ];
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Mail },
     { id: 'templates', label: 'Templates', icon: FileText },
@@ -86,14 +79,12 @@ const EmailIntegrationPage = () => {
     { id: 'analytics', label: 'Analytics', icon: BarChart },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
-
   const emailProviders = [
     { value: 'gmail', label: 'Gmail', icon: Mail },
     { value: 'sendgrid', label: 'SendGrid', icon: Send },
     { value: 'mailgun', label: 'Mailgun', icon: Mail },
     { value: 'ses', label: 'Amazon SES', icon: Mail }
   ];
-
   const handleConnect = () => {
     if (emailConfig.apiKey) {
       setLoading(true);
@@ -103,9 +94,7 @@ const EmailIntegrationPage = () => {
       }, 2000);
     }
   };
-
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -128,7 +117,6 @@ const EmailIntegrationPage = () => {
           </Button>
         )}
       </div>
-
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -152,7 +140,6 @@ const EmailIntegrationPage = () => {
           })}
         </nav>
       </div>
-
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <Card>
@@ -182,7 +169,6 @@ const EmailIntegrationPage = () => {
                   </div>
                 )}
               </div>
-
               {!isConnected && (
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-3">
@@ -230,7 +216,6 @@ const EmailIntegrationPage = () => {
                   </div>
                 </div>
               )}
-
               {isConnected && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -257,7 +242,6 @@ const EmailIntegrationPage = () => {
               )}
             </div>
           </Card>
-
           {isConnected && (
             <>
               <Card>
@@ -279,7 +263,6 @@ const EmailIntegrationPage = () => {
                   </div>
                 </div>
               </Card>
-
               <Card>
                 <div className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
@@ -319,7 +302,6 @@ const EmailIntegrationPage = () => {
           )}
         </div>
       )}
-
       {activeTab === 'templates' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -379,7 +361,6 @@ const EmailIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Template Categories</h3>
@@ -409,7 +390,6 @@ const EmailIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'campaigns' && isConnected && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -424,7 +404,6 @@ const EmailIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -436,7 +415,6 @@ const EmailIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -449,7 +427,6 @@ const EmailIntegrationPage = () => {
               </div>
             </Card>
           </div>
-
           <Card>
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -514,7 +491,6 @@ const EmailIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'automation' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -564,7 +540,6 @@ const EmailIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Automation Templates</h3>
@@ -602,7 +577,6 @@ const EmailIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'analytics' && isConnected && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -625,7 +599,6 @@ const EmailIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Engagement Breakdown</h3>
@@ -657,7 +630,6 @@ const EmailIntegrationPage = () => {
               </div>
             </Card>
           </div>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Top Performing Content</h3>
@@ -697,7 +669,6 @@ const EmailIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'settings' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -720,7 +691,6 @@ const EmailIntegrationPage = () => {
                     ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     API Key
@@ -735,7 +705,6 @@ const EmailIntegrationPage = () => {
                     <Button variant="secondary">Update</Button>
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     From Email
@@ -746,7 +715,6 @@ const EmailIntegrationPage = () => {
                     defaultValue="noreply@bdc.com"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     From Name
@@ -760,7 +728,6 @@ const EmailIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Email Preferences</h3>
@@ -774,7 +741,6 @@ const EmailIntegrationPage = () => {
                     Monitor when recipients open your emails
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -784,7 +750,6 @@ const EmailIntegrationPage = () => {
                     Monitor which links recipients click
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -794,7 +759,6 @@ const EmailIntegrationPage = () => {
                     Include unsubscribe link in all emails (required by law)
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" />
@@ -804,14 +768,12 @@ const EmailIntegrationPage = () => {
                     Send a test copy before launching campaigns
                   </p>
                 </div>
-
                 <div className="pt-4">
                   <Button variant="primary">Save Settings</Button>
                 </div>
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Compliance</h3>
@@ -827,7 +789,6 @@ const EmailIntegrationPage = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="p-4 bg-green-50 rounded-lg">
                   <div className="flex items-start">
                     <CheckCircle className="w-5 h-5 text-green-600 mr-3 flex-shrink-0 mt-0.5" />
@@ -847,5 +808,4 @@ const EmailIntegrationPage = () => {
     </div>
   );
 };
-
 export default EmailIntegrationPage;

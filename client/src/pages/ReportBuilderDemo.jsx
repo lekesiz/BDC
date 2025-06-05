@@ -1,6 +1,5 @@
 import React from 'react';
 import { ReportBuilder } from '../components/reports';
-
 const ReportBuilderDemo = () => {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -8,5 +7,4 @@ const ReportBuilderDemo = () => {
     </div>
   );
 };
-
 export default ReportBuilderDemo;

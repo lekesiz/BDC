@@ -1,6 +1,5 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 /**
  * TrainingProgress component displays the progress of beneficiaries through training programs
  * @param {Object} props - Component props
@@ -14,7 +13,6 @@ export const TrainingProgress = ({ data = [] }) => {
       </div>
     );
   }
-  
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
@@ -50,5 +48,4 @@ export const TrainingProgress = ({ data = [] }) => {
     </div>
   );
 };
-
 export default TrainingProgress;

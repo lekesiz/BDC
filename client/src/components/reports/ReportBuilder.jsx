@@ -34,14 +34,12 @@ import { toast } from '../ui/use-toast';
 import { Separator } from '../ui/separator';
 import { Badge } from '../ui/badge';
 import { Switch } from '../ui/switch';
-
 import WidgetLibrary from './WidgetLibrary';
 import ReportSection from './ReportSection';
 import ReportPreview from './ReportPreview';
 import ReportWidget from './ReportWidget';
 import { reportTemplates } from './reportTemplates';
 import { exportToPDF, exportToExcel, exportToCSV } from './exportUtils';
-
 const ReportBuilder = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [activeTab, setActiveTab] = useState('design');
@@ -58,7 +56,6 @@ const ReportBuilder = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedWidget, setSelectedWidget] = useState(null);
-
   // Available data sources
   const dataSources = [
     { id: 'beneficiaries', name: 'Beneficiaries', icon: '👥' },
@@ -68,18 +65,15 @@ const ReportBuilder = () => {
     { id: 'analytics', name: 'Analytics', icon: '📈' },
     { id: 'performance', name: 'Performance', icon: '🎯' }
   ];
-
   // Auto-save functionality
   useEffect(() => {
     if (autoSave && sections.length > 0) {
       const saveTimer = setTimeout(() => {
         handleSave(true);
       }, 30000); // Auto-save every 30 seconds
-
       return () => clearTimeout(saveTimer);
     }
   }, [sections, autoSave]);
-
   // Load template
   const loadTemplate = (templateId) => {
     const template = reportTemplates.find(t => t.id === templateId);
@@ -96,22 +90,17 @@ const ReportBuilder = () => {
       });
     }
   };
-
   // Handle drag and drop
   const handleDragEnd = (result) => {
     if (!result.destination) return;
-
     const { source, destination, type } = result;
-
     // If dragging from widget library to report
     if (type === 'WIDGET' && source.droppableId === 'widget-library' && destination.droppableId.startsWith('section-')) {
       const sectionId = destination.droppableId.replace('section-', '');
       const widgetType = result.draggableId;
-      
       addWidgetToSection(sectionId, widgetType, destination.index);
       return;
     }
-
     // If reordering sections
     if (type === 'SECTION') {
       const newSections = Array.from(sections);
@@ -120,7 +109,6 @@ const ReportBuilder = () => {
       setSections(newSections);
       return;
     }
-
     // If reordering widgets within a section
     if (type === 'WIDGET' && source.droppableId === destination.droppableId) {
       const sectionId = source.droppableId.replace('section-', '');
@@ -129,27 +117,21 @@ const ReportBuilder = () => {
         const newWidgets = Array.from(section.widgets);
         const [reorderedWidget] = newWidgets.splice(source.index, 1);
         newWidgets.splice(destination.index, 0, reorderedWidget);
-        
         updateSection(sectionId, { widgets: newWidgets });
       }
       return;
     }
-
     // If moving widget between sections
     if (type === 'WIDGET' && source.droppableId !== destination.droppableId) {
       const sourceSectionId = source.droppableId.replace('section-', '');
       const destSectionId = destination.droppableId.replace('section-', '');
-      
       const sourceSection = sections.find(s => s.id === sourceSectionId);
       const destSection = sections.find(s => s.id === destSectionId);
-      
       if (sourceSection && destSection) {
         const sourceWidgets = Array.from(sourceSection.widgets);
         const [movedWidget] = sourceWidgets.splice(source.index, 1);
-        
         const destWidgets = Array.from(destSection.widgets);
         destWidgets.splice(destination.index, 0, movedWidget);
-        
         const newSections = sections.map(section => {
           if (section.id === sourceSectionId) {
             return { ...section, widgets: sourceWidgets };
@@ -159,12 +141,10 @@ const ReportBuilder = () => {
           }
           return section;
         });
-        
         setSections(newSections);
       }
     }
   };
-
   // Add new section
   const addSection = () => {
     const newSection = {
@@ -176,14 +156,12 @@ const ReportBuilder = () => {
     setSections([...sections, newSection]);
     setSelectedSection(newSection.id);
   };
-
   // Update section
   const updateSection = (sectionId, updates) => {
     setSections(sections.map(section => 
       section.id === sectionId ? { ...section, ...updates } : section
     ));
   };
-
   // Delete section
   const deleteSection = (sectionId) => {
     setSections(sections.filter(section => section.id !== sectionId));
@@ -191,7 +169,6 @@ const ReportBuilder = () => {
       setSelectedSection(null);
     }
   };
-
   // Duplicate section
   const duplicateSection = (sectionId) => {
     const section = sections.find(s => s.id === sectionId);
@@ -211,7 +188,6 @@ const ReportBuilder = () => {
       setSections(newSections);
     }
   };
-
   // Add widget to section
   const addWidgetToSection = (sectionId, widgetType, index) => {
     const newWidget = {
@@ -220,7 +196,6 @@ const ReportBuilder = () => {
       config: getDefaultWidgetConfig(widgetType),
       dataSource: selectedDataSources[0] || null
     };
-
     const section = sections.find(s => s.id === sectionId);
     if (section) {
       const newWidgets = [...section.widgets];
@@ -228,7 +203,6 @@ const ReportBuilder = () => {
       updateSection(sectionId, { widgets: newWidgets });
     }
   };
-
   // Get default widget configuration
   const getDefaultWidgetConfig = (widgetType) => {
     const configs = {
@@ -271,10 +245,8 @@ const ReportBuilder = () => {
         alignment: 'center'
       }
     };
-
     return configs[widgetType] || {};
   };
-
   // Update widget
   const updateWidget = (sectionId, widgetId, updates) => {
     setSections(sections.map(section => {
@@ -289,7 +261,6 @@ const ReportBuilder = () => {
       return section;
     }));
   };
-
   // Delete widget
   const deleteWidget = (sectionId, widgetId) => {
     setSections(sections.map(section => {
@@ -302,7 +273,6 @@ const ReportBuilder = () => {
       return section;
     }));
   };
-
   // Save report
   const handleSave = async (isAutoSave = false) => {
     const reportData = {
@@ -316,11 +286,9 @@ const ReportBuilder = () => {
       layoutMode,
       updatedAt: new Date().toISOString()
     };
-
     try {
       // Save to localStorage for now
       localStorage.setItem('currentReport', JSON.stringify(reportData));
-      
       if (!isAutoSave) {
         toast({
           title: "Report Saved",
@@ -335,7 +303,6 @@ const ReportBuilder = () => {
       });
     }
   };
-
   // Save as template
   const handleSaveAsTemplate = () => {
     const templateData = {
@@ -354,12 +321,10 @@ const ReportBuilder = () => {
       layout: layoutMode,
       createdAt: new Date().toISOString()
     };
-
     try {
       const existingTemplates = JSON.parse(localStorage.getItem('customTemplates') || '[]');
       existingTemplates.push(templateData);
       localStorage.setItem('customTemplates', JSON.stringify(existingTemplates));
-      
       toast({
         title: "Template Saved",
         description: "Your report has been saved as a template.",
@@ -372,7 +337,6 @@ const ReportBuilder = () => {
       });
     }
   };
-
   // Export report
   const handleExport = async (format) => {
     const reportData = {
@@ -382,7 +346,6 @@ const ReportBuilder = () => {
       dateRange,
       generatedAt: new Date().toISOString()
     };
-
     try {
       switch (format) {
         case 'pdf':
@@ -397,7 +360,6 @@ const ReportBuilder = () => {
         default:
           throw new Error('Unsupported format');
       }
-      
       toast({
         title: "Export Successful",
         description: `Report exported as ${format.toUpperCase()} successfully.`,
@@ -410,7 +372,6 @@ const ReportBuilder = () => {
       });
     }
   };
-
   return (
     <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
       <DragDropContext onDragEnd={handleDragEnd}>
@@ -429,7 +390,6 @@ const ReportBuilder = () => {
                   placeholder="Report Name"
                 />
               </div>
-              
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -439,7 +399,6 @@ const ReportBuilder = () => {
                   <Eye className="w-4 h-4 mr-2" />
                   Preview
                 </Button>
-                
                 <div className="flex items-center space-x-2 border-l pl-2">
                   <Button
                     variant="outline"
@@ -449,7 +408,6 @@ const ReportBuilder = () => {
                     <Save className="w-4 h-4 mr-2" />
                     Save
                   </Button>
-                  
                   <Button
                     variant="outline"
                     size="sm"
@@ -459,7 +417,6 @@ const ReportBuilder = () => {
                     Save as Template
                   </Button>
                 </div>
-                
                 <div className="flex items-center space-x-2 border-l pl-2">
                   <Button
                     size="sm"
@@ -469,7 +426,6 @@ const ReportBuilder = () => {
                     Export
                   </Button>
                 </div>
-                
                 <div className="flex items-center space-x-2 border-l pl-2">
                   <Button
                     variant="ghost"
@@ -482,7 +438,6 @@ const ReportBuilder = () => {
               </div>
             </div>
           </div>
-          
           {/* Tabs */}
           <div className="px-4">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -494,7 +449,6 @@ const ReportBuilder = () => {
             </Tabs>
           </div>
         </div>
-
         {/* Main Content */}
         <div className="flex h-[calc(100vh-8rem)]">
           {/* Sidebar */}
@@ -503,7 +457,6 @@ const ReportBuilder = () => {
               <WidgetLibrary darkMode={darkMode} />
             </div>
           )}
-
           {/* Content Area */}
           <div className="flex-1 overflow-auto">
             <Tabs value={activeTab} className="h-full">
@@ -589,7 +542,6 @@ const ReportBuilder = () => {
                         </div>
                       )}
                     </Droppable>
-                    
                     <div className="flex justify-center pt-4">
                       <Button onClick={addSection} variant="outline">
                         <Plus className="w-4 h-4 mr-2" />
@@ -599,7 +551,6 @@ const ReportBuilder = () => {
                   </div>
                 )}
               </TabsContent>
-
               {/* Data Tab */}
               <TabsContent value="data" className="h-full p-6">
                 <div className="max-w-4xl mx-auto space-y-6">
@@ -638,7 +589,6 @@ const ReportBuilder = () => {
                       </div>
                     </CardContent>
                   </Card>
-
                   <Card>
                     <CardHeader>
                       <CardTitle>Date Range</CardTitle>
@@ -667,7 +617,6 @@ const ReportBuilder = () => {
                       </div>
                     </CardContent>
                   </Card>
-
                   <Card>
                     <CardHeader>
                       <CardTitle>Filters</CardTitle>
@@ -684,7 +633,6 @@ const ReportBuilder = () => {
                   </Card>
                 </div>
               </TabsContent>
-
               {/* Settings Tab */}
               <TabsContent value="settings" className="h-full p-6">
                 <div className="max-w-4xl mx-auto space-y-6">
@@ -703,7 +651,6 @@ const ReportBuilder = () => {
                           placeholder="Describe the purpose of this report..."
                         />
                       </div>
-                      
                       <div>
                         <Label>Layout Mode</Label>
                         <Select value={layoutMode} onValueChange={setLayoutMode}>
@@ -717,7 +664,6 @@ const ReportBuilder = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                      
                       <div className="flex items-center justify-between">
                         <Label>Auto-save</Label>
                         <Switch
@@ -727,7 +673,6 @@ const ReportBuilder = () => {
                       </div>
                     </CardContent>
                   </Card>
-
                   <Card>
                     <CardHeader>
                       <CardTitle>Export Settings</CardTitle>
@@ -763,7 +708,6 @@ const ReportBuilder = () => {
               </TabsContent>
             </Tabs>
           </div>
-
           {/* Preview Panel */}
           {showPreview && (
             <div className="w-96 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
@@ -794,5 +738,4 @@ const ReportBuilder = () => {
     </div>
   );
 };
-
 export default ReportBuilder;

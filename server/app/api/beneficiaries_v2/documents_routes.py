@@ -27,8 +27,32 @@ def list_documents(beneficiary_id):
             if beneficiary.tenant_id != tenant_id:
                 return jsonify({'error': 'forbidden', 'message': 'Forbidden'}), 403
 
-        documents = DocumentService.get_documents_for_beneficiary(beneficiary_id)
-        return jsonify({'documents': DocumentSchema(many=True).dump(documents), 'total': len(documents)}), 200
+        # Get documents for this beneficiary
+        from app.models.document import Document
+        documents = Document.query.filter_by(
+            beneficiary_id=beneficiary_id,
+            is_active=True
+        ).order_by(Document.created_at.desc()).all()
+        
+        # Convert to dict format since we don't have DocumentSchema
+        documents_data = []
+        for doc in documents:
+            documents_data.append({
+                'id': doc.id,
+                'title': doc.title,
+                'description': doc.description,
+                'file_type': doc.file_type,
+                'file_size': doc.file_size,
+                'document_type': doc.document_type,
+                'created_at': doc.created_at.isoformat(),
+                'updated_at': doc.updated_at.isoformat(),
+                'uploader': {
+                    'id': doc.uploader.id,
+                    'name': f"{doc.uploader.first_name} {doc.uploader.last_name}"
+                } if doc.uploader else None
+            })
+        
+        return jsonify({'documents': documents_data, 'total': len(documents_data)}), 200
     except Exception as err:
         current_app.logger.exception(err)
         return jsonify({'error': 'server_error', 'message': 'Unexpected error'}), 500

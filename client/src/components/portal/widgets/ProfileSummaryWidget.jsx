@@ -2,13 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { User, Mail, Award, Calendar, Clock, Target, Loader } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
 /**
  * Displays a summary of the student's profile information
  */
 const ProfileSummaryWidget = ({ data, isLoading, error }) => {
   const navigate = useNavigate();
-  
   // Format date
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -18,7 +16,6 @@ const ProfileSummaryWidget = ({ data, isLoading, error }) => {
       day: 'numeric'
     });
   };
-  
   if (isLoading) {
     return (
       <Card className="overflow-hidden h-full">
@@ -28,7 +25,6 @@ const ProfileSummaryWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   if (error) {
     return (
       <Card className="overflow-hidden h-full">
@@ -38,7 +34,6 @@ const ProfileSummaryWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   if (!data) {
     return (
       <Card className="overflow-hidden h-full">
@@ -48,7 +43,6 @@ const ProfileSummaryWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   return (
     <Card className="overflow-hidden h-full">
       <div className="p-6 flex items-center border-b">
@@ -68,7 +62,6 @@ const ProfileSummaryWidget = ({ data, isLoading, error }) => {
           <p className="text-sm text-gray-500">{data.email}</p>
         </div>
       </div>
-      
       <div className="p-4 divide-y">
         <div className="py-2 flex justify-between">
           <span className="text-sm text-gray-500">Program</span>
@@ -91,7 +84,6 @@ const ProfileSummaryWidget = ({ data, isLoading, error }) => {
           <span className="text-sm font-medium">{data.primaryTrainer?.name || 'N/A'}</span>
         </div>
       </div>
-      
       <div className="bg-gray-50 p-4 text-center">
         <Button
           variant="link"
@@ -103,5 +95,4 @@ const ProfileSummaryWidget = ({ data, isLoading, error }) => {
     </Card>
   );
 };
-
 export default ProfileSummaryWidget;

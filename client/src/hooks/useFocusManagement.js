@@ -1,18 +1,15 @@
 import { useEffect, useRef } from 'react';
-
 /**
  * Custom hook for managing focus in accessible web applications
  */
 export const useFocusManagement = () => {
   const previousElementRef = useRef(null);
-
   /**
    * Store the currently focused element
    */
   const storeFocus = () => {
     previousElementRef.current = document.activeElement;
   };
-
   /**
    * Restore focus to the previously stored element
    */
@@ -21,7 +18,6 @@ export const useFocusManagement = () => {
       previousElementRef.current.focus();
     }
   };
-
   /**
    * Focus the first focusable element within a container
    */
@@ -31,7 +27,6 @@ export const useFocusManagement = () => {
       focusableElements[0].focus();
     }
   };
-
   /**
    * Focus the last focusable element within a container
    */
@@ -41,13 +36,11 @@ export const useFocusManagement = () => {
       focusableElements[focusableElements.length - 1].focus();
     }
   };
-
   /**
    * Get all focusable elements within a container
    */
   const getFocusableElements = (container) => {
     if (!container) return [];
-    
     const focusableSelectors = [
       'a[href]',
       'button:not([disabled])',
@@ -57,11 +50,9 @@ export const useFocusManagement = () => {
       '[tabindex]:not([tabindex="-1"])',
       '[contenteditable="true"]'
     ].join(', ');
-
     return Array.from(container.querySelectorAll(focusableSelectors))
       .filter(element => !element.hasAttribute('disabled') && isVisible(element));
   };
-
   /**
    * Check if an element is visible
    */
@@ -71,19 +62,15 @@ export const useFocusManagement = () => {
            style.visibility !== 'hidden' && 
            style.opacity !== '0';
   };
-
   /**
    * Trap focus within a container (useful for modals)
    */
   const trapFocus = (container, event) => {
     if (!container) return;
-
     const focusableElements = getFocusableElements(container);
     if (focusableElements.length === 0) return;
-
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
-
     if (event.key === 'Tab') {
       if (event.shiftKey) {
         // Shift + Tab: moving backwards
@@ -100,7 +87,6 @@ export const useFocusManagement = () => {
       }
     }
   };
-
   return {
     storeFocus,
     restoreFocus,
@@ -110,13 +96,11 @@ export const useFocusManagement = () => {
     trapFocus
   };
 };
-
 /**
  * Hook for managing modal focus
  */
 export const useModalFocus = (isOpen, modalRef) => {
   const { storeFocus, restoreFocus, focusFirst, trapFocus } = useFocusManagement();
-
   useEffect(() => {
     if (isOpen) {
       storeFocus();
@@ -126,24 +110,20 @@ export const useModalFocus = (isOpen, modalRef) => {
           focusFirst(modalRef.current);
         }
       }, 100);
-
       // Handle escape key
       const handleEscape = (event) => {
         if (event.key === 'Escape') {
           restoreFocus();
         }
       };
-
       // Handle focus trap
       const handleKeyDown = (event) => {
         if (modalRef.current) {
           trapFocus(modalRef.current, event);
         }
       };
-
       document.addEventListener('keydown', handleEscape);
       document.addEventListener('keydown', handleKeyDown);
-
       return () => {
         document.removeEventListener('keydown', handleEscape);
         document.removeEventListener('keydown', handleKeyDown);
@@ -153,5 +133,4 @@ export const useModalFocus = (isOpen, modalRef) => {
     }
   }, [isOpen, modalRef, storeFocus, restoreFocus, focusFirst, trapFocus]);
 };
-
 export default useFocusManagement;

@@ -23,14 +23,12 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useToast } from '../../components/ui/toast';
-
 const queryCategories = [
   { id: 'slow', label: 'Slow Queries', color: 'red' },
   { id: 'frequent', label: 'Frequent Queries', color: 'yellow' },
   { id: 'complex', label: 'Complex Queries', color: 'orange' },
   { id: 'optimized', label: 'Optimized', color: 'green' }
 ];
-
 const DatabaseOptimizationPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -55,13 +53,11 @@ const DatabaseOptimizationPage = () => {
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [indexAnalysis, setIndexAnalysis] = useState([]);
   const [queryHistory, setQueryHistory] = useState([]);
-
   useEffect(() => {
     fetchMetrics();
     fetchSlowQueries();
     fetchIndexAnalysis();
   }, []);
-
   useEffect(() => {
     if (isMonitoring) {
       const interval = setInterval(() => {
@@ -71,7 +67,6 @@ const DatabaseOptimizationPage = () => {
       return () => clearInterval(interval);
     }
   }, [isMonitoring]);
-
   const fetchMetrics = async () => {
     try {
       const response = await fetch('/api/admin/database/metrics', {
@@ -79,7 +74,6 @@ const DatabaseOptimizationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setMetrics(data.metrics);
@@ -88,7 +82,6 @@ const DatabaseOptimizationPage = () => {
       console.error('Error fetching metrics:', error);
     }
   };
-
   const fetchSlowQueries = async () => {
     setLoading(true);
     try {
@@ -97,7 +90,6 @@ const DatabaseOptimizationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setQueries(data.queries || []);
@@ -108,7 +100,6 @@ const DatabaseOptimizationPage = () => {
       setLoading(false);
     }
   };
-
   const fetchIndexAnalysis = async () => {
     try {
       const response = await fetch('/api/admin/database/index-analysis', {
@@ -116,7 +107,6 @@ const DatabaseOptimizationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setIndexAnalysis(data.indexes || []);
@@ -125,7 +115,6 @@ const DatabaseOptimizationPage = () => {
       console.error('Error fetching index analysis:', error);
     }
   };
-
   const fetchQueryHistory = async () => {
     try {
       const response = await fetch('/api/admin/database/query-history', {
@@ -133,7 +122,6 @@ const DatabaseOptimizationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setQueryHistory(data.history || []);
@@ -142,7 +130,6 @@ const DatabaseOptimizationPage = () => {
       console.error('Error fetching query history:', error);
     }
   };
-
   const analyzeQuery = async (queryId) => {
     try {
       const response = await fetch(`/api/admin/database/analyze-query/${queryId}`, {
@@ -150,7 +137,6 @@ const DatabaseOptimizationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setOptimizationSuggestions(data.suggestions);
@@ -161,7 +147,6 @@ const DatabaseOptimizationPage = () => {
       showToast('Error analyzing query', 'error');
     }
   };
-
   const optimizeQuery = async (queryId, optimization) => {
     try {
       const response = await fetch(`/api/admin/database/optimize-query/${queryId}`, {
@@ -172,7 +157,6 @@ const DatabaseOptimizationPage = () => {
         },
         body: JSON.stringify({ optimization })
       });
-      
       if (response.ok) {
         showToast('Query optimized successfully', 'success');
         fetchSlowQueries();
@@ -181,7 +165,6 @@ const DatabaseOptimizationPage = () => {
       showToast('Error optimizing query', 'error');
     }
   };
-
   const createIndex = async (table, columns) => {
     try {
       const response = await fetch('/api/admin/database/create-index', {
@@ -192,7 +175,6 @@ const DatabaseOptimizationPage = () => {
         },
         body: JSON.stringify({ table, columns })
       });
-      
       if (response.ok) {
         showToast('Index created successfully', 'success');
         fetchIndexAnalysis();
@@ -201,7 +183,6 @@ const DatabaseOptimizationPage = () => {
       showToast('Error creating index', 'error');
     }
   };
-
   const exportReport = async (format = 'pdf') => {
     try {
       const response = await fetch(`/api/admin/database/export-report?format=${format}`, {
@@ -209,7 +190,6 @@ const DatabaseOptimizationPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -225,18 +205,15 @@ const DatabaseOptimizationPage = () => {
       showToast('Error exporting report', 'error');
     }
   };
-
   const getDurationColor = (duration) => {
     if (duration > 1000) return 'text-red-600';
     if (duration > 500) return 'text-yellow-600';
     return 'text-green-600';
   };
-
   const formatDuration = (ms) => {
     if (ms < 1000) return `${ms}ms`;
     return `${(ms / 1000).toFixed(2)}s`;
   };
-
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Metrics Grid */}
@@ -252,7 +229,6 @@ const DatabaseOptimizationPage = () => {
             <Clock className="w-8 h-8 text-primary" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -263,7 +239,6 @@ const DatabaseOptimizationPage = () => {
             <AlertTriangle className="w-8 h-8 text-red-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -275,7 +250,6 @@ const DatabaseOptimizationPage = () => {
             <Zap className="w-8 h-8 text-green-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -288,7 +262,6 @@ const DatabaseOptimizationPage = () => {
           </div>
         </Card>
       </div>
-
       {/* Connection Pool Status */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Connection Pool Status</h3>
@@ -307,7 +280,6 @@ const DatabaseOptimizationPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Real-time Monitoring */}
       <Card>
         <div className="flex justify-between items-center mb-4">
@@ -330,7 +302,6 @@ const DatabaseOptimizationPage = () => {
             )}
           </Button>
         </div>
-        
         {isMonitoring && queryHistory.length > 0 && (
           <div className="space-y-2">
             {queryHistory.slice(0, 5).map((query, index) => (
@@ -343,12 +314,10 @@ const DatabaseOptimizationPage = () => {
             ))}
           </div>
         )}
-        
         {isMonitoring && queryHistory.length === 0 && (
           <p className="text-gray-600 text-center py-4">Monitoring active queries...</p>
         )}
       </Card>
-
       {/* Top Slow Queries */}
       <Card>
         <div className="flex justify-between items-center mb-4">
@@ -361,7 +330,6 @@ const DatabaseOptimizationPage = () => {
             View All
           </Button>
         </div>
-        
         <div className="space-y-3">
           {queries.slice(0, 5).map(query => (
             <div key={query.id} className="border rounded-lg p-3">
@@ -389,7 +357,6 @@ const DatabaseOptimizationPage = () => {
       </Card>
     </div>
   );
-
   const renderQueries = () => (
     <div className="space-y-6">
       <Card>
@@ -414,7 +381,6 @@ const DatabaseOptimizationPage = () => {
             </Button>
           </div>
         </div>
-
         {/* Filters */}
         <div className="flex space-x-4 mb-4">
           {queryCategories.map(category => (
@@ -426,7 +392,6 @@ const DatabaseOptimizationPage = () => {
             </label>
           ))}
         </div>
-
         {/* Query List */}
         <div className="space-y-4">
           {queries.map(query => (
@@ -438,7 +403,6 @@ const DatabaseOptimizationPage = () => {
                   </code>
                 </div>
               </div>
-              
               <div className="grid grid-cols-4 gap-4 text-sm">
                 <div>
                   <p className="text-gray-600">Avg Duration</p>
@@ -461,7 +425,6 @@ const DatabaseOptimizationPage = () => {
                   </p>
                 </div>
               </div>
-              
               <div className="flex justify-between items-center mt-3">
                 <div className="flex space-x-2">
                   {query.tags?.map(tag => (
@@ -492,12 +455,10 @@ const DatabaseOptimizationPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Query Analysis Results */}
       {selectedQuery && (
         <Card>
           <h3 className="font-semibold text-lg mb-4">Analysis Results</h3>
-          
           <div className="space-y-4">
             <div>
               <h4 className="font-medium mb-2">Execution Plan</h4>
@@ -505,7 +466,6 @@ const DatabaseOptimizationPage = () => {
                 {selectedQuery.executionPlan}
               </pre>
             </div>
-            
             <div>
               <h4 className="font-medium mb-2">Optimization Suggestions</h4>
               {optimizationSuggestions.length === 0 ? (
@@ -543,7 +503,6 @@ const DatabaseOptimizationPage = () => {
       )}
     </div>
   );
-
   const renderIndexes = () => (
     <div className="space-y-6">
       <Card>
@@ -554,7 +513,6 @@ const DatabaseOptimizationPage = () => {
             Create Index
           </Button>
         </div>
-
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
@@ -612,7 +570,6 @@ const DatabaseOptimizationPage = () => {
           </table>
         </div>
       </Card>
-
       {/* Missing Indexes */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Recommended Indexes</h3>
@@ -653,7 +610,6 @@ const DatabaseOptimizationPage = () => {
       </Card>
     </div>
   );
-
   const renderPerformance = () => (
     <div className="space-y-6">
       {/* Performance Trends */}
@@ -663,7 +619,6 @@ const DatabaseOptimizationPage = () => {
           <p className="text-gray-600">Performance chart would go here</p>
         </div>
       </Card>
-
       {/* Table Analysis */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Table Analysis</h3>
@@ -721,7 +676,6 @@ const DatabaseOptimizationPage = () => {
           </table>
         </div>
       </Card>
-
       {/* Optimization Recommendations */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Optimization Recommendations</h3>
@@ -786,7 +740,6 @@ const DatabaseOptimizationPage = () => {
       </Card>
     </div>
   );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -798,7 +751,6 @@ const DatabaseOptimizationPage = () => {
           Back to Settings
         </Button>
       </div>
-
       {/* Tabs */}
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
@@ -817,7 +769,6 @@ const DatabaseOptimizationPage = () => {
           ))}
         </nav>
       </div>
-
       {/* Tab Content */}
       {loading ? (
         <div className="flex justify-center py-12">
@@ -834,5 +785,4 @@ const DatabaseOptimizationPage = () => {
     </div>
   );
 };
-
 export default DatabaseOptimizationPage;

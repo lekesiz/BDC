@@ -2,7 +2,6 @@ import { Dialog, DialogTrigger, DialogContent, DialogTitle } from '@radix-ui/rea
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import axios from 'axios'
-
 const DeleteProgramModal = ({ programId, onDeleted }) => {
   const [open, setOpen] = useState(false)
   const handleDelete = async () => {

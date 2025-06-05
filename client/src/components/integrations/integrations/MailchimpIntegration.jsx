@@ -18,7 +18,6 @@ import {
   FileText,
   Eye
 } from 'lucide-react';
-
 const MailchimpIntegration = ({ integration, onBack }) => {
   const [accountInfo, setAccountInfo] = useState({
     accountName: 'BDC Academy',
@@ -28,28 +27,24 @@ const MailchimpIntegration = ({ integration, onBack }) => {
     monthlyEmails: 45000,
     emailLimit: 100000
   });
-
   const [lists, setLists] = useState([
     { id: '1', name: 'All Beneficiaries', subscribers: 5678, growth: '+12%', lastCampaign: '3 days ago' },
     { id: '2', name: 'Active Students', subscribers: 3245, growth: '+8%', lastCampaign: '1 week ago' },
     { id: '3', name: 'Alumni Network', subscribers: 2345, growth: '+5%', lastCampaign: '2 weeks ago' },
     { id: '4', name: 'Newsletter Subscribers', subscribers: 1188, growth: '+15%', lastCampaign: '5 days ago' }
   ]);
-
   const [campaigns, setCampaigns] = useState([
     { id: '1', name: 'November Course Updates', status: 'sent', recipients: 4567, opens: '68%', clicks: '23%', date: '2024-11-15' },
     { id: '2', name: 'New Python Program Launch', status: 'scheduled', recipients: 3245, date: '2024-11-20' },
     { id: '3', name: 'Alumni Success Stories', status: 'draft', recipients: 2345 },
     { id: '4', name: 'End of Year Summary', status: 'sent', recipients: 5678, opens: '72%', clicks: '31%', date: '2024-11-10' }
   ]);
-
   const [automations, setAutomations] = useState([
     { id: '1', name: 'Welcome Series', status: 'active', triggered: 234, inProgress: 45 },
     { id: '2', name: 'Course Completion', status: 'active', triggered: 156, inProgress: 23 },
     { id: '3', name: 'Re-engagement Campaign', status: 'paused', triggered: 89, inProgress: 0 },
     { id: '4', name: 'Birthday Wishes', status: 'active', triggered: 567, inProgress: 12 }
   ]);
-
   const configFields = [
     {
       name: 'apiKey',
@@ -87,7 +82,6 @@ const MailchimpIntegration = ({ integration, onBack }) => {
       description: 'Import open and click data back to BDC'
     }
   ];
-
   const webhookEvents = [
     'subscribe',
     'unsubscribe',
@@ -96,7 +90,6 @@ const MailchimpIntegration = ({ integration, onBack }) => {
     'email_clicked',
     'campaign_sent'
   ];
-
   const apiEndpoints = [
     {
       method: 'GET',
@@ -119,9 +112,7 @@ const MailchimpIntegration = ({ integration, onBack }) => {
       description: 'Get campaign reports'
     }
   ];
-
   const emailUsagePercentage = (accountInfo.monthlyEmails / accountInfo.emailLimit) * 100;
-
   const customOverview = (
     <>
       {/* Account Overview */}
@@ -139,7 +130,6 @@ const MailchimpIntegration = ({ integration, onBack }) => {
             </div>
             <Badge variant="success">Connected</Badge>
           </div>
-          
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <Users className="w-5 h-5 mx-auto mb-2 text-gray-600" />
@@ -162,7 +152,6 @@ const MailchimpIntegration = ({ integration, onBack }) => {
               <p className="text-sm text-gray-600">Avg Click Rate</p>
             </div>
           </div>
-
           <div className="mt-4">
             <div className="flex justify-between text-sm mb-2">
               <span className="text-gray-600">Monthly Email Usage</span>
@@ -174,7 +163,6 @@ const MailchimpIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Email Lists */}
       <Card>
         <div className="p-6">
@@ -210,7 +198,6 @@ const MailchimpIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Recent Campaigns */}
       <Card>
         <div className="p-6">
@@ -264,7 +251,6 @@ const MailchimpIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Automations */}
       <Card>
         <div className="p-6">
@@ -298,7 +284,6 @@ const MailchimpIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Quick Actions */}
       <Card>
         <div className="p-6">
@@ -337,7 +322,6 @@ const MailchimpIntegration = ({ integration, onBack }) => {
       </Card>
     </>
   );
-
   return (
     <BaseIntegration
       integration={integration}
@@ -350,5 +334,4 @@ const MailchimpIntegration = ({ integration, onBack }) => {
     </BaseIntegration>
   );
 };
-
 export default MailchimpIntegration;

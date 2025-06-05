@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Test - BDC</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-user {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .result.success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .result.error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .result.info { background: #d1ecf1; border: 1px solid #bee5eb; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+        .credentials {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .summary {
+            position: sticky;
+            top: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 BDC Authentication Testing Interface</h1>
+    
+    <div class="summary">
+        <h2>Test Summary</h2>
+        <div id="summary">
+            <p>Tests not started yet. Click "Run All Tests" to begin.</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Test Credentials</h2>
+        <div class="credentials">
+            <p><strong>Available test users (based on mock data):</strong></p>
+            <ul id="credentialsList">
+                <li><strong>Super Admin:</strong> admin@bdc.com / admin123</li>
+                <li><strong>Tenant Admin:</strong> tenant@bdc.com / tenant123</li>
+                <li><strong>Trainer:</strong> trainer@bdc.com / trainer123</li>
+                <li><strong>Student:</strong> student@bdc.com / student123</li>
+            </ul>
+            <p class="info"><em>Note: These credentials work with the mock authentication API.</em></p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Authentication Tests</h2>
+        <button onclick="runAllTests()" id="runAllBtn">Run All Tests</button>
+        <button onclick="clearResults()" id="clearBtn">Clear Results</button>
+        
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        // Test configuration
+        const config = {
+            // This will work when the page is served from the development server
+            baseURL: window.location.origin,
+            testUsers: [
+                {
+                    role: 'super_admin',
+                    email: 'admin@bdc.com',
+                    password: 'admin123',
+                    expectedRedirect: '/',
+                    description: 'Super Administrator'
+                },
+                {
+                    role: 'tenant_admin',
+                    email: 'tenant@bdc.com',
+                    password: 'tenant123',
+                    expectedRedirect: '/',
+                    description: 'Tenant Administrator'
+                },
+                {
+                    role: 'trainer',
+                    email: 'trainer@bdc.com',
+                    password: 'trainer123',
+                    expectedRedirect: '/',
+                    description: 'Trainer'
+                },
+                {
+                    role: 'student',
+                    email: 'student@bdc.com',
+                    password: 'student123',
+                    expectedRedirect: '/portal',
+                    description: 'Student'
+                }
+            ]
+        };
+
+        let testResults = {};
+        let summary = { passed: 0, failed: 0, total: 0 };
+
+        // Create axios instance
+        const api = axios.create({
+            baseURL: config.baseURL,
+            timeout: 10000,
+            validateStatus: () => true // Don't throw on error status codes
+        });
+
+        function log(message, type = 'info') {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function updateSummary() {
+            const total = summary.passed + summary.failed;
+            const successRate = total > 0 ? Math.round((summary.passed / total) * 100) : 0;
+            
+            document.getElementById('summary').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center;">
+                    <div><strong>Total:</strong> ${total}</div>
+                    <div class="success"><strong>Passed:</strong> ${summary.passed}</div>
+                    <div class="error"><strong>Failed:</strong> ${summary.failed}</div>
+                    <div class="${successRate >= 80 ? 'success' : 'warning'}"><strong>Success Rate:</strong> ${successRate}%</div>
+                </div>
+            `;
+        }
+
+        function addResult(testName, success, message, data = null) {
+            summary.total = summary.passed + summary.failed + 1;
+            if (success) {
+                summary.passed++;
+            } else {
+                summary.failed++;
+            }
+            
+            const resultClass = success ? 'success' : 'error';
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${resultClass}`;
+            resultDiv.innerHTML = `
+                <div><strong>${success ? '✅' : '❌'} ${testName}</strong></div>
+                <div>${message}</div>
+                ${data ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : ''}
+            `;
+            
+            return resultDiv;
+        }
+
+        async function testLogin(user) {
+            log(`Testing login for ${user.description}`, 'info');
+            
+            const userDiv = document.createElement('div');
+            userDiv.className = 'test-user';
+            userDiv.innerHTML = `<h3>🔐 ${user.description} (${user.email})</h3>`;
+            
+            try {
+                const response = await api.post('/api/auth/login', {
+                    email: user.email,
+                    password: user.password
+                });
+                
+                const loginSuccess = response.status === 200 && response.data?.access_token;
+                
+                testResults[user.role] = {
+                    login: {
+                        success: loginSuccess,
+                        status: response.status,
+                        hasToken: !!response.data?.access_token,
+                        hasUser: !!response.data?.user,
+                        userRole: response.data?.user?.role,
+                        response: response.data
+                    }
+                };
+                
+                userDiv.appendChild(addResult(
+                    'Login Test',
+                    loginSuccess,
+                    loginSuccess 
+                        ? `Login successful (Status: ${response.status})`
+                        : `Login failed (Status: ${response.status}) - ${response.data?.message || 'Unknown error'}`,
+                    loginSuccess ? {
+                        hasToken: !!response.data?.access_token,
+                        userRole: response.data?.user?.role,
+                        tokenLength: response.data?.access_token?.length
+                    } : response.data
+                ));
+                
+                // Test token structure if login was successful
+                if (loginSuccess) {
+                    await testJWTToken(user, userDiv);
+                    await testUserDataEndpoint(user, userDiv);
+                } else {
+                    userDiv.appendChild(addResult('JWT Token Test', false, 'Skipped - login failed'));
+                    userDiv.appendChild(addResult('User Data Test', false, 'Skipped - login failed'));
+                }
+                
+            } catch (error) {
+                log(`Login test failed for ${user.description}: ${error.message}`, 'error');
+                
+                userDiv.appendChild(addResult(
+                    'Login Test',
+                    false,
+                    `Network error: ${error.message}`,
+                    { error: error.message, code: error.code }
+                ));
+                
+                userDiv.appendChild(addResult('JWT Token Test', false, 'Skipped - login failed'));
+                userDiv.appendChild(addResult('User Data Test', false, 'Skipped - login failed'));
+            }
+            
+            document.getElementById('testResults').appendChild(userDiv);
+            updateSummary();
+        }
+
+        async function testJWTToken(user, container) {
+            const loginResult = testResults[user.role]?.login;
+            
+            if (!loginResult?.success || !loginResult.hasToken) {
+                container.appendChild(addResult('JWT Token Test', false, 'No token available'));
+                return;
+            }
+            
+            try {
+                const token = loginResult.response.access_token;
+                const tokenParts = token.split('.');
+                const validStructure = tokenParts.length === 3;
+                
+                if (validStructure) {
+                    const payload = JSON.parse(atob(tokenParts[1]));
+                    const hasUserId = !!payload.user_id;
+                    const hasRole = !!payload.role;
+                    const hasExpiration = !!payload.exp;
+                    
+                    const tokenValid = hasUserId && hasRole && hasExpiration;
+                    
+                    container.appendChild(addResult(
+                        'JWT Token Test',
+                        tokenValid,
+                        tokenValid ? 'Token structure and payload are valid' : 'Token payload missing required fields',
+                        {
+                            structure: 'Valid (3 parts)',
+                            hasUserId,
+                            hasRole,
+                            hasExpiration,
+                            userRole: payload.role,
+                            tokenLength: token.length
+                        }
+                    ));
+                } else {
+                    container.appendChild(addResult(
+                        'JWT Token Test',
+                        false,
+                        'Invalid token structure',
+                        { parts: tokenParts.length, expected: 3 }
+                    ));
+                }
+                
+            } catch (error) {
+                container.appendChild(addResult(
+                    'JWT Token Test',
+                    false,
+                    `Token validation failed: ${error.message}`
+                ));
+            }
+        }
+
+        async function testUserDataEndpoint(user, container) {
+            const loginResult = testResults[user.role]?.login;
+            
+            if (!loginResult?.success || !loginResult.hasToken) {
+                container.appendChild(addResult('User Data Test', false, 'No token available'));
+                return;
+            }
+            
+            try {
+                const response = await api.get('/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${loginResult.response.access_token}`
+                    }
+                });
+                
+                const success = response.status === 200 && response.data?.id;
+                
+                container.appendChild(addResult(
+                    'User Data Test',
+                    success,
+                    success 
+                        ? 'User data endpoint works with token'
+                        : `User data endpoint failed (Status: ${response.status})`,
+                    success ? {
+                        userId: response.data.id,
+                        email: response.data.email,
+                        role: response.data.role,
+                        hasProfile: !!response.data.profile
+                    } : response.data
+                ));
+                
+            } catch (error) {
+                container.appendChild(addResult(
+                    'User Data Test',
+                    false,
+                    `Network error: ${error.message}`
+                ));
+            }
+        }
+
+        async function runAllTests() {
+            const runBtn = document.getElementById('runAllBtn');
+            runBtn.disabled = true;
+            runBtn.textContent = 'Running Tests...';
+            
+            // Clear previous results
+            clearResults();
+            
+            log('Starting authentication tests', 'info');
+            
+            // Add test info
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'result info';
+            infoDiv.innerHTML = `
+                <div><strong>ℹ️ Test Information</strong></div>
+                <div>Base URL: ${config.baseURL}</div>
+                <div>Testing ${config.testUsers.length} user roles</div>
+                <div>Mock API should be enabled in .env file</div>
+            `;
+            document.getElementById('testResults').appendChild(infoDiv);
+            
+            // Run tests for each user
+            for (const user of config.testUsers) {
+                await testLogin(user);
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            // Final summary
+            const finalDiv = document.createElement('div');
+            finalDiv.className = 'result info';
+            finalDiv.innerHTML = `
+                <div><strong>🏁 Testing Complete</strong></div>
+                <div>Check the summary above for overall results</div>
+                <div>Individual test results are shown for each user role</div>
+            `;
+            document.getElementById('testResults').appendChild(finalDiv);
+            
+            runBtn.disabled = false;
+            runBtn.textContent = 'Run All Tests';
+            
+            log('Authentication tests completed', 'info');
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+            testResults = {};
+            summary = { passed: 0, failed: 0, total: 0 };
+            updateSummary();
+        }
+
+        // Initialize
+        updateSummary();
+    </script>
+</body>
+</html>

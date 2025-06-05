@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Textarea component for multiline text input
  * 
@@ -21,7 +20,6 @@ const Textarea = React.forwardRef(({
   ...props 
 }, ref) => {
   const id = props.id || props.name || React.useId();
-  
   return (
     <div className="w-full space-y-2">
       {label && (
@@ -37,7 +35,6 @@ const Textarea = React.forwardRef(({
           {label}
         </label>
       )}
-      
       <textarea
         id={id}
         rows={rows}
@@ -52,14 +49,11 @@ const Textarea = React.forwardRef(({
         ref={ref}
         {...props}
       />
-      
       {error && (
         <p className="text-sm text-red-500 mt-1">{error}</p>
       )}
     </div>
   );
 });
-
 Textarea.displayName = "Textarea";
-
 export { Textarea };

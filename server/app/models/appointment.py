@@ -21,12 +21,19 @@ class Appointment(db.Model):
     status = Column(String(20), nullable=False, default='scheduled')  # 'scheduled', 'completed', 'cancelled'
     calendar_event_id = Column(String(255), nullable=True)  # Google Calendar event ID
     notes = Column(Text, nullable=True)
+    
+    # Recurring appointment support
+    series_id = Column(Integer, ForeignKey('appointment_series.id', ondelete='SET NULL'), nullable=True)
+    is_recurring = Column(Boolean, default=False)
+    reminder_sent = Column(Boolean, default=False)  # For reminder tracking
+    
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
     beneficiary = relationship('Beneficiary', back_populates='appointments', lazy='select')
     trainer = relationship('User', backref='trainer_appointments', lazy='select')
+    series = relationship('AppointmentSeries', back_populates='appointments', lazy='select')
     
     def to_dict(self):
         """Return a dict representation of the appointment."""
@@ -42,6 +49,8 @@ class Appointment(db.Model):
             'status': self.status,
             'notes': self.notes,
             'calendar_event_id': self.calendar_event_id,
+            'series_id': self.series_id,
+            'is_recurring': self.is_recurring,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
             'beneficiary': {

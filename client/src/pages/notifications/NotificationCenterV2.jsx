@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaBell, FaCheck, FaTrash, FaCog, FaFilter, FaEnvelope, FaCalendar, FaGraduationCap, FaUserFriends, FaFile, FaChartBar, FaExclamationCircle, FaInfoCircle, FaCheckCircle, FaTimes } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-
 const NotificationCenterV2 = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -30,22 +29,18 @@ const NotificationCenterV2 = () => {
     today: 0,
     thisWeek: 0
   });
-
   useEffect(() => {
     fetchNotifications();
     fetchPreferences();
     connectWebSocket();
     return () => disconnectWebSocket();
   }, []);
-
   useEffect(() => {
     filterNotifications();
     calculateStats();
   }, [notifications, selectedCategory, timeFilter, readFilter]);
-
   const connectWebSocket = () => {
     const ws = new WebSocket('ws://localhost:8000/ws/notifications');
-    
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'new_notification') {
@@ -53,16 +48,13 @@ const NotificationCenterV2 = () => {
         showBrowserNotification(data.notification);
       }
     };
-
     window.notificationWs = ws;
   };
-
   const disconnectWebSocket = () => {
     if (window.notificationWs) {
       window.notificationWs.close();
     }
   };
-
   const showBrowserNotification = (notification) => {
     if (Notification.permission === 'granted') {
       new Notification(notification.title, {
@@ -72,7 +64,6 @@ const NotificationCenterV2 = () => {
       });
     }
   };
-
   const fetchNotifications = async () => {
     setLoading(true);
     try {
@@ -85,7 +76,6 @@ const NotificationCenterV2 = () => {
       setLoading(false);
     }
   };
-
   const fetchPreferences = async () => {
     try {
       const response = await axios.get('/api/notifications/preferences');
@@ -94,13 +84,11 @@ const NotificationCenterV2 = () => {
       console.error('Tercihler yüklenemedi:', error);
     }
   };
-
   const updateCategoryCounts = (notificationList) => {
     const counts = {};
     notificationList.forEach(notif => {
       counts[notif.category] = (counts[notif.category] || 0) + 1;
     });
-    
     setCategories(prevCategories => 
       prevCategories.map(cat => ({
         ...cat,
@@ -108,22 +96,18 @@ const NotificationCenterV2 = () => {
       }))
     );
   };
-
   const filterNotifications = () => {
     let filtered = [...notifications];
-
     // Category filter
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(notif => notif.category === selectedCategory);
     }
-
     // Read status filter
     if (readFilter === 'unread') {
       filtered = filtered.filter(notif => !notif.is_read);
     } else if (readFilter === 'read') {
       filtered = filtered.filter(notif => notif.is_read);
     }
-
     // Time filter
     const now = new Date();
     if (timeFilter === 'today') {
@@ -138,15 +122,12 @@ const NotificationCenterV2 = () => {
       const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       filtered = filtered.filter(notif => new Date(notif.created_at) >= monthAgo);
     }
-
     setFilteredNotifications(filtered);
   };
-
   const calculateStats = () => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
     setStats({
       total: notifications.length,
       unread: notifications.filter(n => !n.is_read).length,
@@ -154,7 +135,6 @@ const NotificationCenterV2 = () => {
       thisWeek: notifications.filter(n => new Date(n.created_at) >= weekAgo).length
     });
   };
-
   const markAsRead = async (notificationIds) => {
     try {
       await axios.put('/api/notifications/read', { notification_ids: notificationIds });
@@ -168,7 +148,6 @@ const NotificationCenterV2 = () => {
       toast.error('İşlem başarısız');
     }
   };
-
   const deleteNotifications = async (notificationIds) => {
     if (window.confirm('Seçili bildirimleri silmek istediğinizden emin misiniz?')) {
       try {
@@ -183,7 +162,6 @@ const NotificationCenterV2 = () => {
       }
     }
   };
-
   const updatePreferences = async (newPreferences) => {
     try {
       await axios.put('/api/notifications/preferences', newPreferences);
@@ -193,7 +171,6 @@ const NotificationCenterV2 = () => {
       toast.error('Güncelleme başarısız');
     }
   };
-
   const handleSelectNotification = (notificationId) => {
     if (selectedNotifications.includes(notificationId)) {
       setSelectedNotifications(selectedNotifications.filter(id => id !== notificationId));
@@ -201,7 +178,6 @@ const NotificationCenterV2 = () => {
       setSelectedNotifications([...selectedNotifications, notificationId]);
     }
   };
-
   const handleSelectAll = () => {
     if (selectedNotifications.length === filteredNotifications.length) {
       setSelectedNotifications([]);
@@ -209,17 +185,14 @@ const NotificationCenterV2 = () => {
       setSelectedNotifications(filteredNotifications.map(notif => notif.id));
     }
   };
-
   const handleNotificationClick = async (notification) => {
     if (!notification.is_read) {
       await markAsRead([notification.id]);
     }
-    
     if (notification.action_url) {
       navigate(notification.action_url);
     }
   };
-
   const getNotificationIcon = (notification) => {
     const icons = {
       message: FaEnvelope,
@@ -233,11 +206,9 @@ const NotificationCenterV2 = () => {
       info: FaInfoCircle,
       success: FaCheckCircle
     };
-    
     const Icon = icons[notification.category] || icons[notification.type] || FaBell;
     return <Icon />;
   };
-
   const getTypeColor = (type) => {
     const colors = {
       error: 'text-red-500',
@@ -245,10 +216,8 @@ const NotificationCenterV2 = () => {
       info: 'text-blue-500',
       success: 'text-green-500'
     };
-    
     return colors[type] || 'text-gray-500';
   };
-
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -256,14 +225,12 @@ const NotificationCenterV2 = () => {
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
-
     if (diffMins < 1) return 'Şimdi';
     if (diffMins < 60) return `${diffMins} dk önce`;
     if (diffHours < 24) return `${diffHours} saat önce`;
     if (diffDays < 7) return `${diffDays} gün önce`;
     return date.toLocaleDateString('tr-TR');
   };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto p-6">
@@ -272,7 +239,6 @@ const NotificationCenterV2 = () => {
           <h1 className="text-2xl font-bold mb-2">Bildirim Merkezi</h1>
           <p className="text-gray-600">Tüm bildirimlerinizi tek bir yerden yönetin</p>
         </div>
-
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow-md p-4">
@@ -315,7 +281,6 @@ const NotificationCenterV2 = () => {
             </div>
           </div>
         </div>
-
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar */}
           <div className="lg:w-64">
@@ -340,14 +305,12 @@ const NotificationCenterV2 = () => {
                 ))}
               </div>
             </div>
-
             {/* Filters */}
             <div className="bg-white rounded-lg shadow-md p-4">
               <h3 className="font-semibold mb-3 flex items-center">
                 <FaFilter className="mr-2" />
                 Filtreler
               </h3>
-              
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Okunma Durumu</label>
                 <select
@@ -360,7 +323,6 @@ const NotificationCenterV2 = () => {
                   <option value="read">Okunmuş</option>
                 </select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium mb-2">Zaman Aralığı</label>
                 <select
@@ -376,7 +338,6 @@ const NotificationCenterV2 = () => {
               </div>
             </div>
           </div>
-
           {/* Main Content */}
           <div className="flex-1">
             {/* Actions Bar */}
@@ -392,7 +353,6 @@ const NotificationCenterV2 = () => {
                   <span className="text-sm text-gray-600">
                     {selectedNotifications.length} seçili
                   </span>
-                  
                   {selectedNotifications.length > 0 && (
                     <>
                       <button
@@ -412,7 +372,6 @@ const NotificationCenterV2 = () => {
                     </>
                   )}
                 </div>
-
                 <button
                   onClick={() => setShowSettings(true)}
                   className="text-gray-600 hover:text-gray-800"
@@ -421,7 +380,6 @@ const NotificationCenterV2 = () => {
                 </button>
               </div>
             </div>
-
             {/* Notifications List */}
             {loading ? (
               <div className="flex justify-center py-8">
@@ -452,11 +410,9 @@ const NotificationCenterV2 = () => {
                         }}
                         className="mr-3 mt-1"
                       />
-                      
                       <div className={`text-2xl mr-3 ${getTypeColor(notification.type)}`}>
                         {getNotificationIcon(notification)}
                       </div>
-                      
                       <div className="flex-1">
                         <div className="flex items-start justify-between">
                           <div>
@@ -467,7 +423,6 @@ const NotificationCenterV2 = () => {
                             {formatTime(notification.created_at)}
                           </span>
                         </div>
-                        
                         {notification.action_text && (
                           <button className="text-blue-500 hover:text-blue-600 text-sm mt-2">
                             {notification.action_text}
@@ -482,7 +437,6 @@ const NotificationCenterV2 = () => {
           </div>
         </div>
       </div>
-
       {/* Settings Modal */}
       {showSettings && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -496,7 +450,6 @@ const NotificationCenterV2 = () => {
                 <FaTimes />
               </button>
             </div>
-
             <div className="p-6">
               <div className="space-y-4">
                 {Object.entries(preferences).map(([key, value]) => (
@@ -516,7 +469,6 @@ const NotificationCenterV2 = () => {
                   </label>
                 ))}
               </div>
-
               <div className="mt-6 space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">Bildirim Sıklığı</label>
@@ -527,7 +479,6 @@ const NotificationCenterV2 = () => {
                     <option value="weekly">Haftalık Özet</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium mb-2">Sessiz Saatler</label>
                   <div className="flex space-x-2">
@@ -537,7 +488,6 @@ const NotificationCenterV2 = () => {
                   </div>
                 </div>
               </div>
-
               <div className="flex justify-end space-x-2 mt-6">
                 <button
                   onClick={() => setShowSettings(false)}
@@ -562,5 +512,4 @@ const NotificationCenterV2 = () => {
     </div>
   );
 };
-
 export default NotificationCenterV2;

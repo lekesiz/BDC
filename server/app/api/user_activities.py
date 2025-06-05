@@ -6,6 +6,8 @@ from app.models.user import User
 from app.models.activity import Activity
 from app.extensions import db
 
+from app.utils.logging import logger
+
 user_activities_bp = Blueprint('user_activities', __name__)
 
 @user_activities_bp.route('/api/users/<int:user_id>/activities', methods=['GET'])
@@ -60,7 +62,7 @@ def get_user_documents(user_id):
     from app.models.document import Document
     
     documents = Document.query\
-                       .filter_by(created_by=user_id)\
+                       .filter_by(upload_by=user_id)\
                        .order_by(Document.created_at.desc())\
                        .limit(20).all()
     

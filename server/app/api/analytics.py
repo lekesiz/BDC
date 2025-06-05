@@ -11,6 +11,8 @@ from app.models.evaluation import Evaluation
 from app.models.test import TestSession
 from app.models.appointment import Appointment
 
+from app.utils.logging import logger
+
 analytics_bp = Blueprint('analytics', __name__)
 
 @analytics_bp.route('/analytics/dashboard', methods=['GET'])

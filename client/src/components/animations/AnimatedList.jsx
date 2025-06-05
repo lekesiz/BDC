@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { listContainer, listItem } from '@/lib/animations';
-
 export const AnimatedList = ({ children, className, ...props }) => {
   return (
     <motion.ul
@@ -14,7 +13,6 @@ export const AnimatedList = ({ children, className, ...props }) => {
     </motion.ul>
   );
 };
-
 export const AnimatedListItem = ({ children, className, ...props }) => {
   return (
     <motion.li

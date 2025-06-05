@@ -29,11 +29,9 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Input } from '../ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Badge } from '../ui/badge';
-
 const WidgetLibrary = ({ darkMode }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
-
   const widgetCategories = {
     charts: {
       name: 'Charts',
@@ -92,9 +90,7 @@ const WidgetLibrary = ({ darkMode }) => {
       ]
     }
   };
-
   const allWidgets = Object.values(widgetCategories).flatMap(cat => cat.widgets);
-  
   const filteredWidgets = activeCategory === 'all' 
     ? allWidgets.filter(widget => 
         widget.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -102,7 +98,6 @@ const WidgetLibrary = ({ darkMode }) => {
     : widgetCategories[activeCategory]?.widgets.filter(widget =>
         widget.name.toLowerCase().includes(searchTerm.toLowerCase())
       ) || [];
-
   const renderWidget = (widget, index) => (
     <Draggable
       key={widget.id}
@@ -146,12 +141,10 @@ const WidgetLibrary = ({ darkMode }) => {
       )}
     </Draggable>
   );
-
   return (
     <div className="h-full flex flex-col">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold mb-3">Widget Library</h3>
-        
         {/* Search */}
         <div className="relative mb-3">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -163,7 +156,6 @@ const WidgetLibrary = ({ darkMode }) => {
             className="pl-9"
           />
         </div>
-
         {/* Category Tabs */}
         <Tabs value={activeCategory} onValueChange={setActiveCategory}>
           <TabsList className="grid grid-cols-3 gap-1">
@@ -178,7 +170,6 @@ const WidgetLibrary = ({ darkMode }) => {
           </TabsList>
         </Tabs>
       </div>
-
       <ScrollArea className="flex-1 p-4">
         <Droppable 
           droppableId="widget-library" 
@@ -205,7 +196,6 @@ const WidgetLibrary = ({ darkMode }) => {
           )}
         </Droppable>
       </ScrollArea>
-
       {/* Widget Tips */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
         <h4 className="text-sm font-medium mb-2">Tips:</h4>
@@ -219,5 +209,4 @@ const WidgetLibrary = ({ darkMode }) => {
     </div>
   );
 };
-
 export default WidgetLibrary;

@@ -293,7 +293,6 @@ export const generateIntegrationsData = () => {
     ]
   };
 };
-
 // Generate integration activity
 export const generateIntegrationActivity = () => {
   return [
@@ -348,7 +347,6 @@ export const generateIntegrationActivity = () => {
     }
   ];
 };
-
 // Generate integration statistics
 export const generateIntegrationStats = () => {
   return {
@@ -383,7 +381,6 @@ export const generateIntegrationStats = () => {
     ]
   };
 };
-
 // Generate OAuth configurations
 export const generateOAuthConfigs = () => {
   return {

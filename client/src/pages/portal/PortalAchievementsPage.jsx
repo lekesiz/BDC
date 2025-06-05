@@ -18,7 +18,6 @@ import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast';
-
 /**
  * PortalAchievementsPage displays the student's achievements, badges, 
  * certificates and progress milestones
@@ -33,7 +32,6 @@ const PortalAchievementsPage = () => {
     recentAchievements: []
   });
   const [filter, setFilter] = useState('all');
-  
   // Fetch achievements data
   useEffect(() => {
     const fetchAchievements = async () => {
@@ -52,16 +50,13 @@ const PortalAchievementsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchAchievements();
   }, []); // Remove toast dependency to prevent infinite loop
-  
   // Format date
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-  
   // Get icon based on achievement type
   const getAchievementIcon = (type, className = "h-6 w-6") => {
     switch (type) {
@@ -81,7 +76,6 @@ const PortalAchievementsPage = () => {
         return <Star className={className} />;
     }
   };
-  
   // Get color class based on achievement type
   const getAchievementColorClass = (type) => {
     switch (type) {
@@ -101,7 +95,6 @@ const PortalAchievementsPage = () => {
         return 'bg-gray-50 text-gray-500';
     }
   };
-  
   // Filter achievements based on selected filter
   const getFilteredAchievements = () => {
     if (filter === 'all') {
@@ -120,13 +113,11 @@ const PortalAchievementsPage = () => {
         certificates: achievements.certificates || []
       };
     }
-    
     return {
       badges: [],
       certificates: []
     };
   };
-  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -134,10 +125,8 @@ const PortalAchievementsPage = () => {
       </div>
     );
   }
-  
   // Get filtered achievements
   const filteredAchievements = getFilteredAchievements();
-  
   return (
     <div className="container mx-auto py-6">
       {/* Page header */}
@@ -147,7 +136,6 @@ const PortalAchievementsPage = () => {
           Track your learning milestones, earned badges, and certificates
         </p>
       </div>
-      
       {/* Highlights */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {(achievements.highlights || []).map(highlight => (
@@ -163,7 +151,6 @@ const PortalAchievementsPage = () => {
           </Card>
         ))}
       </div>
-      
       {/* Recently earned achievements */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Recently Earned</h2>
@@ -199,7 +186,6 @@ const PortalAchievementsPage = () => {
           ))}
         </div>
       </div>
-      
       {/* All achievements section */}
       <div>
         <div className="flex justify-between items-center mb-4">
@@ -228,7 +214,6 @@ const PortalAchievementsPage = () => {
             </Button>
           </div>
         </div>
-        
         {/* Badges section */}
         {filteredAchievements.badges.length > 0 && (
           <div className="mb-8">
@@ -257,7 +242,6 @@ const PortalAchievementsPage = () => {
             </div>
           </div>
         )}
-        
         {/* Certificates section */}
         {filteredAchievements.certificates.length > 0 && (
           <div>
@@ -286,7 +270,6 @@ const PortalAchievementsPage = () => {
                         )}
                       </div>
                     </div>
-                    
                     {certificate.isEarned && (
                       <Button 
                         variant="outline"
@@ -306,5 +289,4 @@ const PortalAchievementsPage = () => {
     </div>
   );
 };
-
 export default PortalAchievementsPage;

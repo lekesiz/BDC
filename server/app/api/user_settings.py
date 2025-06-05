@@ -6,6 +6,8 @@ from app.extensions import db
 from app.models.user import User
 from app.models.user_preference import UserPreference
 
+from app.utils.logging import logger
+
 user_settings_bp = Blueprint('user_settings', __name__)
 
 @user_settings_bp.route('/api/users/settings/preferences', methods=['GET'])

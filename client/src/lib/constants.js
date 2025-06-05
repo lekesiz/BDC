@@ -1,7 +1,6 @@
 /**
  * Application constants
  */
-
 // User roles
 export const ROLES = {
   SUPER_ADMIN: 'super_admin',
@@ -9,7 +8,6 @@ export const ROLES = {
   TRAINER: 'trainer',
   STUDENT: 'student'
 };
-
 // API endpoints
 export const API_ENDPOINTS = {
   AUTH: {
@@ -83,14 +81,12 @@ export const API_ENDPOINTS = {
     FOLDER: id => `/api/folders/${id}`,
   }
 };
-
 // Local storage keys
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'access_token',
   REFRESH_TOKEN: 'refresh_token',
   USER: 'user',
 };
-
 // App routes
 export const ROUTES = {
   // Auth routes
@@ -98,39 +94,31 @@ export const ROUTES = {
   REGISTER: '/register',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
-  
   // Dashboard routes
   DASHBOARD: '/',
-  
   // User management routes
   USERS: '/admin/users',
   USER_DETAIL: id => `/admin/users/${id}`,
   USER_CREATE: '/admin/users/create',
-  
   // Beneficiary routes
   BENEFICIARIES: '/beneficiaries',
   BENEFICIARY_DETAIL: id => `/beneficiaries/${id}`,
   BENEFICIARY_CREATE: '/beneficiaries/create',
-  
   // Evaluation routes
   EVALUATIONS: '/evaluations',
   EVALUATION_DETAIL: id => `/evaluations/${id}`,
   EVALUATION_CREATE: '/evaluations/create',
   EVALUATION_EDIT: id => `/evaluations/${id}/edit`,
-  
   // Test routes
   TEST_SESSION: id => `/tests/${id}`,
   TEST_RESULTS: id => `/evaluations/${id}/results`,
-  
   // Settings routes
   PROFILE: '/profile',
   SETTINGS: '/settings',
-  
   // Error routes
   UNAUTHORIZED: '/unauthorized',
   NOT_FOUND: '*',
 };
-
 // Notification types
 export const NOTIFICATION_TYPES = {
   INFO: 'info',
@@ -138,7 +126,6 @@ export const NOTIFICATION_TYPES = {
   WARNING: 'warning',
   ERROR: 'error',
 };
-
 // Test question types
 export const QUESTION_TYPES = {
   MULTIPLE_CHOICE: 'multiple_choice',
@@ -147,21 +134,18 @@ export const QUESTION_TYPES = {
   MATCHING: 'matching',
   ORDERING: 'ordering',
 };
-
 // Test status
 export const TEST_STATUS = {
   IN_PROGRESS: 'in_progress',
   COMPLETED: 'completed',
   ABANDONED: 'abandoned',
 };
-
 // Evaluation status
 export const EVALUATION_STATUS = {
   DRAFT: 'draft',
   ACTIVE: 'active',
   ARCHIVED: 'archived',
 };
-
 // AI Feedback status
 export const FEEDBACK_STATUS = {
   DRAFT: 'draft',

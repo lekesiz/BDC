@@ -2,7 +2,9 @@
 
 from flask import Flask
 from app.api.auth import auth_bp
-from app.api.auth_refactored import auth_refactored_bp
+# from app.api.auth_refactored import auth_refactored_bp  # TODO: Module not found
+
+from app.utils.logging import logger
 
 
 def configure_auth_endpoints(app: Flask, use_refactored: bool = False):
@@ -15,16 +17,17 @@ def configure_auth_endpoints(app: Flask, use_refactored: bool = False):
     """
     if use_refactored:
         # Use refactored endpoints
-        app.register_blueprint(auth_refactored_bp, url_prefix='/api/v2/auth')
-        print("Using refactored authentication endpoints at /api/v2/auth")
+        # app.register_blueprint(auth_refactored_bp, url_prefix='/api/v2/auth')  # TODO: Module not found
+        app.register_blueprint(auth_bp, url_prefix='/api/v2/auth')  # Use standard auth for now
+        logger.info("Using refactored authentication endpoints at /api/v2/auth")
     else:
         # Use original endpoints
         app.register_blueprint(auth_bp, url_prefix='/api/auth')
-        print("Using original authentication endpoints at /api/auth")
+        logger.info("Using original authentication endpoints at /api/auth")
     
     # During migration, both can be active
     # app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    # app.register_blueprint(auth_refactored_bp, url_prefix='/api/v2/auth')
+    # app.register_blueprint(auth_refactored_bp, url_prefix='/api/v2/auth')  # TODO: Module not found
 
 
 # Feature flags for gradual migration

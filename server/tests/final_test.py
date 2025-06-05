@@ -6,16 +6,18 @@ import json
 import time
 import socketio
 
+from app.utils.logging import logger
+
 # URLs
 login_url = "http://localhost:5001/api/auth/login"
 notification_url = "http://localhost:5001/api/notifications/unread-count"
 me_url = "http://localhost:5001/api/users/me"
 
-print("BDC System Final Test")
-print("=====================\n")
+logger.info("BDC System Final Test")
+logger.info("=====================\n")
 
 # 1. Login Test
-print("1. Testing Login...")
+logger.info("1. Testing Login...")
 login_data = {
     "email": "admin@bdc.com",
     "password": "Admin123!"
@@ -24,10 +26,10 @@ login_data = {
 login_response = requests.post(login_url, json=login_data)
 if login_response.status_code == 200:
     token = login_response.json()['access_token']
-    print(f"   ✓ Login successful")
-    print(f"   Token: {token[:20]}...")
+    logger.info(f"   ✓ Login successful")
+    logger.info(f"   Token: {token[:20]}...")
 else:
-    print(f"   ✗ Login failed: {login_response.text}")
+    logger.info(f"   ✗ Login failed: {login_response.text}")
     return
 
 headers = {
@@ -36,27 +38,27 @@ headers = {
 }
 
 # 2. Test /me endpoint
-print("\n2. Testing /me endpoint...")
+logger.info("\n2. Testing /me endpoint...")
 me_response = requests.get(me_url, headers=headers)
 if me_response.status_code == 200:
     user_data = me_response.json()
-    print(f"   ✓ User data retrieved")
-    print(f"   User: {user_data.get('email')} ({user_data.get('role')})")
+    logger.info(f"   ✓ User data retrieved")
+    logger.info(f"   User: {user_data.get('email')} ({user_data.get('role')})")
 else:
-    print(f"   ✗ Failed: {me_response.text}")
+    logger.info(f"   ✗ Failed: {me_response.text}")
 
 # 3. Test notification endpoint
-print("\n3. Testing notification endpoint...")
+logger.info("\n3. Testing notification endpoint...")
 notif_response = requests.get(notification_url, headers=headers)
 if notif_response.status_code == 200:
     notif_data = notif_response.json()
-    print(f"   ✓ Notification count retrieved")
-    print(f"   Unread count: {notif_data.get('unread_count')}")
+    logger.info(f"   ✓ Notification count retrieved")
+    logger.info(f"   Unread count: {notif_data.get('unread_count')}")
 else:
-    print(f"   ✗ Failed: {notif_response.text}")
+    logger.info(f"   ✗ Failed: {notif_response.text}")
 
 # 4. Test Socket.IO
-print("\n4. Testing Socket.IO connection...")
+logger.info("\n4. Testing Socket.IO connection...")
 sio = socketio.Client(logger=True, engineio_logger=True)
 
 connected = False
@@ -65,19 +67,19 @@ connected = False
 def connect():
     global connected
     connected = True
-    print("   ✓ Connected to Socket.IO")
+    logger.info("   ✓ Connected to Socket.IO")
 
 @sio.event
 def connect_error(data):
-    print(f"   ✗ Connection error: {data}")
+    logger.info(f"   ✗ Connection error: {data}")
 
 @sio.event
 def disconnect():
-    print("   Disconnected from Socket.IO")
+    logger.info("   Disconnected from Socket.IO")
 
 @sio.on('connected')
 def on_connected(data):
-    print(f"   Server says: {data}")
+    logger.info(f"   Server says: {data}")
 
 try:
     sio.connect('http://localhost:5001', 
@@ -88,18 +90,18 @@ try:
     time.sleep(2)
     
     if connected:
-        print("   ✓ Socket.IO is working")
+        logger.info("   ✓ Socket.IO is working")
     else:
-        print("   ✗ Socket.IO connection failed")
+        logger.info("   ✗ Socket.IO connection failed")
     
     sio.disconnect()
     
 except Exception as e:
-    print(f"   ✗ Socket.IO error: {e}")
+    logger.info(f"   ✗ Socket.IO error: {e}")
 
-print("\n\nSummary")
-print("=======")
-print("API Login: ✓")
-print(f"API /me: {'✓' if me_response.status_code == 200 else '✗'}")
-print(f"API notifications: {'✓' if notif_response.status_code == 200 else '✗'}")
-print(f"Socket.IO: {'✓' if connected else '✗'}")
+logger.info("\n\nSummary")
+logger.info("=======")
+logger.info("API Login: ✓")
+logger.info(f"API /me: {'✓' if me_response.status_code == 200 else '✗'}")
+logger.info(f"API notifications: {'✓' if notif_response.status_code == 200 else '✗'}")
+logger.info(f"Socket.IO: {'✓' if connected else '✗'}")

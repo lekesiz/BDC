@@ -14,7 +14,8 @@ import {
   Calendar,
   User,
   BarChart,
-  LineChart
+  LineChart,
+  Lock
 } from 'lucide-react';
 import {
   LineChart as RechartsLineChart,
@@ -30,11 +31,28 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-
 const AIPerformancePredictionsPage = () => {
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
   const { toast } = useToast();
-  
+  // AI Performance Predictions are restricted to admin and trainer roles only
+  const canAccessPredictions = hasRole(['super_admin', 'tenant_admin', 'trainer']);
+  // If user doesn't have permission, show access denied
+  if (!canAccessPredictions) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="p-8 text-center max-w-md">
+          <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h2>
+          <p className="text-gray-600 mb-4">
+            AI Performance Predictions are only available to administrators and trainers.
+          </p>
+          <p className="text-sm text-gray-500">
+            Current role: <span className="font-medium">{user?.role}</span>
+          </p>
+        </Card>
+      </div>
+    );
+  }
   const [loading, setLoading] = useState(true);
   const [predictions, setPredictions] = useState(null);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState('');
@@ -42,18 +60,15 @@ const AIPerformancePredictionsPage = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('3_months');
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [programs, setPrograms] = useState([]);
-
   useEffect(() => {
     fetchBeneficiaries();
     fetchPrograms();
   }, []);
-
   useEffect(() => {
     if (selectedBeneficiary || selectedProgram) {
       fetchPredictions();
     }
   }, [selectedBeneficiary, selectedProgram, selectedTimeframe]);
-
   const fetchBeneficiaries = async () => {
     try {
       const res = await fetch('/api/beneficiaries', {
@@ -61,16 +76,13 @@ const AIPerformancePredictionsPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch beneficiaries');
-
       const data = await res.json();
       setBeneficiaries(data);
     } catch (error) {
       console.error('Error fetching beneficiaries:', error);
     }
   };
-
   const fetchPrograms = async () => {
     try {
       const res = await fetch('/api/programs', {
@@ -78,34 +90,36 @@ const AIPerformancePredictionsPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch programs');
-
       const data = await res.json();
       setPrograms(data);
     } catch (error) {
       console.error('Error fetching programs:', error);
     }
   };
-
   const fetchPredictions = async () => {
+    // Additional permission check for fetching predictions
+    if (!hasRole(['super_admin', 'tenant_admin', 'trainer'])) {
+      toast({
+        title: 'Access Denied',
+        description: 'Performance predictions access is restricted to administrators and trainers only',
+        variant: 'destructive'
+      });
+      return;
+    }
     setLoading(true);
     try {
       const params = new URLSearchParams({
         timeframe: selectedTimeframe
       });
-      
       if (selectedBeneficiary) params.append('beneficiary_id', selectedBeneficiary);
       if (selectedProgram) params.append('program_id', selectedProgram);
-
       const res = await fetch(`/api/ai/performance-predictions?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch predictions');
-
       const data = await res.json();
       setPredictions(data);
     } catch (error) {
@@ -119,19 +133,16 @@ const AIPerformancePredictionsPage = () => {
       setLoading(false);
     }
   };
-
   const getScoreColor = (score) => {
     if (score >= 80) return 'text-green-600';
     if (score >= 60) return 'text-yellow-600';
     return 'text-red-600';
   };
-
   const getTrendIcon = (trend) => {
     if (trend > 0) return <TrendingUp className="h-4 w-4 text-green-600" />;
     if (trend < 0) return <TrendingDown className="h-4 w-4 text-red-600" />;
     return null;
   };
-
   if (loading && predictions === null) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -139,7 +150,6 @@ const AIPerformancePredictionsPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -148,7 +158,6 @@ const AIPerformancePredictionsPage = () => {
           <h1 className="text-2xl font-bold text-gray-900">Performance Predictions</h1>
         </div>
       </div>
-
       {/* Filters */}
       <Card className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -168,7 +177,6 @@ const AIPerformancePredictionsPage = () => {
               ))}
             </Select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Program
@@ -185,7 +193,6 @@ const AIPerformancePredictionsPage = () => {
               ))}
             </Select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Timeframe
@@ -202,7 +209,6 @@ const AIPerformancePredictionsPage = () => {
           </div>
         </div>
       </Card>
-
       {predictions && (
         <>
           {/* Summary Cards */}
@@ -222,7 +228,6 @@ const AIPerformancePredictionsPage = () => {
                 </span>
               </div>
             </Card>
-
             <Card className="p-6">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm text-gray-600">Completion Probability</p>
@@ -235,7 +240,6 @@ const AIPerformancePredictionsPage = () => {
                 {predictions.summary.at_risk_count} at risk
               </p>
             </Card>
-
             <Card className="p-6">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm text-gray-600">Success Rate</p>
@@ -251,7 +255,6 @@ const AIPerformancePredictionsPage = () => {
                 </span>
               </div>
             </Card>
-
             <Card className="p-6">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm text-gray-600">Risk Level</p>
@@ -265,7 +268,6 @@ const AIPerformancePredictionsPage = () => {
               </p>
             </Card>
           </div>
-
           {/* Performance Trend Chart */}
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">Performance Trend Prediction</h2>
@@ -305,7 +307,6 @@ const AIPerformancePredictionsPage = () => {
               </ResponsiveContainer>
             </div>
           </Card>
-
           {/* Individual Predictions */}
           {selectedBeneficiary && predictions.individual_predictions && (
             <Card className="p-6">
@@ -333,7 +334,6 @@ const AIPerformancePredictionsPage = () => {
               </div>
             </Card>
           )}
-
           {/* Risk Factors */}
           {predictions.risk_analysis && predictions.risk_analysis.length > 0 && (
             <Card className="p-6 border-amber-200 bg-amber-50">
@@ -360,7 +360,6 @@ const AIPerformancePredictionsPage = () => {
               </div>
             </Card>
           )}
-
           {/* Recommendations */}
           <Card className="p-6">
             <h2 className="text-lg font-semibold mb-4">AI Recommendations</h2>
@@ -386,5 +385,4 @@ const AIPerformancePredictionsPage = () => {
     </div>
   );
 };
-
 export default AIPerformancePredictionsPage;

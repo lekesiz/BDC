@@ -15,7 +15,6 @@ import {
 import { Doughnut, Bar, Radar } from 'react-chartjs-2';
 import { motion, AnimatePresence } from 'framer-motion';
 import WordCloud from 'react-d3-cloud';
-
 // Register ChartJS components
 ChartJS.register(
   ArcElement,
@@ -29,7 +28,6 @@ ChartJS.register(
   LineElement,
   Filler
 );
-
 const ThemeExtraction = ({ noteId, noteContent }) => {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,20 +35,17 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
   const [selectedTheme, setSelectedTheme] = useState(null);
   const [compareMode, setCompareMode] = useState(false);
   const [selectedNotes, setSelectedNotes] = useState([]);
-
   useEffect(() => {
     if (noteId || noteContent) {
       analyzeNote();
     }
   }, [noteId, noteContent]);
-
   const analyzeNote = async () => {
     try {
       setLoading(true);
       const payload = noteId 
         ? { noteId } 
         : { content: noteContent };
-
       const response = await fetch('/api/notes/analyze', {
         method: 'POST',
         headers: {
@@ -61,7 +56,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
           analysisType: 'comprehensive'
         })
       });
-
       const data = await response.json();
       setAnalysis(data);
     } catch (error) {
@@ -70,10 +64,8 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       setLoading(false);
     }
   };
-
   const getThemeDistribution = () => {
     if (!analysis?.themes) return null;
-
     const labels = analysis.themes.map(theme => theme.name);
     const data = analysis.themes.map(theme => theme.prominence || 3);
     const backgroundColors = [
@@ -83,7 +75,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       'rgba(239, 68, 68, 0.8)',
       'rgba(168, 85, 247, 0.8)',
     ];
-
     return {
       labels,
       datasets: [{
@@ -94,10 +85,8 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       }]
     };
   };
-
   const getConceptRadar = () => {
     if (!analysis?.concepts) return null;
-
     const labels = analysis.concepts.slice(0, 8).map(c => c.name);
     const values = analysis.concepts.slice(0, 8).map(c => {
       // Calculate concept strength based on various factors
@@ -105,7 +94,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       const definitionLength = c.definition?.length || 0;
       return Math.min(100, (contextLength + definitionLength) / 5);
     });
-
     return {
       labels,
       datasets: [{
@@ -120,13 +108,10 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       }]
     };
   };
-
   const getSkillsChart = () => {
     if (!analysis?.skills) return null;
-
     const categories = Object.keys(analysis.skills);
     const data = categories.map(cat => analysis.skills[cat].length);
-
     return {
       labels: categories.map(cat => cat.replace('_', ' ').charAt(0).toUpperCase() + cat.slice(1).replace('_', ' ')),
       datasets: [{
@@ -148,16 +133,13 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       }]
     };
   };
-
   const getWordCloudData = () => {
     if (!analysis?.key_elements?.important_terms) return [];
-
     return analysis.key_elements.important_terms.map(term => ({
       text: term.term,
       value: term.frequency * 100
     }));
   };
-
   const ThemeCard = ({ theme }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -183,7 +165,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       )}
     </motion.div>
   );
-
   const ConceptCard = ({ concept }) => (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -199,7 +180,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       )}
     </motion.div>
   );
-
   const SkillBadge = ({ skill, category }) => {
     const categoryColors = {
       technical_skills: 'blue',
@@ -207,9 +187,7 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       cognitive_skills: 'purple',
       subject_knowledge: 'yellow'
     };
-
     const color = categoryColors[category] || 'gray';
-
     return (
       <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-${color}-100 text-${color}-800 mr-2 mb-2`}>
         {typeof skill === 'string' ? skill : skill.skill}
@@ -221,16 +199,13 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       </span>
     );
   };
-
   const SentimentIndicator = ({ sentiment }) => {
     const sentimentColors = {
       positive: 'green',
       negative: 'red',
       neutral: 'gray'
     };
-
     const color = sentimentColors[sentiment.sentiment_label] || 'gray';
-
     return (
       <div className="flex items-center space-x-4">
         <div className={`w-4 h-4 rounded-full bg-${color}-500`} />
@@ -257,7 +232,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       </div>
     );
   };
-
   const InsightPanel = ({ insights }) => (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">AI Insights</h3>
@@ -301,7 +275,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       </div>
     </div>
   );
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -312,7 +285,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       </div>
     );
   }
-
   if (!analysis) {
     return (
       <div className="text-center py-8">
@@ -320,7 +292,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       {/* View Selector */}
@@ -339,7 +310,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
           </button>
         ))}
       </div>
-
       {/* Content based on selected view */}
       <AnimatePresence mode="wait">
         {selectedView === 'themes' && analysis.themes && (
@@ -369,7 +339,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
                   />
                 </div>
               </div>
-
               {/* Theme Cards */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Identified Themes</h3>
@@ -382,7 +351,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
             </div>
           </motion.div>
         )}
-
         {selectedView === 'concepts' && analysis.concepts && (
           <motion.div
             key="concepts"
@@ -411,7 +379,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
                   />
                 </div>
               </div>
-
               {/* Word Cloud */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Terms</h3>
@@ -430,7 +397,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
                 </div>
               </div>
             </div>
-
             {/* Concept Cards */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Identified Concepts</h3>
@@ -442,7 +408,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
             </div>
           </motion.div>
         )}
-
         {selectedView === 'skills' && analysis.skills && (
           <motion.div
             key="skills"
@@ -469,7 +434,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
                 />
               </div>
             </div>
-
             {/* Skills by Category */}
             <div className="space-y-6">
               {Object.entries(analysis.skills).map(([category, skills]) => (
@@ -487,7 +451,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
             </div>
           </motion.div>
         )}
-
         {selectedView === 'sentiment' && analysis.sentiment && (
           <motion.div
             key="sentiment"
@@ -501,7 +464,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Overall Sentiment</h3>
               <SentimentIndicator sentiment={analysis.sentiment} />
             </div>
-
             {/* Sentence-level Analysis */}
             {analysis.sentiment.sentence_analysis && (
               <div className="bg-white rounded-lg shadow-md p-6">
@@ -527,7 +489,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
                 </div>
               </div>
             )}
-
             {/* Emotion Words */}
             {analysis.sentiment.emotion_words && (
               <div className="bg-white rounded-lg shadow-md p-6">
@@ -564,7 +525,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
             )}
           </motion.div>
         )}
-
         {selectedView === 'summary' && analysis.summary && (
           <motion.div
             key="summary"
@@ -580,7 +540,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
                 "{analysis.summary.one_line}"
               </p>
             </div>
-
             {/* Abstractive Summary */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Executive Summary</h3>
@@ -588,7 +547,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
                 {analysis.summary.abstractive}
               </p>
             </div>
-
             {/* Key Points */}
             {analysis.summary.key_points && analysis.summary.key_points.length > 0 && (
               <div className="bg-white rounded-lg shadow-md p-6">
@@ -603,7 +561,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
                 </ul>
               </div>
             )}
-
             {/* Extractive Summary */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Extract Summary</h3>
@@ -613,7 +570,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
             </div>
           </motion.div>
         )}
-
         {selectedView === 'insights' && analysis.ai_insights && (
           <motion.div
             key="insights"
@@ -625,7 +581,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Quality Score */}
       {analysis.quality_score !== undefined && (
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -659,7 +614,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
               </span>
             </div>
           </div>
-
           {/* Quality Breakdown */}
           {analysis.text_statistics && (
             <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -687,7 +641,6 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
           )}
         </div>
       )}
-
       {/* Selected Theme Modal */}
       <AnimatePresence>
         {selectedTheme && (
@@ -716,21 +669,18 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
                   </svg>
                 </button>
               </div>
-              
               {selectedTheme.explanation && (
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-700 mb-2">Explanation</h3>
                   <p className="text-gray-600">{selectedTheme.explanation}</p>
                 </div>
               )}
-              
               {selectedTheme.evidence && (
                 <div className="mb-4">
                   <h3 className="font-semibold text-gray-700 mb-2">Evidence</h3>
                   <p className="text-gray-600 italic">{selectedTheme.evidence}</p>
                 </div>
               )}
-              
               <div className="flex items-center justify-between mt-6">
                 <div className="flex items-center">
                   <span className="text-sm text-gray-500 mr-2">Prominence:</span>
@@ -763,5 +713,4 @@ const ThemeExtraction = ({ noteId, noteContent }) => {
     </div>
   );
 };
-
 export default ThemeExtraction;

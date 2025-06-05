@@ -1,7 +1,6 @@
 /**
  * Users Mock Data for Demo and Testing
  */
-
 // User roles
 export const USER_ROLES = {
   SUPER_ADMIN: 'super_admin',
@@ -10,7 +9,6 @@ export const USER_ROLES = {
   STUDENT: 'student',
   TRAINEE: 'trainee'
 };
-
 // User status
 export const USER_STATUS = {
   ACTIVE: 'active',
@@ -18,7 +16,6 @@ export const USER_STATUS = {
   PENDING: 'pending',
   SUSPENDED: 'suspended'
 };
-
 // Sample users data
 const mockUsers = [
   {
@@ -142,15 +139,12 @@ const mockUsers = [
     }
   }
 ];
-
 // Generate additional users
 const generateUser = (id, role) => {
   const firstNames = ['Mehmet', 'Fatma', 'Ali', 'Emine', 'Hasan', 'Zeynep', 'İbrahim', 'Hatice', 'Mustafa', 'Ayşe'];
   const lastNames = ['Yılmaz', 'Kaya', 'Demir', 'Şahin', 'Çelik', 'Yıldız', 'Öztürk', 'Arslan', 'Doğan', 'Aslan'];
-  
   const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
   const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-  
   const rolePermissions = {
     [USER_ROLES.TRAINER]: [
       'beneficiaries.view', 'beneficiaries.edit',
@@ -166,7 +160,6 @@ const generateUser = (id, role) => {
       'documents.view', 'profile.edit'
     ]
   };
-  
   return {
     id,
     email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
@@ -190,17 +183,14 @@ const generateUser = (id, role) => {
     }
   };
 };
-
 // Generate additional users
 for (let i = 5; i <= 30; i++) {
   const roles = [USER_ROLES.TRAINER, USER_ROLES.STUDENT, USER_ROLES.TRAINEE];
   const role = roles[Math.floor(Math.random() * roles.length)];
   mockUsers.push(generateUser(i, role));
 }
-
 // Export users data
 export { mockUsers };
-
 // User statistics
 export const userStats = {
   total: mockUsers.length,
@@ -217,5 +207,4 @@ export const userStats = {
     .filter(u => new Date(u.lastLogin) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
     .length
 };
-
 export default mockUsers;

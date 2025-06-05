@@ -87,6 +87,8 @@ class MessageThread(db.Model):
     
     id = Column(Integer, primary_key=True)
     subject = Column(String(100), nullable=True)
+    title = Column(String(100), nullable=True)  # Added for API compatibility
+    thread_type = Column(String(50), default='direct')  # Added for API compatibility
     
     # Status
     is_archived = Column(Boolean, default=False)
@@ -104,6 +106,8 @@ class MessageThread(db.Model):
         return {
             'id': self.id,
             'subject': self.subject,
+            'title': self.title,
+            'thread_type': self.thread_type,
             'is_archived': self.is_archived,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
@@ -157,6 +161,10 @@ class Message(db.Model):
     content = Column(Text, nullable=False)
     attachments = Column(JSON, nullable=True)
     
+    # Edit tracking
+    is_edited = Column(Boolean, default=False)
+    edited_at = Column(DateTime, nullable=True)
+    
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -173,6 +181,8 @@ class Message(db.Model):
             'sender_id': self.sender_id,
             'content': self.content,
             'attachments': self.attachments,
+            'is_edited': self.is_edited,
+            'edited_at': self.edited_at.isoformat() if self.edited_at else None,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

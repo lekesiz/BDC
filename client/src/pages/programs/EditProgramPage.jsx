@@ -8,14 +8,12 @@ import { Select } from '../../components/ui/select';
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Loader2, Save, X } from 'lucide-react';
-
 const EditProgramPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -29,13 +27,10 @@ const EditProgramPage = () => {
     price: 0,
     currency: 'EUR',
   });
-
   const [modules, setModules] = useState([]);
-
   useEffect(() => {
     fetchProgramDetails();
   }, [id]);
-
   const fetchProgramDetails = async () => {
     try {
       const res = await fetch(`/api/programs/${id}`, {
@@ -43,9 +38,7 @@ const EditProgramPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch program');
-
       const data = await res.json();
       setFormData({
         name: data.name || '',
@@ -60,7 +53,6 @@ const EditProgramPage = () => {
         price: data.price || 0,
         currency: data.currency || 'EUR',
       });
-      
       setModules(data.modules || []);
     } catch (error) {
       console.error('Error fetching program:', error);
@@ -73,14 +65,12 @@ const EditProgramPage = () => {
       setLoading(false);
     }
   };
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
-
   const handleAddModule = () => {
     setModules([
       ...modules,
@@ -92,13 +82,11 @@ const EditProgramPage = () => {
       }
     ]);
   };
-
   const handleModuleChange = (index, field, value) => {
     const updatedModules = [...modules];
     updatedModules[index][field] = value;
     setModules(updatedModules);
   };
-
   const handleRemoveModule = (index) => {
     const updatedModules = modules.filter((_, i) => i !== index);
     // Update order indices
@@ -107,11 +95,9 @@ const EditProgramPage = () => {
     });
     setModules(updatedModules);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-
     try {
       const res = await fetch(`/api/programs/${id}`, {
         method: 'PUT',
@@ -124,14 +110,11 @@ const EditProgramPage = () => {
           modules
         })
       });
-
       if (!res.ok) throw new Error('Failed to update program');
-
       toast({
         title: 'Success',
         description: 'Program updated successfully'
       });
-
       navigate('/programs');
     } catch (error) {
       console.error('Error updating program:', error);
@@ -144,7 +127,6 @@ const EditProgramPage = () => {
       setSaving(false);
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -152,18 +134,15 @@ const EditProgramPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Edit Program</h1>
       </div>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
           <div className="p-6 space-y-6">
             <h2 className="text-lg font-semibold text-gray-800">Basic Information</h2>
-            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -178,7 +157,6 @@ const EditProgramPage = () => {
                   placeholder="Enter program name"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Category *
@@ -192,7 +170,6 @@ const EditProgramPage = () => {
                   placeholder="e.g., Web Development, Data Science"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Level
@@ -207,7 +184,6 @@ const EditProgramPage = () => {
                   <option value="advanced">Advanced</option>
                 </Select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
@@ -223,7 +199,6 @@ const EditProgramPage = () => {
                   <option value="archived">Archived</option>
                 </Select>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Duration (weeks)
@@ -237,7 +212,6 @@ const EditProgramPage = () => {
                   required
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Max Participants
@@ -250,7 +224,6 @@ const EditProgramPage = () => {
                   min="1"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Price
@@ -270,7 +243,6 @@ const EditProgramPage = () => {
                 </div>
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description
@@ -283,7 +255,6 @@ const EditProgramPage = () => {
                 placeholder="Enter program description"
               />
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -297,7 +268,6 @@ const EditProgramPage = () => {
                   placeholder="Enter learning objectives"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Prerequisites
@@ -313,7 +283,6 @@ const EditProgramPage = () => {
             </div>
           </div>
         </Card>
-
         {/* Modules Section */}
         <Card>
           <div className="p-6 space-y-4">
@@ -327,7 +296,6 @@ const EditProgramPage = () => {
                 Add Module
               </Button>
             </div>
-
             {modules.length === 0 ? (
               <p className="text-sm text-gray-500">No modules added yet</p>
             ) : (
@@ -345,7 +313,6 @@ const EditProgramPage = () => {
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -359,7 +326,6 @@ const EditProgramPage = () => {
                           required
                         />
                       </div>
-
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Duration (hours)
@@ -373,7 +339,6 @@ const EditProgramPage = () => {
                         />
                       </div>
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Description
@@ -391,7 +356,6 @@ const EditProgramPage = () => {
             )}
           </div>
         </Card>
-
         <div className="flex items-center justify-end gap-3">
           <Button
             type="button"
@@ -421,5 +385,4 @@ const EditProgramPage = () => {
     </div>
   );
 };
-
 export default EditProgramPage;

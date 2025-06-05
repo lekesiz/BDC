@@ -1,11 +1,9 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Accordion context to manage accordion state
  */
 const AccordionContext = React.createContext(null);
-
 /**
  * Accordion container component that manages the active items
  * 
@@ -35,10 +33,8 @@ const Accordion = ({
     }
     return defaultValue || null;
   };
-  
   const [value, setValue] = React.useState(getInitialValue);
   const activeValue = controlledValue !== undefined ? controlledValue : value;
-  
   const handleValueChange = React.useCallback((itemValue) => {
     const newValue = calculateNewValue(itemValue);
     if (controlledValue === undefined) {
@@ -46,7 +42,6 @@ const Accordion = ({
     }
     onValueChange?.(newValue);
   }, [activeValue, collapsible, multiple, controlledValue, onValueChange]);
-  
   const calculateNewValue = (itemValue) => {
     if (multiple) {
       // Handle multiple selection
@@ -65,14 +60,12 @@ const Accordion = ({
       return activeValue === itemValue && collapsible ? null : itemValue;
     }
   };
-  
   const isItemActive = (itemValue) => {
     if (multiple) {
       return Array.isArray(activeValue) && activeValue.includes(itemValue);
     }
     return activeValue === itemValue;
   };
-  
   return (
     <AccordionContext.Provider 
       value={{ value: activeValue, onValueChange: handleValueChange, isItemActive }}
@@ -86,7 +79,6 @@ const Accordion = ({
     </AccordionContext.Provider>
   );
 };
-
 /**
  * Accordion item component that contains a trigger and content
  * 
@@ -107,7 +99,6 @@ const AccordionItem = ({
   const itemContext = React.useMemo(() => ({ value, disabled }), [value, disabled]);
   const itemContextRef = React.useRef(itemContext);
   itemContextRef.current = itemContext;
-  
   return (
     <div 
       data-state={itemContextRef.current.disabled ? "disabled" : "enabled"}
@@ -127,7 +118,6 @@ const AccordionItem = ({
     </div>
   );
 };
-
 /**
  * Accordion trigger component that toggles the visibility of content
  * 
@@ -146,13 +136,11 @@ const AccordionTrigger = ({
   const { value, disabled } = itemContext || {};
   const { isItemActive, onValueChange } = React.useContext(AccordionContext);
   const isActive = value ? isItemActive(value) : false;
-  
   const handleClick = () => {
     if (!disabled && value) {
       onValueChange(value);
     }
   };
-  
   return (
     <button
       type="button"
@@ -188,7 +176,6 @@ const AccordionTrigger = ({
     </button>
   );
 };
-
 /**
  * Accordion content component that is shown when its trigger is active
  * 
@@ -207,9 +194,7 @@ const AccordionContent = ({
   const { value } = itemContext || {};
   const { isItemActive } = React.useContext(AccordionContext);
   const isActive = value ? isItemActive(value) : false;
-  
   if (!isActive) return null;
-  
   return (
     <div
       data-state={isActive ? "open" : "closed"}
@@ -225,5 +210,4 @@ const AccordionContent = ({
     </div>
   );
 };
-
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };

@@ -1,5 +1,4 @@
 // Mock data for reports testing
-
 export const mockReports = {
   recent: [
     {
@@ -36,7 +35,6 @@ export const mockReports = {
       created_by: "Admin User"
     }
   ],
-  
   saved: [
     {
       id: 4,
@@ -72,7 +70,6 @@ export const mockReports = {
       run_count: 12
     }
   ],
-  
   scheduled: [
     {
       id: 1,
@@ -111,7 +108,6 @@ export const mockReports = {
       status: "paused"
     }
   ],
-  
   fields: {
     beneficiary: [
       { id: 'name', name: 'Full Name', description: 'Beneficiary full name' },
@@ -164,7 +160,6 @@ export const mockReports = {
       { id: 'improvement', name: 'Improvement', description: 'Improvement from previous test' }
     ]
   },
-  
   filters: {
     beneficiary: [
       {
@@ -307,7 +302,6 @@ export const mockReports = {
       }
     ]
   },
-  
   previewData: {
     beneficiary: {
       sections: [

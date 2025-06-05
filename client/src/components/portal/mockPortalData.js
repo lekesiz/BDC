@@ -1,16 +1,13 @@
 /**
  * Mock data for student portal
  */
-
 import { addDays, addHours, subDays, format } from 'date-fns';
-
 const NOW = new Date();
 const FILE_SIZES = {
   small: { min: 10 * 1024, max: 500 * 1024 }, // 10KB - 500KB
   medium: { min: 500 * 1024, max: 5 * 1024 * 1024 }, // 500KB - 5MB
   large: { min: 5 * 1024 * 1024, max: 20 * 1024 * 1024 }, // 5MB - 20MB
 };
-
 // Sample dashboard data
 export const dashboardData = {
   program: {
@@ -139,7 +136,6 @@ export const dashboardData = {
     }
   ]
 };
-
 // Sample courses data
 export const coursesData = [
   {
@@ -249,7 +245,6 @@ export const coursesData = [
     ]
   }
 ];
-
 // Sample module data (for module detail page)
 export const moduleData = {
   1: { // HTML/CSS Fundamentals
@@ -591,7 +586,6 @@ export const moduleData = {
     ]
   }
 };
-
 // Sample calendar data
 export const calendarData = {
   sessions: [
@@ -659,48 +653,36 @@ export const calendarData = {
     }
   ]
 };
-
 // Mock API functions
 export const getPortalDashboard = () => {
   return Promise.resolve(dashboardData);
 };
-
 export const getPortalCourses = () => {
   return Promise.resolve(coursesData);
 };
-
 export const getPortalModuleDetail = (id) => {
   const module = moduleData[id];
-  
   if (!module) {
     return Promise.reject(new Error('Module not found'));
   }
-  
   return Promise.resolve(module);
 };
-
 export const completeLesson = (lessonId) => {
   // In a real implementation, this would update the lesson status in the database
   return Promise.resolve({ success: true });
 };
-
 export const getPortalCalendar = (month, year) => {
   // In a real implementation, this would filter sessions by month and year
   return Promise.resolve(calendarData.sessions);
 };
-
 // First definition removed - using the more complete one below
-
 export const getSessionDetail = (sessionId) => {
   const session = calendarData.sessions.find(s => s.id.toString() === sessionId);
-  
   if (!session) {
     return Promise.reject(new Error('Session not found'));
   }
-  
   return Promise.resolve(session);
 };
-
 // Sample resources data
 export const resourcesData = {
   resources: [
@@ -749,7 +731,6 @@ export const resourcesData = {
       moduleId: 1,
       uploadDate: subDays(NOW, 42).toISOString()
     },
-    
     // JavaScript Basics resources
     {
       id: 1005,
@@ -795,7 +776,6 @@ export const resourcesData = {
       moduleId: 2,
       uploadDate: subDays(NOW, 27).toISOString()
     },
-    
     // JavaScript Advanced resources
     {
       id: 1009,
@@ -841,7 +821,6 @@ export const resourcesData = {
       moduleId: 3,
       uploadDate: subDays(NOW, 10).toISOString()
     },
-    
     // React Fundamentals resources
     {
       id: 1013,
@@ -865,7 +844,6 @@ export const resourcesData = {
       moduleId: 4,
       uploadDate: subDays(NOW, 5).toISOString()
     },
-    
     // Career Development resources
     {
       id: 1015,
@@ -911,24 +889,19 @@ export const resourcesData = {
     { id: 7, name: "Career", count: 2, icon: "Folder", colorClass: "bg-orange-500" }
   ]
 };
-
 // Mock API function for resources
 export const getPortalResources = () => {
   return Promise.resolve(resourcesData);
 };
-
 // Mock API function for downloading a resource
 export const downloadResource = (resourceId) => {
   const resource = resourcesData.resources.find(r => r.id.toString() === resourceId);
-  
   if (!resource) {
     return Promise.reject(new Error('Resource not found'));
   }
-  
   // In a real implementation, this would return the resource file
   return Promise.resolve({ success: true, resource });
 };
-
 // Sample achievements data
 export const achievementsData = {
   highlights: [
@@ -1078,28 +1051,22 @@ export const achievementsData = {
     }
   ]
 };
-
 // Mock API function for achievements
 export const getPortalAchievements = () => {
   return Promise.resolve(achievementsData);
 };
-
 // Mock API function for downloading a certificate
 export const downloadCertificate = (certificateId) => {
   const certificate = achievementsData.certificates.find(c => c.id.toString() === certificateId);
-  
   if (!certificate) {
     return Promise.reject(new Error('Certificate not found'));
   }
-  
   if (!certificate.isEarned) {
     return Promise.reject(new Error('Certificate not yet earned'));
   }
-  
   // In a real implementation, this would return the certificate file
   return Promise.resolve({ success: true, certificate });
 };
-
 // Sample profile data
 export const profileData = {
   id: 1001,
@@ -1150,12 +1117,10 @@ export const profileData = {
   interests: "Front-end development, UX/UI design, data visualization, mobile app development, and digital accessibility.",
   goals: "My primary goal is to transition from marketing to a full-time role as a front-end developer within the next 6 months. I aim to master React and become proficient with modern JavaScript frameworks. Long-term, I'd like to specialize in creating accessible web applications and potentially explore opportunities in technical leadership."
 };
-
 // Mock API function for profile
 export const getPortalProfile = () => {
   return Promise.resolve(profileData);
 };
-
 // Mock API function for updating profile
 export const updatePortalProfile = (updatedData) => {
   // In a real implementation, this would update the profile in the database
@@ -1170,10 +1135,8 @@ export const updatePortalProfile = (updatedData) => {
     interests: updatedData.interests || profileData.interests,
     goals: updatedData.goals || profileData.goals
   });
-  
   return Promise.resolve({ success: true, profile: profileData });
 };
-
 // Sample skills data
 export const skillsData = {
   highlightMetrics: [
@@ -1553,12 +1516,10 @@ export const skillsData = {
     }
   ]
 };
-
 // Mock API function for skills
 export const getPortalSkills = () => {
   return Promise.resolve(skillsData);
 };
-
 // Sample progress data
 export const progressData = {
   program: {
@@ -2019,12 +1980,10 @@ export const progressData = {
     }
   ]
 };
-
 // Mock API function for progress
 export const getPortalProgress = () => {
   return Promise.resolve(progressData);
 };
-
 // Sample notifications data
 export const notificationsData = {
   unreadCount: 4,
@@ -2123,66 +2082,51 @@ export const notificationsData = {
     }
   ]
 };
-
 // Mock API function for notifications
 export const getPortalNotifications = () => {
   return Promise.resolve(notificationsData);
 };
-
 // Mock API function for marking a notification as read
 export const markNotificationAsRead = (id) => {
   // Find the notification
   const notification = notificationsData.notifications.find(n => n.id.toString() === id);
-  
   if (!notification) {
     return Promise.reject(new Error('Notification not found'));
   }
-  
   // Update the notification's read status
   if (!notification.isRead) {
     notification.isRead = true;
     notificationsData.unreadCount = Math.max(0, notificationsData.unreadCount - 1);
   }
-  
   return Promise.resolve({ success: true, notification });
 };
-
 // Mock API function for marking all notifications as read
 export const markAllNotificationsAsRead = () => {
   // Update all notifications to read
   notificationsData.notifications.forEach(notification => {
     notification.isRead = true;
   });
-  
   // Reset unread count
   notificationsData.unreadCount = 0;
-  
   return Promise.resolve({ success: true });
 };
-
 // Mock API function for deleting a notification
 export const deleteNotification = (id) => {
   // Find the notification index
   const index = notificationsData.notifications.findIndex(n => n.id.toString() === id);
-  
   if (index === -1) {
     return Promise.reject(new Error('Notification not found'));
   }
-  
   // Check if it was unread
   const wasUnread = !notificationsData.notifications[index].isRead;
-  
   // Remove the notification
   notificationsData.notifications.splice(index, 1);
-  
   // Update unread count if needed
   if (wasUnread) {
     notificationsData.unreadCount = Math.max(0, notificationsData.unreadCount - 1);
   }
-  
   return Promise.resolve({ success: true });
 };
-
 // Mock API function for updating notification settings
 export const updateNotificationSettings = (settings) => {
   // In a real implementation, this would update the user's notification preferences

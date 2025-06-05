@@ -14,12 +14,10 @@ import {
   UserMinus,
   Users
 } from 'lucide-react';
-
 const AssignBeneficiariesPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [program, setProgram] = useState(null);
@@ -27,12 +25,10 @@ const AssignBeneficiariesPage = () => {
   const [selectedBeneficiaries, setSelectedBeneficiaries] = useState(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [filterEnrolled, setFilterEnrolled] = useState(false);
-
   useEffect(() => {
     fetchProgramDetails();
     fetchBeneficiaries();
   }, [id]);
-
   const fetchProgramDetails = async () => {
     try {
       const res = await fetch(`/api/programs/${id}`, {
@@ -40,9 +36,7 @@ const AssignBeneficiariesPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch program');
-
       const data = await res.json();
       setProgram(data);
     } catch (error) {
@@ -54,7 +48,6 @@ const AssignBeneficiariesPage = () => {
       });
     }
   };
-
   const fetchBeneficiaries = async () => {
     try {
       const res = await fetch('/api/beneficiaries', {
@@ -62,27 +55,21 @@ const AssignBeneficiariesPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch beneficiaries');
-
       const data = await res.json();
-      
       // Fetch enrolled beneficiaries for this program
       const enrolledRes = await fetch(`/api/programs/${id}/beneficiaries`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       const enrolledData = await enrolledRes.json();
       const enrolledIds = new Set(enrolledData.map(b => b.id));
-
       // Mark beneficiaries as enrolled
       const beneficiariesWithEnrollment = data.map(beneficiary => ({
         ...beneficiary,
         isEnrolled: enrolledIds.has(beneficiary.id)
       }));
-
       setBeneficiaries(beneficiariesWithEnrollment);
       setSelectedBeneficiaries(enrolledIds);
     } catch (error) {
@@ -96,7 +83,6 @@ const AssignBeneficiariesPage = () => {
       setLoading(false);
     }
   };
-
   const handleSelectBeneficiary = (beneficiaryId) => {
     const newSelection = new Set(selectedBeneficiaries);
     if (newSelection.has(beneficiaryId)) {
@@ -106,7 +92,6 @@ const AssignBeneficiariesPage = () => {
     }
     setSelectedBeneficiaries(newSelection);
   };
-
   const handleSelectAll = () => {
     if (selectedBeneficiaries.size === filteredBeneficiaries.length) {
       setSelectedBeneficiaries(new Set());
@@ -115,7 +100,6 @@ const AssignBeneficiariesPage = () => {
       setSelectedBeneficiaries(allIds);
     }
   };
-
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -129,14 +113,11 @@ const AssignBeneficiariesPage = () => {
           beneficiary_ids: Array.from(selectedBeneficiaries)
         })
       });
-
       if (!res.ok) throw new Error('Failed to update assignments');
-
       toast({
         title: 'Success',
         description: 'Beneficiary assignments updated successfully'
       });
-
       navigate(`/programs/${id}`);
     } catch (error) {
       console.error('Error saving assignments:', error);
@@ -149,14 +130,12 @@ const AssignBeneficiariesPage = () => {
       setSaving(false);
     }
   };
-
   const filteredBeneficiaries = beneficiaries.filter(beneficiary => {
     const matchesSearch = beneficiary.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          beneficiary.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = !filterEnrolled || beneficiary.isEnrolled;
     return matchesSearch && matchesFilter;
   });
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -164,7 +143,6 @@ const AssignBeneficiariesPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -180,7 +158,6 @@ const AssignBeneficiariesPage = () => {
           Assign Beneficiaries to {program?.name}
         </h1>
       </div>
-
       <Card className="p-6">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -195,7 +172,6 @@ const AssignBeneficiariesPage = () => {
                   className="pl-9 w-64"
                 />
               </div>
-              
               <label className="flex items-center gap-2">
                 <Checkbox
                   checked={filterEnrolled}
@@ -204,7 +180,6 @@ const AssignBeneficiariesPage = () => {
                 <span className="text-sm">Show enrolled only</span>
               </label>
             </div>
-
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600">
                 {selectedBeneficiaries.size} of {filteredBeneficiaries.length} selected
@@ -218,7 +193,6 @@ const AssignBeneficiariesPage = () => {
               </Button>
             </div>
           </div>
-
           <div className="border rounded-lg divide-y max-h-[500px] overflow-y-auto">
             {filteredBeneficiaries.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
@@ -244,7 +218,6 @@ const AssignBeneficiariesPage = () => {
                       <p className="text-sm text-gray-500">{beneficiary.email}</p>
                     </div>
                   </div>
-                  
                   <div className="flex items-center gap-2">
                     {beneficiary.isEnrolled && (
                       <Badge variant="outline" className="text-green-700">
@@ -261,13 +234,11 @@ const AssignBeneficiariesPage = () => {
               ))
             )}
           </div>
-
           <div className="flex items-center justify-between pt-4">
             <div className="text-sm text-gray-600">
               <p>Current enrollment: {program?.enrolled_count || 0} / {program?.max_participants}</p>
               <p>Selected for enrollment: {selectedBeneficiaries.size}</p>
             </div>
-
             <div className="flex gap-3">
               <Button
                 variant="outline"
@@ -298,5 +269,4 @@ const AssignBeneficiariesPage = () => {
     </div>
   );
 };
-
 export default AssignBeneficiariesPage;

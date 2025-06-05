@@ -4,7 +4,6 @@ import {
   ArrowLeft, Save, Plus, Trash2, GripVertical, 
   FileText, Settings, HelpCircle, ChevronRight
 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +16,6 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import { RadioGroup } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
-
 /**
  * TrainerAssessmentCreationPage allows trainers to create new assessment templates
  */
@@ -27,7 +25,6 @@ const TrainerAssessmentCreationPage = () => {
   const [activeTab, setActiveTab] = useState('basic');
   const [isSaving, setIsSaving] = useState(false);
   const [isDraft, setIsDraft] = useState(true);
-  
   // Basic info state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -35,7 +32,6 @@ const TrainerAssessmentCreationPage = () => {
   const [category, setCategory] = useState('');
   const [skills, setSkills] = useState([]);
   const [newSkill, setNewSkill] = useState('');
-  
   // Quiz state
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState({
@@ -46,7 +42,6 @@ const TrainerAssessmentCreationPage = () => {
     points: 10,
     explanation: ''
   });
-  
   // Project state
   const [requirements, setRequirements] = useState([]);
   const [currentRequirement, setCurrentRequirement] = useState({
@@ -55,7 +50,6 @@ const TrainerAssessmentCreationPage = () => {
   });
   const [rubric, setRubric] = useState({});
   const [resources, setResources] = useState([]);
-  
   // Settings state
   const [settings, setSettings] = useState({
     timeLimit: 0,
@@ -70,7 +64,6 @@ const TrainerAssessmentCreationPage = () => {
     notifyBeforeDue: true,
     notifyOnGrade: true
   });
-  
   // Add skill
   const handleAddSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill.trim())) {
@@ -78,12 +71,10 @@ const TrainerAssessmentCreationPage = () => {
       setNewSkill('');
     }
   };
-  
   // Remove skill
   const handleRemoveSkill = (skillToRemove) => {
     setSkills(skills.filter(skill => skill !== skillToRemove));
   };
-  
   // Add question
   const handleAddQuestion = () => {
     if (!currentQuestion.question.trim()) {
@@ -94,7 +85,6 @@ const TrainerAssessmentCreationPage = () => {
       });
       return;
     }
-    
     // Validate based on question type
     if (currentQuestion.type === 'multipleChoice' || currentQuestion.type === 'multipleAnswer') {
       const validOptions = currentQuestion.options.filter(opt => opt.trim());
@@ -108,7 +98,6 @@ const TrainerAssessmentCreationPage = () => {
       }
       currentQuestion.options = validOptions;
     }
-    
     setQuestions([...questions, { ...currentQuestion, id: Date.now() }]);
     setCurrentQuestion({
       type: 'multipleChoice',
@@ -119,12 +108,10 @@ const TrainerAssessmentCreationPage = () => {
       explanation: ''
     });
   };
-  
   // Remove question
   const handleRemoveQuestion = (questionId) => {
     setQuestions(questions.filter(q => q.id !== questionId));
   };
-  
   // Update question type
   const handleQuestionTypeChange = (newType) => {
     setCurrentQuestion(prev => {
@@ -132,7 +119,6 @@ const TrainerAssessmentCreationPage = () => {
         ...prev,
         type: newType
       };
-      
       switch (newType) {
         case 'multipleChoice':
           return {
@@ -172,7 +158,6 @@ const TrainerAssessmentCreationPage = () => {
       }
     });
   };
-  
   // Add requirement
   const handleAddRequirement = () => {
     if (!currentRequirement.description.trim()) {
@@ -183,19 +168,16 @@ const TrainerAssessmentCreationPage = () => {
       });
       return;
     }
-    
     setRequirements([...requirements, { ...currentRequirement, id: Date.now() }]);
     setCurrentRequirement({
       description: '',
       points: 10
     });
   };
-  
   // Remove requirement
   const handleRemoveRequirement = (requirementId) => {
     setRequirements(requirements.filter(r => r.id !== requirementId));
   };
-  
   // Save assessment
   const handleSave = async (publish = false) => {
     // Validate basic info
@@ -208,7 +190,6 @@ const TrainerAssessmentCreationPage = () => {
       setActiveTab('basic');
       return;
     }
-    
     if (!description.trim()) {
       toast({
         title: 'Error',
@@ -218,7 +199,6 @@ const TrainerAssessmentCreationPage = () => {
       setActiveTab('basic');
       return;
     }
-    
     // Validate content
     if (type === 'quiz' && questions.length === 0) {
       toast({
@@ -229,7 +209,6 @@ const TrainerAssessmentCreationPage = () => {
       setActiveTab('content');
       return;
     }
-    
     if (type === 'project' && requirements.length === 0) {
       toast({
         title: 'Error',
@@ -239,10 +218,8 @@ const TrainerAssessmentCreationPage = () => {
       setActiveTab('content');
       return;
     }
-    
     try {
       setIsSaving(true);
-      
       const templateData = {
         title,
         description,
@@ -255,7 +232,6 @@ const TrainerAssessmentCreationPage = () => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
-      
       const response = await fetch('/api/assessment/templates', {
         method: 'POST',
         headers: {
@@ -263,17 +239,13 @@ const TrainerAssessmentCreationPage = () => {
         },
         body: JSON.stringify(templateData),
       });
-      
       if (!response.ok) throw new Error('Failed to create assessment');
-      
       const createdTemplate = await response.json();
-      
       toast({
         title: 'Success',
         description: `Assessment ${publish ? 'published' : 'saved as draft'} successfully`,
         type: 'success',
       });
-      
       navigate(`/assessment/templates/${createdTemplate.id}`);
     } catch (err) {
       console.error('Error creating assessment:', err);
@@ -286,11 +258,9 @@ const TrainerAssessmentCreationPage = () => {
       setIsSaving(false);
     }
   };
-  
   // Tab validation indicators
   const isBasicInfoValid = title.trim() && description.trim();
   const isContentValid = type === 'quiz' ? questions.length > 0 : requirements.length > 0;
-  
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -309,7 +279,6 @@ const TrainerAssessmentCreationPage = () => {
             <p className="text-gray-600">Design a new assessment template</p>
           </div>
         </div>
-        
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -336,7 +305,6 @@ const TrainerAssessmentCreationPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Progress indicator */}
       <Card className="p-4 mb-6">
         <div className="flex items-center justify-between">
@@ -349,9 +317,7 @@ const TrainerAssessmentCreationPage = () => {
               </div>
               <span className="ml-2 font-medium">Basic Info</span>
             </div>
-            
             <ChevronRight className="w-5 h-5 text-gray-400" />
-            
             <div className={`flex items-center ${isContentValid ? 'text-green-600' : 'text-gray-400'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 isContentValid ? 'bg-green-100' : 'bg-gray-100'
@@ -360,9 +326,7 @@ const TrainerAssessmentCreationPage = () => {
               </div>
               <span className="ml-2 font-medium">Content</span>
             </div>
-            
             <ChevronRight className="w-5 h-5 text-gray-400" />
-            
             <div className="flex items-center text-gray-400">
               <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
                 3
@@ -372,7 +336,6 @@ const TrainerAssessmentCreationPage = () => {
           </div>
         </div>
       </Card>
-      
       {/* Tabs */}
       <Tabs
         value={activeTab}
@@ -393,7 +356,6 @@ const TrainerAssessmentCreationPage = () => {
             Settings
           </Tabs.TabTrigger>
         </Tabs.TabsList>
-        
         {/* Basic Information Tab */}
         <Tabs.TabContent value="basic">
           <Card className="p-6">
@@ -409,7 +371,6 @@ const TrainerAssessmentCreationPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Description */}
               <div>
                 <Label htmlFor="description">Description *</Label>
@@ -422,7 +383,6 @@ const TrainerAssessmentCreationPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Type */}
               <div>
                 <Label>Assessment Type *</Label>
@@ -451,7 +411,6 @@ const TrainerAssessmentCreationPage = () => {
                   </div>
                 </RadioGroup>
               </div>
-              
               {/* Category */}
               <div>
                 <Label htmlFor="category">Category</Label>
@@ -472,7 +431,6 @@ const TrainerAssessmentCreationPage = () => {
                   <Select.Option value="other">Other</Select.Option>
                 </Select>
               </div>
-              
               {/* Skills */}
               <div>
                 <Label htmlFor="skills">Skills</Label>
@@ -492,7 +450,6 @@ const TrainerAssessmentCreationPage = () => {
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
-                
                 {skills.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {skills.map(skill => (
@@ -512,7 +469,6 @@ const TrainerAssessmentCreationPage = () => {
             </div>
           </Card>
         </Tabs.TabContent>
-        
         {/* Content Tab */}
         <Tabs.TabContent value="content">
           {type === 'quiz' ? (
@@ -521,7 +477,6 @@ const TrainerAssessmentCreationPage = () => {
               {/* Add Question Form */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Add Question</h3>
-                
                 <div className="space-y-4">
                   {/* Question Type */}
                   <div>
@@ -539,7 +494,6 @@ const TrainerAssessmentCreationPage = () => {
                       <Select.Option value="matching">Matching</Select.Option>
                     </Select>
                   </div>
-                  
                   {/* Question Text */}
                   <div>
                     <Label htmlFor="questionText">Question</Label>
@@ -552,7 +506,6 @@ const TrainerAssessmentCreationPage = () => {
                       className="mt-1"
                     />
                   </div>
-                  
                   {/* Options for Multiple Choice/Answer */}
                   {(currentQuestion.type === 'multipleChoice' || currentQuestion.type === 'multipleAnswer') && (
                     <div>
@@ -600,7 +553,6 @@ const TrainerAssessmentCreationPage = () => {
                       </div>
                     </div>
                   )}
-                  
                   {/* True/False Options */}
                   {currentQuestion.type === 'trueFalse' && (
                     <div>
@@ -621,7 +573,6 @@ const TrainerAssessmentCreationPage = () => {
                       </RadioGroup>
                     </div>
                   )}
-                  
                   {/* Short Answer */}
                   {currentQuestion.type === 'shortAnswer' && (
                     <div>
@@ -635,7 +586,6 @@ const TrainerAssessmentCreationPage = () => {
                       />
                     </div>
                   )}
-                  
                   {/* Matching */}
                   {currentQuestion.type === 'matching' && (
                     <div>
@@ -708,7 +658,6 @@ const TrainerAssessmentCreationPage = () => {
                       )}
                     </div>
                   )}
-                  
                   {/* Points */}
                   <div>
                     <Label htmlFor="points">Points</Label>
@@ -722,7 +671,6 @@ const TrainerAssessmentCreationPage = () => {
                       className="mt-1"
                     />
                   </div>
-                  
                   {/* Explanation */}
                   <div>
                     <Label htmlFor="explanation">Explanation (Optional)</Label>
@@ -735,19 +683,16 @@ const TrainerAssessmentCreationPage = () => {
                       className="mt-1"
                     />
                   </div>
-                  
                   <Button onClick={handleAddQuestion} className="w-full">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Question
                   </Button>
                 </div>
               </Card>
-              
               {/* Questions List */}
               {questions.length > 0 && (
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Questions ({questions.length})</h3>
-                  
                   <div className="space-y-4">
                     {questions.map((question, index) => (
                       <div key={question.id} className="p-4 border rounded-lg">
@@ -764,26 +709,22 @@ const TrainerAssessmentCreationPage = () => {
                                 </Badge>
                                 <span className="text-sm text-gray-500">{question.points} points</span>
                               </div>
-                              
                               {/* Display answer based on type */}
                               {question.type === 'multipleChoice' && (
                                 <div className="text-sm text-gray-600">
                                   Correct: {question.options[question.correctAnswer]}
                                 </div>
                               )}
-                              
                               {question.type === 'trueFalse' && (
                                 <div className="text-sm text-gray-600">
                                   Correct: {question.correctAnswer ? 'True' : 'False'}
                                 </div>
                               )}
-                              
                               {question.type === 'shortAnswer' && (
                                 <div className="text-sm text-gray-600">
                                   Correct: {question.correctAnswer}
                                 </div>
                               )}
-                              
                               {question.explanation && (
                                 <p className="text-sm text-gray-600 mt-1">
                                   <span className="font-medium">Explanation:</span> {question.explanation}
@@ -791,7 +732,6 @@ const TrainerAssessmentCreationPage = () => {
                               )}
                             </div>
                           </div>
-                          
                           <Button
                             variant="ghost"
                             size="sm"
@@ -804,7 +744,6 @@ const TrainerAssessmentCreationPage = () => {
                       </div>
                     ))}
                   </div>
-                  
                   <div className="mt-4 text-center">
                     <p className="text-sm text-gray-600">
                       Total Points: {questions.reduce((sum, q) => sum + q.points, 0)}
@@ -819,7 +758,6 @@ const TrainerAssessmentCreationPage = () => {
               {/* Add Requirement Form */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Add Requirement</h3>
-                
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="requirementDesc">Requirement Description</Label>
@@ -832,7 +770,6 @@ const TrainerAssessmentCreationPage = () => {
                       className="mt-1"
                     />
                   </div>
-                  
                   <div>
                     <Label htmlFor="requirementPoints">Points</Label>
                     <Input
@@ -845,19 +782,16 @@ const TrainerAssessmentCreationPage = () => {
                       className="mt-1"
                     />
                   </div>
-                  
                   <Button onClick={handleAddRequirement} className="w-full">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Requirement
                   </Button>
                 </div>
               </Card>
-              
               {/* Requirements List */}
               {requirements.length > 0 && (
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Requirements ({requirements.length})</h3>
-                  
                   <div className="space-y-3">
                     {requirements.map((requirement, index) => (
                       <div key={requirement.id} className="p-4 border rounded-lg">
@@ -871,7 +805,6 @@ const TrainerAssessmentCreationPage = () => {
                               <p className="text-sm text-gray-500 mt-1">{requirement.points} points</p>
                             </div>
                           </div>
-                          
                           <Button
                             variant="ghost"
                             size="sm"
@@ -884,7 +817,6 @@ const TrainerAssessmentCreationPage = () => {
                       </div>
                     ))}
                   </div>
-                  
                   <div className="mt-4 text-center">
                     <p className="text-sm text-gray-600">
                       Total Points: {requirements.reduce((sum, r) => sum + r.points, 0)}
@@ -892,14 +824,12 @@ const TrainerAssessmentCreationPage = () => {
                   </div>
                 </Card>
               )}
-              
               {/* Resources */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Resources (Optional)</h3>
                 <p className="text-sm text-gray-600 mb-4">
                   Add helpful resources for students working on this project
                 </p>
-                
                 <Button variant="outline" className="w-full" disabled>
                   <Plus className="w-4 h-4 mr-2" />
                   Add Resource
@@ -908,14 +838,12 @@ const TrainerAssessmentCreationPage = () => {
             </div>
           )}
         </Tabs.TabContent>
-        
         {/* Settings Tab */}
         <Tabs.TabContent value="settings">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Basic Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Basic Settings</h3>
-              
               <div className="space-y-4">
                 {type === 'quiz' && (
                   <>
@@ -931,7 +859,6 @@ const TrainerAssessmentCreationPage = () => {
                       />
                       <p className="text-sm text-gray-600 mt-1">0 = No time limit</p>
                     </div>
-                    
                     <div>
                       <Label htmlFor="attempts">Attempts Allowed</Label>
                       <Input
@@ -945,7 +872,6 @@ const TrainerAssessmentCreationPage = () => {
                     </div>
                   </>
                 )}
-                
                 <div>
                   <Label htmlFor="passingScore">Passing Score (%)</Label>
                   <Input
@@ -958,7 +884,6 @@ const TrainerAssessmentCreationPage = () => {
                     className="mt-1"
                   />
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="allowLate">Allow Late Submission</Label>
@@ -970,7 +895,6 @@ const TrainerAssessmentCreationPage = () => {
                     onCheckedChange={(checked) => setSettings({ ...settings, allowLateSubmission: checked })}
                   />
                 </div>
-                
                 {settings.allowLateSubmission && (
                   <div>
                     <Label htmlFor="latePenalty">Late Penalty (% per day)</Label>
@@ -987,12 +911,10 @@ const TrainerAssessmentCreationPage = () => {
                 )}
               </div>
             </Card>
-            
             {/* Quiz Settings */}
             {type === 'quiz' && (
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Quiz Settings</h3>
-                
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -1005,7 +927,6 @@ const TrainerAssessmentCreationPage = () => {
                       onCheckedChange={(checked) => setSettings({ ...settings, shuffleQuestions: checked })}
                     />
                   </div>
-                  
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="showCorrectAnswers">Show Correct Answers</Label>
@@ -1017,7 +938,6 @@ const TrainerAssessmentCreationPage = () => {
                       onCheckedChange={(checked) => setSettings({ ...settings, showCorrectAnswers: checked })}
                     />
                   </div>
-                  
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="autoGrade">Auto-grading</Label>
@@ -1032,11 +952,9 @@ const TrainerAssessmentCreationPage = () => {
                 </div>
               </Card>
             )}
-            
             {/* Notification Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Notifications</h3>
-              
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -1049,7 +967,6 @@ const TrainerAssessmentCreationPage = () => {
                     onCheckedChange={(checked) => setSettings({ ...settings, notifyOnSubmission: checked })}
                   />
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="notifyDue">Before Due Date</Label>
@@ -1061,7 +978,6 @@ const TrainerAssessmentCreationPage = () => {
                     onCheckedChange={(checked) => setSettings({ ...settings, notifyBeforeDue: checked })}
                   />
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="notifyGrade">On Grading</Label>
@@ -1081,5 +997,4 @@ const TrainerAssessmentCreationPage = () => {
     </div>
   );
 };
-
 export default TrainerAssessmentCreationPage;

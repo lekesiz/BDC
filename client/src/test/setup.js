@@ -1,12 +1,10 @@
 import '@testing-library/jest-dom';
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
-
 // Cleanup after each test case (e.g. clearing jsdom)
 afterEach(() => {
   cleanup();
 });
-
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -21,7 +19,6 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: () => {},
   }),
 });
-
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
   constructor() {}
@@ -29,14 +26,12 @@ global.IntersectionObserver = class IntersectionObserver {
   observe() {}
   unobserve() {}
 };
-
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
-
 // Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(),
@@ -45,7 +40,6 @@ const localStorageMock = {
   clear: vi.fn(),
 };
 global.localStorage = localStorageMock;
-
 // Suppress console warnings for tests
 const originalWarn = console.warn;
 console.warn = (...args) => {
@@ -55,11 +49,9 @@ console.warn = (...args) => {
   }
   originalWarn(...args);
 };
-
 // Set test environment
 import.meta.env.DEV = false;
 import.meta.env.VITE_USE_MOCK_API = 'false';
-
 // Mock the api module
 vi.mock('@/lib/api', () => ({
   default: {

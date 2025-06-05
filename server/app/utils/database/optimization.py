@@ -299,10 +299,10 @@ if __name__ == "__main__":
     # Analyze slow queries
     slow_queries = optimizer.analyze_slow_queries()
     for query in slow_queries:
-        print(f"Slow query: {query['query'][:100]}... (Mean time: {query['mean_time']}ms)")
+        logger.info(f"Slow query: {query['query'][:100]}... (Mean time: {query['mean_time']}ms)")
     
     # Generate execution plans
     plans = optimizer.generate_query_execution_plans()
     for plan in plans:
-        print(f"Query: {plan['query'][:100]}...")
-        print(f"Plan: {plan['plan']}") 
+        logger.info(f"Query: {plan['query'][:100]}...")
+        logger.info(f"Plan: {plan['plan']}") 

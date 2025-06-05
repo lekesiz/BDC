@@ -10,12 +10,10 @@ import { Select } from '../../components/ui/select';
 import { Textarea } from '../../components/ui';
 import { Tabs } from '../../components/ui/tabs';
 import { Badge } from '../../components/ui/badge';
-
 const TrainerRubricBuilderPage = () => {
   const navigate = useNavigate();
   const { rubricId } = useParams();
   const isEditMode = !!rubricId;
-  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [rubric, setRubric] = useState({
@@ -36,7 +34,6 @@ const TrainerRubricBuilderPage = () => {
   const [activeTab, setActiveTab] = useState('criteria');
   const [showPreview, setShowPreview] = useState(false);
   const [templates, setTemplates] = useState([]);
-
   useEffect(() => {
     if (isEditMode) {
       fetchRubric();
@@ -45,7 +42,6 @@ const TrainerRubricBuilderPage = () => {
       setLoading(false);
     }
   }, [rubricId]);
-
   const fetchRubric = async () => {
     try {
       const response = await axios.get(`/api/rubrics/${rubricId}`);
@@ -61,7 +57,6 @@ const TrainerRubricBuilderPage = () => {
       setLoading(false);
     }
   };
-
   const fetchTemplates = async () => {
     try {
       const response = await axios.get('/api/rubrics/templates');
@@ -70,7 +65,6 @@ const TrainerRubricBuilderPage = () => {
       console.error('Error fetching templates:', error);
     }
   };
-
   const handleAddCriterion = () => {
     const newCriterion = {
       id: Date.now().toString(),
@@ -84,13 +78,11 @@ const TrainerRubricBuilderPage = () => {
         { id: '4', name: 'Needs Improvement', description: '', points: 25 }
       ]
     };
-    
     setRubric({
       ...rubric,
       criteria: [...rubric.criteria, newCriterion]
     });
   };
-
   const handleUpdateCriterion = (criterionId, updates) => {
     setRubric({
       ...rubric,
@@ -99,14 +91,12 @@ const TrainerRubricBuilderPage = () => {
       )
     });
   };
-
   const handleRemoveCriterion = (criterionId) => {
     setRubric({
       ...rubric,
       criteria: rubric.criteria.filter(criterion => criterion.id !== criterionId)
     });
   };
-
   const handleAddLevel = (criterionId) => {
     const criterion = rubric.criteria.find(c => c.id === criterionId);
     const newLevel = {
@@ -115,40 +105,32 @@ const TrainerRubricBuilderPage = () => {
       description: '',
       points: 0
     };
-    
     handleUpdateCriterion(criterionId, {
       levels: [...criterion.levels, newLevel]
     });
   };
-
   const handleUpdateLevel = (criterionId, levelId, updates) => {
     const criterion = rubric.criteria.find(c => c.id === criterionId);
     const updatedLevels = criterion.levels.map(level =>
       level.id === levelId ? { ...level, ...updates } : level
     );
-    
     handleUpdateCriterion(criterionId, { levels: updatedLevels });
   };
-
   const handleRemoveLevel = (criterionId, levelId) => {
     const criterion = rubric.criteria.find(c => c.id === criterionId);
     const updatedLevels = criterion.levels.filter(level => level.id !== levelId);
-    
     handleUpdateCriterion(criterionId, { levels: updatedLevels });
   };
-
   const handleMoveCriterion = (index, direction) => {
     const newCriteria = [...rubric.criteria];
     const item = newCriteria[index];
     newCriteria.splice(index, 1);
     newCriteria.splice(index + direction, 0, item);
-    
     setRubric({
       ...rubric,
       criteria: newCriteria
     });
   };
-
   const handleSaveRubric = async () => {
     if (!rubric.title.trim()) {
       toast({
@@ -158,7 +140,6 @@ const TrainerRubricBuilderPage = () => {
       });
       return;
     }
-    
     if (rubric.criteria.length === 0) {
       toast({
         title: 'Error',
@@ -167,7 +148,6 @@ const TrainerRubricBuilderPage = () => {
       });
       return;
     }
-    
     setSaving(true);
     try {
       if (isEditMode) {
@@ -197,7 +177,6 @@ const TrainerRubricBuilderPage = () => {
       setSaving(false);
     }
   };
-
   const handleApplyTemplate = (template) => {
     setRubric({
       ...rubric,
@@ -210,23 +189,18 @@ const TrainerRubricBuilderPage = () => {
       variant: 'success'
     });
   };
-
   const handleExportRubric = () => {
     const dataStr = JSON.stringify(rubric, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
     const exportFileDefaultName = `${rubric.title.replace(/\s+/g, '-')}-rubric.json`;
-    
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
   };
-
   const handleImportRubric = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -250,11 +224,9 @@ const TrainerRubricBuilderPage = () => {
     };
     reader.readAsText(file);
   };
-
   const calculateTotalWeight = () => {
     return rubric.criteria.reduce((sum, criterion) => sum + (criterion.weight || 0), 0);
   };
-
   if (loading) {
     return (
       <div className="p-6">
@@ -265,7 +237,6 @@ const TrainerRubricBuilderPage = () => {
       </div>
     );
   }
-
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -309,7 +280,6 @@ const TrainerRubricBuilderPage = () => {
           </div>
         </div>
       </div>
-
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
         <Tabs.TabsList>
@@ -318,7 +288,6 @@ const TrainerRubricBuilderPage = () => {
           <Tabs.TabTrigger value="settings">Settings</Tabs.TabTrigger>
           <Tabs.TabTrigger value="templates">Templates</Tabs.TabTrigger>
         </Tabs.TabsList>
-
         {/* Basic Information Tab */}
         <Tabs.TabContent value="basic">
           <Card className="p-6">
@@ -333,7 +302,6 @@ const TrainerRubricBuilderPage = () => {
                   placeholder="Enter rubric title"
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
@@ -345,7 +313,6 @@ const TrainerRubricBuilderPage = () => {
                   rows={3}
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Rubric Type
@@ -364,7 +331,6 @@ const TrainerRubricBuilderPage = () => {
                   }
                 </p>
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
@@ -381,7 +347,6 @@ const TrainerRubricBuilderPage = () => {
             </div>
           </Card>
         </Tabs.TabContent>
-
         {/* Criteria & Levels Tab */}
         <Tabs.TabContent value="criteria">
           <Card className="p-6">
@@ -402,7 +367,6 @@ const TrainerRubricBuilderPage = () => {
                 Add Criterion
               </Button>
             </div>
-            
             <div className="space-y-4">
               {rubric.criteria.map((criterion, index) => (
                 <Card key={criterion.id} className="p-4">
@@ -425,7 +389,6 @@ const TrainerRubricBuilderPage = () => {
                         <ArrowDown className="h-4 w-4" />
                       </Button>
                     </div>
-                    
                     <div className="flex-1 space-y-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1 space-y-3">
@@ -462,7 +425,6 @@ const TrainerRubricBuilderPage = () => {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      
                       {/* Performance Levels */}
                       <div>
                         <div className="flex items-center justify-between mb-2">
@@ -476,7 +438,6 @@ const TrainerRubricBuilderPage = () => {
                             Add Level
                           </Button>
                         </div>
-                        
                         <div className="space-y-2">
                           {criterion.levels.map((level, levelIndex) => (
                             <div key={level.id} className="flex items-start gap-2">
@@ -524,7 +485,6 @@ const TrainerRubricBuilderPage = () => {
             </div>
           </Card>
         </Tabs.TabContent>
-
         {/* Settings Tab */}
         <Tabs.TabContent value="settings">
           <Card className="p-6">
@@ -545,7 +505,6 @@ const TrainerRubricBuilderPage = () => {
                   <Select.Option value="custom">Custom Scale</Select.Option>
                 </Select>
               </div>
-              
               {rubric.settings.pointsScale === 'points' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -562,7 +521,6 @@ const TrainerRubricBuilderPage = () => {
                   />
                 </div>
               )}
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Passing Score
@@ -582,7 +540,6 @@ const TrainerRubricBuilderPage = () => {
                   <span className="text-gray-600">%</span>
                 </div>
               </div>
-              
               <div className="space-y-3">
                 <label className="flex items-center gap-2">
                   <input
@@ -598,7 +555,6 @@ const TrainerRubricBuilderPage = () => {
                     Allow partial points between levels
                   </span>
                 </label>
-                
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -613,7 +569,6 @@ const TrainerRubricBuilderPage = () => {
                     Show level descriptions as feedback
                   </span>
                 </label>
-                
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -632,7 +587,6 @@ const TrainerRubricBuilderPage = () => {
             </div>
           </Card>
         </Tabs.TabContent>
-
         {/* Templates Tab */}
         <Tabs.TabContent value="templates">
           <Card className="p-6">
@@ -659,7 +613,6 @@ const TrainerRubricBuilderPage = () => {
           </Card>
         </Tabs.TabContent>
       </Tabs>
-
       {/* Preview Panel */}
       {showPreview && (
         <Card className="mt-6 p-6">
@@ -704,5 +657,4 @@ const TrainerRubricBuilderPage = () => {
     </div>
   );
 };
-
 export default TrainerRubricBuilderPage;

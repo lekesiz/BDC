@@ -10,14 +10,12 @@ import { useToast } from '../../hooks/useToast';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import { Badge } from '../ui/badge';
 import api from '../../lib/api';
-
 const PlagiarismDetector = ({ submissionId, initialText }) => {
   const [text, setText] = useState(initialText || '');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [selectedSource, setSelectedSource] = useState(null);
   const { toast } = useToast();
-
   const handleCheckPlagiarism = async () => {
     if (!text.trim()) {
       toast({
@@ -27,7 +25,6 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
       });
       return;
     }
-
     setLoading(true);
     try {
       const response = await api.post('/ai/check-plagiarism', {
@@ -36,9 +33,7 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
         check_type: 'comprehensive',
         include_ai_detection: true
       });
-
       setResults(response.data);
-      
       if (response.data.plagiarism_percentage > 20) {
         toast({
           title: "Plagiarism Detected",
@@ -62,19 +57,16 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
       setLoading(false);
     }
   };
-
   const getPlagiarismSeverity = (percentage) => {
     if (percentage >= 50) return { color: 'red', label: 'High', icon: XCircle };
     if (percentage >= 20) return { color: 'yellow', label: 'Medium', icon: AlertTriangle };
     return { color: 'green', label: 'Low', icon: CheckCircle };
   };
-
   const getAIDetectionSeverity = (score) => {
     if (score >= 0.8) return { color: 'red', label: 'Very Likely AI', icon: Brain };
     if (score >= 0.5) return { color: 'yellow', label: 'Possibly AI', icon: Brain };
     return { color: 'green', label: 'Likely Human', icon: CheckCircle };
   };
-
   return (
     <div className="space-y-6">
       <Card>
@@ -100,7 +92,6 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
               {text.length} characters
             </p>
           </div>
-
           <Button
             onClick={handleCheckPlagiarism}
             disabled={loading || !text.trim()}
@@ -120,7 +111,6 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
           </Button>
         </CardContent>
       </Card>
-
       {results && (
         <div className="space-y-4">
           {/* Overall Results */}
@@ -158,7 +148,6 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
                   </p>
                 </div>
               </div>
-
               {/* AI Detection Results */}
               {results.ai_detection && (
                 <div className="space-y-3">
@@ -190,7 +179,6 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
                   </div>
                 </div>
               )}
-
               {/* Summary */}
               <Alert className={results.plagiarism_percentage > 20 || (results.ai_detection?.score > 0.5) ? "border-red-200 bg-red-50" : "border-green-200 bg-green-50"}>
                 <AlertTriangle className="h-4 w-4" />
@@ -209,7 +197,6 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
               </Alert>
             </CardContent>
           </Card>
-
           {/* Matched Sources */}
           {results.sources && results.sources.length > 0 && (
             <Card>
@@ -238,7 +225,6 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
                           </p>
                         </div>
                       </div>
-                      
                       {selectedSource === index && source.matched_text && (
                         <div className="mt-3 p-3 bg-gray-50 rounded text-sm">
                           <p className="font-medium text-xs text-gray-600 mb-1">Matched Text:</p>
@@ -251,7 +237,6 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
               </CardContent>
             </Card>
           )}
-
           {/* AI Detection Details */}
           {results.ai_detection?.details && (
             <Card>
@@ -279,5 +264,4 @@ const PlagiarismDetector = ({ submissionId, initialText }) => {
     </div>
   );
 };
-
 export default PlagiarismDetector;

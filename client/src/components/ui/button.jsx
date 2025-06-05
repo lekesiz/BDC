@@ -1,7 +1,6 @@
 import React from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
-
 /**
  * Button variants using class-variance-authority
  */
@@ -39,7 +38,6 @@ const buttonVariants = cva(
     },
   }
 );
-
 /**
  * Button component with support for different variants and sizes
  * 
@@ -67,7 +65,6 @@ const Button = ({
 }) => {
   // Use mobile size on small screens if specified
   const effectiveSize = mobileSize && typeof window !== 'undefined' && window.innerWidth < 640 ? mobileSize : size;
-  
   return (
     <button
       className={cn(
@@ -119,5 +116,4 @@ const Button = ({
     </button>
   );
 };
-
 export { Button, buttonVariants };

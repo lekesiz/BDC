@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { announceToScreenReader } from '@/utils/accessibility';
-
 /**
  * Accessible form component with proper ARIA attributes and keyboard navigation
  * This serves as an example for creating accessible forms
@@ -27,7 +26,6 @@ const AccessibleForm = ({
   } = useForm({
     defaultValues: initialValues
   });
-
   // Focus first error field
   useEffect(() => {
     const firstError = Object.keys(errors)[0];
@@ -37,7 +35,6 @@ const AccessibleForm = ({
       announceToScreenReader(`Error in ${firstError} field`, 'assertive');
     }
   }, [errors, setFocus]);
-
   // Announce form submission status
   useEffect(() => {
     if (isSubmitted && !isSubmitting) {
@@ -48,7 +45,6 @@ const AccessibleForm = ({
       }
     }
   }, [isSubmitted, isSubmitting, errors]);
-
   const onSubmitHandler = async (data) => {
     try {
       await onSubmit(data);
@@ -58,7 +54,6 @@ const AccessibleForm = ({
       announceToScreenReader('Form submission failed. Please try again.', 'assertive');
     }
   };
-
   return (
     <form
       ref={formRef}
@@ -71,7 +66,6 @@ const AccessibleForm = ({
         <legend className="text-lg font-semibold text-gray-900 mb-4">
           {formTitle}
         </legend>
-
         {/* Name field */}
         <div>
           <Input
@@ -91,7 +85,6 @@ const AccessibleForm = ({
             helpText="Please enter your full name"
           />
         </div>
-
         {/* Email field */}
         <div>
           <Input
@@ -111,7 +104,6 @@ const AccessibleForm = ({
             helpText="We'll never share your email"
           />
         </div>
-
         {/* Phone field */}
         <div>
           <Input
@@ -128,7 +120,6 @@ const AccessibleForm = ({
             placeholder="Enter your phone number"
           />
         </div>
-
         {/* Message field */}
         <div>
           <label 
@@ -170,7 +161,6 @@ const AccessibleForm = ({
           )}
         </div>
       </fieldset>
-
       {/* Form actions */}
       <div className="flex justify-end space-x-3 pt-4">
         {onCancel && (
@@ -192,7 +182,6 @@ const AccessibleForm = ({
           {submitButtonText}
         </Button>
       </div>
-
       {/* Screen reader only live region for form status */}
       <div 
         className="sr-only" 
@@ -207,5 +196,4 @@ const AccessibleForm = ({
     </form>
   );
 };
-
 export default AccessibleForm;

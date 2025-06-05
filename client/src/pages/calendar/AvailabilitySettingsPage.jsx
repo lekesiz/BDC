@@ -1,1144 +1,1061 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Save, Clock, Plus, Minus, Calendar, AlertTriangle, CheckCircle, Loader, Info } from 'lucide-react';
-import api from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Tabs } from '@/components/ui/tabs';
-import { useToast } from '@/components/ui/toast';
-import { Input } from '@/components/ui/input';
-import { useAuth } from '@/hooks/useAuth';
-
+import React, { useState, useEffect } from 'react';
+import { format, setHours, setMinutes, addDays, startOfWeek, endOfWeek } from 'date-fns';
+import { tr } from 'date-fns/locale';
+import { 
+  Clock, Calendar, Plus, X, Save, Copy, AlertCircle, 
+  CheckCircle, Settings, Coffee, Ban, Moon, Sun,
+  ChevronDown, ChevronUp, Trash2, Edit, RefreshCw
+} from 'lucide-react';
+import axios from '../../lib/api';
+import { toast } from '../../hooks/useToast';
+import { Button } from '../../components/ui/button';
+import { Card } from '../../components/ui/card';
+import { Input } from '../../components/ui/input';
+import { Select } from '../../components/ui/select';
+import { Badge } from '../../components/ui/badge';
+import { Alert } from '../../components/ui/alert';
+import { Tabs } from '../../components/ui/tabs';
+import { Textarea, Label } from '../../components/ui';
+import { useAuth } from '../../hooks/useAuth';
 /**
- * AvailabilitySettingsPage allows users to set their availability for appointments
+ * Enhanced AvailabilitySettingsPage with advanced scheduling features
  */
-const AvailabilitySettingsPage = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
+const AvailabilitySettingsPageV2 = () => {
   const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [availabilitySettings, setAvailabilitySettings] = useState({
-    regular_schedule: [
-      { day: 0, is_available: false, time_slots: [] }, // Sunday
-      { day: 1, is_available: true, time_slots: [{ start: '09:00', end: '17:00' }] }, // Monday
-      { day: 2, is_available: true, time_slots: [{ start: '09:00', end: '17:00' }] }, // Tuesday
-      { day: 3, is_available: true, time_slots: [{ start: '09:00', end: '17:00' }] }, // Wednesday
-      { day: 4, is_available: true, time_slots: [{ start: '09:00', end: '17:00' }] }, // Thursday
-      { day: 5, is_available: true, time_slots: [{ start: '09:00', end: '17:00' }] }, // Friday
-      { day: 6, is_available: false, time_slots: [] }, // Saturday
-    ],
-    exceptions: [], // Date-specific exceptions
-    buffer_time: 15, // Minutes between appointments
-    appointment_duration: 60, // Default appointment duration in minutes
-    advance_notice: 24, // Hours in advance for appointment booking
-    max_appointments_per_day: 8,
-    auto_confirm: true,
-    working_hours: {
-      start: '09:00',
-      end: '17:00',
-    },
-    break_time: {
+  const [activeTab, setActiveTab] = useState('schedule');
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  // Weekly Schedule State
+  const [weeklySchedule, setWeeklySchedule] = useState({
+    monday: { enabled: true, slots: [] },
+    tuesday: { enabled: true, slots: [] },
+    wednesday: { enabled: true, slots: [] },
+    thursday: { enabled: true, slots: [] },
+    friday: { enabled: true, slots: [] },
+    saturday: { enabled: false, slots: [] },
+    sunday: { enabled: false, slots: [] }
+  });
+  // Settings State
+  const [settings, setSettings] = useState({
+    timezone: 'Europe/Istanbul',
+    defaultDuration: 60,
+    bufferTime: 15,
+    minAdvanceNotice: 24,
+    maxAdvanceBooking: 30,
+    slotIncrement: 30,
+    allowOverlapping: false,
+    autoAcceptAppointments: false,
+    sendConfirmationEmail: true,
+    sendReminderEmail: true,
+    maxDailyAppointments: 8,
+    maxWeeklyAppointments: 40,
+    breakBetweenAppointments: 5,
+    lunchBreak: {
       enabled: true,
-      start: '12:00',
-      end: '13:00',
-    },
-    sync_with_google: false,
+      startTime: '12:00',
+      endTime: '13:00'
+    }
   });
-  const [activeTab, setActiveTab] = useState('weekly');
-  const [availableTimeRange, setAvailableTimeRange] = useState({
-    start: '08:00',
-    end: '20:00',
+  // Special Days State
+  const [specialDays, setSpecialDays] = useState([]);
+  const [holidays, setHolidays] = useState([]);
+  const [workingHours, setWorkingHours] = useState({
+    start: '09:00',
+    end: '18:00'
   });
-  const [dateExceptions, setDateExceptions] = useState([]);
-  const [newException, setNewException] = useState({
-    date: '',
-    is_available: false,
-    time_slots: [],
-  });
-
-  const daysOfWeek = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ];
-
-  // Fetch availability settings
+  // Templates
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  // Blocked Times
+  const [blockedTimes, setBlockedTimes] = useState([]);
+  const [recurringBlocks, setRecurringBlocks] = useState([]);
+  // Override Rules
+  const [overrideRules, setOverrideRules] = useState([]);
+  // View State
+  const [expandedDays, setExpandedDays] = useState({});
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [previewDate, setPreviewDate] = useState(new Date());
   useEffect(() => {
-    const fetchAvailabilitySettings = async () => {
-      try {
-        setIsLoading(true);
-        const response = await api.get('/api/availability');
-        
-        if (response.data) {
-          setAvailabilitySettings(response.data);
-          
-          // Process exceptions to format dates correctly
-          const formattedExceptions = response.data.exceptions.map(exception => ({
-            ...exception,
-            date: new Date(exception.date).toISOString().split('T')[0],
-          }));
-          
-          setDateExceptions(formattedExceptions);
-        }
-      } catch (error) {
-        console.error('Error fetching availability settings:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load availability settings',
-          type: 'error',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchAvailabilitySettings();
-  }, [toast]);
-
-  // Handle day availability toggle
-  const handleDayAvailabilityToggle = (dayIndex) => {
-    setAvailabilitySettings(prev => {
-      const updatedSchedule = [...prev.regular_schedule];
-      updatedSchedule[dayIndex] = {
-        ...updatedSchedule[dayIndex],
-        is_available: !updatedSchedule[dayIndex].is_available,
-        time_slots: !updatedSchedule[dayIndex].is_available 
-          ? [{ start: prev.working_hours.start, end: prev.working_hours.end }] 
-          : [],
-      };
-      
-      return {
-        ...prev,
-        regular_schedule: updatedSchedule,
-      };
-    });
-  };
-
-  // Handle time slot changes
-  const handleTimeSlotChange = (dayIndex, slotIndex, field, value) => {
-    setAvailabilitySettings(prev => {
-      const updatedSchedule = [...prev.regular_schedule];
-      const updatedTimeSlots = [...updatedSchedule[dayIndex].time_slots];
-      
-      updatedTimeSlots[slotIndex] = {
-        ...updatedTimeSlots[slotIndex],
-        [field]: value,
-      };
-      
-      updatedSchedule[dayIndex] = {
-        ...updatedSchedule[dayIndex],
-        time_slots: updatedTimeSlots,
-      };
-      
-      return {
-        ...prev,
-        regular_schedule: updatedSchedule,
-      };
-    });
-  };
-
-  // Add a new time slot to a day
-  const handleAddTimeSlot = (dayIndex) => {
-    setAvailabilitySettings(prev => {
-      const updatedSchedule = [...prev.regular_schedule];
-      const updatedTimeSlots = [...updatedSchedule[dayIndex].time_slots];
-      
-      // Calculate a reasonable default for the new time slot
-      let newStart = '09:00';
-      let newEnd = '17:00';
-      
-      if (updatedTimeSlots.length > 0) {
-        const lastSlot = updatedTimeSlots[updatedTimeSlots.length - 1];
-        const [lastEndHours, lastEndMinutes] = lastSlot.end.split(':').map(Number);
-        
-        // Add 1 hour to the end time of the last slot for the new start time
-        let newStartHours = lastEndHours + 1;
-        let newStartMinutes = lastEndMinutes;
-        
-        // If hours go beyond 23, cap at 23
-        if (newStartHours > 23) {
-          newStartHours = 23;
-          newStartMinutes = 0;
-        }
-        
-        // Calculate end time (start time + 1 hour)
-        let newEndHours = newStartHours + 1;
-        let newEndMinutes = newStartMinutes;
-        
-        // If end hours go beyond 23, cap at 23:59
-        if (newEndHours > 23) {
-          newEndHours = 23;
-          newEndMinutes = 59;
-        }
-        
-        newStart = `${newStartHours.toString().padStart(2, '0')}:${newStartMinutes.toString().padStart(2, '0')}`;
-        newEnd = `${newEndHours.toString().padStart(2, '0')}:${newEndMinutes.toString().padStart(2, '0')}`;
-      }
-      
-      updatedTimeSlots.push({ start: newStart, end: newEnd });
-      
-      updatedSchedule[dayIndex] = {
-        ...updatedSchedule[dayIndex],
-        time_slots: updatedTimeSlots,
-      };
-      
-      return {
-        ...prev,
-        regular_schedule: updatedSchedule,
-      };
-    });
-  };
-
-  // Remove a time slot
-  const handleRemoveTimeSlot = (dayIndex, slotIndex) => {
-    setAvailabilitySettings(prev => {
-      const updatedSchedule = [...prev.regular_schedule];
-      const updatedTimeSlots = updatedSchedule[dayIndex].time_slots.filter((_, i) => i !== slotIndex);
-      
-      updatedSchedule[dayIndex] = {
-        ...updatedSchedule[dayIndex],
-        time_slots: updatedTimeSlots,
-      };
-      
-      return {
-        ...prev,
-        regular_schedule: updatedSchedule,
-      };
-    });
-  };
-
-  // Handle general settings changes
-  const handleSettingChange = (field, value) => {
-    setAvailabilitySettings(prev => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  // Handle working hours changes
-  const handleWorkingHoursChange = (field, value) => {
-    setAvailabilitySettings(prev => ({
-      ...prev,
-      working_hours: {
-        ...prev.working_hours,
-        [field]: value,
-      },
-    }));
-  };
-
-  // Handle break time changes
-  const handleBreakTimeChange = (field, value) => {
-    if (field === 'enabled') {
-      setAvailabilitySettings(prev => ({
-        ...prev,
-        break_time: {
-          ...prev.break_time,
-          enabled: value,
-        },
-      }));
-    } else {
-      setAvailabilitySettings(prev => ({
-        ...prev,
-        break_time: {
-          ...prev.break_time,
-          [field]: value,
-        },
-      }));
-    }
-  };
-
-  // Handle new exception changes
-  const handleNewExceptionChange = (field, value) => {
-    setNewException(prev => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  // Handle adding a new exception
-  const handleAddException = () => {
-    // Validate the exception date
-    if (!newException.date) {
-      toast({
-        title: 'Error',
-        description: 'Please select a date for the exception',
-        type: 'error',
-      });
-      return;
-    }
-    
-    // Check if an exception already exists for this date
-    const existingExceptionIndex = dateExceptions.findIndex(
-      exception => exception.date === newException.date
-    );
-    
-    if (existingExceptionIndex !== -1) {
-      // Update existing exception
-      const updatedExceptions = [...dateExceptions];
-      updatedExceptions[existingExceptionIndex] = {
-        ...newException,
-        time_slots: newException.is_available 
-          ? newException.time_slots.length > 0
-            ? newException.time_slots
-            : [{ start: availabilitySettings.working_hours.start, end: availabilitySettings.working_hours.end }]
-          : [],
-      };
-      
-      setDateExceptions(updatedExceptions);
-    } else {
-      // Add new exception
-      setDateExceptions(prev => [
-        ...prev,
-        {
-          ...newException,
-          time_slots: newException.is_available 
-            ? [{ start: availabilitySettings.working_hours.start, end: availabilitySettings.working_hours.end }]
-            : [],
-        },
-      ]);
-    }
-    
-    // Reset the new exception form
-    setNewException({
-      date: '',
-      is_available: false,
-      time_slots: [],
-    });
-  };
-
-  // Handle removing an exception
-  const handleRemoveException = (index) => {
-    setDateExceptions(prev => prev.filter((_, i) => i !== index));
-  };
-
-  // Handle exception time slot changes
-  const handleExceptionTimeSlotChange = (exceptionIndex, slotIndex, field, value) => {
-    setDateExceptions(prev => {
-      const updatedExceptions = [...prev];
-      const updatedTimeSlots = [...updatedExceptions[exceptionIndex].time_slots];
-      
-      updatedTimeSlots[slotIndex] = {
-        ...updatedTimeSlots[slotIndex],
-        [field]: value,
-      };
-      
-      updatedExceptions[exceptionIndex] = {
-        ...updatedExceptions[exceptionIndex],
-        time_slots: updatedTimeSlots,
-      };
-      
-      return updatedExceptions;
-    });
-  };
-
-  // Add a new time slot to an exception
-  const handleAddExceptionTimeSlot = (exceptionIndex) => {
-    setDateExceptions(prev => {
-      const updatedExceptions = [...prev];
-      const updatedTimeSlots = [...updatedExceptions[exceptionIndex].time_slots];
-      
-      // Calculate a reasonable default for the new time slot
-      let newStart = '09:00';
-      let newEnd = '17:00';
-      
-      if (updatedTimeSlots.length > 0) {
-        const lastSlot = updatedTimeSlots[updatedTimeSlots.length - 1];
-        const [lastEndHours, lastEndMinutes] = lastSlot.end.split(':').map(Number);
-        
-        // Add 1 hour to the end time of the last slot for the new start time
-        let newStartHours = lastEndHours + 1;
-        let newStartMinutes = lastEndMinutes;
-        
-        // If hours go beyond 23, cap at 23
-        if (newStartHours > 23) {
-          newStartHours = 23;
-          newStartMinutes = 0;
-        }
-        
-        // Calculate end time (start time + 1 hour)
-        let newEndHours = newStartHours + 1;
-        let newEndMinutes = newStartMinutes;
-        
-        // If end hours go beyond 23, cap at 23:59
-        if (newEndHours > 23) {
-          newEndHours = 23;
-          newEndMinutes = 59;
-        }
-        
-        newStart = `${newStartHours.toString().padStart(2, '0')}:${newStartMinutes.toString().padStart(2, '0')}`;
-        newEnd = `${newEndHours.toString().padStart(2, '0')}:${newEndMinutes.toString().padStart(2, '0')}`;
-      }
-      
-      updatedTimeSlots.push({ start: newStart, end: newEnd });
-      
-      updatedExceptions[exceptionIndex] = {
-        ...updatedExceptions[exceptionIndex],
-        time_slots: updatedTimeSlots,
-      };
-      
-      return updatedExceptions;
-    });
-  };
-
-  // Remove a time slot from an exception
-  const handleRemoveExceptionTimeSlot = (exceptionIndex, slotIndex) => {
-    setDateExceptions(prev => {
-      const updatedExceptions = [...prev];
-      const updatedTimeSlots = updatedExceptions[exceptionIndex].time_slots.filter((_, i) => i !== slotIndex);
-      
-      updatedExceptions[exceptionIndex] = {
-        ...updatedExceptions[exceptionIndex],
-        time_slots: updatedTimeSlots,
-      };
-      
-      return updatedExceptions;
-    });
-  };
-
-  // Handle saving the settings
-  const handleSaveSettings = async () => {
+    fetchAvailabilityData();
+  }, []);
+  const fetchAvailabilityData = async () => {
     try {
-      setIsSaving(true);
-      
-      // Prepare data for saving
-      const dataToSave = {
-        ...availabilitySettings,
-        exceptions: dateExceptions,
-      };
-      
-      await api.put('/api/availability', dataToSave);
-      
-      toast({
-        title: 'Success',
-        description: 'Availability settings saved successfully',
-        type: 'success',
-      });
+      setLoading(true);
+      const [scheduleRes, settingsRes, specialRes, templatesRes, blockedRes] = await Promise.all([
+        axios.get('/api/availability/schedule'),
+        axios.get('/api/availability/settings'),
+        axios.get('/api/availability/special-days'),
+        axios.get('/api/availability/templates'),
+        axios.get('/api/availability/blocked-times')
+      ]);
+      setWeeklySchedule(scheduleRes.data.schedule || weeklySchedule);
+      setSettings(settingsRes.data.settings || settings);
+      setSpecialDays(specialRes.data.specialDays || []);
+      setHolidays(specialRes.data.holidays || []);
+      setTemplates(templatesRes.data || []);
+      setBlockedTimes(blockedRes.data.blockedTimes || []);
+      setRecurringBlocks(blockedRes.data.recurringBlocks || []);
     } catch (error) {
-      console.error('Error saving availability settings:', error);
+      console.error('Error fetching availability data:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to save availability settings',
-        type: 'error',
+        title: 'Hata',
+        description: 'Uygunluk verileri yüklenemedi',
+        variant: 'error'
       });
     } finally {
-      setIsSaving(false);
+      setLoading(false);
     }
   };
-
-  // Generate time options (30 min intervals) for select dropdowns
-  const generateTimeOptions = () => {
-    const options = [];
-    const [startHour, startMinute] = availableTimeRange.start.split(':').map(Number);
-    const [endHour, endMinute] = availableTimeRange.end.split(':').map(Number);
-    
-    const startTime = new Date();
-    startTime.setHours(startHour, startMinute, 0, 0);
-    
-    const endTime = new Date();
-    endTime.setHours(endHour, endMinute, 0, 0);
-    
-    // Loop in 30 minute increments
-    for (let time = startTime; time <= endTime; time.setMinutes(time.getMinutes() + 30)) {
-      const hours = time.getHours().toString().padStart(2, '0');
-      const minutes = time.getMinutes().toString().padStart(2, '0');
-      const timeString = `${hours}:${minutes}`;
-      
-      options.push(
-        <option key={timeString} value={timeString}>
-          {timeString}
-        </option>
-      );
-    }
-    
-    return options;
-  };
-
-  // Time options for dropdowns
-  const timeOptions = generateTimeOptions();
-
-  // Apply working hours to all available days
-  const applyWorkingHoursToAll = () => {
-    setAvailabilitySettings(prev => {
-      const updatedSchedule = prev.regular_schedule.map(day => {
-        if (day.is_available) {
-          return {
-            ...day,
-            time_slots: [{ start: prev.working_hours.start, end: prev.working_hours.end }],
-          };
-        }
-        return day;
-      });
-      
-      return {
-        ...prev,
-        regular_schedule: updatedSchedule,
-      };
+  const addTimeSlot = (day) => {
+    const newSlot = {
+      id: Date.now().toString(),
+      startTime: '09:00',
+      endTime: '10:00',
+      maxAppointments: 1,
+      appointmentTypes: ['all']
+    };
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [day]: {
+        ...weeklySchedule[day],
+        slots: [...weeklySchedule[day].slots, newSlot]
+      }
     });
   };
-
-  // Render loading state
-  if (isLoading) {
+  const updateTimeSlot = (day, slotId, updates) => {
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [day]: {
+        ...weeklySchedule[day],
+        slots: weeklySchedule[day].slots.map(slot => 
+          slot.id === slotId ? { ...slot, ...updates } : slot
+        )
+      }
+    });
+  };
+  const removeTimeSlot = (day, slotId) => {
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [day]: {
+        ...weeklySchedule[day],
+        slots: weeklySchedule[day].slots.filter(slot => slot.id !== slotId)
+      }
+    });
+  };
+  const copyDaySchedule = (fromDay, toDay) => {
+    setWeeklySchedule({
+      ...weeklySchedule,
+      [toDay]: {
+        ...weeklySchedule[fromDay],
+        slots: weeklySchedule[fromDay].slots.map(slot => ({
+          ...slot,
+          id: Date.now().toString() + Math.random()
+        }))
+      }
+    });
+    toast({
+      title: 'Başarılı',
+      description: 'Program kopyalandı',
+      variant: 'success'
+    });
+  };
+  const applyTemplate = (template) => {
+    setWeeklySchedule(template.schedule);
+    setSettings({ ...settings, ...template.settings });
+    toast({
+      title: 'Başarılı',
+      description: 'Şablon uygulandı',
+      variant: 'success'
+    });
+  };
+  const saveAsTemplate = async () => {
+    const templateName = prompt('Şablon adı:');
+    if (!templateName) return;
+    try {
+      await axios.post('/api/availability/templates', {
+        name: templateName,
+        schedule: weeklySchedule,
+        settings: settings
+      });
+      toast({
+        title: 'Başarılı',
+        description: 'Şablon kaydedildi',
+        variant: 'success'
+      });
+      fetchAvailabilityData();
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Şablon kaydedilemedi',
+        variant: 'error'
+      });
+    }
+  };
+  const addSpecialDay = () => {
+    const newSpecialDay = {
+      id: Date.now().toString(),
+      date: format(new Date(), 'yyyy-MM-dd'),
+      type: 'custom',
+      slots: [],
+      reason: ''
+    };
+    setSpecialDays([...specialDays, newSpecialDay]);
+  };
+  const addBlockedTime = () => {
+    const newBlock = {
+      id: Date.now().toString(),
+      startDate: format(new Date(), 'yyyy-MM-dd'),
+      endDate: format(new Date(), 'yyyy-MM-dd'),
+      startTime: '09:00',
+      endTime: '10:00',
+      reason: '',
+      recurring: false,
+      recurrencePattern: 'weekly'
+    };
+    setBlockedTimes([...blockedTimes, newBlock]);
+  };
+  const saveAvailability = async () => {
+    setSaving(true);
+    try {
+      await Promise.all([
+        axios.put('/api/availability/schedule', { schedule: weeklySchedule }),
+        axios.put('/api/availability/settings', { settings }),
+        axios.put('/api/availability/special-days', { specialDays, holidays }),
+        axios.put('/api/availability/blocked-times', { blockedTimes, recurringBlocks })
+      ]);
+      toast({
+        title: 'Başarılı',
+        description: 'Uygunluk ayarları kaydedildi',
+        variant: 'success'
+      });
+    } catch (error) {
+      toast({
+        title: 'Hata',
+        description: 'Ayarlar kaydedilemedi',
+        variant: 'error'
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += settings.slotIncrement) {
+        const time = format(setMinutes(setHours(new Date(), hour), minute), 'HH:mm');
+        options.push(time);
+      }
+    }
+    return options;
+  };
+  const getDayName = (day) => {
+    const names = {
+      monday: 'Pazartesi',
+      tuesday: 'Salı',
+      wednesday: 'Çarşamba',
+      thursday: 'Perşembe',
+      friday: 'Cuma',
+      saturday: 'Cumartesi',
+      sunday: 'Pazar'
+    };
+    return names[day];
+  };
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-10 h-10 text-primary animate-spin" />
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
       </div>
     );
   }
-
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Availability Settings</h1>
-        <Button
-          onClick={handleSaveSettings}
-          disabled={isSaving}
-          className="flex items-center"
-        >
-          {isSaving ? (
-            <>
-              <Loader className="w-4 h-4 mr-2 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4 mr-2" />
-              Save Settings
-            </>
-          )}
-        </Button>
-      </div>
-      
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="mb-6"
-      >
-        <Tabs.TabsList>
-          <Tabs.TabTrigger value="weekly">
-            <Calendar className="w-4 h-4 mr-2" />
-            Weekly Schedule
-          </Tabs.TabTrigger>
-          <Tabs.TabTrigger value="exceptions">
-            <AlertTriangle className="w-4 h-4 mr-2" />
-            Date Exceptions
-          </Tabs.TabTrigger>
-          <Tabs.TabTrigger value="settings">
-            <Clock className="w-4 h-4 mr-2" />
-            General Settings
-          </Tabs.TabTrigger>
-        </Tabs.TabsList>
-        
-        {/* Weekly Schedule Tab */}
-        <Tabs.TabContent value="weekly">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Working Hours Card */}
-            <Card className="p-6">
-              <h2 className="text-lg font-medium mb-4">Default Working Hours</h2>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Time
-                  </label>
-                  <select
-                    value={availabilitySettings.working_hours.start}
-                    onChange={(e) => handleWorkingHoursChange('start', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                  >
-                    {timeOptions}
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    End Time
-                  </label>
-                  <select
-                    value={availabilitySettings.working_hours.end}
-                    onChange={(e) => handleWorkingHoursChange('end', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                  >
-                    {timeOptions}
-                  </select>
-                </div>
-              </div>
-              
-              <div className="flex items-center mb-4">
-                <input
-                  id="break_time_enabled"
-                  name="break_time_enabled"
-                  type="checkbox"
-                  checked={availabilitySettings.break_time.enabled}
-                  onChange={(e) => handleBreakTimeChange('enabled', e.target.checked)}
-                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                />
-                <label htmlFor="break_time_enabled" className="ml-2 block text-sm text-gray-700">
-                  Include Daily Break Time
-                </label>
-              </div>
-              
-              {availabilitySettings.break_time.enabled && (
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Break Start
-                    </label>
-                    <select
-                      value={availabilitySettings.break_time.start}
-                      onChange={(e) => handleBreakTimeChange('start', e.target.value)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                    >
-                      {timeOptions}
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Break End
-                    </label>
-                    <select
-                      value={availabilitySettings.break_time.end}
-                      onChange={(e) => handleBreakTimeChange('end', e.target.value)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                    >
-                      {timeOptions}
-                    </select>
-                  </div>
-                </div>
-              )}
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={applyWorkingHoursToAll}
-                className="mt-2"
-              >
-                Apply To All Available Days
-              </Button>
-            </Card>
-            
-            {/* Schedule Overview Card */}
-            <Card className="p-6">
-              <h2 className="text-lg font-medium mb-4">Schedule Overview</h2>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="space-y-1">
-                  <div className="font-medium">Available Days:</div>
-                  <div>
-                    {availabilitySettings.regular_schedule
-                      .filter(day => day.is_available)
-                      .map(day => daysOfWeek[day.day])
-                      .join(', ') || 'None'}
-                  </div>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="font-medium">Working Hours:</div>
-                  <div>
-                    {availabilitySettings.working_hours.start} - {availabilitySettings.working_hours.end}
-                  </div>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="font-medium">Break Time:</div>
-                  <div>
-                    {availabilitySettings.break_time.enabled 
-                      ? `${availabilitySettings.break_time.start} - ${availabilitySettings.break_time.end}` 
-                      : 'No break time'}
-                  </div>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="font-medium">Buffer Time:</div>
-                  <div>{availabilitySettings.buffer_time} minutes</div>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="font-medium">Date Exceptions:</div>
-                  <div>{dateExceptions.length} exceptions set</div>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="font-medium">Google Calendar:</div>
-                  <div>
-                    {availabilitySettings.sync_with_google 
-                      ? 'Synced' 
-                      : 'Not synced'}
-                  </div>
-                </div>
-              </div>
-            </Card>
+    <div className="p-6 max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Uygunluk Ayarları</h1>
+            <p className="text-gray-600 mt-1">Randevu alınabilir zamanlarınızı yönetin</p>
           </div>
-          
-          {/* Daily Schedule Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            {availabilitySettings.regular_schedule.map((day, index) => (
-              <Card key={index} className={`p-6 ${day.is_available ? 'border-primary' : 'border-gray-200'}`}>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium">{daysOfWeek[day.day]}</h3>
-                  <div className="flex items-center">
-                    <input
-                      id={`day_${day.day}_available`}
-                      name={`day_${day.day}_available`}
-                      type="checkbox"
-                      checked={day.is_available}
-                      onChange={() => handleDayAvailabilityToggle(index)}
-                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                    />
-                    <label htmlFor={`day_${day.day}_available`} className="ml-2 block text-sm text-gray-700">
-                      Available
-                    </label>
-                  </div>
-                </div>
-                
-                {day.is_available && (
-                  <div className="space-y-4">
-                    {day.time_slots.map((slot, slotIndex) => (
-                      <div key={slotIndex} className="flex items-center space-x-2">
-                        <div className="grid grid-cols-2 gap-2 flex-1">
-                          <select
-                            value={slot.start}
-                            onChange={(e) => handleTimeSlotChange(index, slotIndex, 'start', e.target.value)}
-                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                          >
-                            {timeOptions}
-                          </select>
-                          <select
-                            value={slot.end}
-                            onChange={(e) => handleTimeSlotChange(index, slotIndex, 'end', e.target.value)}
-                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                          >
-                            {timeOptions}
-                          </select>
-                        </div>
-                        
-                        {day.time_slots.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveTimeSlot(index, slotIndex)}
-                            className="text-gray-500 hover:text-red-500"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                    
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={saveAsTemplate}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Şablon Olarak Kaydet
+            </Button>
+            <Button
+              onClick={saveAvailability}
+              disabled={saving}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Kaydet
+            </Button>
+          </div>
+        </div>
+      </div>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs.TabsList>
+          <Tabs.TabTrigger value="schedule">Haftalık Program</Tabs.TabTrigger>
+          <Tabs.TabTrigger value="settings">Genel Ayarlar</Tabs.TabTrigger>
+          <Tabs.TabTrigger value="special">Özel Günler</Tabs.TabTrigger>
+          <Tabs.TabTrigger value="blocked">Bloklu Zamanlar</Tabs.TabTrigger>
+          <Tabs.TabTrigger value="preview">Önizleme</Tabs.TabTrigger>
+        </Tabs.TabsList>
+        {/* Weekly Schedule Tab */}
+        <Tabs.TabContent value="schedule">
+          <Card className="p-6">
+            {/* Templates */}
+            {templates.length > 0 && (
+              <div className="mb-6">
+                <Label>Şablonlar</Label>
+                <div className="flex gap-2 mt-2">
+                  {templates.map(template => (
                     <Button
-                      type="button"
+                      key={template.id}
                       variant="outline"
                       size="sm"
-                      onClick={() => handleAddTimeSlot(index)}
-                      className="flex items-center w-full justify-center"
+                      onClick={() => applyTemplate(template)}
                     >
-                      <Plus className="w-4 h-4 mr-1" />
-                      Add Time Slot
+                      {template.name}
                     </Button>
-                  </div>
-                )}
-                
-                {!day.is_available && (
-                  <div className="text-gray-500 italic text-sm">
-                    Not available on this day
-                  </div>
-                )}
-              </Card>
-            ))}
-          </div>
-        </Tabs.TabContent>
-        
-        {/* Date Exceptions Tab */}
-        <Tabs.TabContent value="exceptions">
-          <Card className="p-6 mb-6">
-            <h2 className="text-lg font-medium mb-4">Add Date Exception</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date
-                </label>
-                <Input
-                  type="date"
-                  value={newException.date}
-                  onChange={(e) => handleNewExceptionChange('date', e.target.value)}
-                  min={new Date().toISOString().split('T')[0]} // Prevent past dates
-                />
+                  ))}
+                </div>
               </div>
-              
-              <div className="flex items-center space-x-2 h-[38px]">
-                <input
-                  id="exception_available"
-                  name="exception_available"
-                  type="checkbox"
-                  checked={newException.is_available}
-                  onChange={(e) => handleNewExceptionChange('is_available', e.target.checked)}
-                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                />
-                <label htmlFor="exception_available" className="block text-sm text-gray-700">
-                  Available on this date
-                </label>
-              </div>
-              
-              <Button
-                onClick={handleAddException}
-                className="flex items-center"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Exception
-              </Button>
-            </div>
-            
-            <div className="flex items-center mt-4 bg-amber-50 p-4 rounded-lg">
-              <Info className="w-5 h-5 text-amber-500 mr-2 flex-shrink-0" />
-              <p className="text-sm text-amber-800">
-                Date exceptions let you mark specific dates as unavailable (like holidays) or set special hours that differ from your regular weekly schedule.
-              </p>
-            </div>
-          </Card>
-          
-          {/* Exception List */}
-          {dateExceptions.length > 0 ? (
-            <div className="space-y-4">
-              {dateExceptions.map((exception, exIndex) => (
-                <Card 
-                  key={exIndex} 
-                  className={`p-6 ${exception.is_available ? 'border-green-300' : 'border-red-300'}`}
+            )}
+            {/* Working Hours */}
+            <div className="mb-6">
+              <Label>Genel Çalışma Saatleri</Label>
+              <div className="flex items-center gap-4 mt-2">
+                <div className="flex items-center gap-2">
+                  <Sun className="h-4 w-4 text-yellow-600" />
+                  <Select
+                    value={workingHours.start}
+                    onValueChange={(value) => setWorkingHours({ ...workingHours, start: value })}
+                  >
+                    {generateTimeOptions().map(time => (
+                      <Select.Option key={time} value={time}>{time}</Select.Option>
+                    ))}
+                  </Select>
+                </div>
+                <span>-</span>
+                <div className="flex items-center gap-2">
+                  <Moon className="h-4 w-4 text-blue-600" />
+                  <Select
+                    value={workingHours.end}
+                    onValueChange={(value) => setWorkingHours({ ...workingHours, end: value })}
+                  >
+                    {generateTimeOptions().map(time => (
+                      <Select.Option key={time} value={time}>{time}</Select.Option>
+                    ))}
+                  </Select>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    Object.keys(weeklySchedule).forEach(day => {
+                      if (weeklySchedule[day].enabled) {
+                        setWeeklySchedule({
+                          ...weeklySchedule,
+                          [day]: {
+                            ...weeklySchedule[day],
+                            slots: [{
+                              id: Date.now().toString(),
+                              startTime: workingHours.start,
+                              endTime: workingHours.end,
+                              maxAppointments: 1,
+                              appointmentTypes: ['all']
+                            }]
+                          }
+                        });
+                      }
+                    });
+                  }}
                 >
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="flex items-center">
-                      <h3 className="text-lg font-medium">
-                        {new Date(exception.date).toLocaleDateString(undefined, { 
-                          weekday: 'long', 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })}
-                      </h3>
-                      {exception.is_available ? (
-                        <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Available
-                        </span>
-                      ) : (
-                        <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                          <AlertTriangle className="w-3 h-3 mr-1" />
-                          Unavailable
-                        </span>
-                      )}
+                  Tüm Günlere Uygula
+                </Button>
+              </div>
+            </div>
+            {/* Days */}
+            <div className="space-y-4">
+              {Object.entries(weeklySchedule).map(([day, daySchedule]) => (
+                <div key={day} className="border rounded-lg">
+                  <div
+                    className="p-4 flex items-center justify-between cursor-pointer"
+                    onClick={() => setExpandedDays({ ...expandedDays, [day]: !expandedDays[day] })}
+                  >
+                    <div className="flex items-center gap-3">
+                      {expandedDays[day] ? <ChevronUp /> : <ChevronDown />}
+                      <h3 className="font-medium">{getDayName(day)}</h3>
+                      <label className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={daySchedule.enabled}
+                          onChange={(e) => setWeeklySchedule({
+                            ...weeklySchedule,
+                            [day]: { ...daySchedule, enabled: e.target.checked }
+                          })}
+                        />
+                        <span className="text-sm">Aktif</span>
+                      </label>
                     </div>
-                    
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveException(exIndex)}
-                      className="text-gray-500 hover:text-red-500"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {daySchedule.slots.length > 0 && (
+                        <Badge variant="secondary">
+                          {daySchedule.slots.length} zaman aralığı
+                        </Badge>
+                      )}
+                      <div className="relative">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border p-2 hidden group-hover:block z-10">
+                          <p className="text-sm font-medium mb-2">Kopyala:</p>
+                          {Object.keys(weeklySchedule).filter(d => d !== day).map(targetDay => (
+                            <button
+                              key={targetDay}
+                              onClick={() => copyDaySchedule(day, targetDay)}
+                              className="w-full text-left px-3 py-1 rounded hover:bg-gray-100 text-sm"
+                            >
+                              {getDayName(targetDay)}'ye
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  
-                  {exception.is_available && (
-                    <div className="space-y-4">
-                      {exception.time_slots.map((slot, slotIndex) => (
-                        <div key={slotIndex} className="flex items-center space-x-2">
-                          <div className="grid grid-cols-2 gap-2 flex-1">
-                            <select
-                              value={slot.start}
-                              onChange={(e) => handleExceptionTimeSlotChange(exIndex, slotIndex, 'start', e.target.value)}
-                              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                  {expandedDays[day] && daySchedule.enabled && (
+                    <div className="p-4 pt-0 space-y-3">
+                      {daySchedule.slots.map(slot => (
+                        <div key={slot.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-gray-600" />
+                            <Select
+                              value={slot.startTime}
+                              onValueChange={(value) => updateTimeSlot(day, slot.id, { startTime: value })}
                             >
-                              {timeOptions}
-                            </select>
-                            <select
-                              value={slot.end}
-                              onChange={(e) => handleExceptionTimeSlotChange(exIndex, slotIndex, 'end', e.target.value)}
-                              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                              {generateTimeOptions().map(time => (
+                                <Select.Option key={time} value={time}>{time}</Select.Option>
+                              ))}
+                            </Select>
+                            <span>-</span>
+                            <Select
+                              value={slot.endTime}
+                              onValueChange={(value) => updateTimeSlot(day, slot.id, { endTime: value })}
                             >
-                              {timeOptions}
-                            </select>
+                              {generateTimeOptions().map(time => (
+                                <Select.Option key={time} value={time}>{time}</Select.Option>
+                              ))}
+                            </Select>
                           </div>
-                          
-                          {exception.time_slots.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRemoveExceptionTimeSlot(exIndex, slotIndex)}
-                              className="text-gray-500 hover:text-red-500"
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-gray-600" />
+                            <Input
+                              type="number"
+                              value={slot.maxAppointments}
+                              onChange={(e) => updateTimeSlot(day, slot.id, { 
+                                maxAppointments: parseInt(e.target.value) || 1 
+                              })}
+                              className="w-16"
+                              min="1"
+                            />
+                            <span className="text-sm text-gray-600">randevu</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Select
+                              value={slot.appointmentTypes.includes('all') ? 'all' : 'specific'}
+                              onValueChange={(value) => {
+                                if (value === 'all') {
+                                  updateTimeSlot(day, slot.id, { appointmentTypes: ['all'] });
+                                } else {
+                                  updateTimeSlot(day, slot.id, { appointmentTypes: ['session'] });
+                                }
+                              }}
                             >
-                              <Minus className="w-4 h-4" />
-                            </Button>
-                          )}
+                              <Select.Option value="all">Tüm Türler</Select.Option>
+                              <Select.Option value="specific">Belirli Türler</Select.Option>
+                            </Select>
+                            {!slot.appointmentTypes.includes('all') && (
+                              <div className="flex gap-1">
+                                {['session', 'evaluation', 'meeting'].map(type => (
+                                  <label key={type} className="flex items-center gap-1">
+                                    <input
+                                      type="checkbox"
+                                      checked={slot.appointmentTypes.includes(type)}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          updateTimeSlot(day, slot.id, {
+                                            appointmentTypes: [...slot.appointmentTypes, type]
+                                          });
+                                        } else {
+                                          updateTimeSlot(day, slot.id, {
+                                            appointmentTypes: slot.appointmentTypes.filter(t => t !== type)
+                                          });
+                                        }
+                                      }}
+                                    />
+                                    <span className="text-sm">{type}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeTimeSlot(day, slot.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       ))}
-                      
                       <Button
-                        type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => handleAddExceptionTimeSlot(exIndex)}
-                        className="flex items-center w-full justify-center"
+                        onClick={() => addTimeSlot(day)}
                       >
-                        <Plus className="w-4 h-4 mr-1" />
-                        Add Time Slot
+                        <Plus className="h-4 w-4 mr-2" />
+                        Zaman Aralığı Ekle
                       </Button>
                     </div>
                   )}
-                  
-                  {!exception.is_available && (
-                    <div className="text-gray-500 italic text-sm">
-                      You will not be available for appointments on this day
-                    </div>
-                  )}
-                </Card>
+                </div>
               ))}
             </div>
-          ) : (
-            <Card className="p-6 text-center">
-              <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <h3 className="text-lg font-medium text-gray-900 mb-1">No Exceptions Set</h3>
-              <p className="text-gray-500 mb-4">
-                You haven't added any date exceptions yet. Add exceptions for holidays, vacations, or special schedules.
-              </p>
-            </Card>
-          )}
+          </Card>
         </Tabs.TabContent>
-        
-        {/* General Settings Tab */}
+        {/* Settings Tab */}
         <Tabs.TabContent value="settings">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Appointment Settings */}
-            <Card className="p-6">
-              <h2 className="text-lg font-medium mb-4">Appointment Settings</h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Default Appointment Duration (minutes)
-                  </label>
-                  <select
-                    value={availabilitySettings.appointment_duration}
-                    onChange={(e) => handleSettingChange('appointment_duration', parseInt(e.target.value))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                  >
-                    <option value={15}>15 minutes</option>
-                    <option value={30}>30 minutes</option>
-                    <option value={45}>45 minutes</option>
-                    <option value={60}>60 minutes</option>
-                    <option value={90}>90 minutes</option>
-                    <option value={120}>2 hours</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Buffer Time Between Appointments (minutes)
-                  </label>
-                  <select
-                    value={availabilitySettings.buffer_time}
-                    onChange={(e) => handleSettingChange('buffer_time', parseInt(e.target.value))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                  >
-                    <option value={0}>No buffer</option>
-                    <option value={5}>5 minutes</option>
-                    <option value={10}>10 minutes</option>
-                    <option value={15}>15 minutes</option>
-                    <option value={30}>30 minutes</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Maximum Appointments Per Day
-                  </label>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="20"
-                    value={availabilitySettings.max_appointments_per_day}
-                    onChange={(e) => handleSettingChange('max_appointments_per_day', parseInt(e.target.value))}
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Advance Notice Required (hours)
-                  </label>
-                  <select
-                    value={availabilitySettings.advance_notice}
-                    onChange={(e) => handleSettingChange('advance_notice', parseInt(e.target.value))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                  >
-                    <option value={0}>No advance notice</option>
-                    <option value={1}>1 hour</option>
-                    <option value={2}>2 hours</option>
-                    <option value={6}>6 hours</option>
-                    <option value={12}>12 hours</option>
-                    <option value={24}>24 hours</option>
-                    <option value={48}>2 days</option>
-                    <option value={72}>3 days</option>
-                  </select>
-                </div>
-                
-                <div className="flex items-center">
-                  <input
-                    id="auto_confirm"
-                    name="auto_confirm"
-                    type="checkbox"
-                    checked={availabilitySettings.auto_confirm}
-                    onChange={(e) => handleSettingChange('auto_confirm', e.target.checked)}
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                  />
-                  <label htmlFor="auto_confirm" className="ml-2 block text-sm text-gray-700">
-                    Automatically confirm appointments
-                  </label>
-                </div>
-              </div>
-            </Card>
-            
-            {/* Google Calendar Integration */}
-            <Card className="p-6">
-              <h2 className="text-lg font-medium mb-4">Google Calendar Integration</h2>
-              
-              <div className="flex items-center mb-4">
-                <input
-                  id="sync_with_google"
-                  name="sync_with_google"
-                  type="checkbox"
-                  checked={availabilitySettings.sync_with_google}
-                  onChange={(e) => handleSettingChange('sync_with_google', e.target.checked)}
-                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                />
-                <label htmlFor="sync_with_google" className="ml-2 block text-sm text-gray-700">
-                  Sync availability with Google Calendar
-                </label>
-              </div>
-              
-              {availabilitySettings.sync_with_google ? (
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <div className="flex">
-                    <CheckCircle className="h-5 w-5 text-blue-400 mr-2" />
-                    <h3 className="text-sm font-medium text-blue-800">Connected to Google Calendar</h3>
+          <Card className="p-6">
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Randevu Ayarları</h3>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="defaultDuration">Varsayılan Süre (dk)</Label>
+                    <Input
+                      id="defaultDuration"
+                      type="number"
+                      value={settings.defaultDuration}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        defaultDuration: parseInt(e.target.value) || 60 
+                      })}
+                    />
                   </div>
-                  <p className="mt-2 text-sm text-blue-700">
-                    Your availability is being synced with your Google Calendar. When you create appointments in either system, they will be reflected in both.
-                  </p>
-                  <div className="mt-3 flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        // Navigate to Google Calendar Sync page
-                        navigate('/calendar/google-sync');
-                      }}
+                  <div>
+                    <Label htmlFor="bufferTime">Randevular Arası Boşluk (dk)</Label>
+                    <Input
+                      id="bufferTime"
+                      type="number"
+                      value={settings.bufferTime}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        bufferTime: parseInt(e.target.value) || 0 
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="minAdvanceNotice">Minimum Ön Bildirim (saat)</Label>
+                    <Input
+                      id="minAdvanceNotice"
+                      type="number"
+                      value={settings.minAdvanceNotice}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        minAdvanceNotice: parseInt(e.target.value) || 24 
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="maxAdvanceBooking">Maksimum İleri Tarih (gün)</Label>
+                    <Input
+                      id="maxAdvanceBooking"
+                      type="number"
+                      value={settings.maxAdvanceBooking}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        maxAdvanceBooking: parseInt(e.target.value) || 30 
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="slotIncrement">Zaman Aralığı (dk)</Label>
+                    <Select
+                      id="slotIncrement"
+                      value={settings.slotIncrement}
+                      onValueChange={(value) => setSettings({ 
+                        ...settings, 
+                        slotIncrement: parseInt(value) 
+                      })}
                     >
-                      Advanced Sync Settings
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        // In a real app, this would open Google Calendar
-                        window.open('https://calendar.google.com/', '_blank');
-                      }}
-                    >
-                      Open Google Calendar
-                    </Button>
+                      <Select.Option value="15">15 dakika</Select.Option>
+                      <Select.Option value="30">30 dakika</Select.Option>
+                      <Select.Option value="45">45 dakika</Select.Option>
+                      <Select.Option value="60">60 dakika</Select.Option>
+                    </Select>
                   </div>
                 </div>
-              ) : (
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-700">
-                    Connect your Google Calendar to automatically sync your availability and block times when you have other appointments.
-                  </p>
-                  <div className="mt-3 flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        // In a real app, this would initiate Google OAuth
-                        handleSettingChange('sync_with_google', true);
-                        toast({
-                          title: 'Success',
-                          description: 'Connected to Google Calendar (simulated)',
-                          type: 'success',
-                        });
-                      }}
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Sistem Ayarları</h3>
+                <div className="space-y-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={settings.autoAcceptAppointments}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        autoAcceptAppointments: e.target.checked 
+                      })}
+                    />
+                    <span>Randevuları Otomatik Onayla</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={settings.sendConfirmationEmail}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        sendConfirmationEmail: e.target.checked 
+                      })}
+                    />
+                    <span>Onay E-postası Gönder</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={settings.sendReminderEmail}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        sendReminderEmail: e.target.checked 
+                      })}
+                    />
+                    <span>Hatırlatma E-postası Gönder</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={settings.allowOverlapping}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        allowOverlapping: e.target.checked 
+                      })}
+                    />
+                    <span>Çakışan Randevulara İzin Ver</span>
+                  </label>
+                </div>
+                <div className="mt-6">
+                  <label className="flex items-center gap-2 mb-3">
+                    <Coffee className="h-4 w-4" />
+                    <span>Öğle Arası</span>
+                    <input
+                      type="checkbox"
+                      checked={settings.lunchBreak.enabled}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        lunchBreak: { 
+                          ...settings.lunchBreak, 
+                          enabled: e.target.checked 
+                        }
+                      })}
+                    />
+                  </label>
+                  {settings.lunchBreak.enabled && (
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={settings.lunchBreak.startTime}
+                        onValueChange={(value) => setSettings({ 
+                          ...settings, 
+                          lunchBreak: { 
+                            ...settings.lunchBreak, 
+                            startTime: value 
+                          }
+                        })}
+                      >
+                        {generateTimeOptions().map(time => (
+                          <Select.Option key={time} value={time}>{time}</Select.Option>
+                        ))}
+                      </Select>
+                      <span>-</span>
+                      <Select
+                        value={settings.lunchBreak.endTime}
+                        onValueChange={(value) => setSettings({ 
+                          ...settings, 
+                          lunchBreak: { 
+                            ...settings.lunchBreak, 
+                            endTime: value 
+                          }
+                        })}
+                      >
+                        {generateTimeOptions().map(time => (
+                          <Select.Option key={time} value={time}>{time}</Select.Option>
+                        ))}
+                      </Select>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            {/* Advanced Settings */}
+            <div className="mt-6 pt-6 border-t">
+              <button
+                type="button"
+                onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+              >
+                {showAdvancedSettings ? <ChevronUp /> : <ChevronDown />}
+                Gelişmiş Ayarlar
+              </button>
+              {showAdvancedSettings && (
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="maxDailyAppointments">Günlük Maksimum Randevu</Label>
+                    <Input
+                      id="maxDailyAppointments"
+                      type="number"
+                      value={settings.maxDailyAppointments}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        maxDailyAppointments: parseInt(e.target.value) || 0 
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="maxWeeklyAppointments">Haftalık Maksimum Randevu</Label>
+                    <Input
+                      id="maxWeeklyAppointments"
+                      type="number"
+                      value={settings.maxWeeklyAppointments}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        maxWeeklyAppointments: parseInt(e.target.value) || 0 
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="breakBetweenAppointments">Randevular Arası Mola (dk)</Label>
+                    <Input
+                      id="breakBetweenAppointments"
+                      type="number"
+                      value={settings.breakBetweenAppointments}
+                      onChange={(e) => setSettings({ 
+                        ...settings, 
+                        breakBetweenAppointments: parseInt(e.target.value) || 0 
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="timezone">Zaman Dilimi</Label>
+                    <Select
+                      id="timezone"
+                      value={settings.timezone}
+                      onValueChange={(value) => setSettings({ 
+                        ...settings, 
+                        timezone: value 
+                      })}
                     >
-                      Connect to Google Calendar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        // Navigate to Google Calendar Sync page
-                        navigate('/calendar/google-sync');
-                      }}
-                    >
-                      Sync Settings
-                    </Button>
+                      <Select.Option value="Europe/Istanbul">Türkiye (İstanbul)</Select.Option>
+                      <Select.Option value="UTC">UTC</Select.Option>
+                      <Select.Option value="Europe/London">London</Select.Option>
+                      <Select.Option value="America/New_York">New York</Select.Option>
+                    </Select>
                   </div>
                 </div>
               )}
-              
-              <div className="mt-6">
-                <h3 className="text-md font-medium mb-2">Available time range</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  This setting controls the time options available in dropdowns throughout the application.
-                </p>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Earliest Time
-                    </label>
-                    <select
-                      value={availableTimeRange.start}
-                      onChange={(e) => setAvailableTimeRange(prev => ({ ...prev, start: e.target.value }))}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                    >
-                      {Array.from({ length: 13 }).map((_, i) => {
-                        const hour = (i + 6).toString().padStart(2, '0'); // Start from 6 AM
-                        return (
-                          <option key={hour} value={`${hour}:00`}>
-                            {`${hour}:00`}
-                          </option>
-                        );
-                      })}
-                    </select>
+            </div>
+          </Card>
+        </Tabs.TabContent>
+        {/* Special Days Tab */}
+        <Tabs.TabContent value="special">
+          <Card className="p-6">
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Özel Günler</h3>
+                <Button size="sm" onClick={addSpecialDay}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Özel Gün Ekle
+                </Button>
+              </div>
+              <div className="space-y-3">
+                {specialDays.map(day => (
+                  <div key={day.id} className="p-4 border rounded-lg">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 space-y-3">
+                        <div className="grid grid-cols-3 gap-3">
+                          <Input
+                            type="date"
+                            value={day.date}
+                            onChange={(e) => setSpecialDays(specialDays.map(d => 
+                              d.id === day.id ? { ...d, date: e.target.value } : d
+                            ))}
+                          />
+                          <Select
+                            value={day.type}
+                            onValueChange={(value) => setSpecialDays(specialDays.map(d => 
+                              d.id === day.id ? { ...d, type: value } : d
+                            ))}
+                          >
+                            <Select.Option value="custom">Özel</Select.Option>
+                            <Select.Option value="holiday">Tatil</Select.Option>
+                            <Select.Option value="halfday">Yarım Gün</Select.Option>
+                          </Select>
+                          <Input
+                            placeholder="Açıklama"
+                            value={day.reason}
+                            onChange={(e) => setSpecialDays(specialDays.map(d => 
+                              d.id === day.id ? { ...d, reason: e.target.value } : d
+                            ))}
+                          />
+                        </div>
+                        {day.type === 'custom' && (
+                          <div className="space-y-2">
+                            {day.slots.map((slot, index) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <Select
+                                  value={slot.startTime}
+                                  onValueChange={(value) => {
+                                    const newSlots = [...day.slots];
+                                    newSlots[index] = { ...slot, startTime: value };
+                                    setSpecialDays(specialDays.map(d => 
+                                      d.id === day.id ? { ...d, slots: newSlots } : d
+                                    ));
+                                  }}
+                                >
+                                  {generateTimeOptions().map(time => (
+                                    <Select.Option key={time} value={time}>{time}</Select.Option>
+                                  ))}
+                                </Select>
+                                <span>-</span>
+                                <Select
+                                  value={slot.endTime}
+                                  onValueChange={(value) => {
+                                    const newSlots = [...day.slots];
+                                    newSlots[index] = { ...slot, endTime: value };
+                                    setSpecialDays(specialDays.map(d => 
+                                      d.id === day.id ? { ...d, slots: newSlots } : d
+                                    ));
+                                  }}
+                                >
+                                  {generateTimeOptions().map(time => (
+                                    <Select.Option key={time} value={time}>{time}</Select.Option>
+                                  ))}
+                                </Select>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newSlots = day.slots.filter((_, i) => i !== index);
+                                    setSpecialDays(specialDays.map(d => 
+                                      d.id === day.id ? { ...d, slots: newSlots } : d
+                                    ));
+                                  }}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newSlots = [...day.slots, { startTime: '09:00', endTime: '10:00' }];
+                                setSpecialDays(specialDays.map(d => 
+                                  d.id === day.id ? { ...d, slots: newSlots } : d
+                                ));
+                              }}
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Zaman Ekle
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSpecialDays(specialDays.filter(d => d.id !== day.id))}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Latest Time
-                    </label>
-                    <select
-                      value={availableTimeRange.end}
-                      onChange={(e) => setAvailableTimeRange(prev => ({ ...prev, end: e.target.value }))}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                ))}
+              </div>
+            </div>
+            {/* Holidays */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Resmi Tatiller</h3>
+              <div className="space-y-2">
+                {[
+                  { date: '2024-01-01', name: "Yılbaşı" },
+                  { date: '2024-04-23', name: "23 Nisan Ulusal Egemenlik ve Çocuk Bayramı" },
+                  { date: '2024-05-01', name: "1 Mayıs İşçi Bayramı" },
+                  { date: '2024-05-19', name: "19 Mayıs Atatürk'ü Anma, Gençlik ve Spor Bayramı" },
+                  { date: '2024-08-30', name: "30 Ağustos Zafer Bayramı" },
+                  { date: '2024-10-29', name: "29 Ekim Cumhuriyet Bayramı" }
+                ].map(holiday => (
+                  <label key={holiday.date} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={holidays.some(h => h.date === holiday.date)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setHolidays([...holidays, holiday]);
+                        } else {
+                          setHolidays(holidays.filter(h => h.date !== holiday.date));
+                        }
+                      }}
+                    />
+                    <span>{holiday.name} - {format(parseISO(holiday.date), 'dd MMMM yyyy', { locale: tr })}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </Tabs.TabContent>
+        {/* Blocked Times Tab */}
+        <Tabs.TabContent value="blocked">
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Bloklu Zamanlar</h3>
+              <Button size="sm" onClick={addBlockedTime}>
+                <Plus className="h-4 w-4 mr-2" />
+                Bloklu Zaman Ekle
+              </Button>
+            </div>
+            <div className="space-y-3">
+              {blockedTimes.map(block => (
+                <div key={block.id} className="p-4 border rounded-lg">
+                  <div className="grid grid-cols-5 gap-3">
+                    <Input
+                      type="date"
+                      value={block.startDate}
+                      onChange={(e) => setBlockedTimes(blockedTimes.map(b => 
+                        b.id === block.id ? { ...b, startDate: e.target.value } : b
+                      ))}
+                    />
+                    <Input
+                      type="date"
+                      value={block.endDate}
+                      onChange={(e) => setBlockedTimes(blockedTimes.map(b => 
+                        b.id === block.id ? { ...b, endDate: e.target.value } : b
+                      ))}
+                    />
+                    <Select
+                      value={block.startTime}
+                      onValueChange={(value) => setBlockedTimes(blockedTimes.map(b => 
+                        b.id === block.id ? { ...b, startTime: value } : b
+                      ))}
                     >
-                      {Array.from({ length: 13 }).map((_, i) => {
-                        const hour = (i + 12).toString().padStart(2, '0'); // Start from 12 PM
-                        return (
-                          <option key={hour} value={`${hour}:00`}>
-                            {`${hour}:00`}
-                          </option>
-                        );
-                      })}
-                    </select>
+                      {generateTimeOptions().map(time => (
+                        <Select.Option key={time} value={time}>{time}</Select.Option>
+                      ))}
+                    </Select>
+                    <Select
+                      value={block.endTime}
+                      onValueChange={(value) => setBlockedTimes(blockedTimes.map(b => 
+                        b.id === block.id ? { ...b, endTime: value } : b
+                      ))}
+                    >
+                      {generateTimeOptions().map(time => (
+                        <Select.Option key={time} value={time}>{time}</Select.Option>
+                      ))}
+                    </Select>
+                    <Input
+                      placeholder="Sebep"
+                      value={block.reason}
+                      onChange={(e) => setBlockedTimes(blockedTimes.map(b => 
+                        b.id === block.id ? { ...b, reason: e.target.value } : b
+                      ))}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between mt-3">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={block.recurring}
+                        onChange={(e) => setBlockedTimes(blockedTimes.map(b => 
+                          b.id === block.id ? { ...b, recurring: e.target.checked } : b
+                        ))}
+                      />
+                      <Repeat className="h-4 w-4" />
+                      <span>Tekrarlayan</span>
+                    </label>
+                    {block.recurring && (
+                      <Select
+                        value={block.recurrencePattern}
+                        onValueChange={(value) => setBlockedTimes(blockedTimes.map(b => 
+                          b.id === block.id ? { ...b, recurrencePattern: value } : b
+                        ))}
+                      >
+                        <Select.Option value="daily">Günlük</Select.Option>
+                        <Select.Option value="weekly">Haftalık</Select.Option>
+                        <Select.Option value="monthly">Aylık</Select.Option>
+                      </Select>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setBlockedTimes(blockedTimes.filter(b => b.id !== block.id))}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
+              ))}
+            </div>
+          </Card>
+        </Tabs.TabContent>
+        {/* Preview Tab */}
+        <Tabs.TabContent value="preview">
+          <Card className="p-6">
+            <div className="mb-4">
+              <Label>Önizleme Tarihi</Label>
+              <Input
+                type="date"
+                value={format(previewDate, 'yyyy-MM-dd')}
+                onChange={(e) => setPreviewDate(new Date(e.target.value))}
+              />
+            </div>
+            <div className="border rounded-lg p-4">
+              <h4 className="font-semibold mb-3">
+                {format(previewDate, 'dd MMMM yyyy EEEE', { locale: tr })}
+              </h4>
+              <div className="space-y-2">
+                {/* Preview logic would show available slots for the selected date */}
+                <div className="p-3 bg-green-50 text-green-800 rounded">
+                  Uygun: 09:00 - 10:00
+                </div>
+                <div className="p-3 bg-green-50 text-green-800 rounded">
+                  Uygun: 10:30 - 11:30
+                </div>
+                <div className="p-3 bg-red-50 text-red-800 rounded">
+                  Dolu: 11:30 - 12:30
+                </div>
+                <div className="p-3 bg-gray-50 text-gray-800 rounded">
+                  Öğle Arası: 12:30 - 13:30
+                </div>
+                <div className="p-3 bg-green-50 text-green-800 rounded">
+                  Uygun: 14:00 - 15:00
+                </div>
               </div>
-            </Card>
-          </div>
+            </div>
+          </Card>
         </Tabs.TabContent>
       </Tabs>
     </div>
   );
 };
-
-export default AvailabilitySettingsPage;
+export default AvailabilitySettingsPageV2;

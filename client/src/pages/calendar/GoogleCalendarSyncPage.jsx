@@ -1,830 +1,513 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Calendar, 
-  Link, 
-  CheckCircle, 
-  AlertTriangle, 
-  Loader, 
-  RefreshCw, 
-  Settings, 
-  Trash, 
-  Lock, 
-  Info 
-} from 'lucide-react';
-import api from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Tabs } from '@/components/ui/tabs';
-import { useToast } from '@/components/ui/toast';
-import { useAuth } from '@/hooks/useAuth';
-
-/**
- * GoogleCalendarSyncPage provides controls for Google Calendar synchronization
- */
-const GoogleCalendarSyncPage = () => {
+import axios from 'axios';
+import { FaGoogle, FaSync, FaCheck, FaTimes, FaInfoCircle, FaCalendarAlt, FaExclamationTriangle, FaTrash, FaClock, FaChartBar } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+const GoogleCalendarSyncPageV2 = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [isRefreshingEvents, setIsRefreshingEvents] = useState(false);
-  const [activeTab, setActiveTab] = useState('connection');
+  const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [accountInfo, setAccountInfo] = useState(null);
   const [syncSettings, setSyncSettings] = useState({
-    is_connected: false,
-    last_synced: null,
-    calendars: [],
+    enabled: false,
+    auto_sync: false,
+    sync_interval: 30,
+    sync_direction: 'bidirectional',
+    conflict_resolution: 'calendar_wins',
+    sync_range_days: 365,
     selected_calendars: [],
-    sync_options: {
-      two_way_sync: true,
-      sync_past_events: false,
-      days_to_sync_in_past: 30,
-      days_to_sync_in_future: 90,
-      avoid_conflicts: true,
-      auto_sync_frequency: 'hourly', // 'manual', 'hourly', 'daily'
+    sync_types: {
+      appointments: true,
+      availability: true,
+      holidays: false,
+      reminders: true
     },
-    conflict_resolution: {
-      strategy: 'prompt', // 'bdc_overrides', 'google_overrides', 'prompt'
-      auto_resolve_simple_conflicts: true,
-    },
-    sync_status: {
-      total_events_synced: 0,
-      last_sync_errors: [],
-      last_sync_success: true,
+    notification_settings: {
+      sync_success: true,
+      sync_errors: true,
+      conflicts: true,
+      email_notifications: false
     }
   });
-
-  // Fetch sync settings
+  const [googleCalendars, setGoogleCalendars] = useState([]);
+  const [syncHistory, setSyncHistory] = useState([]);
+  const [syncStats, setSyncStats] = useState({
+    total_synced: 0,
+    last_sync_appointments: 0,
+    last_sync_errors: 0,
+    next_sync_time: null
+  });
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   useEffect(() => {
-    const fetchSyncSettings = async () => {
-      try {
-        setIsLoading(true);
-        // In a real app, this would make an API call
-        const response = await api.get('/api/calendar/google-sync');
-        
-        if (response.data) {
-          setSyncSettings(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching Google Calendar sync settings:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load Google Calendar sync settings',
-          type: 'error',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
+    fetchAccountInfo();
     fetchSyncSettings();
-  }, [toast]);
-
-  // Connect to Google Calendar
-  const handleConnectGoogleCalendar = async () => {
+    fetchSyncHistory();
+    fetchSyncStats();
+  }, []);
+  const fetchAccountInfo = async () => {
+    setLoading(true);
     try {
-      setIsConnecting(true);
-      
-      // In a real app, this would initiate the OAuth flow
-      // For now, simulate a successful connection
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock successful connection with sample calendars
-      setSyncSettings(prev => ({
-        ...prev,
-        is_connected: true,
-        last_synced: new Date().toISOString(),
-        calendars: [
-          { id: 'primary', name: 'Primary Calendar', color: '#039BE5' },
-          { id: 'work', name: 'Work Calendar', color: '#33B679' },
-          { id: 'personal', name: 'Personal Calendar', color: '#8E24AA' },
-        ],
-        selected_calendars: ['primary'],
-      }));
-      
-      toast({
-        title: 'Success',
-        description: 'Connected to Google Calendar successfully',
-        type: 'success',
-      });
+      const response = await axios.get('/api/calendar/google/account');
+      setAccountInfo(response.data);
+      if (response.data.connected) {
+        fetchGoogleCalendars();
+      }
     } catch (error) {
-      console.error('Error connecting to Google Calendar:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to connect to Google Calendar',
-        type: 'error',
-      });
+      console.error('Hesap bilgileri alınamadı:', error);
     } finally {
-      setIsConnecting(false);
+      setLoading(false);
     }
   };
-
-  // Disconnect from Google Calendar
-  const handleDisconnectGoogleCalendar = async () => {
+  const fetchSyncSettings = async () => {
     try {
-      setIsConnecting(true);
-      
-      // In a real app, this would revoke access
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setSyncSettings(prev => ({
-        ...prev,
-        is_connected: false,
-        calendars: [],
-        selected_calendars: [],
-      }));
-      
-      toast({
-        title: 'Success',
-        description: 'Disconnected from Google Calendar',
-        type: 'success',
-      });
+      const response = await axios.get('/api/calendar/google/settings');
+      setSyncSettings(response.data);
     } catch (error) {
-      console.error('Error disconnecting from Google Calendar:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to disconnect from Google Calendar',
-        type: 'error',
-      });
-    } finally {
-      setIsConnecting(false);
+      console.error('Senkronizasyon ayarları alınamadı:', error);
     }
   };
-
-  // Toggle calendar selection
+  const fetchGoogleCalendars = async () => {
+    try {
+      const response = await axios.get('/api/calendar/google/calendars');
+      setGoogleCalendars(response.data);
+    } catch (error) {
+      console.error('Google takvimler alınamadı:', error);
+    }
+  };
+  const fetchSyncHistory = async () => {
+    try {
+      const response = await axios.get('/api/calendar/google/history');
+      setSyncHistory(response.data);
+    } catch (error) {
+      console.error('Senkronizasyon geçmişi alınamadı:', error);
+    }
+  };
+  const fetchSyncStats = async () => {
+    try {
+      const response = await axios.get('/api/calendar/google/stats');
+      setSyncStats(response.data);
+    } catch (error) {
+      console.error('Senkronizasyon istatistikleri alınamadı:', error);
+    }
+  };
+  const handleConnectGoogle = async () => {
+    try {
+      const response = await axios.get('/api/calendar/google/auth-url');
+      window.location.href = response.data.auth_url;
+    } catch (error) {
+      toast.error('Google bağlantısı başlatılamadı');
+    }
+  };
+  const handleDisconnectGoogle = async () => {
+    if (window.confirm('Google hesabı bağlantısını kesmek istediğinizden emin misiniz?')) {
+      try {
+        await axios.post('/api/calendar/google/disconnect');
+        setAccountInfo(null);
+        setGoogleCalendars([]);
+        setSyncSettings({ ...syncSettings, enabled: false });
+        toast.success('Google hesabı bağlantısı kesildi');
+      } catch (error) {
+        toast.error('Bağlantı kesilirken hata oluştu');
+      }
+    }
+  };
+  const handleSyncNow = async () => {
+    setSyncing(true);
+    try {
+      const response = await axios.post('/api/calendar/google/sync');
+      toast.success(`Senkronizasyon tamamlandı: ${response.data.synced_count} randevu senkronize edildi`);
+      fetchSyncHistory();
+      fetchSyncStats();
+    } catch (error) {
+      toast.error('Senkronizasyon sırasında hata oluştu');
+    } finally {
+      setSyncing(false);
+    }
+  };
+  const handleUpdateSettings = async () => {
+    try {
+      await axios.put('/api/calendar/google/settings', syncSettings);
+      toast.success('Ayarlar güncellendi');
+    } catch (error) {
+      toast.error('Ayarlar güncellenirken hata oluştu');
+    }
+  };
   const handleCalendarToggle = (calendarId) => {
-    setSyncSettings(prev => {
-      const isSelected = prev.selected_calendars.includes(calendarId);
-      
-      return {
-        ...prev,
-        selected_calendars: isSelected
-          ? prev.selected_calendars.filter(id => id !== calendarId)
-          : [...prev.selected_calendars, calendarId],
-      };
-    });
-  };
-
-  // Handle sync option changes
-  const handleSyncOptionChange = (option, value) => {
-    setSyncSettings(prev => ({
-      ...prev,
-      sync_options: {
-        ...prev.sync_options,
-        [option]: value,
-      },
-    }));
-  };
-
-  // Handle conflict resolution changes
-  const handleConflictResolutionChange = (option, value) => {
-    setSyncSettings(prev => ({
-      ...prev,
-      conflict_resolution: {
-        ...prev.conflict_resolution,
-        [option]: value,
-      },
-    }));
-  };
-
-  // Save sync settings
-  const handleSaveSettings = async () => {
-    try {
-      setIsSaving(true);
-      
-      // In a real app, this would make an API call
-      await api.put('/api/calendar/google-sync', syncSettings);
-      
-      toast({
-        title: 'Success',
-        description: 'Google Calendar sync settings saved successfully',
-        type: 'success',
-      });
-    } catch (error) {
-      console.error('Error saving Google Calendar sync settings:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to save Google Calendar sync settings',
-        type: 'error',
-      });
-    } finally {
-      setIsSaving(false);
+    const updated = [...syncSettings.selected_calendars];
+    const index = updated.indexOf(calendarId);
+    if (index > -1) {
+      updated.splice(index, 1);
+    } else {
+      updated.push(calendarId);
     }
+    setSyncSettings({ ...syncSettings, selected_calendars: updated });
   };
-
-  // Manually trigger sync
-  const handleManualSync = async () => {
-    try {
-      setIsRefreshingEvents(true);
-      
-      // In a real app, this would trigger a sync
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Update last synced time
-      setSyncSettings(prev => ({
-        ...prev,
-        last_synced: new Date().toISOString(),
-        sync_status: {
-          ...prev.sync_status,
-          total_events_synced: prev.sync_status.total_events_synced + 5,
-          last_sync_errors: [],
-          last_sync_success: true,
-        }
-      }));
-      
-      toast({
-        title: 'Success',
-        description: 'Calendar events synced successfully',
-        type: 'success',
-      });
-    } catch (error) {
-      console.error('Error syncing calendar events:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to sync calendar events',
-        type: 'error',
-      });
-      
-      // Update sync status with error
-      setSyncSettings(prev => ({
-        ...prev,
-        sync_status: {
-          ...prev.sync_status,
-          last_sync_errors: ['Network error while syncing events'],
-          last_sync_success: false,
-        }
-      }));
-    } finally {
-      setIsRefreshingEvents(false);
-    }
-  };
-
-  // Navigate to availability settings
-  const handleNavigateToAvailability = () => {
-    navigate('/calendar/availability');
-  };
-
-  // Render loading state
-  if (isLoading) {
+  const renderConnectionStatus = () => {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader className="w-10 h-10 text-primary animate-spin" />
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          <FaGoogle className="mr-2 text-blue-500" />
+          Google Hesap Bağlantısı
+        </h3>
+        {accountInfo?.connected ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">{accountInfo.email}</p>
+                <p className="text-sm text-gray-600">
+                  Bağlantı: {new Date(accountInfo.connected_at).toLocaleDateString('tr-TR')}
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="flex items-center text-green-600">
+                  <FaCheck className="mr-1" />
+                  Bağlı
+                </span>
+                <button
+                  onClick={handleDisconnectGoogle}
+                  className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded"
+                >
+                  Bağlantıyı Kes
+                </button>
+              </div>
+            </div>
+            <div className="pt-4 border-t">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={syncSettings.enabled}
+                  onChange={(e) => setSyncSettings({ ...syncSettings, enabled: e.target.checked })}
+                  className="mr-2"
+                />
+                <span>Senkronizasyonu Etkinleştir</span>
+              </label>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <FaGoogle className="text-5xl text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600 mb-4">Google hesabınız bağlı değil</p>
+            <button
+              onClick={handleConnectGoogle}
+              className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+            >
+              Google ile Bağlan
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+  const renderSyncSettings = () => {
+    if (!accountInfo?.connected || !syncSettings.enabled) return null;
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          <FaSync className="mr-2" />
+          Senkronizasyon Ayarları
+        </h3>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Senkronizasyon Yönü</label>
+            <select
+              value={syncSettings.sync_direction}
+              onChange={(e) => setSyncSettings({ ...syncSettings, sync_direction: e.target.value })}
+              className="w-full px-3 py-2 border rounded"
+            >
+              <option value="to_google">Sadece Google'a</option>
+              <option value="from_google">Sadece Google'dan</option>
+              <option value="bidirectional">Çift Yönlü</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Çakışma Çözümü</label>
+            <select
+              value={syncSettings.conflict_resolution}
+              onChange={(e) => setSyncSettings({ ...syncSettings, conflict_resolution: e.target.value })}
+              className="w-full px-3 py-2 border rounded"
+            >
+              <option value="calendar_wins">Takvim Öncelikli</option>
+              <option value="google_wins">Google Öncelikli</option>
+              <option value="ask_each_time">Her Seferinde Sor</option>
+            </select>
+          </div>
+          <div>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={syncSettings.auto_sync}
+                onChange={(e) => setSyncSettings({ ...syncSettings, auto_sync: e.target.checked })}
+                className="mr-2"
+              />
+              <span>Otomatik Senkronizasyon</span>
+            </label>
+          </div>
+          {syncSettings.auto_sync && (
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Senkronizasyon Aralığı (dakika)
+              </label>
+              <input
+                type="number"
+                value={syncSettings.sync_interval}
+                onChange={(e) => setSyncSettings({ ...syncSettings, sync_interval: parseInt(e.target.value) })}
+                className="w-full px-3 py-2 border rounded"
+                min="5"
+                max="1440"
+              />
+            </div>
+          )}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Senkronizasyon Aralığı (gün)
+            </label>
+            <input
+              type="number"
+              value={syncSettings.sync_range_days}
+              onChange={(e) => setSyncSettings({ ...syncSettings, sync_range_days: parseInt(e.target.value) })}
+              className="w-full px-3 py-2 border rounded"
+              min="30"
+              max="730"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Veri Türleri</label>
+            <div className="space-y-2">
+              {Object.entries(syncSettings.sync_types).map(([type, enabled]) => (
+                <label key={type} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={enabled}
+                    onChange={(e) => setSyncSettings({
+                      ...syncSettings,
+                      sync_types: { ...syncSettings.sync_types, [type]: e.target.checked }
+                    })}
+                    className="mr-2"
+                  />
+                  <span>{type === 'appointments' ? 'Randevular' :
+                         type === 'availability' ? 'Uygunluk' :
+                         type === 'holidays' ? 'Tatiller' : 'Hatırlatıcılar'}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <button
+            onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+            className="text-blue-500 hover:text-blue-600 text-sm"
+          >
+            {showAdvancedSettings ? 'Gelişmiş Ayarları Gizle' : 'Gelişmiş Ayarları Göster'}
+          </button>
+          {showAdvancedSettings && (
+            <div className="space-y-4 pt-4 border-t">
+              <div>
+                <label className="block text-sm font-medium mb-2">Bildirim Ayarları</label>
+                <div className="space-y-2">
+                  {Object.entries(syncSettings.notification_settings).map(([setting, enabled]) => (
+                    <label key={setting} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={enabled}
+                        onChange={(e) => setSyncSettings({
+                          ...syncSettings,
+                          notification_settings: {
+                            ...syncSettings.notification_settings,
+                            [setting]: e.target.checked
+                          }
+                        })}
+                        className="mr-2"
+                      />
+                      <span>
+                        {setting === 'sync_success' ? 'Başarılı Senkronizasyonlar' :
+                         setting === 'sync_errors' ? 'Senkronizasyon Hataları' :
+                         setting === 'conflicts' ? 'Çakışmalar' : 'E-posta Bildirimleri'}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          <div className="flex justify-end space-x-2 pt-4">
+            <button
+              onClick={handleUpdateSettings}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
+              Ayarları Kaydet
+            </button>
+            <button
+              onClick={handleSyncNow}
+              disabled={syncing}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+            >
+              {syncing ? 'Senkronize Ediliyor...' : 'Şimdi Senkronize Et'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  const renderCalendarSelection = () => {
+    if (!accountInfo?.connected || !syncSettings.enabled || googleCalendars.length === 0) return null;
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          <FaCalendarAlt className="mr-2" />
+          Google Takvimler
+        </h3>
+        <div className="space-y-3">
+          {googleCalendars.map((calendar) => (
+            <div key={calendar.id} className="flex items-center justify-between p-3 border rounded">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={syncSettings.selected_calendars.includes(calendar.id)}
+                  onChange={() => handleCalendarToggle(calendar.id)}
+                  className="mr-3"
+                />
+                <div>
+                  <p className="font-medium">{calendar.name}</p>
+                  {calendar.description && (
+                    <p className="text-sm text-gray-600">{calendar.description}</p>
+                  )}
+                </div>
+              </div>
+              <div
+                className="w-4 h-4 rounded"
+                style={{ backgroundColor: calendar.color }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+  const renderSyncStats = () => {
+    if (!accountInfo?.connected || !syncSettings.enabled) return null;
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          <FaChartBar className="mr-2" />
+          Senkronizasyon İstatistikleri
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="text-center p-4 bg-blue-50 rounded">
+            <p className="text-2xl font-bold text-blue-600">{syncStats.total_synced}</p>
+            <p className="text-sm text-gray-600">Toplam Senkronize</p>
+          </div>
+          <div className="text-center p-4 bg-green-50 rounded">
+            <p className="text-2xl font-bold text-green-600">{syncStats.last_sync_appointments}</p>
+            <p className="text-sm text-gray-600">Son Senkronizasyon</p>
+          </div>
+          <div className="text-center p-4 bg-red-50 rounded">
+            <p className="text-2xl font-bold text-red-600">{syncStats.last_sync_errors}</p>
+            <p className="text-sm text-gray-600">Hata Sayısı</p>
+          </div>
+          <div className="text-center p-4 bg-purple-50 rounded">
+            <p className="text-2xl font-bold text-purple-600">
+              {syncStats.next_sync_time ? new Date(syncStats.next_sync_time).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '-'}
+            </p>
+            <p className="text-sm text-gray-600">Sonraki Senkronizasyon</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  const renderSyncHistory = () => {
+    if (!accountInfo?.connected || !syncSettings.enabled || syncHistory.length === 0) return null;
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          <FaClock className="mr-2" />
+          Senkronizasyon Geçmişi
+        </h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tarih/Saat
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Durum
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Senkronize
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Hata
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Süre
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {syncHistory.map((sync) => (
+                <tr key={sync.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {new Date(sync.sync_time).toLocaleString('tr-TR')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {sync.status === 'success' ? (
+                      <span className="flex items-center text-green-600">
+                        <FaCheck className="mr-1" />
+                        Başarılı
+                      </span>
+                    ) : (
+                      <span className="flex items-center text-red-600">
+                        <FaTimes className="mr-1" />
+                        Hatalı
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {sync.synced_count}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {sync.error_count}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {sync.duration}s
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
+        </div>
       </div>
     );
   }
-
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Google Calendar Synchronization</h1>
-        
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            onClick={handleNavigateToAvailability}
-            className="flex items-center"
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-6">
+          <button
+            onClick={() => navigate('/calendar')}
+            className="text-gray-600 hover:text-gray-800 mb-4"
           >
-            <Settings className="w-4 h-4 mr-2" />
-            Availability Settings
-          </Button>
-          
-          <Button
-            onClick={handleSaveSettings}
-            disabled={isSaving}
-            className="flex items-center"
-          >
-            {isSaving ? (
-              <>
-                <Loader className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Save Settings
-              </>
-            )}
-          </Button>
+            ← Takvime Geri Dön
+          </button>
+          <h1 className="text-2xl font-bold">Google Takvim Senkronizasyonu</h1>
+          <p className="text-gray-600">Google Takvim ile otomatik senkronizasyon ayarlarını yönetin</p>
         </div>
+        {renderConnectionStatus()}
+        {renderSyncSettings()}
+        {renderCalendarSelection()}
+        {renderSyncStats()}
+        {renderSyncHistory()}
       </div>
-      
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="mb-6"
-      >
-        <Tabs.TabsList>
-          <Tabs.TabTrigger value="connection">
-            <Link className="w-4 h-4 mr-2" />
-            Connection
-          </Tabs.TabTrigger>
-          <Tabs.TabTrigger value="calendars" disabled={!syncSettings.is_connected}>
-            <Calendar className="w-4 h-4 mr-2" />
-            Calendars
-          </Tabs.TabTrigger>
-          <Tabs.TabTrigger value="sync-options" disabled={!syncSettings.is_connected}>
-            <Settings className="w-4 h-4 mr-2" />
-            Sync Options
-          </Tabs.TabTrigger>
-          <Tabs.TabTrigger value="conflicts" disabled={!syncSettings.is_connected}>
-            <AlertTriangle className="w-4 h-4 mr-2" />
-            Conflict Resolution
-          </Tabs.TabTrigger>
-        </Tabs.TabsList>
-        
-        {/* Connection Tab */}
-        <Tabs.TabContent value="connection">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="p-6">
-              <h2 className="text-lg font-medium mb-4">Google Calendar Connection</h2>
-              
-              {syncSettings.is_connected ? (
-                <div className="space-y-6">
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <div className="flex">
-                      <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                      <h3 className="text-sm font-medium text-green-800">Connected to Google Calendar</h3>
-                    </div>
-                    <p className="mt-2 text-sm text-green-700">
-                      Your BDC account is connected to Google Calendar. You can manage which calendars to sync and sync settings.
-                    </p>
-                    <div className="mt-2 text-sm text-green-700">
-                      {syncSettings.last_synced && (
-                        <div className="flex items-center mt-1">
-                          <RefreshCw className="h-4 w-4 mr-1" />
-                          <span>
-                            Last synced: {new Date(syncSettings.last_synced).toLocaleString()}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <Button
-                      variant="outline" 
-                      onClick={handleManualSync}
-                      disabled={isRefreshingEvents}
-                      className="w-full flex items-center justify-center"
-                    >
-                      {isRefreshingEvents ? (
-                        <>
-                          <Loader className="w-4 h-4 mr-2 animate-spin" />
-                          Syncing...
-                        </>
-                      ) : (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-2" />
-                          Sync Now
-                        </>
-                      )}
-                    </Button>
-                    
-                    <Button
-                      variant="destructive" 
-                      onClick={handleDisconnectGoogleCalendar}
-                      disabled={isConnecting}
-                      className="w-full flex items-center justify-center"
-                    >
-                      {isConnecting ? (
-                        <>
-                          <Loader className="w-4 h-4 mr-2 animate-spin" />
-                          Disconnecting...
-                        </>
-                      ) : (
-                        <>
-                          <Trash className="w-4 h-4 mr-2" />
-                          Disconnect from Google Calendar
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <div className="flex">
-                      <Info className="h-5 w-5 text-blue-500 mr-2" />
-                      <h3 className="text-sm font-medium text-blue-800">Connect to Google Calendar</h3>
-                    </div>
-                    <p className="mt-2 text-sm text-blue-700">
-                      Connecting to Google Calendar allows you to sync your BDC appointments with your Google Calendar, and vice versa.
-                    </p>
-                  </div>
-                  
-                  <Button
-                    onClick={handleConnectGoogleCalendar}
-                    disabled={isConnecting}
-                    className="w-full flex items-center justify-center"
-                  >
-                    {isConnecting ? (
-                      <>
-                        <Loader className="w-4 h-4 mr-2 animate-spin" />
-                        Connecting...
-                      </>
-                    ) : (
-                      <>
-                        <Calendar className="w-4 h-4 mr-2" />
-                        Connect to Google Calendar
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </Card>
-            
-            <Card className="p-6">
-              <h2 className="text-lg font-medium mb-4">Benefits of Google Calendar Sync</h2>
-              
-              <ul className="space-y-4">
-                <li className="flex">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    <span className="font-medium">Avoid Double Bookings:</span> Automatically block times in BDC when you have Google Calendar events.
-                  </span>
-                </li>
-                <li className="flex">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    <span className="font-medium">See All Appointments:</span> View BDC appointments directly in your Google Calendar.
-                  </span>
-                </li>
-                <li className="flex">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    <span className="font-medium">Two-Way Sync:</span> Changes made in either system are reflected in both.
-                  </span>
-                </li>
-                <li className="flex">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    <span className="font-medium">Auto-Sync:</span> Set automatic sync frequency based on your needs.
-                  </span>
-                </li>
-                <li className="flex">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700">
-                    <span className="font-medium">Conflict Handling:</span> Define how to handle conflicting appointments.
-                  </span>
-                </li>
-              </ul>
-              
-              <div className="mt-6 flex items-center bg-gray-50 p-4 rounded-lg">
-                <Lock className="w-5 h-5 text-gray-500 mr-2 flex-shrink-0" />
-                <p className="text-sm text-gray-600">
-                  BDC only requests calendar access necessary for syncing appointments. We never read the content of your events or share your calendar data with third parties.
-                </p>
-              </div>
-            </Card>
-          </div>
-          
-          {syncSettings.is_connected && syncSettings.sync_status.last_sync_errors.length > 0 && (
-            <Card className="p-6 mt-6 border-orange-300">
-              <h2 className="text-lg font-medium mb-4 flex items-center">
-                <AlertTriangle className="w-5 h-5 text-orange-500 mr-2" />
-                Sync Issues
-              </h2>
-              
-              <ul className="space-y-2 text-sm">
-                {syncSettings.sync_status.last_sync_errors.map((error, index) => (
-                  <li key={index} className="flex items-start">
-                    <div className="h-5 w-5 text-orange-500 mr-2">•</div>
-                    <span>{error}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleManualSync}
-                className="mt-4 flex items-center"
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Retry Sync
-              </Button>
-            </Card>
-          )}
-        </Tabs.TabContent>
-        
-        {/* Calendars Tab */}
-        <Tabs.TabContent value="calendars">
-          {syncSettings.is_connected && (
-            <Card className="p-6">
-              <h2 className="text-lg font-medium mb-4">Select Calendars to Sync</h2>
-              <p className="text-gray-600 mb-4">
-                Choose which Google Calendars you want to sync with BDC. Appointments from selected calendars will be considered when checking your availability.
-              </p>
-              
-              <div className="space-y-4 mt-6">
-                {syncSettings.calendars.map(calendar => (
-                  <div 
-                    key={calendar.id} 
-                    className={`p-4 rounded-lg border ${
-                      syncSettings.selected_calendars.includes(calendar.id)
-                        ? 'border-primary bg-primary-50'
-                        : 'border-gray-200'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div 
-                          className="w-4 h-4 rounded-full mr-3" 
-                          style={{ backgroundColor: calendar.color }}
-                        ></div>
-                        <span className="font-medium">{calendar.name}</span>
-                      </div>
-                      
-                      <div className="flex items-center">
-                        <button
-                          type="button"
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                            syncSettings.selected_calendars.includes(calendar.id)
-                              ? 'bg-primary'
-                              : 'bg-gray-200'
-                          }`}
-                          onClick={() => handleCalendarToggle(calendar.id)}
-                        >
-                          <span
-                            className={`${
-                              syncSettings.selected_calendars.includes(calendar.id)
-                                ? 'translate-x-6'
-                                : 'translate-x-1'
-                            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {syncSettings.calendars.length === 0 && (
-                <div className="bg-gray-50 p-6 rounded-lg text-center">
-                  <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-1">No Calendars Found</h3>
-                  <p className="text-gray-500 mb-4">
-                    We couldn't find any calendars in your Google account.
-                  </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleConnectGoogleCalendar}
-                  >
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Refresh Calendars
-                  </Button>
-                </div>
-              )}
-            </Card>
-          )}
-        </Tabs.TabContent>
-        
-        {/* Sync Options Tab */}
-        <Tabs.TabContent value="sync-options">
-          {syncSettings.is_connected && (
-            <Card className="p-6">
-              <h2 className="text-lg font-medium mb-4">Sync Options</h2>
-              <p className="text-gray-600 mb-6">
-                Customize how your calendars sync between BDC and Google Calendar.
-              </p>
-              
-              <div className="space-y-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <label htmlFor="two_way_sync" className="block text-sm font-medium text-gray-700 mb-1">
-                      Two-Way Sync
-                    </label>
-                    <p className="text-xs text-gray-500">
-                      When enabled, changes made in either BDC or Google Calendar will sync to the other.
-                      When disabled, only Google Calendar events will sync to BDC.
-                    </p>
-                  </div>
-                  <div className="ml-4">
-                    <button
-                      id="two_way_sync"
-                      type="button"
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                        syncSettings.sync_options.two_way_sync
-                          ? 'bg-primary'
-                          : 'bg-gray-200'
-                      }`}
-                      onClick={() => handleSyncOptionChange('two_way_sync', !syncSettings.sync_options.two_way_sync)}
-                    >
-                      <span
-                        className={`${
-                          syncSettings.sync_options.two_way_sync
-                            ? 'translate-x-6'
-                            : 'translate-x-1'
-                        } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                      />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="flex items-start justify-between">
-                  <div>
-                    <label htmlFor="avoid_conflicts" className="block text-sm font-medium text-gray-700 mb-1">
-                      Avoid Double Bookings
-                    </label>
-                    <p className="text-xs text-gray-500">
-                      When enabled, BDC will check for conflicts with Google Calendar events before allowing appointments.
-                    </p>
-                  </div>
-                  <div className="ml-4">
-                    <button
-                      id="avoid_conflicts"
-                      type="button"
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                        syncSettings.sync_options.avoid_conflicts
-                          ? 'bg-primary'
-                          : 'bg-gray-200'
-                      }`}
-                      onClick={() => handleSyncOptionChange('avoid_conflicts', !syncSettings.sync_options.avoid_conflicts)}
-                    >
-                      <span
-                        className={`${
-                          syncSettings.sync_options.avoid_conflicts
-                            ? 'translate-x-6'
-                            : 'translate-x-1'
-                        } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                      />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="flex items-start justify-between">
-                  <div>
-                    <label htmlFor="sync_past_events" className="block text-sm font-medium text-gray-700 mb-1">
-                      Sync Past Events
-                    </label>
-                    <p className="text-xs text-gray-500">
-                      When enabled, past events will also be synced between calendars.
-                    </p>
-                  </div>
-                  <div className="ml-4">
-                    <button
-                      id="sync_past_events"
-                      type="button"
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                        syncSettings.sync_options.sync_past_events
-                          ? 'bg-primary'
-                          : 'bg-gray-200'
-                      }`}
-                      onClick={() => handleSyncOptionChange('sync_past_events', !syncSettings.sync_options.sync_past_events)}
-                    >
-                      <span
-                        className={`${
-                          syncSettings.sync_options.sync_past_events
-                            ? 'translate-x-6'
-                            : 'translate-x-1'
-                        } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                      />
-                    </button>
-                  </div>
-                </div>
-                
-                {syncSettings.sync_options.sync_past_events && (
-                  <div>
-                    <label htmlFor="days_to_sync_in_past" className="block text-sm font-medium text-gray-700 mb-1">
-                      Days to Sync in Past
-                    </label>
-                    <select
-                      id="days_to_sync_in_past"
-                      value={syncSettings.sync_options.days_to_sync_in_past}
-                      onChange={(e) => handleSyncOptionChange('days_to_sync_in_past', parseInt(e.target.value))}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                    >
-                      <option value={7}>7 days</option>
-                      <option value={14}>14 days</option>
-                      <option value={30}>30 days</option>
-                      <option value={60}>60 days</option>
-                      <option value={90}>90 days</option>
-                    </select>
-                  </div>
-                )}
-                
-                <div>
-                  <label htmlFor="days_to_sync_in_future" className="block text-sm font-medium text-gray-700 mb-1">
-                    Days to Sync in Future
-                  </label>
-                  <select
-                    id="days_to_sync_in_future"
-                    value={syncSettings.sync_options.days_to_sync_in_future}
-                    onChange={(e) => handleSyncOptionChange('days_to_sync_in_future', parseInt(e.target.value))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                  >
-                    <option value={30}>30 days</option>
-                    <option value={60}>60 days</option>
-                    <option value={90}>90 days</option>
-                    <option value={180}>180 days</option>
-                    <option value={365}>365 days</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label htmlFor="auto_sync_frequency" className="block text-sm font-medium text-gray-700 mb-1">
-                    Auto-Sync Frequency
-                  </label>
-                  <select
-                    id="auto_sync_frequency"
-                    value={syncSettings.sync_options.auto_sync_frequency}
-                    onChange={(e) => handleSyncOptionChange('auto_sync_frequency', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                  >
-                    <option value="manual">Manual only</option>
-                    <option value="hourly">Every hour</option>
-                    <option value="daily">Once a day</option>
-                  </select>
-                </div>
-              </div>
-            </Card>
-          )}
-        </Tabs.TabContent>
-        
-        {/* Conflict Resolution Tab */}
-        <Tabs.TabContent value="conflicts">
-          {syncSettings.is_connected && (
-            <Card className="p-6">
-              <h2 className="text-lg font-medium mb-4">Conflict Resolution</h2>
-              <p className="text-gray-600 mb-6">
-                Configure how to handle conflicting appointments between BDC and Google Calendar.
-              </p>
-              
-              <div className="space-y-6">
-                <div>
-                  <label htmlFor="conflict_strategy" className="block text-sm font-medium text-gray-700 mb-1">
-                    Conflict Resolution Strategy
-                  </label>
-                  <select
-                    id="conflict_strategy"
-                    value={syncSettings.conflict_resolution.strategy}
-                    onChange={(e) => handleConflictResolutionChange('strategy', e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                  >
-                    <option value="prompt">Prompt me to resolve conflicts</option>
-                    <option value="bdc_overrides">BDC appointments take priority</option>
-                    <option value="google_overrides">Google Calendar events take priority</option>
-                  </select>
-                </div>
-                
-                <div className="flex items-start justify-between">
-                  <div>
-                    <label htmlFor="auto_resolve_simple_conflicts" className="block text-sm font-medium text-gray-700 mb-1">
-                      Auto-Resolve Simple Conflicts
-                    </label>
-                    <p className="text-xs text-gray-500">
-                      When enabled, simple conflicts (like identical events with different titles) will be automatically resolved using your strategy.
-                    </p>
-                  </div>
-                  <div className="ml-4">
-                    <button
-                      id="auto_resolve_simple_conflicts"
-                      type="button"
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                        syncSettings.conflict_resolution.auto_resolve_simple_conflicts
-                          ? 'bg-primary'
-                          : 'bg-gray-200'
-                      }`}
-                      onClick={() => handleConflictResolutionChange('auto_resolve_simple_conflicts', !syncSettings.conflict_resolution.auto_resolve_simple_conflicts)}
-                    >
-                      <span
-                        className={`${
-                          syncSettings.conflict_resolution.auto_resolve_simple_conflicts
-                            ? 'translate-x-6'
-                            : 'translate-x-1'
-                        } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                      />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-6 bg-blue-50 p-4 rounded-lg">
-                <div className="flex">
-                  <Info className="h-5 w-5 text-blue-500 mr-2" />
-                  <h3 className="text-sm font-medium text-blue-800">What is a conflict?</h3>
-                </div>
-                <p className="mt-2 text-sm text-blue-700">
-                  A conflict occurs when appointments in BDC overlap with events in Google Calendar, or when an event is updated in both systems with different information.
-                </p>
-              </div>
-              
-              <div className="mt-6">
-                <h3 className="text-md font-medium mb-2">Example conflict scenarios:</h3>
-                <ul className="space-y-2 text-sm text-gray-700 list-disc pl-6">
-                  <li>You have a Google Calendar event at 10:00-11:00 AM, and someone tries to book a BDC appointment at the same time</li>
-                  <li>You modify an appointment's time in BDC, but someone also modifies the same event's time in Google Calendar</li>
-                  <li>You delete an event in Google Calendar that still exists in BDC</li>
-                </ul>
-              </div>
-            </Card>
-          )}
-        </Tabs.TabContent>
-      </Tabs>
     </div>
   );
 };
-
-export default GoogleCalendarSyncPage;
+export default GoogleCalendarSyncPageV2;

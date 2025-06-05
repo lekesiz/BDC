@@ -15,7 +15,6 @@ import {
   ChevronDown,
   AlignJustify
 } from 'lucide-react';
-
 /**
  * Header component for the dashboard layout
  */
@@ -25,21 +24,17 @@ const Header = ({ onToggleSidebar }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
   const toggleUserMenu = () => {
     setUserMenuOpen(!userMenuOpen);
     if (notificationsOpen) setNotificationsOpen(false);
   };
-  
   const toggleNotifications = () => {
     setNotificationsOpen(!notificationsOpen);
     if (userMenuOpen) setUserMenuOpen(false);
   };
-  
   const handleLogout = () => {
     logout();
   };
-  
   // Handle escape key for dropdown menus
   useEffect(() => {
     const handleEscape = (e) => {
@@ -49,7 +44,6 @@ const Header = ({ onToggleSidebar }) => {
         if (mobileMenuOpen) setMobileMenuOpen(false);
       }
     };
-    
     const handleClickOutside = (e) => {
       if (userMenuOpen || notificationsOpen) {
         const isClickInsideMenu = e.target.closest('[data-dropdown-menu]');
@@ -59,7 +53,6 @@ const Header = ({ onToggleSidebar }) => {
         }
       }
     };
-    
     if (userMenuOpen || notificationsOpen || mobileMenuOpen) {
       document.addEventListener('keydown', handleEscape);
       document.addEventListener('click', handleClickOutside);
@@ -69,7 +62,6 @@ const Header = ({ onToggleSidebar }) => {
       };
     }
   }, [userMenuOpen, notificationsOpen, mobileMenuOpen]);
-  
   return (
     <header 
       className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-10 transition-colors"
@@ -87,7 +79,6 @@ const Header = ({ onToggleSidebar }) => {
             >
               <AlignJustify className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
             </button>
-            
             {/* Logo for mobile */}
             <div className="ml-2 sm:ml-4 lg:hidden">
               <Link 
@@ -99,20 +90,16 @@ const Header = ({ onToggleSidebar }) => {
               </Link>
             </div>
           </div>
-          
           {/* Right section */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Language selector - hide on small mobile */}
             <div className="hidden xs:block">
               <LanguageSelector />
             </div>
-            
             {/* Theme toggle */}
             <ThemeToggle />
-            
             {/* Real-time notifications */}
             <RealTimeNotifications />
-            
             {/* User dropdown */}
             <div className="relative" data-dropdown-menu>
               <button
@@ -130,7 +117,6 @@ const Header = ({ onToggleSidebar }) => {
                 </span>
                 <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 dark:text-gray-400 hidden sm:block" aria-hidden="true" />
               </button>
-              
               {userMenuOpen && (
                 <div 
                   className="absolute right-0 mt-2 w-56 sm:w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1 z-50"
@@ -182,5 +168,4 @@ const Header = ({ onToggleSidebar }) => {
     </header>
   );
 };
-
 export default Header;

@@ -10,6 +10,8 @@ from app.schemas import UserSchema, UserCreateSchema, UserUpdateSchema, UserProf
 from app.models import User
 from app.middleware.request_context import admin_required, role_required
 
+from app.utils.logging import logger
+
 
 users_bp = Blueprint('users', __name__)
 

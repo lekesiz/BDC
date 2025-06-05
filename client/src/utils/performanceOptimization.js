@@ -1,5 +1,4 @@
 // Performance optimization utilities
-
 /**
  * Debounce function to limit function calls
  */
@@ -10,7 +9,6 @@ export const debounce = (func, delay) => {
     timeoutId = setTimeout(() => func.apply(this, args), delay);
   };
 };
-
 /**
  * Throttle function to limit function calls
  */
@@ -24,7 +22,6 @@ export const throttle = (func, limit) => {
     }
   };
 };
-
 /**
  * Request Idle Callback polyfill
  */
@@ -39,7 +36,6 @@ export const requestIdleCallback =
       });
     }, 1);
   };
-
 /**
  * Cancel Idle Callback polyfill
  */
@@ -48,7 +44,6 @@ export const cancelIdleCallback =
   function (id) {
     clearTimeout(id);
   };
-
 /**
  * Defer non-critical work
  */
@@ -60,7 +55,6 @@ export const deferWork = (work) => {
     });
   });
 };
-
 /**
  * Batch DOM updates
  */
@@ -72,7 +66,6 @@ export const batchDOMUpdates = (updates) => {
     });
   });
 };
-
 /**
  * Preload critical resources
  */
@@ -84,13 +77,11 @@ export const preloadResource = (href, as, type) => {
   if (type) link.type = type;
   document.head.appendChild(link);
 };
-
 /**
  * Lazy load images with Intersection Observer
  */
 export const lazyLoadImages = (selector = 'img[data-lazy]') => {
   const images = document.querySelectorAll(selector);
-  
   if ('IntersectionObserver' in window) {
     const imageObserver = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
@@ -105,7 +96,6 @@ export const lazyLoadImages = (selector = 'img[data-lazy]') => {
       rootMargin: '50px 0px',
       threshold: 0.01
     });
-    
     images.forEach(img => imageObserver.observe(img));
   } else {
     // Fallback for browsers without IntersectionObserver
@@ -115,7 +105,6 @@ export const lazyLoadImages = (selector = 'img[data-lazy]') => {
     });
   }
 };
-
 /**
  * Measure performance of a function
  */
@@ -123,32 +112,24 @@ export const measurePerformance = async (name, fn) => {
   const startMark = `${name}-start`;
   const endMark = `${name}-end`;
   const measureName = `${name}-duration`;
-  
   performance.mark(startMark);
-  
   try {
     const result = await fn();
-    
     performance.mark(endMark);
     performance.measure(measureName, startMark, endMark);
-    
     const measure = performance.getEntriesByName(measureName)[0];
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`${name} took ${measure.duration.toFixed(2)}ms`);
+    if (process.env.NODE_ENV === 'development') {}ms`);
     }
-    
     // Clean up
     performance.clearMarks(startMark);
     performance.clearMarks(endMark);
     performance.clearMeasures(measureName);
-    
     return result;
   } catch (error) {
     performance.clearMarks(startMark);
     throw error;
   }
 };
-
 /**
  * Web Vitals monitoring
  */
@@ -163,7 +144,6 @@ export const reportWebVitals = (onPerfEntry) => {
     });
   }
 };
-
 /**
  * Memory usage monitoring
  */
@@ -177,7 +157,6 @@ export const getMemoryUsage = () => {
   }
   return null;
 };
-
 /**
  * FPS monitoring
  */
@@ -189,34 +168,27 @@ export class FPSMonitor {
     this.lastTime = performance.now();
     this.running = false;
   }
-
   start() {
     if (this.running) return;
     this.running = true;
     this.measure();
   }
-
   stop() {
     this.running = false;
   }
-
   measure = () => {
     if (!this.running) return;
-
     const currentTime = performance.now();
     this.frames++;
-
     if (currentTime >= this.lastTime + 1000) {
       this.fps = Math.round((this.frames * 1000) / (currentTime - this.lastTime));
       this.callback(this.fps);
       this.frames = 0;
       this.lastTime = currentTime;
     }
-
     requestAnimationFrame(this.measure);
   };
 }
-
 /**
  * Prefetch navigation routes
  */
@@ -228,13 +200,11 @@ export const prefetchRoute = (path) => {
     document.head.appendChild(link);
   }
 };
-
 /**
  * Network connection monitoring
  */
 export const getConnectionInfo = () => {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  
   if (connection) {
     return {
       effectiveType: connection.effectiveType,
@@ -243,28 +213,21 @@ export const getConnectionInfo = () => {
       saveData: connection.saveData,
     };
   }
-  
   return null;
 };
-
 /**
  * Adaptive loading based on network and device
  */
 export const shouldReduceMotion = () => {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 };
-
 export const shouldLoadHighQuality = () => {
   const connection = getConnectionInfo();
-  
   if (!connection) return true; // Default to high quality if unknown
-  
   // Check for save data mode
   if (connection.saveData) return false;
-  
   // Check connection quality
   const slowConnections = ['slow-2g', '2g'];
   if (slowConnections.includes(connection.effectiveType)) return false;
-  
   return true;
 };

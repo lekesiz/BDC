@@ -33,14 +33,62 @@ class PerformanceMonitor:
 performance_monitor = PerformanceMonitor()
 
 class DatabaseIndexingStrategy:
-    """Database indexing strategy implementation"""
+    """Enhanced database indexing strategy implementation"""
     
     def __init__(self):
         self.index_stats = {
             'indexes_created': 0,
             'indexes_analyzed': 0,
             'indexes_dropped': 0,
-            'query_improvements': []
+            'query_improvements': [],
+            'composite_indexes_created': 0,
+            'partial_indexes_created': 0,
+            'covering_indexes_created': 0
+        }
+        
+        # Critical indexes for BDC application
+        self.critical_indexes = {
+            'users': [
+                {'columns': ['email'], 'unique': True, 'reason': 'Login lookups'},
+                {'columns': ['role', 'is_active'], 'reason': 'Role-based filtering'},
+                {'columns': ['tenant_id', 'role'], 'reason': 'Tenant user queries'},
+                {'columns': ['created_at'], 'reason': 'Chronological queries'},
+                {'columns': ['last_login'], 'reason': 'Activity tracking'}
+            ],
+            'beneficiaries': [
+                {'columns': ['user_id'], 'unique': True, 'reason': 'User-beneficiary mapping'},
+                {'columns': ['trainer_id'], 'reason': 'Trainer assignment queries'},
+                {'columns': ['tenant_id', 'status'], 'reason': 'Tenant beneficiary filtering'},
+                {'columns': ['status', 'created_at'], 'reason': 'Status timeline queries'},
+                {'columns': ['birth_date'], 'reason': 'Age-based filtering'}
+            ],
+            'appointments': [
+                {'columns': ['beneficiary_id', 'start_time'], 'reason': 'Beneficiary schedule'},
+                {'columns': ['trainer_id', 'start_time'], 'reason': 'Trainer schedule'},
+                {'columns': ['status', 'start_time'], 'reason': 'Status-based scheduling'},
+                {'columns': ['start_time', 'end_time'], 'reason': 'Time range queries'},
+                {'columns': ['series_id'], 'reason': 'Recurring appointments'}
+            ],
+            'evaluations': [
+                {'columns': ['beneficiary_id', 'created_at'], 'reason': 'Beneficiary evaluation history'},
+                {'columns': ['status'], 'reason': 'Status filtering'},
+                {'columns': ['assessment_type', 'created_at'], 'reason': 'Type-based queries'}
+            ],
+            'programs': [
+                {'columns': ['status'], 'reason': 'Program status filtering'},
+                {'columns': ['created_by', 'created_at'], 'reason': 'Creator queries'},
+                {'columns': ['start_date', 'end_date'], 'reason': 'Date range filtering'}
+            ],
+            'documents': [
+                {'columns': ['beneficiary_id', 'created_at'], 'reason': 'Document timeline'},
+                {'columns': ['created_by', 'created_at'], 'reason': 'Creator history'},
+                {'columns': ['file_type'], 'reason': 'Type filtering'}
+            ],
+            'notifications': [
+                {'columns': ['user_id', 'is_read'], 'reason': 'User notification queries'},
+                {'columns': ['created_at'], 'reason': 'Chronological sorting'},
+                {'columns': ['notification_type'], 'reason': 'Type filtering'}
+            ]
         }
         
     def analyze_and_create_indexes(self, db: Session, models: List[type] = None):

@@ -1,17 +1,14 @@
 /**
  * Lazy loading utilities for React applications
  */
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Skeleton, Box } from '@mui/material';
-
 /**
  * Intersection Observer hook for lazy loading
  */
 export const useIntersectionObserver = (options = {}) => {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const targetRef = useRef(null);
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -26,23 +23,18 @@ export const useIntersectionObserver = (options = {}) => {
         ...options
       }
     );
-
     const currentTarget = targetRef.current;
-
     if (currentTarget) {
       observer.observe(currentTarget);
     }
-
     return () => {
       if (currentTarget) {
         observer.unobserve(currentTarget);
       }
     };
   }, [options]);
-
   return [targetRef, isIntersecting];
 };
-
 /**
  * Lazy image component
  */
@@ -61,25 +53,20 @@ export const LazyImage = ({
   const [targetRef, isIntersecting] = useIntersectionObserver();
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-
   useEffect(() => {
     if (isIntersecting && src) {
       const img = new Image();
-      
       img.onload = () => {
         setIsLoaded(true);
         onLoad && onLoad();
       };
-      
       img.onerror = () => {
         setHasError(true);
         onError && onError();
       };
-      
       img.src = src;
     }
   }, [isIntersecting, src, onLoad, onError]);
-
   return (
     <div
       ref={targetRef}
@@ -101,7 +88,6 @@ export const LazyImage = ({
           />
         )
       )}
-      
       {isLoaded && (
         <img
           src={src}
@@ -114,7 +100,6 @@ export const LazyImage = ({
           {...props}
         />
       )}
-      
       {hasError && (
         <Box
           display="flex"
@@ -131,7 +116,6 @@ export const LazyImage = ({
     </div>
   );
 };
-
 /**
  * Lazy component wrapper
  */
@@ -146,7 +130,6 @@ export const LazyComponent = ({
     threshold,
     rootMargin
   });
-
   return (
     <div ref={targetRef}>
       {isIntersecting ? (
@@ -157,7 +140,6 @@ export const LazyComponent = ({
     </div>
   );
 };
-
 /**
  * Lazy list component for virtual scrolling
  */
@@ -172,36 +154,29 @@ export const LazyList = ({
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 10 });
   const containerRef = useRef(null);
   const scrollTimeoutRef = useRef(null);
-
   useEffect(() => {
     const handleScroll = () => {
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
-
       scrollTimeoutRef.current = setTimeout(() => {
         if (!containerRef.current) return;
-
         const container = containerRef.current;
         const scrollTop = container.scrollTop;
         const containerHeight = container.clientHeight;
-
         const start = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
         const end = Math.min(
           items.length,
           Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
         );
-
         setVisibleRange({ start, end });
       }, 10);
     };
-
     const container = containerRef.current;
     if (container) {
       container.addEventListener('scroll', handleScroll);
       handleScroll(); // Initial calculation
     }
-
     return () => {
       if (container) {
         container.removeEventListener('scroll', handleScroll);
@@ -211,10 +186,8 @@ export const LazyList = ({
       }
     };
   }, [items.length, itemHeight, overscan]);
-
   const totalHeight = items.length * itemHeight;
   const offsetY = visibleRange.start * itemHeight;
-
   return (
     <div
       ref={containerRef}
@@ -248,7 +221,6 @@ export const LazyList = ({
     </div>
   );
 };
-
 /**
  * Progressive image loading
  */
@@ -264,20 +236,16 @@ export const ProgressiveImage = ({
   const [currentSrc, setCurrentSrc] = useState(placeholder);
   const [isLoading, setIsLoading] = useState(true);
   const [targetRef, isIntersecting] = useIntersectionObserver();
-
   useEffect(() => {
     if (isIntersecting && src) {
       const img = new Image();
-      
       img.onload = () => {
         setCurrentSrc(src);
         setIsLoading(false);
       };
-      
       img.src = src;
     }
   }, [isIntersecting, src]);
-
   return (
     <div
       ref={targetRef}
@@ -304,7 +272,6 @@ export const ProgressiveImage = ({
     </div>
   );
 };
-
 /**
  * Lazy load content based on scroll
  */
@@ -317,17 +284,13 @@ export const LazyContent = ({
   const [isVisible, setIsVisible] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
   const contentRef = useRef(null);
-
   useEffect(() => {
     if (hasLoaded && once) return;
-
     const handleScroll = () => {
       if (!contentRef.current) return;
-
       const rect = contentRef.current.getBoundingClientRect();
       const isInViewport = rect.top <= window.innerHeight + offset &&
                           rect.bottom >= -offset;
-
       if (isInViewport) {
         setIsVisible(true);
         if (once) {
@@ -338,22 +301,18 @@ export const LazyContent = ({
         setIsVisible(false);
       }
     };
-
     handleScroll(); // Check initial position
     window.addEventListener('scroll', handleScroll);
-
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [offset, once, hasLoaded]);
-
   return (
     <div ref={contentRef}>
       {isVisible ? children : fallback}
     </div>
   );
 };
-
 /**
  * Lazy iframe component
  */
@@ -368,7 +327,6 @@ export const LazyIframe = ({
 }) => {
   const [targetRef, isIntersecting] = useIntersectionObserver();
   const [isLoaded, setIsLoaded] = useState(false);
-
   return (
     <div
       ref={targetRef}
@@ -388,7 +346,6 @@ export const LazyIframe = ({
           animation="wave"
         />
       )}
-      
       {isIntersecting && (
         <iframe
           src={src}
@@ -406,7 +363,6 @@ export const LazyIframe = ({
     </div>
   );
 };
-
 /**
  * Lazy video component
  */
@@ -423,13 +379,11 @@ export const LazyVideo = ({
 }) => {
   const [targetRef, isIntersecting] = useIntersectionObserver();
   const videoRef = useRef(null);
-
   useEffect(() => {
     if (isIntersecting && autoPlay && videoRef.current) {
       videoRef.current.play();
     }
   }, [isIntersecting, autoPlay]);
-
   return (
     <div
       ref={targetRef}
@@ -462,7 +416,6 @@ export const LazyVideo = ({
     </div>
   );
 };
-
 /**
  * Lazy loading utilities
  */
@@ -482,7 +435,6 @@ export const lazyLoadingUtils = {
       })
     );
   },
-
   /**
    * Lazy load script
    */
@@ -490,18 +442,14 @@ export const lazyLoadingUtils = {
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = src;
-      
       if (options.async) script.async = true;
       if (options.defer) script.defer = true;
       if (options.crossOrigin) script.crossOrigin = options.crossOrigin;
-      
       script.onload = () => resolve(script);
       script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
-      
       document.head.appendChild(script);
     });
   },
-
   /**
    * Lazy load CSS
    */
@@ -510,17 +458,13 @@ export const lazyLoadingUtils = {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = href;
-      
       if (options.media) link.media = options.media;
       if (options.crossOrigin) link.crossOrigin = options.crossOrigin;
-      
       link.onload = () => resolve(link);
       link.onerror = () => reject(new Error(`Failed to load CSS: ${href}`));
-      
       document.head.appendChild(link);
     });
   },
-
   /**
    * Priority hints for resources
    */
@@ -530,14 +474,11 @@ export const lazyLoadingUtils = {
     link.href = resource.href;
     link.as = resource.as || 'script';
     link.importance = priority;
-    
     if (resource.type) link.type = resource.type;
     if (resource.crossOrigin) link.crossOrigin = resource.crossOrigin;
-    
     document.head.appendChild(link);
   }
 };
-
 /**
  * Performance monitoring for lazy loading
  */
@@ -549,7 +490,6 @@ export const lazyLoadingMonitor = {
     scriptsFailed: 0,
     totalLoadTime: 0
   },
-
   trackImageLoad: (success, loadTime) => {
     if (success) {
       lazyLoadingMonitor.metrics.imagesLoaded++;
@@ -558,7 +498,6 @@ export const lazyLoadingMonitor = {
     }
     lazyLoadingMonitor.metrics.totalLoadTime += loadTime;
   },
-
   trackScriptLoad: (success, loadTime) => {
     if (success) {
       lazyLoadingMonitor.metrics.scriptsLoaded++;
@@ -567,9 +506,7 @@ export const lazyLoadingMonitor = {
     }
     lazyLoadingMonitor.metrics.totalLoadTime += loadTime;
   },
-
   getMetrics: () => lazyLoadingMonitor.metrics,
-
   reset: () => {
     lazyLoadingMonitor.metrics = {
       imagesLoaded: 0,
@@ -580,7 +517,6 @@ export const lazyLoadingMonitor = {
     };
   }
 };
-
 export default {
   useIntersectionObserver,
   LazyImage,

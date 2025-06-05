@@ -4,7 +4,6 @@ import {
   ArrowLeft, Save, Calendar, Clock, AlertCircle
 } from 'lucide-react';
 import { format } from 'date-fns';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +22,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-
 /**
  * TrainerAssignedAssessmentEditPage allows trainers to edit assigned assessment settings
  */
@@ -34,7 +32,6 @@ const TrainerAssignedAssessmentEditPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
-  
   // State for assignment data
   const [originalAssignment, setOriginalAssignment] = useState(null);
   const [template, setTemplate] = useState(null);
@@ -43,7 +40,6 @@ const TrainerAssignedAssessmentEditPage = () => {
   const [dueDate, setDueDate] = useState(null);
   const [availableFrom, setAvailableFrom] = useState(null);
   const [instructions, setInstructions] = useState('');
-  
   // Settings state
   const [settings, setSettings] = useState({
     attemptsAllowed: 1,
@@ -54,31 +50,23 @@ const TrainerAssignedAssessmentEditPage = () => {
     notifyImmediately: true,
     reminderBeforeDue: true
   });
-  
   // Dialog state
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
-  
   // Load assignment data
   useEffect(() => {
     let isMounted = true;
-    
     const fetchAssignment = async () => {
       try {
         if (!isMounted) return;
-        
         setIsLoading(true);
         setError(null);
-        
         // Fetch assignment details
         const assignmentResponse = await fetch(`/api/assessment/assigned/${id}`);
         if (!isMounted) return;
-        
         if (!assignmentResponse.ok) throw new Error('Failed to fetch assignment');
         const assignmentData = await assignmentResponse.json();
-        
         if (!isMounted) return;
         setOriginalAssignment(assignmentData);
-        
         // Initialize form fields
         setTitle(assignmentData.title || '');
         setDescription(assignmentData.description || '');
@@ -89,19 +77,15 @@ const TrainerAssignedAssessmentEditPage = () => {
           ...settings,
           ...assignmentData.settings
         });
-        
         // Fetch template details
         const templateResponse = await fetch(`/api/assessment/templates/${assignmentData.template_id}`);
         if (!isMounted) return;
-        
         if (!templateResponse.ok) throw new Error('Failed to fetch template');
         const templateData = await templateResponse.json();
-        
         if (!isMounted) return;
         setTemplate(templateData);
       } catch (err) {
         if (!isMounted) return;
-        
         console.error('Error fetching assignment:', err);
         setError(err.message);
         toast({
@@ -115,18 +99,14 @@ const TrainerAssignedAssessmentEditPage = () => {
         }
       }
     };
-    
     fetchAssignment();
-    
     return () => {
       isMounted = false;
     };
   }, [id, toast]);
-  
   // Check if there are unsaved changes
   const hasUnsavedChanges = () => {
     if (!originalAssignment) return false;
-    
     return (
       title !== originalAssignment.title ||
       description !== originalAssignment.description ||
@@ -136,7 +116,6 @@ const TrainerAssignedAssessmentEditPage = () => {
       JSON.stringify(settings) !== JSON.stringify(originalAssignment.settings)
     );
   };
-  
   // Handle navigation with unsaved changes
   const handleNavigate = (path) => {
     if (hasUnsavedChanges()) {
@@ -145,7 +124,6 @@ const TrainerAssignedAssessmentEditPage = () => {
       navigate(path);
     }
   };
-  
   // Handle save
   const handleSave = async () => {
     // Validate required fields
@@ -157,7 +135,6 @@ const TrainerAssignedAssessmentEditPage = () => {
       });
       return;
     }
-    
     if (!dueDate) {
       toast({
         title: 'Error',
@@ -166,7 +143,6 @@ const TrainerAssignedAssessmentEditPage = () => {
       });
       return;
     }
-    
     if (!availableFrom) {
       toast({
         title: 'Error',
@@ -175,10 +151,8 @@ const TrainerAssignedAssessmentEditPage = () => {
       });
       return;
     }
-    
     try {
       setIsSaving(true);
-      
       const updatedAssignment = {
         title,
         description,
@@ -188,7 +162,6 @@ const TrainerAssignedAssessmentEditPage = () => {
         settings,
         updated_at: new Date().toISOString()
       };
-      
       const response = await fetch(`/api/assessment/assigned/${id}`, {
         method: 'PUT',
         headers: {
@@ -196,18 +169,14 @@ const TrainerAssignedAssessmentEditPage = () => {
         },
         body: JSON.stringify(updatedAssignment),
       });
-      
       if (!response.ok) throw new Error('Failed to update assignment');
-      
       const updated = await response.json();
       setOriginalAssignment(updated);
-      
       toast({
         title: 'Success',
         description: 'Assignment updated successfully',
         type: 'success',
       });
-      
       navigate(`/assessment/assigned/${id}`);
     } catch (err) {
       console.error('Error updating assignment:', err);
@@ -220,7 +189,6 @@ const TrainerAssignedAssessmentEditPage = () => {
       setIsSaving(false);
     }
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -229,7 +197,6 @@ const TrainerAssignedAssessmentEditPage = () => {
       </div>
     );
   }
-  
   // Render error state
   if (error || !originalAssignment || !template) {
     return (
@@ -244,7 +211,6 @@ const TrainerAssignedAssessmentEditPage = () => {
             Back to Assessments
           </Button>
         </div>
-        
         <Card className="p-6 text-center">
           <div className="text-red-500 mb-4">
             <AlertCircle className="w-12 h-12 mx-auto" />
@@ -258,7 +224,6 @@ const TrainerAssignedAssessmentEditPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -277,7 +242,6 @@ const TrainerAssignedAssessmentEditPage = () => {
             <p className="text-gray-600">{template.title}</p>
           </div>
         </div>
-        
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -298,7 +262,6 @@ const TrainerAssignedAssessmentEditPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Template info card */}
       <Card className="p-6 mb-6 bg-gray-50">
         <div className="flex items-start justify-between">
@@ -326,13 +289,11 @@ const TrainerAssignedAssessmentEditPage = () => {
           </div>
         </div>
       </Card>
-      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Assignment Details */}
         <div className="lg:col-span-2 space-y-6">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Assignment Details</h3>
-            
             <div className="space-y-4">
               {/* Title */}
               <div>
@@ -345,7 +306,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Description */}
               <div>
                 <Label htmlFor="description">Description</Label>
@@ -358,7 +318,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Dates */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -373,7 +332,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                     Current: {originalAssignment && format(new Date(originalAssignment.available_from), 'MMM d, yyyy')}
                   </p>
                 </div>
-                
                 <div>
                   <Label htmlFor="due">Due Date *</Label>
                   <DatePicker
@@ -388,7 +346,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                   </p>
                 </div>
               </div>
-              
               {/* Instructions */}
               <div>
                 <Label htmlFor="instructions">Instructions for Students</Label>
@@ -404,12 +361,10 @@ const TrainerAssignedAssessmentEditPage = () => {
             </div>
           </Card>
         </div>
-        
         {/* Settings */}
         <div className="space-y-6">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Assignment Settings</h3>
-            
             <div className="space-y-4">
               {/* Attempts */}
               <div>
@@ -423,7 +378,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Passing Score */}
               <div>
                 <Label htmlFor="passing">Passing Score (%)</Label>
@@ -437,7 +391,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Late Submission */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -448,7 +401,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                     onCheckedChange={(checked) => setSettings({ ...settings, allowLateSubmission: checked })}
                   />
                 </div>
-                
                 {settings.allowLateSubmission && (
                   <div>
                     <Label htmlFor="penalty">Late Penalty (% per day)</Label>
@@ -464,7 +416,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                   </div>
                 )}
               </div>
-              
               {/* Show Results */}
               <div className="flex items-center justify-between">
                 <Label htmlFor="results">Show Results After Completion</Label>
@@ -476,11 +427,9 @@ const TrainerAssignedAssessmentEditPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Notification Settings */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Notifications</h3>
-            
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label htmlFor="notify">Notify Students Immediately</Label>
@@ -490,7 +439,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                   onCheckedChange={(checked) => setSettings({ ...settings, notifyImmediately: checked })}
                 />
               </div>
-              
               <div className="flex items-center justify-between">
                 <Label htmlFor="reminder">Send Reminder Before Due</Label>
                 <Switch
@@ -501,11 +449,9 @@ const TrainerAssignedAssessmentEditPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Status Info */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Assignment Status</h3>
-            
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-gray-600">Created</p>
@@ -513,7 +459,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                   {format(new Date(originalAssignment.created_at), "MMM d, yyyy 'at' h:mm a")}
                 </p>
               </div>
-              
               <div>
                 <p className="text-sm text-gray-600">Last Updated</p>
                 <p className="font-medium">
@@ -522,7 +467,6 @@ const TrainerAssignedAssessmentEditPage = () => {
                     : 'Never'}
                 </p>
               </div>
-              
               <div>
                 <p className="text-sm text-gray-600">Created By</p>
                 <p className="font-medium">{originalAssignment.created_by}</p>
@@ -531,7 +475,6 @@ const TrainerAssignedAssessmentEditPage = () => {
           </Card>
         </div>
       </div>
-      
       {/* Discard Changes Dialog */}
       <Dialog open={showDiscardDialog} onOpenChange={setShowDiscardDialog}>
         <DialogContent>
@@ -560,5 +503,4 @@ const TrainerAssignedAssessmentEditPage = () => {
     </div>
   );
 };
-
 export default TrainerAssignedAssessmentEditPage;

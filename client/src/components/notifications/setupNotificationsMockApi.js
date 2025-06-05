@@ -4,7 +4,6 @@ import {
   generateNotificationStats,
   generateNotificationTemplates 
 } from './mockNotificationsData';
-
 export const setupNotificationsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -12,14 +11,12 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     put: originalPut || api.put.bind(api),
     delete: originalDelete || api.delete.bind(api)
   };
-
   // Notification endpoints
   api.get = function(url, ...args) {
     // List notifications
     if (url === '/api/notifications' || url.startsWith('/api/notifications?')) {
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
-      
       // Parse query parameters
       const urlObj = new URL(url, 'http://localhost');
       const category = urlObj.searchParams.get('category');
@@ -27,28 +24,22 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
       const read = urlObj.searchParams.get('read');
       const limit = parseInt(urlObj.searchParams.get('limit') || '50');
       const offset = parseInt(urlObj.searchParams.get('offset') || '0');
-      
       let filteredNotifications = [...notifications];
-      
       // Filter by category
       if (category) {
         filteredNotifications = filteredNotifications.filter(n => n.category === category);
       }
-      
       // Filter by priority
       if (priority) {
         filteredNotifications = filteredNotifications.filter(n => n.priority === priority);
       }
-      
       // Filter by read status
       if (read !== null) {
         const isRead = read === 'true';
         filteredNotifications = filteredNotifications.filter(n => n.read === isRead);
       }
-      
       // Apply pagination
       const paginatedNotifications = filteredNotifications.slice(offset, offset + limit);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -59,13 +50,11 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Unread notifications count
     if (url === '/api/notifications/unread-count') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
       const unreadCount = notifications.filter(n => !n.read).length;
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -81,14 +70,12 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Specific notification
     if (url.match(/^\/api\/notifications\/\d+$/)) {
       const notificationId = parseInt(url.split('/').pop());
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
       const notification = notifications.find(n => n.id === notificationId);
-      
       if (notification) {
         return Promise.resolve({
           status: 200,
@@ -101,31 +88,25 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         });
       }
     }
-    
     // Notification preferences
     if (url === '/api/notifications/preferences') {
       const preferences = generateNotificationPreferences();
-      
       return Promise.resolve({
         status: 200,
         data: preferences
       });
     }
-    
     // Notification statistics
     if (url === '/api/notifications/statistics') {
       const stats = generateNotificationStats();
-      
       return Promise.resolve({
         status: 200,
         data: stats
       });
     }
-    
     // Notification templates
     if (url === '/api/notifications/templates') {
       const templates = generateNotificationTemplates();
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -134,19 +115,16 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Notification history
     if (url === '/api/notifications/history') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
-      
       // Include read notifications from the past 30 days
       const historicalNotifications = notifications.map(n => ({
         ...n,
         read: true,
         timestamp: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
       }));
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -155,10 +133,8 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Notification categories
     if (url === '/api/notifications/categories') {
-      
       const categories = [
         { id: 'academic', name: 'Academic', icon: 'graduation-cap', color: 'blue' },
         { id: 'reminder', name: 'Reminders', icon: 'clock', color: 'orange' },
@@ -167,23 +143,19 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         { id: 'achievement', name: 'Achievements', icon: 'trophy', color: 'yellow' },
         { id: 'event', name: 'Events', icon: 'calendar', color: 'purple' }
       ];
-      
       return Promise.resolve({
         status: 200,
         data: categories
       });
     }
-    
     // Call original get for other endpoints
     return originalFunctions.get.call(api, url, ...args);
   };
-  
   // Notification POST endpoints
   api.post = function(url, data, ...args) {
     // Mark notification as read
     if (url.match(/^\/api\/notifications\/\d+\/read$/)) {
       const notificationId = parseInt(url.split('/')[3]);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -193,10 +165,8 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Mark all notifications as read
     if (url === '/api/notifications/mark-all-read') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -205,11 +175,9 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Snooze notification
     if (url.match(/^\/api\/notifications\/\d+\/snooze$/)) {
       const notificationId = parseInt(url.split('/')[3]);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -218,11 +186,9 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Execute notification action
     if (url.match(/^\/api\/notifications\/\d+\/action$/)) {
       const notificationId = parseInt(url.split('/')[3]);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -233,10 +199,8 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Create notification (admin)
     if (url === '/api/notifications/send') {
-      
       const newNotification = {
         id: Date.now(),
         ...data,
@@ -244,16 +208,13 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         read: false,
         sent: true
       };
-      
       return Promise.resolve({
         status: 201,
         data: newNotification
       });
     }
-    
     // Subscribe to notifications
     if (url === '/api/notifications/subscribe') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -263,10 +224,8 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Test notification
     if (url === '/api/notifications/test') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -276,15 +235,12 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     return originalFunctions.post.call(api, url, data, ...args);
   };
-  
   // Notification PUT endpoints
   api.put = function(url, data, ...args) {
     // Update notification preferences
     if (url === '/api/notifications/preferences') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -294,11 +250,9 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Update notification template
     if (url.match(/^\/api\/notifications\/templates\/\d+$/)) {
       const templateId = parseInt(url.split('/').pop());
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -308,10 +262,8 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Update notification settings
     if (url === '/api/notifications/settings') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -321,10 +273,8 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Batch update notifications
     if (url === '/api/notifications/batch-update') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -334,16 +284,13 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     return originalFunctions.put.call(api, url, data, ...args);
   };
-  
   // Notification DELETE endpoints
   api.delete = function(url, ...args) {
     // Delete notification
     if (url.match(/^\/api\/notifications\/\d+$/)) {
       const notificationId = parseInt(url.split('/').pop());
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -352,10 +299,8 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Delete old notifications
     if (url === '/api/notifications/old') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -364,10 +309,8 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Unsubscribe from notifications
     if (url === '/api/notifications/unsubscribe') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -376,11 +319,9 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Delete notification template
     if (url.match(/^\/api\/notifications\/templates\/\d+$/)) {
       const templateId = parseInt(url.split('/').pop());
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -389,10 +330,8 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     // Clear all notifications
     if (url === '/api/notifications/clear-all') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -401,7 +340,6 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         }
       });
     }
-    
     return originalFunctions.delete.call(api, url, ...args);
   };
 };

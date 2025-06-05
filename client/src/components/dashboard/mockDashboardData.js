@@ -101,7 +101,6 @@ export const generateDashboardData = (userRole) => {
       { label: "Student Satisfaction", value: "4.8/5", change: 0.2, trend: "up", color: "orange" }
     ]
   };
-
   // Customize data based on user role
   if (userRole === "admin") {
     return {
@@ -270,7 +269,6 @@ export const generateDashboardData = (userRole) => {
     };
   }
 };
-
 // Generate notifications for dashboard
 export const generateDashboardNotifications = (userRole) => {
   const baseNotifications = [
@@ -291,7 +289,6 @@ export const generateDashboardNotifications = (userRole) => {
       read: false
     }
   ];
-
   if (userRole === "trainer") {
     return [
       ...baseNotifications,
@@ -313,7 +310,6 @@ export const generateDashboardNotifications = (userRole) => {
       }
     ];
   }
-
   if (userRole === "student") {
     return [
       ...baseNotifications,
@@ -335,10 +331,8 @@ export const generateDashboardNotifications = (userRole) => {
       }
     ];
   }
-
   return baseNotifications;
 };
-
 // Generate quick actions for dashboard
 export const generateQuickActions = (userRole) => {
   const baseActions = [
@@ -346,7 +340,6 @@ export const generateQuickActions = (userRole) => {
     { icon: "document", label: "Documents", path: "/documents", color: "green" },
     { icon: "message", label: "Messages", path: "/messages", color: "purple" }
   ];
-
   if (userRole === "admin") {
     return [
       { icon: "users", label: "Manage Users", path: "/users", color: "blue" },

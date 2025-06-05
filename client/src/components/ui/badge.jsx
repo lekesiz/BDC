@@ -1,7 +1,6 @@
 import React from 'react';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
-
 /**
  * Badge variants using class-variance-authority
  */
@@ -30,7 +29,6 @@ const badgeVariants = cva(
     },
   }
 );
-
 /**
  * Badge component for displaying status indicators or labels
  * 
@@ -49,5 +47,4 @@ function Badge({
     <div className={cn(badgeVariants({ variant }), className)} {...props} />
   );
 }
-
 export { Badge, badgeVariants };

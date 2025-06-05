@@ -5,6 +5,8 @@ from app.models.tenant import Tenant
 from app.models.user import User
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.utils.logging import logger
+
 tenants_bp = Blueprint('tenants', __name__)
 
 @tenants_bp.route('/tenants', methods=['GET'])

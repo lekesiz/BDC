@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import api from '../../lib/api';
 import { toast } from 'react-toastify';
-
 const NotificationTestPage = () => {
   const [notification, setNotification] = useState({
     title: 'Test Notification',
@@ -10,18 +9,15 @@ const NotificationTestPage = () => {
     recipient_id: null,
     data: {}
   });
-
   const sendNotification = async () => {
     try {
       const response = await api.post('/api/notifications/send', notification);
       toast.success('Notification sent successfully!');
-      console.log('Notification response:', response.data);
     } catch (error) {
       toast.error('Failed to send notification');
       console.error('Error sending notification:', error);
     }
   };
-
   const sendGlobalNotification = async () => {
     try {
       const response = await api.post('/api/notifications/broadcast', {
@@ -29,13 +25,11 @@ const NotificationTestPage = () => {
         broadcast: true
       });
       toast.success('Global notification sent!');
-      console.log('Broadcast response:', response.data);
     } catch (error) {
       toast.error('Failed to send global notification');
       console.error('Error broadcasting:', error);
     }
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNotification(prev => ({
@@ -43,14 +37,11 @@ const NotificationTestPage = () => {
       [name]: value
     }));
   };
-
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Notification Test Page</h1>
-      
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">Send Test Notification</h2>
-        
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Title</label>
@@ -62,7 +53,6 @@ const NotificationTestPage = () => {
               className="w-full px-3 py-2 border rounded"
             />
           </div>
-          
           <div>
             <label className="block text-sm font-medium mb-1">Message</label>
             <textarea
@@ -73,7 +63,6 @@ const NotificationTestPage = () => {
               className="w-full px-3 py-2 border rounded"
             />
           </div>
-          
           <div>
             <label className="block text-sm font-medium mb-1">Type</label>
             <select
@@ -88,7 +77,6 @@ const NotificationTestPage = () => {
               <option value="error">Error</option>
             </select>
           </div>
-          
           <div>
             <label className="block text-sm font-medium mb-1">Recipient ID (optional)</label>
             <input
@@ -103,7 +91,6 @@ const NotificationTestPage = () => {
               className="w-full px-3 py-2 border rounded"
             />
           </div>
-          
           <div>
             <label className="block text-sm font-medium mb-1">Additional Data (JSON)</label>
             <textarea
@@ -121,7 +108,6 @@ const NotificationTestPage = () => {
               className="w-full px-3 py-2 border rounded font-mono text-sm"
             />
           </div>
-          
           <div className="flex gap-4">
             <button
               onClick={sendNotification}
@@ -129,7 +115,6 @@ const NotificationTestPage = () => {
             >
               Send Notification
             </button>
-            
             <button
               onClick={sendGlobalNotification}
               className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
@@ -139,7 +124,6 @@ const NotificationTestPage = () => {
           </div>
         </div>
       </div>
-      
       <div className="mt-6 bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">Instructions</h2>
         <ol className="list-decimal list-inside space-y-2 text-gray-700">
@@ -155,5 +139,4 @@ const NotificationTestPage = () => {
     </div>
   );
 };
-
 export default NotificationTestPage;

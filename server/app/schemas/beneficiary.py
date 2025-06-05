@@ -20,6 +20,13 @@ class BeneficiaryBaseSchema(Schema):
     postal_code = fields.String(allow_none=True)
     country = fields.String(allow_none=True)
     
+    # Emergency contact information
+    emergency_contact_name = fields.String(allow_none=True)
+    emergency_contact_relationship = fields.String(allow_none=True)
+    emergency_contact_phone = fields.String(allow_none=True)
+    emergency_contact_email = fields.Email(allow_none=True)
+    emergency_contact_address = fields.String(allow_none=True)
+    
     # Professional information
     profession = fields.String(allow_none=True)
     company = fields.String(allow_none=True)
@@ -95,6 +102,13 @@ class BeneficiaryCreateSchema(Schema):
     notes = fields.String(allow_none=True)
     referral_source = fields.String(allow_none=True)
     custom_fields = fields.Dict(allow_none=True)
+    
+    # Emergency contact information
+    emergency_contact_name = fields.String(allow_none=True)
+    emergency_contact_relationship = fields.String(allow_none=True)
+    emergency_contact_phone = fields.String(allow_none=True)
+    emergency_contact_email = fields.Email(allow_none=True)
+    emergency_contact_address = fields.String(allow_none=True)
     
     @validates('confirm_password')
     def validate_confirm_password(self, value):
@@ -181,6 +195,13 @@ class BeneficiaryUpdateSchema(Schema):
     notes = fields.String(allow_none=True)
     referral_source = fields.String(allow_none=True)
     custom_fields = fields.Dict(allow_none=True)
+    
+    # Emergency contact information
+    emergency_contact_name = fields.String(allow_none=True)
+    emergency_contact_relationship = fields.String(allow_none=True)
+    emergency_contact_phone = fields.String(allow_none=True)
+    emergency_contact_email = fields.Email(allow_none=True)
+    emergency_contact_address = fields.String(allow_none=True)
     
     # Status
     status = fields.String(validate=validate.OneOf(['active', 'inactive', 'archived']))

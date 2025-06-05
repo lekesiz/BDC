@@ -3,10 +3,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import BeneficiariesPageV2 from './BeneficiariesPageV2';
 import api from '@/lib/api';
-
 // Mock the API
 vi.mock('@/lib/api');
-
 // Mock the navigation
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -16,7 +14,6 @@ vi.mock('react-router-dom', async () => {
     useNavigate: () => mockNavigate,
   };
 });
-
 const mockBeneficiariesData = {
   items: [
     {
@@ -46,98 +43,76 @@ const mockBeneficiariesData = {
   pages: 1,
   current_page: 1
 };
-
 describe('BeneficiariesPageV2', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-
   it('renders loading state initially', () => {
     api.get.mockImplementation(() => new Promise(() => {})); // Never resolves
-    
     render(
       <BrowserRouter>
         <BeneficiariesPageV2 />
       </BrowserRouter>
     );
-
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
-
   it('renders beneficiaries data correctly', async () => {
     api.get.mockResolvedValueOnce({ data: mockBeneficiariesData });
-
     render(
       <BrowserRouter>
         <BeneficiariesPageV2 />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
       expect(screen.getByText('Jane Smith')).toBeInTheDocument();
     });
-
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
     expect(screen.getByText('jane@example.com')).toBeInTheDocument();
   });
-
   it('handles empty state correctly', async () => {
     api.get.mockResolvedValueOnce({ data: { items: [], total: 0, pages: 0 } });
-
     render(
       <BrowserRouter>
         <BeneficiariesPageV2 />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       expect(screen.getByText('No beneficiaries found')).toBeInTheDocument();
       expect(screen.getByText('Get started by adding your first beneficiary')).toBeInTheDocument();
     });
   });
-
   it('handles error state with retry', async () => {
     const error = new Error('Failed to fetch');
     api.get.mockRejectedValueOnce(error);
-
     render(
       <BrowserRouter>
         <BeneficiariesPageV2 />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       expect(screen.getByText('Failed to load beneficiaries')).toBeInTheDocument();
       expect(screen.getByText('Try Again')).toBeInTheDocument();
     });
-
     // Mock successful retry
     api.get.mockResolvedValueOnce({ data: mockBeneficiariesData });
-
     // Click retry button
     fireEvent.click(screen.getByText('Try Again'));
-
     await waitFor(() => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
   });
-
   it('handles search functionality', async () => {
     api.get.mockResolvedValueOnce({ data: mockBeneficiariesData });
-
     render(
       <BrowserRouter>
         <BeneficiariesPageV2 />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
-
     const searchInput = screen.getByPlaceholderText('Search by name, email or phone...');
-    
     // Mock search results
     api.get.mockResolvedValueOnce({
       data: {
@@ -146,9 +121,7 @@ describe('BeneficiariesPageV2', () => {
         pages: 1
       }
     });
-
     fireEvent.change(searchInput, { target: { value: 'John' } });
-
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith('/api/beneficiaries', {
         params: expect.objectContaining({
@@ -157,7 +130,6 @@ describe('BeneficiariesPageV2', () => {
       });
     });
   });
-
   it('handles pagination', async () => {
     const multiPageData = {
       ...mockBeneficiariesData,
@@ -165,19 +137,15 @@ describe('BeneficiariesPageV2', () => {
       total_pages: 3,
       total: 30
     };
-    
     api.get.mockResolvedValueOnce({ data: multiPageData });
-
     render(
       <BrowserRouter>
         <BeneficiariesPageV2 />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
-
     // Mock page 2 data
     api.get.mockResolvedValueOnce({
       data: {
@@ -196,10 +164,8 @@ describe('BeneficiariesPageV2', () => {
         }]
       }
     });
-
     // Click next page
     fireEvent.click(screen.getByText('Next'));
-
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith('/api/beneficiaries', {
         params: expect.objectContaining({
@@ -208,26 +174,20 @@ describe('BeneficiariesPageV2', () => {
       });
     });
   });
-
   it('handles sorting', async () => {
     api.get.mockResolvedValueOnce({ data: mockBeneficiariesData });
-
     render(
       <BrowserRouter>
         <BeneficiariesPageV2 />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
-
     // Mock sorted data
     api.get.mockResolvedValueOnce({ data: mockBeneficiariesData });
-
     // Click on Name column to sort
     fireEvent.click(screen.getByText('Name'));
-
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith('/api/beneficiaries', {
         params: expect.objectContaining({
@@ -237,64 +197,48 @@ describe('BeneficiariesPageV2', () => {
       });
     });
   });
-
   it('navigates to beneficiary detail on row click', async () => {
     api.get.mockResolvedValueOnce({ data: mockBeneficiariesData });
-
     render(
       <BrowserRouter>
         <BeneficiariesPageV2 />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
-
     // Click on the first row
     const firstRow = screen.getByText('John Doe').closest('tr');
     fireEvent.click(firstRow);
-
     expect(mockNavigate).toHaveBeenCalledWith('/beneficiaries/1');
   });
-
   it('navigates to create beneficiary on button click', async () => {
     api.get.mockResolvedValueOnce({ data: mockBeneficiariesData });
-
     render(
       <BrowserRouter>
         <BeneficiariesPageV2 />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
-
     fireEvent.click(screen.getByText('Add Beneficiary'));
-
     expect(mockNavigate).toHaveBeenCalledWith('/beneficiaries/new');
   });
-
   it('handles filter toggle correctly', async () => {
     api.get.mockResolvedValueOnce({ data: mockBeneficiariesData });
-
     render(
       <BrowserRouter>
         <BeneficiariesPageV2 />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
-
     // Filters should be hidden initially
     expect(screen.queryByLabelText('Status')).not.toBeInTheDocument();
-
     // Click to show filters
     fireEvent.click(screen.getByText('Filters'));
-
     // Filters should now be visible
     expect(screen.getByLabelText('Status')).toBeInTheDocument();
     expect(screen.getByLabelText('Sort By')).toBeInTheDocument();

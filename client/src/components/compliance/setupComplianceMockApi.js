@@ -3,7 +3,6 @@ import {
   generateComplianceMetrics,
   generateComplianceReports 
 } from './mockComplianceData';
-
 export const setupComplianceMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -11,13 +10,11 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     put: originalPut || api.put.bind(api),
     delete: originalDelete || api.delete.bind(api)
   };
-
   // Compliance endpoints
   api.get = function(url, ...args) {
     // Audit logs endpoint
     if (url === '/api/compliance/audit-logs' || url.startsWith('/api/compliance/audit-logs?')) {
       const complianceData = generateComplianceData();
-      
       // Parse query parameters
       const urlObj = new URL(url, 'http://localhost');
       const user = urlObj.searchParams.get('user');
@@ -26,9 +23,7 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
       const startDate = urlObj.searchParams.get('startDate');
       const endDate = urlObj.searchParams.get('endDate');
       const risk = urlObj.searchParams.get('risk');
-      
       let logs = complianceData.auditLogs;
-      
       // Filter by user
       if (user) {
         logs = logs.filter(log => 
@@ -36,22 +31,18 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
           log.userId?.toLowerCase().includes(user.toLowerCase())
         );
       }
-      
       // Filter by action
       if (action) {
         logs = logs.filter(log => log.action === action);
       }
-      
       // Filter by resource
       if (resource) {
         logs = logs.filter(log => log.resource === resource);
       }
-      
       // Filter by risk level
       if (risk) {
         logs = logs.filter(log => log.risk === risk);
       }
-      
       // Filter by date range
       if (startDate && endDate) {
         const start = new Date(startDate);
@@ -61,7 +52,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
           return logDate >= start && logDate <= end;
         });
       }
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -71,81 +61,65 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // GDPR compliance endpoint
     if (url === '/api/compliance/gdpr') {
       const complianceData = generateComplianceData();
-      
       return Promise.resolve({
         status: 200,
         data: complianceData.gdprCompliance
       });
     }
-    
     // Security headers endpoint
     if (url === '/api/compliance/security-headers') {
       const complianceData = generateComplianceData();
-      
       return Promise.resolve({
         status: 200,
         data: complianceData.securityHeaders
       });
     }
-    
     // Data backup endpoint
     if (url === '/api/compliance/backups') {
       const complianceData = generateComplianceData();
-      
       return Promise.resolve({
         status: 200,
         data: complianceData.dataBackup
       });
     }
-    
     // Input validation endpoint
     if (url === '/api/compliance/input-validation') {
       const complianceData = generateComplianceData();
-      
       return Promise.resolve({
         status: 200,
         data: complianceData.inputValidation
       });
     }
-    
     // Regulatory compliance endpoint
     if (url === '/api/compliance/regulatory') {
       const complianceData = generateComplianceData();
-      
       return Promise.resolve({
         status: 200,
         data: complianceData.regulatoryCompliance
       });
     }
-    
     // Risk assessment endpoint
     if (url === '/api/compliance/risk-assessment') {
       const complianceData = generateComplianceData();
-      
       return Promise.resolve({
         status: 200,
         data: complianceData.riskAssessment
       });
     }
-    
     // Compliance metrics endpoint
     if (url === '/api/compliance/metrics') {
       const metrics = generateComplianceMetrics();
-      
       return Promise.resolve({
         status: 200,
         data: metrics
       });
     }
-    
     // Compliance reports endpoint
     if (url === '/api/compliance/reports') {
       const reports = generateComplianceReports();
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -154,13 +128,11 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Specific backup details
     if (url.match(/^\/api\/compliance\/backups\/\d+$/)) {
       const backupId = parseInt(url.split('/').pop());
       const complianceData = generateComplianceData();
       const backup = complianceData.dataBackup.backups.find(b => b.id === backupId);
-      
       if (backup) {
         return Promise.resolve({
           status: 200,
@@ -173,10 +145,8 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Compliance policies
     if (url === '/api/compliance/policies') {
-      
       const policies = [
         {
           id: 1,
@@ -215,7 +185,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
           status: "active"
         }
       ];
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -224,32 +193,26 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Call original get for other endpoints
     return originalFunctions.get.call(api, url, ...args);
   };
-  
   // Compliance POST endpoints
   api.post = function(url, data, ...args) {
     // Create audit log entry
     if (url === '/api/compliance/audit-logs') {
-      
       const newLog = {
         id: Date.now(),
         ...data,
         timestamp: new Date().toISOString(),
         status: "success"
       };
-      
       return Promise.resolve({
         status: 201,
         data: newLog
       });
     }
-    
     // Initiate backup
     if (url === '/api/compliance/backups/initiate') {
-      
       const backup = {
         id: Date.now(),
         type: data.type || 'manual',
@@ -259,16 +222,13 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         encrypted: true,
         progress: 0
       };
-      
       return Promise.resolve({
         status: 202,
         data: backup
       });
     }
-    
     // Generate compliance report
     if (url === '/api/compliance/reports/generate') {
-      
       const report = {
         id: Date.now(),
         title: data.title,
@@ -277,16 +237,13 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         generatedAt: new Date().toISOString(),
         estimatedTime: '5 minutes'
       };
-      
       return Promise.resolve({
         status: 202,
         data: report
       });
     }
-    
     // Perform security scan
     if (url === '/api/compliance/security/scan') {
-      
       return Promise.resolve({
         status: 202,
         data: {
@@ -298,10 +255,8 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Submit compliance assessment
     if (url === '/api/compliance/assessments') {
-      
       const assessment = {
         id: Date.now(),
         framework: data.framework,
@@ -310,16 +265,13 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         submittedAt: new Date().toISOString(),
         findings: data.findings || []
       };
-      
       return Promise.resolve({
         status: 201,
         data: assessment
       });
     }
-    
     // Export compliance data
     if (url === '/api/compliance/export') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -330,15 +282,12 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     return originalFunctions.post.call(api, url, data, ...args);
   };
-  
   // Compliance PUT endpoints
   api.put = function(url, data, ...args) {
     // Update compliance settings
     if (url === '/api/compliance/settings') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -348,10 +297,8 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Update security headers
     if (url === '/api/compliance/security-headers') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -361,10 +308,8 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Update backup schedule
     if (url === '/api/compliance/backups/schedule') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -374,10 +319,8 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Update validation rules
     if (url === '/api/compliance/validation-rules') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -387,11 +330,9 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Update policy
     if (url.match(/^\/api\/compliance\/policies\/\d+$/)) {
       const policyId = parseInt(url.split('/').pop());
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -401,11 +342,9 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Mark assessment as reviewed
     if (url.match(/^\/api\/compliance\/assessments\/\d+\/review$/)) {
       const assessmentId = parseInt(url.split('/')[3]);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -416,15 +355,12 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     return originalFunctions.put.call(api, url, data, ...args);
   };
-  
   // Compliance DELETE endpoints
   api.delete = function(url, ...args) {
     // Delete old audit logs
     if (url === '/api/compliance/audit-logs/old') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -433,11 +369,9 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Delete backup
     if (url.match(/^\/api\/compliance\/backups\/\d+$/)) {
       const backupId = parseInt(url.split('/').pop());
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -447,11 +381,9 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Remove validation rule
     if (url.match(/^\/api\/compliance\/validation-rules\/\d+$/)) {
       const ruleId = parseInt(url.split('/').pop());
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -461,11 +393,9 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     // Archive policy
     if (url.match(/^\/api\/compliance\/policies\/\d+$/)) {
       const policyId = parseInt(url.split('/').pop());
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -475,7 +405,6 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-    
     return originalFunctions.delete.call(api, url, ...args);
   };
 };

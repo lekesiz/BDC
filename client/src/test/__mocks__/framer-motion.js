@@ -1,5 +1,4 @@
 // Mock of framer-motion for tests
-
 // Create a simple mock component that just renders children
 const createMockComponent = (name) => {
   const component = ({ children, ...props }) => {
@@ -11,7 +10,6 @@ const createMockComponent = (name) => {
   component.displayName = name;
   return component;
 };
-
 // Mock motion function
 export const motion = new Proxy(
   {},
@@ -21,7 +19,6 @@ export const motion = new Proxy(
     }
   }
 );
-
 // Mock animation helpers
 export const AnimatePresence = createMockComponent('AnimatePresence');
 export const useAnimation = () => ({
@@ -42,13 +39,11 @@ export const useCycle = (...args) => {
   const [first] = args;
   return [first, () => {}];
 };
-
 // Mock variants
 export const fadeInUp = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 }
 };
-
 // Default export for when the whole package is imported
 export default {
   motion,

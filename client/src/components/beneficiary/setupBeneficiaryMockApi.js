@@ -27,7 +27,6 @@ export const setupBeneficiaryMockApi = (api, originalGet, originalPost, original
         ]
       });
     }
-    
     // Get beneficiary sessions
     if (url.match(/^\/api\/beneficiaries\/\d+\/sessions$/)) {
       return Promise.resolve({
@@ -55,7 +54,6 @@ export const setupBeneficiaryMockApi = (api, originalGet, originalPost, original
         ]
       });
     }
-    
     // Get beneficiary trainers
     if (url.match(/^\/api\/beneficiaries\/\d+\/trainers$/)) {
       return Promise.resolve({
@@ -83,7 +81,6 @@ export const setupBeneficiaryMockApi = (api, originalGet, originalPost, original
         ]
       });
     }
-    
     // Get beneficiary progress
     if (url.match(/^\/api\/beneficiaries\/\d+\/progress$/)) {
       return Promise.resolve({
@@ -134,7 +131,6 @@ export const setupBeneficiaryMockApi = (api, originalGet, originalPost, original
         }
       });
     }
-    
     // Get beneficiary documents
     if (url.match(/^\/api\/beneficiaries\/\d+\/documents$/)) {
       return Promise.resolve({
@@ -181,10 +177,8 @@ export const setupBeneficiaryMockApi = (api, originalGet, originalPost, original
         ]
       });
     }
-    
     return originalGet.call(this, url, ...args);
   };
-  
   // Keep other methods unchanged
   api.post = originalPost;
   api.put = originalPut;

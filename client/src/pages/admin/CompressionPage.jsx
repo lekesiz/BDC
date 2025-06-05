@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 import { 
   FileArchive, 
   Activity, 
@@ -17,7 +17,6 @@ import {
   Monitor
 } from 'lucide-react';
 import { LineChart, Line, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 const CompressionPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -28,7 +27,6 @@ const CompressionPage = () => {
     responseTime: -32,
     requestsPerDay: 145000
   });
-
   useEffect(() => {
     const mockEndpoints = [
       { path: '/api/users', compression: 'gzip', ratio: 82, size: '342KB', compressed: '62KB' },
@@ -39,7 +37,6 @@ const CompressionPage = () => {
     ];
     setEndpoints(mockEndpoints);
   }, []);
-
   const performanceData = [
     { time: '00:00', uncompressed: 450, compressed: 120 },
     { time: '04:00', uncompressed: 380, compressed: 95 },
@@ -49,14 +46,12 @@ const CompressionPage = () => {
     { time: '20:00', uncompressed: 540, compressed: 140 },
     { time: '24:00', uncompressed: 410, compressed: 105 }
   ];
-
   const compressionMethods = [
     { name: 'Gzip', ratio: 72, browser: '95%', speed: 'Fast' },
     { name: 'Brotli', ratio: 85, browser: '93%', speed: 'Medium' },
     { name: 'Deflate', ratio: 68, browser: '99%', speed: 'Very Fast' },
     { name: 'Zstd', ratio: 88, browser: '45%', speed: 'Slow' }
   ];
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart },
     { id: 'endpoints', label: 'Endpoints', icon: Globe },
@@ -64,7 +59,6 @@ const CompressionPage = () => {
     { id: 'performance', label: 'Performance', icon: Activity },
     { id: 'implementation', label: 'Implementation', icon: Code }
   ];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -74,7 +68,6 @@ const CompressionPage = () => {
           Configure Compression
         </Button>
       </div>
-
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -98,7 +91,6 @@ const CompressionPage = () => {
           })}
         </nav>
       </div>
-
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -113,7 +105,6 @@ const CompressionPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -125,7 +116,6 @@ const CompressionPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -137,7 +127,6 @@ const CompressionPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -150,7 +139,6 @@ const CompressionPage = () => {
               </div>
             </Card>
           </div>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Response Time Comparison</h3>
@@ -169,7 +157,6 @@ const CompressionPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Compression Methods</h3>
@@ -215,7 +202,6 @@ const CompressionPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'endpoints' && (
         <div className="space-y-6">
           <Card>
@@ -266,7 +252,6 @@ const CompressionPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'configuration' && (
         <div className="space-y-6">
           <Card>
@@ -283,21 +268,18 @@ const CompressionPage = () => {
                     <option>Deflate</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Compression Level (1-9)
                   </label>
                   <Input type="number" min="1" max="9" defaultValue="6" />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Minimum Response Size (bytes)
                   </label>
                   <Input type="number" defaultValue="1024" />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Excluded Content Types
@@ -307,7 +289,6 @@ const CompressionPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Performance Settings</h3>
@@ -318,14 +299,12 @@ const CompressionPage = () => {
                     <span className="text-sm font-medium text-gray-700">Enable Dynamic Compression</span>
                   </label>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
                     <span className="text-sm font-medium text-gray-700">Cache Compressed Responses</span>
                   </label>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" />
@@ -337,7 +316,6 @@ const CompressionPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'performance' && (
         <div className="space-y-6">
           <Card>
@@ -353,7 +331,6 @@ const CompressionPage = () => {
                     <Monitor className="w-6 h-6 text-blue-500" />
                   </div>
                 </div>
-
                 <div className="bg-gray-50 p-4 rounded">
                   <div className="flex items-center justify-between">
                     <div>
@@ -363,7 +340,6 @@ const CompressionPage = () => {
                     <Server className="w-6 h-6 text-green-500" />
                   </div>
                 </div>
-
                 <div className="bg-gray-50 p-4 rounded">
                   <div className="flex items-center justify-between">
                     <div>
@@ -374,7 +350,6 @@ const CompressionPage = () => {
                   </div>
                 </div>
               </div>
-
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <RechartsBarChart data={performanceData}>
@@ -392,7 +367,6 @@ const CompressionPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'implementation' && (
         <div className="space-y-6">
           <Card>
@@ -401,13 +375,10 @@ const CompressionPage = () => {
               <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
                 <code>{`from flask import Flask, jsonify
 from flask_compress import Compress
-
 app = Flask(__name__)
-
 # Initialize Flask-Compress
 compress = Compress()
 compress.init_app(app)
-
 # Configuration
 app.config['COMPRESS_ALGORITHM'] = 'gzip'
 app.config['COMPRESS_LEVEL'] = 6
@@ -419,16 +390,13 @@ app.config['COMPRESS_MIMETYPES'] = [
               </pre>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Express.js Implementation</h3>
               <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
                 <code>{`const express = require('express');
 const compression = require('compression');
-
 const app = express();
-
 // Use compression middleware
 app.use(compression({
   filter: (req, res) => {
@@ -444,7 +412,6 @@ app.use(compression({
               </pre>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Nginx Configuration</h3>
@@ -459,7 +426,6 @@ gzip_proxied any;
 gzip_comp_level 6;
 gzip_min_length 1000;
 gzip_disable "msie6";
-
 # Enable Brotli compression
 brotli on;
 brotli_comp_level 6;
@@ -473,5 +439,4 @@ brotli_types text/plain text/css text/xml text/javascript
     </div>
   );
 };
-
 export default CompressionPage;

@@ -1,11 +1,9 @@
 import React, { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Tabs context to manage tab state
  */
 const TabsContext = React.createContext(null);
-
 /**
  * Tabs container component that manages the active tab state
  * 
@@ -26,14 +24,12 @@ const Tabs = ({
 }) => {
   const [value, setValue] = React.useState(defaultValue);
   const activeValue = controlledValue !== undefined ? controlledValue : value;
-  
   const handleValueChange = React.useCallback((newValue) => {
     if (controlledValue === undefined) {
       setValue(newValue);
     }
     onValueChange?.(newValue);
   }, [controlledValue, onValueChange]);
-
   return (
     <TabsContext.Provider value={{ value: activeValue, onValueChange: handleValueChange }}>
       <div className={cn("w-full", className)} {...props}>
@@ -42,7 +38,6 @@ const Tabs = ({
     </TabsContext.Provider>
   );
 };
-
 /**
  * Tab list component that contains the tab triggers
  * 
@@ -54,13 +49,11 @@ const Tabs = ({
 const TabsList = ({ className, children, ...props }) => {
   const tabsRef = useRef([]);
   const { value: activeValue } = React.useContext(TabsContext);
-  
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       const currentIndex = tabsRef.current.findIndex(tab => tab === e.target);
       if (currentIndex === -1) return;
-      
       let nextIndex;
       switch (e.key) {
         case 'ArrowRight':
@@ -87,15 +80,12 @@ const TabsList = ({ className, children, ...props }) => {
           break;
       }
     };
-    
     const tabList = tabsRef.current[0]?.parentElement;
     tabList?.addEventListener('keydown', handleKeyDown);
-    
     return () => {
       tabList?.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-  
   return (
     <div 
       className={cn(
@@ -118,7 +108,6 @@ const TabsList = ({ className, children, ...props }) => {
     </div>
   );
 };
-
 /**
  * Tab trigger button that activates its associated content
  * 
@@ -132,7 +121,6 @@ const TabsList = ({ className, children, ...props }) => {
 const TabTrigger = React.forwardRef(({ value, className, disabled, children, ...props }, ref) => {
   const { value: activeValue, onValueChange } = React.useContext(TabsContext);
   const isActive = activeValue === value;
-  
   return (
     <button
       ref={ref}
@@ -154,9 +142,7 @@ const TabTrigger = React.forwardRef(({ value, className, disabled, children, ...
     </button>
   );
 });
-
 TabTrigger.displayName = 'TabTrigger';
-
 /**
  * Tab content panel that displays when its associated trigger is active
  * 
@@ -169,9 +155,7 @@ TabTrigger.displayName = 'TabTrigger';
 const TabContent = ({ value, className, children, forceRender = false, ...props }) => {
   const { value: activeValue } = React.useContext(TabsContext);
   const isActive = activeValue === value;
-  
   if (!isActive && !forceRender) return null;
-  
   return (
     <div
       role="tabpanel"
@@ -191,5 +175,4 @@ const TabContent = ({ value, className, children, forceRender = false, ...props 
     </div>
   );
 };
-
 export { Tabs, TabsList, TabTrigger, TabContent };

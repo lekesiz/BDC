@@ -1,0 +1,878 @@
+openapi: 3.0.0
+info:
+  title: BDC API
+  description: Beneficiary Development Center API for managing training programs and beneficiaries
+  version: 2025.06
+  contact:
+    email: support@bdc.com
+  license:
+    name: Proprietary
+    
+servers:
+  - url: http://localhost:5001/api
+    description: Development server
+  - url: https://api.bdc.com/api
+    description: Production server
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details
+          
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        role:
+          type: string
+          enum: [super_admin, tenant_admin, trainer, student]
+          
+    Beneficiary:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        trainer_id:
+          type: integer
+          nullable: true
+        tenant_id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        gender:
+          type: string
+          enum: [male, female, other]
+        birth_date:
+          type: string
+          format: date
+        address:
+          type: string
+        city:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+        profession:
+          type: string
+        company:
+          type: string
+        company_size:
+          type: string
+          enum: [small, medium, large, enterprise]
+        years_of_experience:
+          type: integer
+        education_level:
+          type: string
+        emergency_contact_name:
+          type: string
+        emergency_contact_relationship:
+          type: string
+        emergency_contact_phone:
+          type: string
+        emergency_contact_email:
+          type: string
+          format: email
+        emergency_contact_address:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, archived]
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          
+    BeneficiaryCreate:
+      type: object
+      required:
+        - email
+        - first_name
+        - last_name
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        first_name:
+          type: string
+        last_name:
+          type: string
+        tenant_id:
+          type: integer
+        trainer_id:
+          type: integer
+        phone:
+          type: string
+        gender:
+          type: string
+          enum: [male, female, other]
+        birth_date:
+          type: string
+          format: date
+        address:
+          type: string
+        city:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+        profession:
+          type: string
+        company:
+          type: string
+        emergency_contact_name:
+          type: string
+        emergency_contact_relationship:
+          type: string
+        emergency_contact_phone:
+          type: string
+        emergency_contact_email:
+          type: string
+          format: email
+        emergency_contact_address:
+          type: string
+          
+    Program:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        tenant_id:
+          type: integer
+        duration_weeks:
+          type: integer
+        status:
+          type: string
+          enum: [draft, active, completed, archived]
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        max_participants:
+          type: integer
+        enrolled_count:
+          type: integer
+        category:
+          type: string
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        prerequisites:
+          type: string
+          
+    Evaluation:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        beneficiary_id:
+          type: integer
+        program_id:
+          type: integer
+        due_date:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [pending, in_progress, completed, overdue]
+        score:
+          type: number
+        max_score:
+          type: number
+          
+    EvaluationSubmission:
+      type: object
+      required:
+        - responses
+      properties:
+        responses:
+          type: array
+          items:
+            type: object
+            properties:
+              question_id:
+                type: integer
+              answer:
+                type: string
+        time_spent:
+          type: integer
+          description: Time spent in seconds
+          
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        filename:
+          type: string
+        file_size:
+          type: integer
+        mime_type:
+          type: string
+        category:
+          type: string
+        beneficiary_id:
+          type: integer
+        current_version:
+          type: integer
+        version_control_enabled:
+          type: boolean
+        download_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+          
+    DocumentVersion:
+      type: object
+      properties:
+        id:
+          type: integer
+        version_number:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+        change_notes:
+          type: string
+        file_size:
+          type: integer
+        is_current:
+          type: boolean
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+        pages:
+          type: integer
+
+paths:
+  # Authentication endpoints
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login to the system
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      responses:
+        '200':
+          description: New access token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout from the system
+      responses:
+        '200':
+          description: Successfully logged out
+          
+  # Beneficiary endpoints
+  /beneficiaries:
+    get:
+      tags:
+        - Beneficiaries
+      summary: List beneficiaries
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: tenant_id
+          in: query
+          schema:
+            type: integer
+        - name: trainer_id
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, archived]
+        - name: query
+          in: query
+          schema:
+            type: string
+            description: Search query for name or email
+      responses:
+        '200':
+          description: List of beneficiaries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Beneficiary'
+                  page:
+                    type: integer
+                  per_page:
+                    type: integer
+                  total:
+                    type: integer
+                  pages:
+                    type: integer
+                    
+    post:
+      tags:
+        - Beneficiaries
+      summary: Create a new beneficiary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeneficiaryCreate'
+      responses:
+        '201':
+          description: Beneficiary created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  beneficiary:
+                    $ref: '#/components/schemas/Beneficiary'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /beneficiaries/{id}:
+    get:
+      tags:
+        - Beneficiaries
+      summary: Get beneficiary details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Beneficiary details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Beneficiary'
+        '404':
+          description: Beneficiary not found
+          
+    put:
+      tags:
+        - Beneficiaries
+      summary: Update beneficiary
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                address:
+                  type: string
+                emergency_contact_name:
+                  type: string
+                emergency_contact_phone:
+                  type: string
+                # ... other updatable fields
+      responses:
+        '200':
+          description: Beneficiary updated successfully
+          
+  # Program endpoints
+  /programs:
+    get:
+      tags:
+        - Programs
+      summary: List programs
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+        - name: tenant_id
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, active, completed, archived]
+      responses:
+        '200':
+          description: List of programs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Program'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+                    
+  # Evaluation endpoints
+  /evaluations/{id}/submit:
+    post:
+      tags:
+        - Evaluations
+      summary: Submit evaluation responses
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationSubmission'
+      responses:
+        '200':
+          description: Evaluation submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  submission_id:
+                    type: integer
+                  score:
+                    type: number
+                  status:
+                    type: string
+                    
+  /evaluations/{id}/results:
+    get:
+      tags:
+        - Evaluations
+      summary: Get evaluation results
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Evaluation results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  evaluation_id:
+                    type: integer
+                  beneficiary_id:
+                    type: integer
+                  score:
+                    type: number
+                  max_score:
+                    type: number
+                  percentage:
+                    type: number
+                  status:
+                    type: string
+                  submitted_at:
+                    type: string
+                    format: date-time
+                  time_spent:
+                    type: integer
+                  questions_answered:
+                    type: integer
+                  correct_answers:
+                    type: integer
+                  feedback:
+                    type: string
+                    
+  /evaluations/{id}/analyze:
+    post:
+      tags:
+        - Evaluations
+      summary: Analyze evaluation with AI
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: AI analysis results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  analysis:
+                    type: object
+                    properties:
+                      strengths:
+                        type: array
+                        items:
+                          type: string
+                      weaknesses:
+                        type: array
+                        items:
+                          type: string
+                      recommendations:
+                        type: array
+                        items:
+                          type: string
+                      predicted_improvement:
+                        type: number
+                        
+  # Document endpoints
+  /documents:
+    get:
+      tags:
+        - Documents
+      summary: List documents
+      parameters:
+        - name: beneficiary_id
+          in: query
+          schema:
+            type: integer
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  documents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Document'
+                      
+    post:
+      tags:
+        - Documents
+      summary: Upload a document
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - title
+                - beneficiary_id
+              properties:
+                file:
+                  type: string
+                  format: binary
+                title:
+                  type: string
+                description:
+                  type: string
+                beneficiary_id:
+                  type: integer
+                category:
+                  type: string
+                version_control_enabled:
+                  type: boolean
+      responses:
+        '201':
+          description: Document uploaded successfully
+          
+  /documents/{id}:
+    get:
+      tags:
+        - Documents
+      summary: Get document details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+                
+    put:
+      tags:
+        - Documents
+      summary: Update document metadata
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                category:
+                  type: string
+      responses:
+        '200':
+          description: Document updated successfully
+          
+    delete:
+      tags:
+        - Documents
+      summary: Delete a document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Document deleted successfully
+          
+  /documents/{id}/download:
+    get:
+      tags:
+        - Documents
+      summary: Download a document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Document file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                
+  /documents/{id}/versions:
+    get:
+      tags:
+        - Document Versioning
+      summary: List document versions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of document versions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  versions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DocumentVersion'
+                      
+    post:
+      tags:
+        - Document Versioning
+      summary: Create a new version
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                change_notes:
+                  type: string
+      responses:
+        '201':
+          description: New version created successfully
+
+tags:
+  - name: Authentication
+    description: Authentication endpoints
+  - name: Beneficiaries
+    description: Beneficiary management
+  - name: Programs
+    description: Training program management
+  - name: Evaluations
+    description: Test and evaluation management
+  - name: Documents
+    description: Document management
+  - name: Document Versioning
+    description: Document version control

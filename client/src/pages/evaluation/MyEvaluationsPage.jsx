@@ -8,7 +8,6 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
 import { formatDate } from '@/lib/utils';
-
 /**
  * MyEvaluationsPage displays evaluations for student users
  */
@@ -17,7 +16,6 @@ const MyEvaluationsPage = () => {
   const { toast } = useToast();
   const [evaluations, setEvaluations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
   // Fetch student's evaluations
   useEffect(() => {
     const fetchMyEvaluations = async () => {
@@ -37,20 +35,16 @@ const MyEvaluationsPage = () => {
         setIsLoading(false);
       }
     };
-
     fetchMyEvaluations();
   }, [toast]);
-
   // Start an evaluation
   const handleStartEvaluation = (evaluationId) => {
     navigate(`/evaluations/sessions/new?evaluation_id=${evaluationId}`);
   };
-
   // View results
   const handleViewResults = (sessionId) => {
     navigate(`/evaluations/sessions/${sessionId}/results`);
   };
-
   // Get status icon
   const getStatusIcon = (status) => {
     switch (status) {
@@ -64,7 +58,6 @@ const MyEvaluationsPage = () => {
         return <ClipboardList className="h-4 w-4" />;
     }
   };
-
   // Get status color
   const getStatusColor = (status) => {
     switch (status) {
@@ -78,7 +71,6 @@ const MyEvaluationsPage = () => {
         return 'secondary';
     }
   };
-
   if (isLoading) {
     return (
       <div className="p-6">
@@ -88,14 +80,12 @@ const MyEvaluationsPage = () => {
       </div>
     );
   }
-
   return (
     <div className="p-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">My Evaluations</h1>
         <p className="text-gray-600 mt-1">View and take your assigned evaluations</p>
       </div>
-
       {evaluations.length === 0 ? (
         <Card className="p-8 text-center">
           <ClipboardList className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -118,11 +108,9 @@ const MyEvaluationsPage = () => {
                     </span>
                   </Badge>
                 </div>
-
                 <p className="text-gray-600 text-sm mb-4">
                   {evaluation.description}
                 </p>
-
                 <div className="space-y-2 text-sm text-gray-500">
                   {evaluation.time_limit && (
                     <div className="flex items-center gap-2">
@@ -143,7 +131,6 @@ const MyEvaluationsPage = () => {
                     </div>
                   )}
                 </div>
-
                 <div className="mt-6">
                   {evaluation.status === 'completed' && evaluation.latest_session_id ? (
                     <Button
@@ -180,5 +167,4 @@ const MyEvaluationsPage = () => {
     </div>
   );
 };
-
 export default MyEvaluationsPage;

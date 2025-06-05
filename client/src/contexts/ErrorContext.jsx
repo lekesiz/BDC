@@ -2,12 +2,10 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, AlertTriangle, XCircle, CheckCircle, Info } from 'lucide-react';
 import { createErrorBoundaryHandler } from '@/utils/errorHandling';
-
 /**
  * Global error context for centralized error handling
  */
 const ErrorContext = createContext();
-
 export const useError = () => {
   const context = useContext(ErrorContext);
   if (!context) {
@@ -15,7 +13,6 @@ export const useError = () => {
   }
   return context;
 };
-
 /**
  * Error notification component
  */
@@ -26,17 +23,14 @@ const ErrorNotification = ({ error, onClose }) => {
     success: CheckCircle,
     info: Info
   };
-  
   const colors = {
     error: 'bg-red-50 text-red-800 border-red-200',
     warning: 'bg-yellow-50 text-yellow-800 border-yellow-200',
     success: 'bg-green-50 text-green-800 border-green-200',
     info: 'bg-blue-50 text-blue-800 border-blue-200'
   };
-  
   const Icon = icons[error.type] || AlertTriangle;
   const colorClass = colors[error.type] || colors.error;
-  
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -70,21 +64,18 @@ const ErrorNotification = ({ error, onClose }) => {
     </motion.div>
   );
 };
-
 /**
  * Error provider component
  */
 export const ErrorProvider = ({ children, options = {} }) => {
   const [errors, setErrors] = useState([]);
   const [errorQueue, setErrorQueue] = useState([]);
-  
   const {
     maxErrors = 3,
     errorDuration = 5000,
     position = 'top-right',
     enableErrorBoundary = true
   } = options;
-
   // Add error to the list
   const addError = useCallback((error) => {
     const newError = {
@@ -92,7 +83,6 @@ export const ErrorProvider = ({ children, options = {} }) => {
       timestamp: new Date(),
       ...error
     };
-    
     setErrors(prev => {
       const updated = [...prev, newError];
       // Keep only the latest maxErrors
@@ -102,21 +92,17 @@ export const ErrorProvider = ({ children, options = {} }) => {
       }
       return updated;
     });
-    
     // Auto-remove after duration
     if (errorDuration > 0 && error.type !== 'error') {
       setTimeout(() => {
         removeError(newError.id);
       }, errorDuration);
     }
-    
     return newError;
   }, [maxErrors, errorDuration]);
-
   // Remove error
   const removeError = useCallback((id) => {
     setErrors(prev => prev.filter(error => error.id !== id));
-    
     // Check if there are queued errors
     setErrorQueue(queue => {
       if (queue.length > 0) {
@@ -127,13 +113,11 @@ export const ErrorProvider = ({ children, options = {} }) => {
       return queue;
     });
   }, []);
-
   // Clear all errors
   const clearErrors = useCallback(() => {
     setErrors([]);
     setErrorQueue([]);
   }, []);
-
   // Show error notification
   const showError = useCallback((message, options = {}) => {
     return addError({
@@ -142,7 +126,6 @@ export const ErrorProvider = ({ children, options = {} }) => {
       ...options
     });
   }, [addError]);
-
   // Show warning notification
   const showWarning = useCallback((message, options = {}) => {
     return addError({
@@ -151,7 +134,6 @@ export const ErrorProvider = ({ children, options = {} }) => {
       ...options
     });
   }, [addError]);
-
   // Show success notification
   const showSuccess = useCallback((message, options = {}) => {
     return addError({
@@ -160,7 +142,6 @@ export const ErrorProvider = ({ children, options = {} }) => {
       ...options
     });
   }, [addError]);
-
   // Show info notification
   const showInfo = useCallback((message, options = {}) => {
     return addError({
@@ -169,11 +150,9 @@ export const ErrorProvider = ({ children, options = {} }) => {
       ...options
     });
   }, [addError]);
-
   // Error boundary handler
   const errorBoundaryHandler = React.useMemo(() => {
     if (!enableErrorBoundary) return null;
-    
     return createErrorBoundaryHandler({
       onError: (error, details) => {
         showError('An unexpected error occurred', {
@@ -186,7 +165,6 @@ export const ErrorProvider = ({ children, options = {} }) => {
       }
     });
   }, [enableErrorBoundary, showError]);
-
   // Position classes
   const positionClasses = {
     'top-left': 'top-4 left-4',
@@ -196,7 +174,6 @@ export const ErrorProvider = ({ children, options = {} }) => {
     'top-center': 'top-4 left-1/2 transform -translate-x-1/2',
     'bottom-center': 'bottom-4 left-1/2 transform -translate-x-1/2'
   };
-
   const value = {
     errors,
     errorQueue,
@@ -209,11 +186,9 @@ export const ErrorProvider = ({ children, options = {} }) => {
     showInfo,
     errorBoundaryHandler
   };
-
   return (
     <ErrorContext.Provider value={value}>
       {children}
-      
       {/* Error notifications container */}
       <div className={`fixed z-50 ${positionClasses[position] || positionClasses['top-right']}`}>
         <AnimatePresence>
@@ -229,25 +204,21 @@ export const ErrorProvider = ({ children, options = {} }) => {
     </ErrorContext.Provider>
   );
 };
-
 /**
  * Hook for handling async errors
  */
 export const useAsyncError = () => {
   const { showError } = useError();
-  
   return useCallback((error) => {
     // This will be caught by the nearest error boundary
     throw error;
   }, []);
 };
-
 /**
  * Error boundary component that integrates with ErrorContext
  */
 export const ContextErrorBoundary = ({ children }) => {
   const { errorBoundaryHandler } = useError();
-  
   return (
     <ErrorBoundary
       onError={errorBoundaryHandler}

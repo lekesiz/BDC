@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
-
 describe('Card Component', () => {
   it('renders children correctly', () => {
     render(
@@ -11,7 +10,6 @@ describe('Card Component', () => {
     );
     expect(screen.getByText('Card content')).toBeInTheDocument();
   });
-
   it('renders title when provided', () => {
     render(
       <Card>
@@ -22,7 +20,6 @@ describe('Card Component', () => {
     );
     expect(screen.getByText('Test Title')).toBeInTheDocument();
   });
-
   it('renders content and title', () => {
     render(
       <Card>
@@ -35,7 +32,6 @@ describe('Card Component', () => {
     expect(screen.getByText('Title')).toBeInTheDocument();
     expect(screen.getByText('Content')).toBeInTheDocument();
   });
-
   it('renders footer when provided', () => {
     render(
       <Card>
@@ -45,7 +41,6 @@ describe('Card Component', () => {
     );
     expect(screen.getByText('Footer content')).toBeInTheDocument();
   });
-
   it('applies custom className', () => {
     render(
       <Card className="custom-class">
@@ -55,7 +50,6 @@ describe('Card Component', () => {
     const card = screen.getByText('Content').closest('.custom-class');
     expect(card).toBeInTheDocument();
   });
-
   it('has default card classes', () => {
     render(
       <Card>

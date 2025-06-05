@@ -22,7 +22,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
-
 /**
  * PortalProgressPage shows the student's overall program progress,
  * completion status, and learning journey
@@ -34,23 +33,19 @@ const PortalProgressPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [progressData, setProgressData] = useState(null);
   const [selectedModule, setSelectedModule] = useState(null);
-  
   // Fetch progress data
   useEffect(() => {
     const fetchProgressData = async () => {
       try {
         setIsLoading(true);
         const response = await api.get('/api/portal/progress');
-        
         // Handle different response structures
         let data = response.data;
-        
         // If response has a 'progress' key with array data, transform it
         if (data.progress && Array.isArray(data.progress)) {
           // Transform from server format to expected format
           const programs = data.progress;
           const firstProgram = programs[0];
-          
           data = {
             program: firstProgram ? {
               id: firstProgram.program.id,
@@ -69,9 +64,7 @@ const PortalProgressPage = () => {
             skills: []
           };
         }
-        
         setProgressData(data);
-        
         // Set the first module as selected by default if there are modules
         if (data.modules && data.modules.length > 0) {
           setSelectedModule(data.modules[0].id);
@@ -104,21 +97,17 @@ const PortalProgressPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchProgressData();
   }, []); // Remove toast dependency to prevent infinite loop
-  
   // Format date
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-  
   // Format time duration (minutes to hours and minutes)
   const formatDuration = (minutes) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
-    
     if (hours === 0) {
       return `${mins} min`;
     } else if (mins === 0) {
@@ -127,26 +116,20 @@ const PortalProgressPage = () => {
       return `${hours} ${hours === 1 ? 'hour' : 'hours'} ${mins} min`;
     }
   };
-  
   // Get the selected module details
   const getSelectedModuleDetails = () => {
     if (!progressData || !selectedModule || !progressData.modules) return null;
-    
     return progressData.modules.find(module => module.id === selectedModule);
   };
-  
   // Calculate days remaining in program
   const getDaysRemaining = () => {
     if (!progressData || !progressData.program || !progressData.program.expectedEndDate) return 0;
-    
     const endDate = new Date(progressData.program.expectedEndDate);
     const today = new Date();
     const diffTime = endDate - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
     return diffDays > 0 ? diffDays : 0;
   };
-  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -154,7 +137,6 @@ const PortalProgressPage = () => {
       </div>
     );
   }
-  
   if (!progressData || !progressData.program) {
     return (
       <div className="container mx-auto py-6">
@@ -165,10 +147,8 @@ const PortalProgressPage = () => {
       </div>
     );
   }
-  
   const selectedModuleDetails = getSelectedModuleDetails();
   const daysRemaining = getDaysRemaining();
-  
   return (
     <div className="container mx-auto py-6">
       {/* Page header */}
@@ -178,7 +158,6 @@ const PortalProgressPage = () => {
           Track your learning journey and progress in the {progressData?.program?.name || 'your'} program
         </p>
       </div>
-      
       {/* Overview metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Overall progress */}
@@ -203,7 +182,6 @@ const PortalProgressPage = () => {
             <span>Expected End: {formatDate(progressData.program.expectedEndDate)}</span>
           </div>
         </Card>
-        
         {/* Modules */}
         <Card className="p-6">
           <div className="flex items-center mb-4">
@@ -242,7 +220,6 @@ const PortalProgressPage = () => {
             </div>
           </div>
         </Card>
-        
         {/* Estimated completion */}
         <Card className="p-6">
           <div className="flex items-center mb-4">
@@ -254,7 +231,6 @@ const PortalProgressPage = () => {
               <p className="text-2xl font-bold">{daysRemaining} days</p>
             </div>
           </div>
-          
           <div className="space-y-2 mb-3">
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Time spent:</span>
@@ -269,7 +245,6 @@ const PortalProgressPage = () => {
               <span className="font-medium">{formatDuration(progressData.timeStats.remaining)}</span>
             </div>
           </div>
-          
           {progressData.timeStats.onTrack ? (
             <div className="flex items-center text-sm text-green-600 bg-green-50 p-2 rounded">
               <CheckCircle className="h-4 w-4 mr-2" />
@@ -288,7 +263,6 @@ const PortalProgressPage = () => {
           )}
         </Card>
       </div>
-      
       {/* Recent achievements */}
       {progressData.recentAchievements && progressData.recentAchievements.length > 0 && (
         <div className="mb-8">
@@ -303,7 +277,6 @@ const PortalProgressPage = () => {
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {progressData.recentAchievements.map(achievement => (
               <Card key={achievement.id} className="overflow-hidden">
@@ -335,11 +308,9 @@ const PortalProgressPage = () => {
           </div>
         </div>
       )}
-      
       {/* Module progress section */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Module Progress</h2>
-        
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Module list */}
           <div className="lg:col-span-1">
@@ -400,7 +371,6 @@ const PortalProgressPage = () => {
               </div>
             </Card>
           </div>
-          
           {/* Module details */}
           <div className="lg:col-span-3">
             {selectedModuleDetails ? (
@@ -440,7 +410,6 @@ const PortalProgressPage = () => {
                     </Button>
                   </div>
                 </div>
-                
                 <div className="p-6">
                   {/* Module stats */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -460,14 +429,12 @@ const PortalProgressPage = () => {
                         </div>
                       </div>
                     </div>
-                    
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h4 className="text-sm text-gray-500 mb-1">Lessons Completed</h4>
                       <div className="text-2xl font-bold">
                         {selectedModuleDetails.lessonsCompleted}/{selectedModuleDetails.totalLessons}
                       </div>
                     </div>
-                    
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h4 className="text-sm text-gray-500 mb-1">Time Spent</h4>
                       <div className="text-2xl font-bold">
@@ -475,7 +442,6 @@ const PortalProgressPage = () => {
                       </div>
                     </div>
                   </div>
-                  
                   {/* Lesson progress */}
                   <h4 className="font-medium mb-3">Lesson Progress</h4>
                   <div className="space-y-4 mb-6">
@@ -498,18 +464,15 @@ const PortalProgressPage = () => {
                             <div>
                               <h5 className="font-medium">{lesson.title}</h5>
                               <p className="text-sm text-gray-600">{lesson.description}</p>
-                              
                               <div className="flex items-center mt-2 space-x-4 text-xs">
                                 <span className="text-gray-500">
                                   Duration: {formatDuration(lesson.duration)}
                                 </span>
-                                
                                 {lesson.lastAccessed && (
                                   <span className="text-gray-500">
                                     Last accessed: {formatDate(lesson.lastAccessed)}
                                   </span>
                                 )}
-                                
                                 {lesson.completedDate && (
                                   <span className="text-green-600">
                                     Completed: {formatDate(lesson.completedDate)}
@@ -518,7 +481,6 @@ const PortalProgressPage = () => {
                               </div>
                             </div>
                           </div>
-                          
                           <Button
                             variant={lesson.status === 'completed' ? 'outline' : 'default'}
                             size="sm"
@@ -530,7 +492,6 @@ const PortalProgressPage = () => {
                       </div>
                     ))}
                   </div>
-                  
                   {/* Resources */}
                   {selectedModuleDetails.resources && selectedModuleDetails.resources.length > 0 && (
                     <div>
@@ -549,7 +510,6 @@ const PortalProgressPage = () => {
                                     <p className="text-xs text-gray-500">{resource.type} • {resource.size}</p>
                                   </div>
                                 </div>
-                                
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -579,12 +539,10 @@ const PortalProgressPage = () => {
           </div>
         </div>
       </div>
-      
       {/* Program certificate */}
       {progressData.programCertificate && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Program Certificate</h2>
-          
           <Card className="p-6">
             <div className="md:flex items-center justify-between">
               <div className="mb-4 md:mb-0">
@@ -598,7 +556,6 @@ const PortalProgressPage = () => {
                     : `Complete ${progressData.programCertificate.requiredCompletion - progressData.programCertificate.currentCompletion} more modules to earn your certificate.`
                   }
                 </p>
-                
                 <div className="flex items-center">
                   <div className="flex -space-x-2 mr-3">
                     {[...Array(3)].map((_, index) => (
@@ -618,7 +575,6 @@ const PortalProgressPage = () => {
                   </div>
                 </div>
               </div>
-              
               <div className="text-center">
                 <div className="inline-block relative mb-4">
                   <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center">
@@ -628,7 +584,6 @@ const PortalProgressPage = () => {
                   </div>
                   {/* Progress circle indicator could be added here */}
                 </div>
-                
                 <Button
                   disabled={!progressData.programCertificate.isEarned}
                   onClick={() => progressData.programCertificate.isEarned && 
@@ -646,12 +601,10 @@ const PortalProgressPage = () => {
           </Card>
         </div>
       )}
-      
       {/* Learning recommendations */}
       {progressData.recommendations && progressData.recommendations.length > 0 && (
         <div>
           <h2 className="text-xl font-semibold mb-4">Learning Recommendations</h2>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {progressData.recommendations.map(recommendation => (
               <Card key={recommendation.id} className="overflow-hidden">
@@ -681,9 +634,7 @@ const PortalProgressPage = () => {
                     </div>
                     <h3 className="font-medium">{recommendation.title}</h3>
                   </div>
-                  
                   <p className="text-gray-600 mb-4">{recommendation.description}</p>
-                  
                   <Button
                     variant="outline"
                     className="w-full"
@@ -714,5 +665,4 @@ const PortalProgressPage = () => {
     </div>
   );
 };
-
 export default PortalProgressPage;

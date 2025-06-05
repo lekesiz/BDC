@@ -24,7 +24,6 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-
 const BaseIntegration = ({ 
   integration, 
   onBack, 
@@ -48,13 +47,11 @@ const BaseIntegration = ({
     remaining: 850,
     resetsAt: new Date(Date.now() + 3600000).toISOString()
   });
-
   useEffect(() => {
     // Load saved configuration
     loadConfiguration();
     loadActivityLog();
   }, [integration.id]);
-
   const loadConfiguration = () => {
     // Mock loading saved config
     const savedConfig = localStorage.getItem(`integration_${integration.id}_config`);
@@ -62,7 +59,6 @@ const BaseIntegration = ({
       setConfig(JSON.parse(savedConfig));
     }
   };
-
   const loadActivityLog = () => {
     // Mock activity log
     setActivityLog([
@@ -71,7 +67,6 @@ const BaseIntegration = ({
       { id: 3, action: 'Configuration updated', timestamp: new Date(Date.now() - 86400000), status: 'info' }
     ]);
   };
-
   const handleConnect = async () => {
     setLoading(true);
     try {
@@ -91,7 +86,6 @@ const BaseIntegration = ({
       setLoading(false);
     }
   };
-
   const handleDisconnect = async () => {
     setLoading(true);
     try {
@@ -106,7 +100,6 @@ const BaseIntegration = ({
       setLoading(false);
     }
   };
-
   const testConnection = async () => {
     setTestingConnection(true);
     try {
@@ -120,7 +113,6 @@ const BaseIntegration = ({
       setTestingConnection(false);
     }
   };
-
   const saveConfiguration = () => {
     localStorage.setItem(`integration_${integration.id}_config`, JSON.stringify(config));
     // Add to activity log
@@ -131,10 +123,8 @@ const BaseIntegration = ({
       status: 'success'
     }, ...prev]);
   };
-
   const buildOAuthUrl = () => {
     if (!oauthConfig) return '';
-    
     const params = new URLSearchParams({
       client_id: oauthConfig.clientId,
       redirect_uri: oauthConfig.redirectUri,
@@ -142,14 +132,11 @@ const BaseIntegration = ({
       scope: oauthConfig.scopes.join(' '),
       state: generateState()
     });
-
     return `${oauthConfig.authUrl}?${params.toString()}`;
   };
-
   const generateState = () => {
     return Math.random().toString(36).substring(2, 15);
   };
-
   const handleSync = async () => {
     setLoading(true);
     try {
@@ -167,7 +154,6 @@ const BaseIntegration = ({
       setLoading(false);
     }
   };
-
   const defaultTabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'configuration', label: 'Configuration', icon: Settings },
@@ -176,7 +162,6 @@ const BaseIntegration = ({
     { id: 'api', label: 'API & Webhooks', icon: Database },
     ...customTabs
   ];
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -212,7 +197,6 @@ const BaseIntegration = ({
           )}
         </div>
       </div>
-
       {/* Connection Status */}
       <Card>
         <div className="p-6">
@@ -245,7 +229,6 @@ const BaseIntegration = ({
           </div>
         </div>
       </Card>
-
       {/* Tabs */}
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
@@ -270,14 +253,12 @@ const BaseIntegration = ({
           })}
         </nav>
       </div>
-
       {/* Tab Content */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
           {children}
         </div>
       )}
-
       {activeTab === 'configuration' && (
         <Card>
           <div className="p-6">
@@ -366,7 +347,6 @@ const BaseIntegration = ({
           </div>
         </Card>
       )}
-
       {activeTab === 'security' && (
         <div className="space-y-6">
           <Card>
@@ -414,7 +394,6 @@ const BaseIntegration = ({
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Rate Limits</h3>
@@ -437,7 +416,6 @@ const BaseIntegration = ({
           </Card>
         </div>
       )}
-
       {activeTab === 'activity' && (
         <Card>
           <div className="p-6">
@@ -469,7 +447,6 @@ const BaseIntegration = ({
           </div>
         </Card>
       )}
-
       {activeTab === 'api' && (
         <div className="space-y-6">
           {webhookEvents.length > 0 && (
@@ -501,7 +478,6 @@ const BaseIntegration = ({
               </div>
             </Card>
           )}
-
           {apiEndpoints.length > 0 && (
             <Card>
               <div className="p-6">
@@ -539,5 +515,4 @@ const BaseIntegration = ({
     </div>
   );
 };
-
 export default BaseIntegration;

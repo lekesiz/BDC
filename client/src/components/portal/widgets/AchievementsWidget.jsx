@@ -2,19 +2,16 @@ import { useNavigate } from 'react-router-dom';
 import { Award, Medal, Star, CheckCircle, Loader } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
 /**
  * Displays the student's recent achievements, badges, and certificates
  */
 const AchievementsWidget = ({ data, isLoading, error }) => {
   const navigate = useNavigate();
-  
   // Format date
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-  
   // Get icon based on achievement type
   const getAchievementIcon = (type, className = "h-5 w-5") => {
     switch (type) {
@@ -28,7 +25,6 @@ const AchievementsWidget = ({ data, isLoading, error }) => {
         return <Star className={className} />;
     }
   };
-  
   // Get color class based on achievement type
   const getAchievementColorClass = (type) => {
     switch (type) {
@@ -42,7 +38,6 @@ const AchievementsWidget = ({ data, isLoading, error }) => {
         return 'bg-gray-50 text-gray-500';
     }
   };
-  
   if (isLoading) {
     return (
       <Card className="overflow-hidden h-full">
@@ -55,7 +50,6 @@ const AchievementsWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   if (error) {
     return (
       <Card className="overflow-hidden h-full">
@@ -68,13 +62,10 @@ const AchievementsWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   // Get achievements summary stats
   const highlightMetrics = data?.highlights || [];
-  
   // Get recent achievements to display (limit to 3)
   const recentAchievements = data?.recentAchievements?.slice(0, 3) || [];
-  
   return (
     <Card className="overflow-hidden h-full">
       <div className="p-6 flex justify-between items-center border-b">
@@ -87,7 +78,6 @@ const AchievementsWidget = ({ data, isLoading, error }) => {
           View All
         </Button>
       </div>
-      
       <div className="p-4">
         {/* Achievement stats */}
         {highlightMetrics.length > 0 && (
@@ -106,10 +96,8 @@ const AchievementsWidget = ({ data, isLoading, error }) => {
             ))}
           </div>
         )}
-        
         {/* Recent achievements */}
         <h3 className="text-sm font-medium text-gray-500 mb-3">Recently Earned</h3>
-        
         {recentAchievements.length > 0 ? (
           <div className="space-y-3">
             {recentAchievements.map(achievement => (
@@ -137,7 +125,6 @@ const AchievementsWidget = ({ data, isLoading, error }) => {
           </div>
         )}
       </div>
-      
       <div className="bg-gray-50 p-4 text-center border-t">
         <Button
           variant="link"
@@ -149,5 +136,4 @@ const AchievementsWidget = ({ data, isLoading, error }) => {
     </Card>
   );
 };
-
 export default AchievementsWidget;

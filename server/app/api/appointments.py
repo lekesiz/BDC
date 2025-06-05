@@ -9,6 +9,8 @@ from app.extensions import db
 from app.services.appointment_service_factory import AppointmentServiceFactory
 from app.exceptions import NotFoundException, ForbiddenException, ValidationException
 
+from app.utils.logging import logger
+
 appointments_bp = Blueprint('appointments', __name__)
 
 # Create service instance

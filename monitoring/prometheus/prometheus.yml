@@ -1,80 +1,66 @@
-# Prometheus configuration for BDC application monitoring
-
+# BDC Prometheus Configuration
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
     cluster: 'bdc-production'
-    replica: '1'
+    environment: 'production'
 
-rule_files:
-  - "rules/*.yml"
-
+# Alertmanager configuration
 alerting:
   alertmanagers:
     - static_configs:
         - targets:
           - alertmanager:9093
 
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "alerts/*.yml"
+
+# Scrape configuration
 scrape_configs:
-  # Prometheus self-monitoring
+  # Prometheus itself
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
     scrape_interval: 30s
     metrics_path: /metrics
 
-  # BDC Backend Application
-  - job_name: 'bdc-backend'
-    static_configs:
-      - targets: ['backend:5000']
-    scrape_interval: 15s
-    metrics_path: /metrics
-    scheme: http
-    scrape_timeout: 10s
-    honor_labels: false
-    honor_timestamps: true
-
-  # BDC Frontend (nginx metrics)
-  - job_name: 'bdc-frontend'
-    static_configs:
-      - targets: ['frontend:80']
-    scrape_interval: 15s
-    metrics_path: /metrics
-    scheme: http
-
-  # PostgreSQL Database
-  - job_name: 'postgres'
-    static_configs:
-      - targets: ['postgres:5432']
-    scrape_interval: 30s
-    metrics_path: /metrics
-
-  # Redis Cache
-  - job_name: 'redis'
-    static_configs:
-      - targets: ['redis:6379']
-    scrape_interval: 30s
-
-  # Node Exporter for system metrics
+  # Node Exporter - System metrics
   - job_name: 'node-exporter'
     static_configs:
       - targets: ['node-exporter:9100']
     scrape_interval: 15s
-    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.*):(.*)'
+        replacement: '${1}'
 
-  # cAdvisor for container metrics
+  # cAdvisor - Container metrics
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']
     scrape_interval: 15s
     metrics_path: /metrics
 
-  # Nginx Load Balancer
-  - job_name: 'nginx-lb'
+  # Redis Exporter
+  - job_name: 'redis-exporter'
     static_configs:
-      - targets: ['nginx-lb:80']
-    scrape_interval: 30s
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 15s
+
+  # PostgreSQL Exporter
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 15s
+
+  # BDC Application Metrics
+  - job_name: 'bdc-backend'
+    static_configs:
+      - targets: ['app-exporter:8000']
+    scrape_interval: 15s
     metrics_path: /metrics
 
   # AlertManager
@@ -90,24 +76,40 @@ scrape_configs:
     scrape_interval: 30s
     metrics_path: /metrics
 
-  # Elasticsearch
-  - job_name: 'elasticsearch'
+  # Blackbox Exporter - External monitoring
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
     static_configs:
-      - targets: ['elasticsearch:9200']
-    scrape_interval: 30s
-    metrics_path: /_prometheus/metrics
+      - targets:
+        - http://bdc-frontend:80/health
+        - http://bdc-backend:5000/api/health
+        - https://httpbin.org/status/200
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
 
-  # Jaeger
-  - job_name: 'jaeger'
+  # Docker containers (if Docker daemon metrics are exposed)
+  - job_name: 'docker'
     static_configs:
-      - targets: ['jaeger:16686']
+      - targets: ['host.docker.internal:9323']
     scrape_interval: 30s
-    metrics_path: /metrics
+    honor_labels: true
 
-# Remote write configuration (optional - for external monitoring services)
+# Remote write configuration for long-term storage (optional)
 # remote_write:
-#   - url: "https://your-remote-monitoring-service.com/api/v1/write"
-#     queue_config:
-#       max_samples_per_send: 1000
-#       max_shards: 200
-#       capacity: 2500
+#   - url: "https://your-remote-storage-endpoint/api/v1/write"
+#     basic_auth:
+#       username: "your-username"
+#       password: "your-password"
+
+# Storage configuration
+storage:
+  tsdb:
+    retention.time: 30d
+    retention.size: 10GB

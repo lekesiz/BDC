@@ -1,7 +1,6 @@
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useMemo } from 'react';
-
 /**
  * Performance-optimized animation wrapper that only animates when in viewport
  * and uses GPU-accelerated transforms
@@ -20,7 +19,6 @@ export const OptimizedAnimation = ({
     threshold,
     triggerOnce: once,
   });
-
   // Memoize animation variants for performance
   const animationVariants = useMemo(() => ({
     hidden: { 
@@ -38,7 +36,6 @@ export const OptimizedAnimation = ({
       }
     }
   }), [delay, duration]);
-
   return (
     <motion.div
       ref={ref}
@@ -53,14 +50,12 @@ export const OptimizedAnimation = ({
     </motion.div>
   );
 };
-
 /**
  * Optimized scroll-triggered animation
  */
 export const ScrollAnimation = ({ children, className, offset = 100 }) => {
   const y = useMotionValue(0);
   const opacity = useTransform(y, [-offset, 0, offset], [0, 1, 0]);
-  
   return (
     <motion.div
       className={className}
@@ -70,7 +65,6 @@ export const ScrollAnimation = ({ children, className, offset = 100 }) => {
     </motion.div>
   );
 };
-
 /**
  * Batch animation for multiple elements to reduce re-renders
  */

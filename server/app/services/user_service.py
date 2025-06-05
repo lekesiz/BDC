@@ -1,369 +1,442 @@
-"""User Service implementation."""
-
+"""User service implementation with dependency injection."""
 import os
-import time
-from typing import Dict, Any, Optional, List
-from werkzeug.datastructures import FileStorage
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+from flask import current_app
+from sqlalchemy.orm import Session
 from werkzeug.utils import secure_filename
-from marshmallow import ValidationError
-from passlib.context import CryptContext
 
-from app.extensions import db, logger
-from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate, UserResponse
-from app.schemas import UserSchema, UserCreateSchema, UserUpdateSchema, UserProfileSchema
-from app.services.interfaces.user_service_interface import IUserService
-from app.repositories.user_repository import UserRepository
+from app.models import User, UserProfile, UserActivity, Permission, Role
+from app.repositories.v2.interfaces.user_repository_interface import IUserRepository
+from app.repositories.v2.user_repository import UserRepository
+from app.services.v2.interfaces.user_service_interface import IUserService
+from app.core.security import SecurityManager
+from app.utils.cache import cache, generate_cache_key
 
 
-class UserService(IUserService):
-    """User service implementation."""
+class UserServiceV2(IUserService):
+    """User service with dependency injection."""
     
-    def __init__(self, user_repository: UserRepository, upload_folder: str = None):
-        """
-        Initialize UserService.
-        
-        Args:
-            user_repository: The user repository instance
-            upload_folder: Path to upload folder for profile pictures
-        """
+    def __init__(self, user_repository: Optional[IUserRepository] = None,
+                 security_manager: Optional[SecurityManager] = None,
+                 db_session: Optional[Session] = None):
+        """Initialize user service with dependencies."""
         self.user_repository = user_repository
-        self.upload_folder = upload_folder or 'uploads'
-        self.allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
-        self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        self.security_manager = security_manager or SecurityManager()
+        self.db_session = db_session
     
-    async def create_user(self, user_data: UserCreate) -> UserResponse:
+    def _get_repository(self) -> IUserRepository:
+        """Get user repository instance."""
+        if self.user_repository:
+            return self.user_repository
+        
+        from app.extensions import db
+        session = self.db_session or db.session
+        return UserRepository(session)
+    
+    def create_user(self, user_data: Dict[str, Any]) -> User:
         """Create a new user."""
-        try:
-            # Check if user already exists
-            existing_user = await self.user_repository.get_by_email(user_data.email)
-            if existing_user:
-                raise ValueError("User with this email already exists")
-            
-            # Hash the password
-            hashed_password = self.pwd_context.hash(user_data.password)
-            
-            # Create user entity
-            user = User(
-                email=user_data.email,
-                password=hashed_password,
-                first_name=user_data.first_name,
-                last_name=user_data.last_name,
-                role=user_data.role,
-                phone=user_data.phone,
-                organization=user_data.organization,
-                tenant_id=user_data.tenant_id,
-                is_active=True
-            )
-            
-            # Save to database
-            saved_user = await self.user_repository.create(user)
-            
-            # Convert to response schema
-            return UserResponse.from_orm(saved_user)
-            
-        except Exception as e:
-            logger.exception(f"Create user error: {str(e)}")
-            raise
+        repo = self._get_repository()
+        
+        # Check if user exists
+        if repo.find_by_email(user_data['email']):
+            raise ValueError(f"User with email {user_data['email']} already exists")
+        
+        # Hash password if provided
+        if 'password' in user_data:
+            user_data['password_hash'] = self.security_manager.hash_password(user_data.pop('password'))
+        
+        # Create user
+        user = User(**user_data)
+        created_user = repo.create(user)
+        
+        # Create default profile
+        self.create_user_profile(created_user.id, {})
+        
+        # Log activity
+        self.log_user_activity(created_user.id, 'user_created', {'email': user_data['email']})
+        
+        # Clear cache
+        self._clear_cache()
+        
+        return created_user
     
-    async def get_user(self, user_id: int) -> Optional[UserResponse]:
-        """Get a user by ID."""
-        try:
-            user = await self.user_repository.get_by_id(user_id)
-            
-            if not user:
-                return None
-            
-            return UserResponse.from_orm(user)
-            
-        except Exception as e:
-            logger.exception(f"Get user error: {str(e)}")
-            raise
+    def get_user(self, user_id: int) -> Optional[User]:
+        """Get user by ID."""
+        cache_key = generate_cache_key('user', user_id)
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        
+        repo = self._get_repository()
+        user = repo.find_by_id(user_id)
+        
+        if user:
+            cache.set(cache_key, user, timeout=300)
+        
+        return user
     
-    async def get_user_by_email(self, email: str) -> Optional[UserResponse]:
-        """Get a user by email."""
-        try:
-            user = await self.user_repository.get_by_email(email)
-            
-            if not user:
-                return None
-            
-            return UserResponse.from_orm(user)
-            
-        except Exception as e:
-            logger.exception(f"Get user by email error: {str(e)}")
-            raise
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        """Get user by email."""
+        repo = self._get_repository()
+        return repo.find_by_email(email)
     
-    async def update_user(self, user_id: int, user_data: UserUpdate) -> Optional[UserResponse]:
-        """Update a user's information."""
-        try:
-            user = await self.user_repository.get_by_id(user_id)
-            
-            if not user:
-                return None
-            
-            # Update user fields
-            update_data = user_data.dict(exclude_unset=True)
-            
-            # Handle password update if provided
-            if 'password' in update_data:
-                update_data['password'] = self.pwd_context.hash(update_data['password'])
-            
-            # Update fields
-            for key, value in update_data.items():
+    def update_user(self, user_id: int, update_data: Dict[str, Any]) -> Optional[User]:
+        """Update user information."""
+        repo = self._get_repository()
+        user = repo.find_by_id(user_id)
+        
+        if not user:
+            return None
+        
+        # Hash password if being updated
+        if 'password' in update_data:
+            update_data['password_hash'] = self.security_manager.hash_password(update_data.pop('password'))
+        
+        # Update fields
+        for key, value in update_data.items():
+            if hasattr(user, key) and key not in ['id', 'created_at']:
                 setattr(user, key, value)
-            
-            # Save changes
-            updated_user = await self.user_repository.update(user)
-            
-            return UserResponse.from_orm(updated_user)
-            
-        except Exception as e:
-            logger.exception(f"Update user error: {str(e)}")
-            raise
+        
+        updated_user = repo.update(user)
+        
+        # Log activity
+        self.log_user_activity(user_id, 'user_updated', {'fields': list(update_data.keys())})
+        
+        # Clear cache
+        cache_key = generate_cache_key('user', user_id)
+        cache.delete(cache_key)
+        self._clear_cache()
+        
+        return updated_user
     
-    async def delete_user(self, user_id: int) -> bool:
+    def delete_user(self, user_id: int) -> bool:
         """Delete a user."""
-        try:
-            user = await self.user_repository.get_by_id(user_id)
-            
-            if not user:
-                return False
-            
-            # Soft delete the user
-            user.is_active = False
-            await self.user_repository.update(user)
-            
-            return True
-            
-        except Exception as e:
-            logger.exception(f"Delete user error: {str(e)}")
-            raise
+        repo = self._get_repository()
+        user = repo.find_by_id(user_id)
+        
+        if not user:
+            return False
+        
+        # Log activity before deletion
+        self.log_user_activity(user_id, 'user_deleted', {'email': user.email})
+        
+        result = repo.delete(user_id)
+        
+        if result:
+            # Clear cache
+            cache_key = generate_cache_key('user', user_id)
+            cache.delete(cache_key)
+            self._clear_cache()
+        
+        return result
     
-    async def verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        """Verify a password against its hash."""
-        return self.pwd_context.verify(plain_password, hashed_password)
+    def search_users(self, query: str, filters: Optional[Dict[str, Any]] = None,
+                    page: int = 1, per_page: int = 20) -> Dict[str, Any]:
+        """Search users with pagination."""
+        repo = self._get_repository()
+        
+        # Build search query
+        users_query = repo.db.query(User)
+        
+        # Apply text search
+        if query:
+            users_query = users_query.filter(
+                User.name.ilike(f'%{query}%') |
+                User.surname.ilike(f'%{query}%') |
+                User.email.ilike(f'%{query}%')
+            )
+        
+        # Apply filters
+        if filters:
+            if 'role' in filters:
+                users_query = users_query.filter(User.role == filters['role'])
+            if 'is_active' in filters:
+                users_query = users_query.filter(User.is_active == filters['is_active'])
+            if 'tenant_id' in filters:
+                users_query = users_query.filter(User.tenant_id == filters['tenant_id'])
+        
+        # Paginate
+        total = users_query.count()
+        users = users_query.offset((page - 1) * per_page).limit(per_page).all()
+        
+        return {
+            'items': users,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'pages': (total + per_page - 1) // per_page
+        }
     
-    async def authenticate_user(self, email: str, password: str) -> Optional[User]:
-        """Authenticate a user by email and password."""
-        try:
-            user = await self.user_repository.get_by_email(email)
-            
-            if not user:
-                return None
-            
-            if not await self.verify_password(password, user.password):
-                return None
-            
-            return user
-            
-        except Exception as e:
-            logger.exception(f"Authenticate user error: {str(e)}")
-            raise
+    def activate_user(self, user_id: int) -> bool:
+        """Activate a user account."""
+        repo = self._get_repository()
+        user = repo.find_by_id(user_id)
+        
+        if not user:
+            return False
+        
+        user.is_active = True
+        user.activated_at = datetime.utcnow()
+        repo.update(user)
+        
+        self.log_user_activity(user_id, 'user_activated', {})
+        self._clear_cache()
+        
+        return True
     
-    async def update_user_password(self, user_id: int, new_password: str) -> bool:
-        """Update a user's password."""
-        try:
-            user = await self.user_repository.get_by_id(user_id)
-            
-            if not user:
-                return False
-            
-            # Hash the new password
-            user.password = self.pwd_context.hash(new_password)
-            
-            # Save changes
-            await self.user_repository.update(user)
-            
-            return True
-            
-        except Exception as e:
-            logger.exception(f"Update user password error: {str(e)}")
-            raise
+    def deactivate_user(self, user_id: int) -> bool:
+        """Deactivate a user account."""
+        repo = self._get_repository()
+        user = repo.find_by_id(user_id)
+        
+        if not user:
+            return False
+        
+        user.is_active = False
+        user.deactivated_at = datetime.utcnow()
+        repo.update(user)
+        
+        self.log_user_activity(user_id, 'user_deactivated', {})
+        self._clear_cache()
+        
+        return True
     
-    # Additional methods that were in the original service
-    def get_current_user(self, user_id: int) -> Optional[Dict[str, Any]]:
-        """Get the current authenticated user."""
-        try:
-            user = self.user_repository.get_by_id(user_id)
-            
-            if not user:
-                return None
-            
-            schema = UserProfileSchema()
-            return schema.dump(user)
-            
-        except Exception as e:
-            logger.exception(f"Get current user error: {str(e)}")
-            raise
+    def update_user_role(self, user_id: int, new_role: str) -> bool:
+        """Update user role."""
+        repo = self._get_repository()
+        user = repo.find_by_id(user_id)
+        
+        if not user:
+            return False
+        
+        old_role = user.role
+        user.role = new_role
+        repo.update(user)
+        
+        self.log_user_activity(user_id, 'role_changed', {
+            'old_role': old_role,
+            'new_role': new_role
+        })
+        self._clear_cache()
+        
+        return True
     
-    def get_users(
-        self,
-        page: int = 1,
-        per_page: int = 10,
-        role: Optional[str] = None,
-        is_active: Optional[bool] = None,
-        status: Optional[str] = None,
-        tenant_id: Optional[int] = None,
-        sort_by: str = 'created_at',
-        sort_direction: str = 'desc'
-    ) -> Dict[str, Any]:
-        """Get paginated users with filters."""
-        try:
-            # Build query
-            query = User.query
-            
-            if role:
-                query = query.filter_by(role=role)
-            
-            # Handle is_active filtering
-            if is_active is not None:
-                query = query.filter_by(is_active=is_active)
-            elif status:
-                if status == 'active':
-                    query = query.filter_by(is_active=True)
-                elif status == 'inactive':
-                    query = query.filter_by(is_active=False)
-            else:
-                # Default to active users only
-                query = query.filter_by(is_active=True)
-            
-            if tenant_id:
-                query = query.filter_by(tenant_id=tenant_id)
-            
-            # Apply sorting
-            sort_attr = getattr(User, sort_by, None)
-            if sort_attr:
-                if sort_direction.lower() == 'desc':
-                    query = query.order_by(sort_attr.desc())
-                else:
-                    query = query.order_by(sort_attr.asc())
-            
-            # Paginate query
-            pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-            
-            # Serialize data
-            schema = UserSchema(many=True)
-            users = schema.dump(pagination.items)
-            
-            return {
-                'items': users,
-                'page': pagination.page,
-                'per_page': pagination.per_page,
-                'total': pagination.total,
-                'pages': pagination.pages,
-                'filters': {
-                    'is_active': is_active,
-                    'status': status,
-                    'role': role,
-                    'show_inactive': is_active is False or status == 'inactive'
-                }
-            }
-            
-        except Exception as e:
-            logger.exception(f"Get users error: {str(e)}")
-            raise
+    def get_users_by_role(self, role: str) -> List[User]:
+        """Get all users with a specific role."""
+        repo = self._get_repository()
+        return repo.find_all_by(role=role)
     
-    def get_user_profile(self, user_id: int) -> Optional[Dict[str, Any]]:
-        """Get detailed user profile."""
-        try:
-            user = self.user_repository.get_by_id(user_id)
-            
-            if not user:
-                return None
-            
-            schema = UserProfileSchema()
-            profile_data = schema.dump(user)
-            
-            # Add additional profile information
-            profile_data['stats'] = {
-                'appointments_count': 0,  # To be implemented
-                'evaluations_count': 0,   # To be implemented
-                'documents_count': 0      # To be implemented
-            }
-            
-            return profile_data
-            
-        except Exception as e:
-            logger.exception(f"Get user profile error: {str(e)}")
-            raise
+    def get_users_by_tenant(self, tenant_id: int) -> List[User]:
+        """Get all users for a tenant."""
+        repo = self._get_repository()
+        return repo.find_all_by(tenant_id=tenant_id)
     
-    def update_user_profile(self, user_id: int, data: Dict[str, Any]) -> Dict[str, Any]:
+    # User Profile Management
+    def create_user_profile(self, user_id: int, profile_data: Dict[str, Any]) -> UserProfile:
+        """Create user profile."""
+        from app.extensions import db
+        
+        # Check if profile exists
+        existing = db.session.query(UserProfile).filter_by(user_id=user_id).first()
+        if existing:
+            return existing
+        
+        profile = UserProfile(user_id=user_id, **profile_data)
+        db.session.add(profile)
+        db.session.commit()
+        
+        return profile
+    
+    def get_user_profile(self, user_id: int) -> Optional[UserProfile]:
+        """Get user profile."""
+        from app.extensions import db
+        return db.session.query(UserProfile).filter_by(user_id=user_id).first()
+    
+    def update_user_profile(self, user_id: int, profile_data: Dict[str, Any]) -> Optional[UserProfile]:
         """Update user profile."""
-        try:
-            user = self.user_repository.get_by_id(user_id)
-            
-            if not user:
-                raise ValueError("User not found")
-            
-            # Update user fields
-            updateable_fields = [
-                'first_name', 'last_name', 'phone', 'bio', 'timezone', 
-                'organization', 'address', 'city', 'state', 'zip_code', 
-                'country', 'email_notifications', 'push_notifications', 
-                'sms_notifications', 'language', 'theme'
-            ]
-            
-            for field in updateable_fields:
-                if field in data:
-                    setattr(user, field, data[field])
-            
-            db.session.commit()
-            
-            # Return updated profile
-            schema = UserProfileSchema()
-            return schema.dump(user)
-            
-        except Exception as e:
-            logger.exception(f"Update user profile error: {str(e)}")
-            db.session.rollback()
-            raise
+        profile = self.get_user_profile(user_id)
+        
+        if not profile:
+            return self.create_user_profile(user_id, profile_data)
+        
+        from app.extensions import db
+        for key, value in profile_data.items():
+            if hasattr(profile, key):
+                setattr(profile, key, value)
+        
+        profile.updated_at = datetime.utcnow()
+        db.session.commit()
+        
+        return profile
     
-    def upload_profile_picture(self, user_id: int, file: FileStorage) -> Dict[str, str]:
+    def upload_profile_picture(self, user_id: int, file_data: Dict[str, Any]) -> str:
         """Upload user profile picture."""
-        try:
-            user = self.user_repository.get_by_id(user_id)
-            
-            if not user:
-                raise ValueError("User not found")
-            
-            if not file or file.filename == '':
-                raise ValueError("No file provided")
-            
-            # Check file extension
-            if not self._allowed_file(file.filename):
-                raise ValueError("Invalid file type. Allowed types: png, jpg, jpeg, gif")
-            
-            # Create secure filename
-            filename = secure_filename(file.filename)
-            timestamp = str(int(time.time()))
-            filename = f"{user_id}_{timestamp}_{filename}"
-            
-            # Save file
-            profile_pictures_folder = os.path.join(self.upload_folder, 'profile_pictures')
-            
-            # Create directory if it doesn't exist
-            if not os.path.exists(profile_pictures_folder):
-                os.makedirs(profile_pictures_folder)
-            
-            file_path = os.path.join(profile_pictures_folder, filename)
-            file.save(file_path)
-            
-            # Update user's profile picture URL
-            user.profile_picture = f'/uploads/profile_pictures/{filename}'
-            db.session.commit()
-            
-            return {
-                'message': 'Profile picture uploaded successfully',
-                'profile_picture': user.profile_picture
-            }
-            
-        except Exception as e:
-            logger.exception(f"Upload profile picture error: {str(e)}")
-            db.session.rollback()
-            raise
+        file = file_data['file']
+        filename = secure_filename(file.filename)
+        timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+        filename = f"{user_id}_{timestamp}_{filename}"
+        
+        # Create upload directory
+        upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'profile_pictures')
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        file_path = os.path.join(upload_dir, filename)
+        file.save(file_path)
+        
+        # Update profile
+        profile_url = f"/uploads/profile_pictures/{filename}"
+        self.update_user_profile(user_id, {'profile_picture': profile_url})
+        
+        return profile_url
     
-    def _allowed_file(self, filename: str) -> bool:
-        """Check if file extension is allowed."""
-        return '.' in filename and \
-               filename.rsplit('.', 1)[1].lower() in self.allowed_extensions
+    # Activity Tracking
+    def get_user_activities(self, user_id: int, limit: int = 50) -> List[UserActivity]:
+        """Get user activity history."""
+        from app.extensions import db
+        return db.session.query(UserActivity).filter_by(
+            user_id=user_id
+        ).order_by(UserActivity.created_at.desc()).limit(limit).all()
+    
+    def log_user_activity(self, user_id: int, activity_type: str,
+                         details: Dict[str, Any]) -> UserActivity:
+        """Log user activity."""
+        from app.extensions import db
+        
+        activity = UserActivity(
+            user_id=user_id,
+            activity_type=activity_type,
+            details=details,
+            ip_address=details.get('ip_address'),
+            user_agent=details.get('user_agent')
+        )
+        
+        db.session.add(activity)
+        db.session.commit()
+        
+        return activity
+    
+    # Statistics and Analytics
+    def get_user_statistics(self, user_id: int) -> Dict[str, Any]:
+        """Get user statistics."""
+        from app.extensions import db
+        
+        user = self.get_user(user_id)
+        if not user:
+            return {}
+        
+        # Activity count
+        activity_count = db.session.query(UserActivity).filter_by(
+            user_id=user_id
+        ).count()
+        
+        # Last activity
+        last_activity = db.session.query(UserActivity).filter_by(
+            user_id=user_id
+        ).order_by(UserActivity.created_at.desc()).first()
+        
+        # Login count
+        login_count = db.session.query(UserActivity).filter_by(
+            user_id=user_id,
+            activity_type='login'
+        ).count()
+        
+        return {
+            'user_id': user_id,
+            'role': user.role,
+            'is_active': user.is_active,
+            'created_at': user.created_at,
+            'last_login': user.last_login,
+            'activity_count': activity_count,
+            'login_count': login_count,
+            'last_activity': last_activity.created_at if last_activity else None
+        }
+    
+    def get_users_statistics(self) -> Dict[str, Any]:
+        """Get overall users statistics."""
+        cache_key = generate_cache_key('users_stats')
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        
+        repo = self._get_repository()
+        
+        # Count by role
+        role_counts = repo.db.query(
+            User.role,
+            repo.db.func.count(User.id)
+        ).group_by(User.role).all()
+        
+        # Count active/inactive
+        active_count = repo.count_by(is_active=True)
+        inactive_count = repo.count_by(is_active=False)
+        
+        stats = {
+            'total': repo.count(),
+            'active': active_count,
+            'inactive': inactive_count,
+            'by_role': dict(role_counts),
+            'recent_registrations': repo.db.query(User).filter(
+                User.created_at >= datetime.utcnow() - timedelta(days=30)
+            ).count()
+        }
+        
+        cache.set(cache_key, stats, timeout=600)
+        
+        return stats
+    
+    # Permissions and Access
+    def check_permission(self, user_id: int, permission: str) -> bool:
+        """Check if user has a specific permission."""
+        user = self.get_user(user_id)
+        if not user:
+            return False
+        
+        # Super admin has all permissions
+        if user.role == 'super_admin':
+            return True
+        
+        # Check role-based permissions
+        from app.extensions import db
+        role = db.session.query(Role).filter_by(name=user.role).first()
+        if role:
+            return any(p.name == permission for p in role.permissions)
+        
+        return False
+    
+    def get_user_permissions(self, user_id: int) -> List[str]:
+        """Get all permissions for a user."""
+        user = self.get_user(user_id)
+        if not user:
+            return []
+        
+        # Super admin has all permissions
+        if user.role == 'super_admin':
+            from app.extensions import db
+            all_permissions = db.session.query(Permission).all()
+            return [p.name for p in all_permissions]
+        
+        # Get role-based permissions
+        from app.extensions import db
+        role = db.session.query(Role).filter_by(name=user.role).first()
+        if role:
+            return [p.name for p in role.permissions]
+        
+        return []
+    
+    def update_user_permissions(self, user_id: int, permissions: List[str]) -> bool:
+        """Update user permissions."""
+        # This would typically update custom user permissions
+        # For now, permissions are role-based
+        self.log_user_activity(user_id, 'permissions_updated', {
+            'permissions': permissions
+        })
+        return True
+    
+    def _clear_cache(self):
+        """Clear relevant cache entries."""
+        cache.delete(generate_cache_key('users_stats'))
+        cache.delete_many(*[
+            generate_cache_key('users_list', page)
+            for page in range(1, 10)
+        ])

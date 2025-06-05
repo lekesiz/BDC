@@ -1,10 +1,8 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
-
 /**
  * Different types of loading states for various use cases
  */
-
 // Full page loading state
 export const FullPageLoader = ({ message = "Loading..." }) => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -14,7 +12,6 @@ export const FullPageLoader = ({ message = "Loading..." }) => (
     </div>
   </div>
 );
-
 // Card/Section loading state
 export const CardLoader = ({ message = "Loading content..." }) => (
   <div className="flex items-center justify-center py-12">
@@ -24,7 +21,6 @@ export const CardLoader = ({ message = "Loading content..." }) => (
     </div>
   </div>
 );
-
 // Inline loading state (for buttons, small sections)
 export const InlineLoader = ({ size = "sm", className = "" }) => {
   const sizeClasses = {
@@ -34,12 +30,10 @@ export const InlineLoader = ({ size = "sm", className = "" }) => {
     lg: "h-6 w-6",
     xl: "h-8 w-8"
   };
-  
   return (
     <Loader2 className={`animate-spin ${sizeClasses[size]} ${className}`} />
   );
 };
-
 // Button loading state
 export const ButtonLoader = ({ text = "Loading...", size = "sm" }) => (
   <div className="flex items-center gap-2">
@@ -47,7 +41,6 @@ export const ButtonLoader = ({ text = "Loading...", size = "sm" }) => (
     <span>{text}</span>
   </div>
 );
-
 // Skeleton loaders for different content types
 export const SkeletonTable = ({ rows = 5, columns = 4 }) => (
   <div className="animate-pulse">
@@ -77,13 +70,11 @@ export const SkeletonTable = ({ rows = 5, columns = 4 }) => (
     </div>
   </div>
 );
-
 export const SkeletonCard = ({ height = "h-48" }) => (
   <div className="animate-pulse">
     <div className={`bg-gray-200 rounded-lg ${height}`} />
   </div>
 );
-
 export const SkeletonList = ({ items = 3 }) => (
   <div className="animate-pulse space-y-4">
     {Array.from({ length: items }).map((_, i) => (
@@ -97,7 +88,6 @@ export const SkeletonList = ({ items = 3 }) => (
     ))}
   </div>
 );
-
 export const SkeletonForm = ({ fields = 4 }) => (
   <div className="animate-pulse space-y-6">
     {Array.from({ length: fields }).map((_, i) => (
@@ -112,7 +102,6 @@ export const SkeletonForm = ({ fields = 4 }) => (
     </div>
   </div>
 );
-
 // Loading container with customizable content
 export const LoadingContainer = ({ 
   loading, 
@@ -125,7 +114,6 @@ export const LoadingContainer = ({
   if (loading) {
     return <div className={className}>{loader}</div>;
   }
-  
   if (error) {
     if (errorComponent) {
       return <div className={className}>{errorComponent}</div>;
@@ -136,10 +124,8 @@ export const LoadingContainer = ({
       </div>
     );
   }
-  
   return <div className={className}>{children}</div>;
 };
-
 // Data fetching state component
 export const DataState = ({ 
   loading, 
@@ -151,7 +137,6 @@ export const DataState = ({
   children
 }) => {
   if (loading) return loadingComponent;
-  
   if (error) {
     return errorComponent || (
       <div className="text-center py-12">
@@ -159,14 +144,11 @@ export const DataState = ({
       </div>
     );
   }
-  
   if (!data || (Array.isArray(data) && data.length === 0)) {
     return emptyComponent;
   }
-  
   return children;
 };
-
 export default {
   FullPageLoader,
   CardLoader,

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, UserPlus, Edit, Trash2, MoreHorizontal, Download, RefreshCw } from 'lucide-react';
-
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,6 @@ import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { formatDate } from '@/lib/utils';
 import api from '@/lib/api';
-
 /**
  * Users listing and management page
  */
@@ -23,7 +21,6 @@ const UsersPage = () => {
   const { hasRole } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
-  
   // State
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -40,15 +37,12 @@ const UsersPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  
   // Determine if user can manage users
   const canManageUsers = hasRole(['super_admin', 'tenant_admin']);
-  
   // Fetch users
   const fetchUsers = async (page = 1, limit = pageSize) => {
     try {
       setIsLoading(true);
-      
       const response = await api.get('/api/users', {
         params: {
           page,
@@ -60,12 +54,10 @@ const UsersPage = () => {
           search: searchTerm || undefined,
         }
       });
-      
       setUsers(response.data.items);
       setFilteredUsers(response.data.items);
       setTotalPages(response.data.total_pages);
       setTotalItems(response.data.total_items);
-      
     } catch (error) {
       console.error('Error fetching users:', error);
       addToast({
@@ -77,30 +69,25 @@ const UsersPage = () => {
       setIsLoading(false);
     }
   };
-  
   // Load users on component mount and when filters change
   useEffect(() => {
     fetchUsers(currentPage, pageSize);
   }, [currentPage, pageSize, sortField, sortDirection, roleFilter, statusFilter, searchTerm]);
-  
   // Handle search input change
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1); // Reset to first page on new search
   };
-  
   // Handle role filter change
   const handleRoleFilterChange = (value) => {
     setRoleFilter(value);
     setCurrentPage(1); // Reset to first page on filter change
   };
-  
   // Handle status filter change
   const handleStatusFilterChange = (value) => {
     setStatusFilter(value);
     setCurrentPage(1); // Reset to first page on filter change
   };
-  
   // Handle sorting
   const handleSort = (field) => {
     if (sortField === field) {
@@ -113,59 +100,47 @@ const UsersPage = () => {
     }
     setCurrentPage(1); // Reset to first page on sort change
   };
-  
   // Handle page change
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
-  
   // Handle page size change
   const handlePageSizeChange = (size) => {
     setPageSize(size);
     setCurrentPage(1); // Reset to first page on page size change
   };
-  
   // Handle create new user
   const handleCreateUser = () => {
     navigate('/users/create');
   };
-  
   // Handle edit user
   const handleEditUser = (userId) => {
     navigate(`/users/${userId}/edit`);
   };
-  
   // Handle view user
   const handleViewUser = (userId) => {
     navigate(`/users/${userId}`);
   };
-  
   // Handle delete user
   const handleDeleteUser = (user) => {
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
   };
-  
   // Confirm delete user
   const confirmDeleteUser = async () => {
     if (!selectedUser) return;
-    
     try {
       setIsLoading(true);
-      
       await api.delete(`/api/users/${selectedUser.id}`);
-      
       addToast({
         type: 'success',
         title: 'User deleted',
         message: `User ${selectedUser.first_name} ${selectedUser.last_name} has been deleted.`,
       });
-      
       // Close modal and refresh user list
       setIsDeleteModalOpen(false);
       setSelectedUser(null);
       fetchUsers(currentPage, pageSize);
-      
     } catch (error) {
       console.error('Error deleting user:', error);
       addToast({
@@ -177,12 +152,10 @@ const UsersPage = () => {
       setIsLoading(false);
     }
   };
-  
   // Handle export users
   const handleExportUsers = async () => {
     try {
       setIsExporting(true);
-      
       const response = await api.get('/api/users/export', {
         params: {
           role: roleFilter !== 'all' ? roleFilter : undefined,
@@ -191,7 +164,6 @@ const UsersPage = () => {
         },
         responseType: 'blob',
       });
-      
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -199,17 +171,14 @@ const UsersPage = () => {
       link.setAttribute('download', `users-export-${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
-      
       // Clean up
       link.remove();
       window.URL.revokeObjectURL(url);
-      
       addToast({
         type: 'success',
         title: 'Export successful',
         message: 'Users have been exported to CSV.',
       });
-      
     } catch (error) {
       console.error('Error exporting users:', error);
       addToast({
@@ -221,12 +190,10 @@ const UsersPage = () => {
       setIsExporting(false);
     }
   };
-  
   // Render role badge
   const renderRoleBadge = (role) => {
     let color;
     let label;
-    
     switch (role) {
       case 'super_admin':
         color = 'red';
@@ -248,14 +215,11 @@ const UsersPage = () => {
         color = 'gray';
         label = role;
     }
-    
     return <Badge color={color}>{label}</Badge>;
   };
-  
   // Render status badge
   const renderStatusBadge = (status) => {
     let color;
-    
     switch (status) {
       case 'active':
         color = 'green';
@@ -269,10 +233,8 @@ const UsersPage = () => {
       default:
         color = 'gray';
     }
-    
     return <Badge color={color}>{status}</Badge>;
   };
-  
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
@@ -280,7 +242,6 @@ const UsersPage = () => {
           <h1 className="text-2xl font-bold">User Management</h1>
           <p className="text-gray-600">Manage users and their access</p>
         </div>
-        
         {canManageUsers && (
           <Button
             onClick={handleCreateUser}
@@ -291,7 +252,6 @@ const UsersPage = () => {
           </Button>
         )}
       </div>
-      
       <Card>
         {/* Filters and search */}
         <div className="p-4 border-b">
@@ -306,7 +266,6 @@ const UsersPage = () => {
                 className="w-full"
               />
             </div>
-            
             <div className="flex flex-row gap-2">
               <div className="w-40">
                 <select
@@ -321,7 +280,6 @@ const UsersPage = () => {
                   <option value="trainee">Trainee</option>
                 </select>
               </div>
-              
               <div className="w-40">
                 <select
                   value={statusFilter}
@@ -334,7 +292,6 @@ const UsersPage = () => {
                   <option value="suspended">Suspended</option>
                 </select>
               </div>
-              
               <Button
                 variant="outline"
                 onClick={() => fetchUsers(currentPage, pageSize)}
@@ -342,7 +299,6 @@ const UsersPage = () => {
               >
                 <RefreshCw className="h-4 w-4" />
               </Button>
-              
               {canManageUsers && (
                 <Button
                   variant="outline"
@@ -357,7 +313,6 @@ const UsersPage = () => {
             </div>
           </div>
         </div>
-        
         {/* Users table */}
         <div className="overflow-x-auto">
           <Table>
@@ -408,7 +363,6 @@ const UsersPage = () => {
                 </TableCell>
               </TableRow>
             </TableHeader>
-            
             <TableBody>
               {isLoading ? (
                 <TableRow>
@@ -490,7 +444,6 @@ const UsersPage = () => {
             </TableBody>
           </Table>
         </div>
-        
         {/* Pagination */}
         <div className="p-4 border-t">
           <TablePagination
@@ -504,7 +457,6 @@ const UsersPage = () => {
           />
         </div>
       </Card>
-      
       {/* Delete confirmation modal */}
       <Modal
         isOpen={isDeleteModalOpen}
@@ -513,7 +465,6 @@ const UsersPage = () => {
         <ModalHeader>
           <h3 className="text-lg font-medium text-red-600">Delete User</h3>
         </ModalHeader>
-        
         <ModalBody>
           {selectedUser && (
             <div className="space-y-4">
@@ -521,7 +472,6 @@ const UsersPage = () => {
                 Are you sure you want to delete the user <strong>{selectedUser.first_name} {selectedUser.last_name}</strong>?
                 This will permanently remove their account and all associated data.
               </Alert>
-              
               <div className="p-4 bg-gray-50 rounded-md">
                 <div className="flex items-center">
                   <Avatar
@@ -541,7 +491,6 @@ const UsersPage = () => {
             </div>
           )}
         </ModalBody>
-        
         <ModalFooter>
           <Button
             variant="outline"
@@ -563,5 +512,4 @@ const UsersPage = () => {
     </div>
   );
 };
-
 export default UsersPage;

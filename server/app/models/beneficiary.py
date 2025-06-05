@@ -43,6 +43,13 @@ class Beneficiary(db.Model):
     referral_source = Column(String(200), nullable=True)
     custom_fields = Column(JSON, nullable=True)
     
+    # Emergency contact information
+    emergency_contact_name = Column(String(200), nullable=True)
+    emergency_contact_relationship = Column(String(100), nullable=True)
+    emergency_contact_phone = Column(String(20), nullable=True)
+    emergency_contact_email = Column(String(100), nullable=True)
+    emergency_contact_address = Column(Text, nullable=True)
+    
     # Computed fields for statistics
     @property
     def evaluation_count(self):
@@ -117,6 +124,11 @@ class Beneficiary(db.Model):
             'education_level': self.education_level,
             'status': self.status,
             'is_active': self.is_active,
+            'emergency_contact_name': self.emergency_contact_name,
+            'emergency_contact_relationship': self.emergency_contact_relationship,
+            'emergency_contact_phone': self.emergency_contact_phone,
+            'emergency_contact_email': self.emergency_contact_email,
+            'emergency_contact_address': self.emergency_contact_address,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

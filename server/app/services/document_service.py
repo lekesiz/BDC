@@ -87,6 +87,84 @@ class DocumentService:
         return False
     
     @staticmethod
+    def can_access_document(user, document):
+        """Check if a user can access (view) a document."""
+        # Owner can always access
+        if document.upload_by == user.id:
+            return True
+        
+        # Super admin can access all
+        if user.role == 'super_admin':
+            return True
+        
+        # Tenant admin can access documents in their tenant
+        if user.role == 'tenant_admin' and document.tenant_id:
+            if user.tenants and document.tenant_id == user.tenants[0].id:
+                return True
+        
+        # Check beneficiary access
+        if document.beneficiary_id:
+            from app.models.beneficiary import Beneficiary
+            beneficiary = Beneficiary.query.get(document.beneficiary_id)
+            if beneficiary:
+                # Beneficiary can access their own documents
+                if beneficiary.user_id == user.id:
+                    return True
+                # Trainer can access their beneficiary's documents
+                if user.role == 'trainer' and beneficiary.trainer_id == user.id:
+                    return True
+        
+        # Check document permissions
+        return DocumentService.check_permission(document.id, user.id, 'read')
+    
+    @staticmethod
+    def can_modify_document(user, document):
+        """Check if a user can modify (update) a document."""
+        # Owner can always modify
+        if document.upload_by == user.id:
+            return True
+        
+        # Super admin can modify all
+        if user.role == 'super_admin':
+            return True
+        
+        # Check document permissions
+        return DocumentService.check_permission(document.id, user.id, 'update')
+    
+    @staticmethod
+    def can_delete_document(user, document):
+        """Check if a user can delete a document."""
+        # Owner can always delete
+        if document.upload_by == user.id:
+            return True
+        
+        # Super admin can delete all
+        if user.role == 'super_admin':
+            return True
+        
+        # Tenant admin can delete documents in their tenant
+        if user.role == 'tenant_admin' and document.tenant_id:
+            if user.tenants and document.tenant_id == user.tenants[0].id:
+                return True
+        
+        # Check document permissions
+        return DocumentService.check_permission(document.id, user.id, 'delete')
+    
+    @staticmethod
+    def can_share_document(user, document):
+        """Check if a user can share a document."""
+        # Owner can always share
+        if document.upload_by == user.id:
+            return True
+        
+        # Super admin can share all
+        if user.role == 'super_admin':
+            return True
+        
+        # Check document permissions
+        return DocumentService.check_permission(document.id, user.id, 'share')
+    
+    @staticmethod
     def grant_permission(document_id, user_id=None, role=None, permissions=None, expires_in=None):
         """
         Grant permissions to a user or role for a document.

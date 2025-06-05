@@ -6,7 +6,6 @@ import {
   Edit2, Trash2, RefreshCw, Download
 } from 'lucide-react';
 import { format, differenceInDays, isPast } from 'date-fns';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +25,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
-
 /**
  * TrainerAssignedAssessmentDetailPage displays detailed information about an assigned assessment
  * and provides management options for trainers
@@ -38,92 +36,69 @@ const TrainerAssignedAssessmentDetailPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   // State for assignment data
   const [assignment, setAssignment] = useState(null);
   const [template, setTemplate] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [recipients, setRecipients] = useState([]);
   const [analytics, setAnalytics] = useState(null);
-  
   // State for dialogs
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showExtendDialog, setShowExtendDialog] = useState(false);
   const [showReminderDialog, setShowReminderDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  
   // Extension form state
   const [newDueDate, setNewDueDate] = useState(null);
   const [extensionReason, setExtensionReason] = useState('');
-  
   // Reminder form state
   const [reminderMessage, setReminderMessage] = useState('');
-  
   // Fetch data
   useEffect(() => {
     let isMounted = true;
-    
     const fetchData = async () => {
       try {
         if (!isMounted) return;
-        
         setIsLoading(true);
         setError(null);
-        
         // Fetch assignment details
         const assignmentResponse = await fetch(`/api/assessment/assigned/${id}`);
         if (!isMounted) return;
-        
         if (!assignmentResponse.ok) throw new Error('Failed to fetch assignment details');
         const assignmentData = await assignmentResponse.json();
-        
         if (!isMounted) return;
         setAssignment(assignmentData);
         setNewDueDate(new Date(assignmentData.due_date));
-        
         // Fetch template details
         const templateResponse = await fetch(`/api/assessment/templates/${assignmentData.template_id}`);
         if (!isMounted) return;
-        
         if (!templateResponse.ok) throw new Error('Failed to fetch template details');
         const templateData = await templateResponse.json();
-        
         if (!isMounted) return;
         setTemplate(templateData);
-        
         // Fetch submissions
         const submissionsResponse = await fetch(`/api/assessment/assigned/${id}/submissions`);
         if (!isMounted) return;
-        
         if (!submissionsResponse.ok) throw new Error('Failed to fetch submissions');
         const submissionsData = await submissionsResponse.json();
-        
         if (!isMounted) return;
         setSubmissions(submissionsData);
-        
         // Fetch recipients
         const recipientsResponse = await fetch(`/api/assessment/assigned/${id}/recipients`);
         if (!isMounted) return;
-        
         if (!recipientsResponse.ok) throw new Error('Failed to fetch recipients');
         const recipientsData = await recipientsResponse.json();
-        
         if (!isMounted) return;
         setRecipients(recipientsData);
-        
         // Fetch analytics
         const analyticsResponse = await fetch(`/api/assessment/assigned/${id}/analytics`);
         if (!isMounted) return;
-        
         if (!analyticsResponse.ok) throw new Error('Failed to fetch analytics');
         const analyticsData = await analyticsResponse.json();
-        
         if (!isMounted) return;
         setAnalytics(analyticsData);
       } catch (err) {
         if (!isMounted) return;
-        
         console.error('Error fetching assignment data:', err);
         setError(err.message);
         toast({
@@ -137,32 +112,25 @@ const TrainerAssignedAssessmentDetailPage = () => {
         }
       }
     };
-    
     fetchData();
-    
     // Cleanup function to prevent state updates after unmount
     return () => {
       isMounted = false;
     };
   }, [id, toast]);
-  
   // Handle assignment deletion
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      
       const response = await fetch(`/api/assessment/assigned/${id}`, {
         method: 'DELETE',
       });
-      
       if (!response.ok) throw new Error('Failed to delete assignment');
-      
       toast({
         title: 'Success',
         description: 'Assignment deleted successfully',
         type: 'success',
       });
-      
       navigate('/assessment');
     } catch (err) {
       console.error('Error deleting assignment:', err);
@@ -176,7 +144,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
       setShowDeleteDialog(false);
     }
   };
-  
   // Handle due date extension
   const handleExtendDueDate = async () => {
     if (!newDueDate || !extensionReason.trim()) {
@@ -187,10 +154,8 @@ const TrainerAssignedAssessmentDetailPage = () => {
       });
       return;
     }
-    
     try {
       setIsSending(true);
-      
       const response = await fetch(`/api/assessment/assigned/${id}/extend`, {
         method: 'POST',
         headers: {
@@ -201,18 +166,14 @@ const TrainerAssignedAssessmentDetailPage = () => {
           reason: extensionReason,
         }),
       });
-      
       if (!response.ok) throw new Error('Failed to extend due date');
-      
       const updatedAssignment = await response.json();
       setAssignment(updatedAssignment);
-      
       toast({
         title: 'Success',
         description: 'Due date extended successfully',
         type: 'success',
       });
-      
       setShowExtendDialog(false);
       setExtensionReason('');
     } catch (err) {
@@ -226,7 +187,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
       setIsSending(false);
     }
   };
-  
   // Handle sending reminder
   const handleSendReminder = async () => {
     if (!reminderMessage.trim()) {
@@ -237,10 +197,8 @@ const TrainerAssignedAssessmentDetailPage = () => {
       });
       return;
     }
-    
     try {
       setIsSending(true);
-      
       const response = await fetch(`/api/assessment/assigned/${id}/remind`, {
         method: 'POST',
         headers: {
@@ -251,15 +209,12 @@ const TrainerAssignedAssessmentDetailPage = () => {
           recipients: 'pending', // Send to students who haven't submitted
         }),
       });
-      
       if (!response.ok) throw new Error('Failed to send reminder');
-      
       toast({
         title: 'Success',
         description: 'Reminder sent successfully',
         type: 'success',
       });
-      
       setShowReminderDialog(false);
       setReminderMessage('');
     } catch (err) {
@@ -273,24 +228,18 @@ const TrainerAssignedAssessmentDetailPage = () => {
       setIsSending(false);
     }
   };
-  
   // Calculate status
   const calculateStatus = () => {
     if (!assignment) return 'loading';
-    
     const now = new Date();
     const dueDate = new Date(assignment.due_date);
     const availableFrom = new Date(assignment.available_from);
-    
     if (now < availableFrom) return 'scheduled';
     if (now > dueDate) return 'overdue';
-    
     const completionRate = (submissions.length / recipients.length) * 100;
     if (completionRate === 100) return 'completed';
-    
     return 'active';
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -299,7 +248,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
       </div>
     );
   }
-  
   // Render error state
   if (error || !assignment || !template) {
     return (
@@ -314,7 +262,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
             Back to Assessments
           </Button>
         </div>
-        
         <Card className="p-6 text-center">
           <div className="text-red-500 mb-4">
             <AlertCircle className="w-12 h-12 mx-auto" />
@@ -328,7 +275,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
       </div>
     );
   }
-  
   // Calculate metrics
   const status = calculateStatus();
   const completionRate = recipients.length > 0 
@@ -338,7 +284,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
   const isOverdue = isPast(new Date(assignment.due_date));
   const averageScore = analytics?.average_score || 0;
   const passRate = analytics?.pass_rate || 0;
-  
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -357,7 +302,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
             <p className="text-gray-600">{template.title}</p>
           </div>
         </div>
-        
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
@@ -401,7 +345,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Status Banner */}
       <Card className={`p-4 mb-6 ${
         status === 'completed' ? 'bg-green-50 border-green-200' :
@@ -444,7 +387,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
           </Badge>
         </div>
       </Card>
-      
       {/* Tabs */}
       <Tabs
         value={activeTab}
@@ -469,7 +411,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
             Settings
           </Tabs.TabTrigger>
         </Tabs.TabsList>
-        
         {/* Overview Tab */}
         <Tabs.TabContent value="overview">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -479,7 +420,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
                 <FileText className="w-5 h-5 mr-2 text-primary" />
                 Assignment Details
               </h3>
-              
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-gray-600">Type</p>
@@ -487,22 +427,18 @@ const TrainerAssignedAssessmentDetailPage = () => {
                     {template.type}
                   </Badge>
                 </div>
-                
                 <div>
                   <p className="text-sm text-gray-600">Available From</p>
                   <p className="font-medium">{format(new Date(assignment.available_from), "MMM d, yyyy 'at' h:mm a")}</p>
                 </div>
-                
                 <div>
                   <p className="text-sm text-gray-600">Due Date</p>
                   <p className="font-medium">{format(new Date(assignment.due_date), "MMM d, yyyy 'at' h:mm a")}</p>
                 </div>
-                
                 <div>
                   <p className="text-sm text-gray-600">Created By</p>
                   <p className="font-medium">{assignment.created_by}</p>
                 </div>
-                
                 <div>
                   <p className="text-sm text-gray-600">Total Points</p>
                   <p className="font-medium">
@@ -513,14 +449,12 @@ const TrainerAssignedAssessmentDetailPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Progress Card */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <BarChart2 className="w-5 h-5 mr-2 text-primary" />
                 Progress
               </h3>
-              
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-2">
@@ -532,13 +466,11 @@ const TrainerAssignedAssessmentDetailPage = () => {
                   <Progress value={completionRate} className="h-2" />
                   <p className="text-sm text-gray-600 mt-1">{completionRate}% completed</p>
                 </div>
-                
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-600">Submitted</p>
                     <p className="text-xl font-bold text-green-600">{submissions.length}</p>
                   </div>
-                  
                   <div className="p-3 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-600">Pending</p>
                     <p className="text-xl font-bold text-amber-600">
@@ -548,14 +480,12 @@ const TrainerAssignedAssessmentDetailPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Performance Card */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <BarChart2 className="w-5 h-5 mr-2 text-primary" />
                 Performance
               </h3>
-              
               <div className="space-y-4">
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-600">Average Score</p>
@@ -563,14 +493,12 @@ const TrainerAssignedAssessmentDetailPage = () => {
                     {averageScore ? `${averageScore}%` : 'N/A'}
                   </p>
                 </div>
-                
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-600">Pass Rate</p>
                   <p className="text-xl font-bold text-green-600">
                     {passRate ? `${passRate}%` : 'N/A'}
                   </p>
                 </div>
-                
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-600">Average Time</p>
                   <p className="text-xl font-bold">
@@ -579,7 +507,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Instructions Card */}
             {assignment.instructions && (
               <Card className="p-6 lg:col-span-3">
@@ -589,7 +516,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
             )}
           </div>
         </Tabs.TabContent>
-        
         {/* Recipients Tab */}
         <Tabs.TabContent value="recipients">
           <Card className="p-6">
@@ -600,7 +526,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
                 Export
               </Button>
             </div>
-            
             <Table>
               <Table.Header>
                 <Table.Row>
@@ -615,7 +540,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
               <Table.Body>
                 {recipients.map(recipient => {
                   const submission = submissions.find(s => s.student_id === recipient.id);
-                  
                   return (
                     <Table.Row key={recipient.id}>
                       <Table.Cell>{recipient.name}</Table.Cell>
@@ -651,7 +575,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
             </Table>
           </Card>
         </Tabs.TabContent>
-        
         {/* Submissions Tab */}
         <Tabs.TabContent value="submissions">
           <Card className="p-6">
@@ -668,7 +591,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
                 </Button>
               </div>
             </div>
-            
             <Table>
               <Table.Header>
                 <Table.Row>
@@ -727,7 +649,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
                 ))}
               </Table.Body>
             </Table>
-            
             {submissions.length === 0 && (
               <p className="text-gray-500 text-center py-8">
                 No submissions yet
@@ -735,14 +656,12 @@ const TrainerAssignedAssessmentDetailPage = () => {
             )}
           </Card>
         </Tabs.TabContent>
-        
         {/* Settings Tab */}
         <Tabs.TabContent value="settings">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Assignment Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Assignment Settings</h3>
-              
               <Table>
                 <Table.Body>
                   <Table.Row>
@@ -774,11 +693,9 @@ const TrainerAssignedAssessmentDetailPage = () => {
                 </Table.Body>
               </Table>
             </Card>
-            
             {/* Assessment Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Assessment Settings</h3>
-              
               <Table>
                 <Table.Body>
                   {template.type === 'quiz' && (
@@ -812,11 +729,9 @@ const TrainerAssignedAssessmentDetailPage = () => {
                 </Table.Body>
               </Table>
             </Card>
-            
             {/* Notification Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Notifications</h3>
-              
               <Table>
                 <Table.Body>
                   <Table.Row>
@@ -849,7 +764,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
           </div>
         </Tabs.TabContent>
       </Tabs>
-      
       {/* Delete Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
@@ -881,7 +795,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
       {/* Extend Due Date Dialog */}
       <Dialog open={showExtendDialog} onOpenChange={setShowExtendDialog}>
         <DialogContent>
@@ -891,7 +804,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
               Extend the due date for this assignment. All recipients will be notified.
             </DialogDescription>
           </DialogHeader>
-          
           <div className="space-y-4 py-4">
             <div>
               <Label htmlFor="newDueDate">New Due Date</Label>
@@ -906,7 +818,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
                 Current due date: {format(new Date(assignment.due_date), 'MMM d, yyyy')}
               </p>
             </div>
-            
             <div>
               <Label htmlFor="reason">Reason for Extension</Label>
               <Textarea
@@ -919,7 +830,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
               />
             </div>
           </div>
-          
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowExtendDialog(false)}>
               Cancel
@@ -940,7 +850,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
       {/* Send Reminder Dialog */}
       <Dialog open={showReminderDialog} onOpenChange={setShowReminderDialog}>
         <DialogContent>
@@ -950,7 +859,6 @@ const TrainerAssignedAssessmentDetailPage = () => {
               Send a reminder to students who haven't submitted yet ({recipients.length - submissions.length} students).
             </DialogDescription>
           </DialogHeader>
-          
           <div className="py-4">
             <Label htmlFor="reminder">Reminder Message</Label>
             <Textarea
@@ -961,14 +869,12 @@ const TrainerAssignedAssessmentDetailPage = () => {
               rows={4}
               className="mt-1"
             />
-            
             <div className="mt-4 p-3 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
                 Default information will be included: assignment title, due date, and a link to the assessment.
               </p>
             </div>
           </div>
-          
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowReminderDialog(false)}>
               Cancel
@@ -992,5 +898,4 @@ const TrainerAssignedAssessmentDetailPage = () => {
     </div>
   );
 };
-
 export default TrainerAssignedAssessmentDetailPage;

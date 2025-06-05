@@ -4,7 +4,6 @@ import {
   generateAITrainingHistory,
   generateAIConfigOptions 
 } from './mockAIData';
-
 export const setupAIMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -12,58 +11,48 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     put: originalPut || api.put.bind(api),
     delete: originalDelete || api.delete.bind(api)
   };
-
   // AI endpoints
   api.get = function(url, ...args) {
     // AI recommendations endpoint
     if (url === '/api/ai/recommendations' || url.startsWith('/api/ai/recommendations?')) {
       const userRole = localStorage.getItem('userRole') || 'student';
       const aiData = generateAIData(userRole);
-      
       // Parse query parameters
       const urlObj = new URL(url, 'http://localhost');
       const type = urlObj.searchParams.get('type');
-      
       if (type) {
         return Promise.resolve({
           status: 200,
           data: aiData.recommendations[type] || []
         });
       }
-      
       return Promise.resolve({
         status: 200,
         data: aiData.recommendations
       });
     }
-    
     // AI insights endpoint
     if (url === '/api/ai/insights') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const aiData = generateAIData(userRole);
-      
       return Promise.resolve({
         status: 200,
         data: aiData.insights
       });
     }
-    
     // AI content generation endpoint
     if (url === '/api/ai/content-generation') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const aiData = generateAIData(userRole);
-      
       return Promise.resolve({
         status: 200,
         data: aiData.contentGeneration
       });
     }
-    
     // AI chatbot history endpoint
     if (url === '/api/ai/chatbot/history') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const aiData = generateAIData(userRole);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -72,18 +61,15 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         }
       });
     }
-    
     // AI feedback endpoint
     if (url === '/api/ai/feedback') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const aiData = generateAIData(userRole);
-      
       return Promise.resolve({
         status: 200,
         data: aiData.feedback
       });
     }
-    
     // AI teaching assistant (trainer only)
     if (url === '/api/ai/teaching-assistant') {
       const userRole = localStorage.getItem('userRole');
@@ -99,7 +85,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         data: { error: 'Access denied' }
       });
     }
-    
     // AI performance predictions (admin only)
     if (url === '/api/ai/predictions') {
       const userRole = localStorage.getItem('userRole');
@@ -115,21 +100,17 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         data: { error: 'Access denied' }
       });
     }
-    
     // AI model metrics endpoint
     if (url === '/api/ai/models/metrics') {
       const metrics = generateAIModelMetrics();
-      
       return Promise.resolve({
         status: 200,
         data: metrics
       });
     }
-    
     // AI training history endpoint
     if (url === '/api/ai/training/history') {
       const history = generateAITrainingHistory();
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -138,21 +119,17 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         }
       });
     }
-    
     // AI configuration endpoint
     if (url === '/api/ai/config') {
       const config = generateAIConfigOptions();
-      
       return Promise.resolve({
         status: 200,
         data: config
       });
     }
-    
     // AI learning path details
     if (url.match(/^\/api\/ai\/learning-paths\/\d+$/)) {
       const pathId = parseInt(url.split('/').pop());
-      
       const pathDetails = {
         id: pathId,
         title: "Full Stack Developer Path",
@@ -171,22 +148,18 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
           { id: 3, title: "Full Stack Developer", achieved: false, estimatedDate: "2024-06-15" }
         ]
       };
-      
       return Promise.resolve({
         status: 200,
         data: pathDetails
       });
     }
-    
     // Call original get for other endpoints
     return originalFunctions.get.call(api, url, ...args);
   };
-  
   // AI POST endpoints
   api.post = function(url, data, ...args) {
     // AI chatbot message endpoint
     if (url === '/api/ai/chatbot/message') {
-      
       const response = {
         id: Date.now(),
         message: "I understand you're asking about " + data.message + ". Here's what I can help you with...",
@@ -201,18 +174,14 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
           { type: "video", title: "Tutorial Video", url: "/videos/123" }
         ]
       };
-      
       return Promise.resolve({
         status: 200,
         data: response
       });
     }
-    
     // Generate AI content endpoint
     if (url === '/api/ai/content/generate') {
-      
       let generatedContent;
-      
       if (data.type === 'quiz') {
         generatedContent = {
           id: Date.now(),
@@ -259,16 +228,13 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
           ]
         };
       }
-      
       return Promise.resolve({
         status: 201,
         data: generatedContent
       });
     }
-    
     // Request AI feedback endpoint
     if (url === '/api/ai/feedback/request') {
-      
       const feedback = {
         id: Date.now(),
         submissionId: data.submissionId,
@@ -286,16 +252,13 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         ],
         timestamp: new Date().toISOString()
       };
-      
       return Promise.resolve({
         status: 200,
         data: feedback
       });
     }
-    
     // Train AI model endpoint (admin only)
     if (url === '/api/ai/models/train') {
-      
       return Promise.resolve({
         status: 202,
         data: {
@@ -307,10 +270,8 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         }
       });
     }
-    
     // Generate AI report endpoint
     if (url === '/api/ai/reports/generate') {
-      
       return Promise.resolve({
         status: 202,
         data: {
@@ -322,15 +283,12 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         }
       });
     }
-    
     return originalFunctions.post.call(api, url, data, ...args);
   };
-  
   // AI PUT endpoints
   api.put = function(url, data, ...args) {
     // Update AI configuration
     if (url === '/api/ai/config') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -340,11 +298,9 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         }
       });
     }
-    
     // Update AI model
     if (url.match(/^\/api\/ai\/models\/\d+$/)) {
       const modelId = parseInt(url.split('/').pop());
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -354,10 +310,8 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         }
       });
     }
-    
     // Update learning path progress
     if (url.match(/^\/api\/ai\/learning-paths\/\d+\/progress$/)) {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -367,15 +321,12 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         }
       });
     }
-    
     return originalFunctions.put.call(api, url, data, ...args);
   };
-  
   // AI DELETE endpoints
   api.delete = function(url, ...args) {
     // Delete AI conversation
     if (url.match(/^\/api\/ai\/chatbot\/conversations\/\d+$/)) {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -383,10 +334,8 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         }
       });
     }
-    
     // Remove AI training data
     if (url.match(/^\/api\/ai\/training\/data\/\d+$/)) {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -394,10 +343,8 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         }
       });
     }
-    
     // Cancel AI job
     if (url.match(/^\/api\/ai\/jobs\/\d+$/)) {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -405,7 +352,6 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         }
       });
     }
-    
     return originalFunctions.delete.call(api, url, ...args);
   };
 };

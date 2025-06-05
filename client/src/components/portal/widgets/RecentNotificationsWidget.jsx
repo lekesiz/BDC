@@ -13,39 +13,32 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
 /**
  * Displays recent notifications for the student
  */
 const RecentNotificationsWidget = ({ data, isLoading, error }) => {
   const navigate = useNavigate();
-  
   // Format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
-    
     // If it's today, show only time
     if (date.toDateString() === now.toDateString()) {
       return `Today at ${formatTime(date)}`;
     }
-    
     // If it's yesterday, show "Yesterday"
     const yesterday = new Date(now);
     yesterday.setDate(now.getDate() - 1);
     if (date.toDateString() === yesterday.toDateString()) {
       return `Yesterday at ${formatTime(date)}`;
     }
-    
     // Otherwise, show the day
     return date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
   };
-  
   // Format time
   const formatTime = (date) => {
     return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
   };
-  
   // Get icon based on notification type
   const getNotificationIcon = (type) => {
     switch (type) {
@@ -67,7 +60,6 @@ const RecentNotificationsWidget = ({ data, isLoading, error }) => {
         return <Info className="h-4 w-4" />;
     }
   };
-  
   // Get color class based on notification type
   const getNotificationColorClass = (type) => {
     switch (type) {
@@ -89,7 +81,6 @@ const RecentNotificationsWidget = ({ data, isLoading, error }) => {
         return 'bg-gray-50 text-gray-500';
     }
   };
-  
   if (isLoading) {
     return (
       <Card className="overflow-hidden h-full">
@@ -102,7 +93,6 @@ const RecentNotificationsWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   if (error) {
     return (
       <Card className="overflow-hidden h-full">
@@ -115,10 +105,8 @@ const RecentNotificationsWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   // Get notifications to display (limit to 5)
   const notifications = data?.notifications?.slice(0, 5) || [];
-  
   return (
     <Card className="overflow-hidden h-full">
       <div className="p-6 flex justify-between items-center border-b">
@@ -138,7 +126,6 @@ const RecentNotificationsWidget = ({ data, isLoading, error }) => {
           View All
         </Button>
       </div>
-      
       {notifications.length > 0 ? (
         <div className="divide-y max-h-80 overflow-auto">
           {notifications.map(notification => (
@@ -155,7 +142,6 @@ const RecentNotificationsWidget = ({ data, isLoading, error }) => {
                   <p className="text-xs text-gray-500 mt-1">
                     {formatDate(notification.timestamp)}
                   </p>
-                  
                   {notification.link && (
                     <Button
                       variant="link"
@@ -177,7 +163,6 @@ const RecentNotificationsWidget = ({ data, isLoading, error }) => {
           <p className="text-gray-500">No notifications</p>
         </div>
       )}
-      
       <div className="bg-gray-50 p-4 text-center border-t">
         <Button
           variant="link"
@@ -189,5 +174,4 @@ const RecentNotificationsWidget = ({ data, isLoading, error }) => {
     </Card>
   );
 };
-
 export default RecentNotificationsWidget;

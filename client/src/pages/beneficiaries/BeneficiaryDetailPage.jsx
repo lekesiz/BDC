@@ -18,7 +18,6 @@ import {
   Award,
   AlertTriangle
 } from 'lucide-react';
-
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
@@ -30,7 +29,6 @@ import { Alert } from '@/components/ui/alert';
 import { Avatar } from '@/components/ui/avatar';
 import { formatDate, formatDateTime } from '@/lib/utils';
 import api from '@/lib/api';
-
 /**
  * Beneficiary detail page displaying comprehensive information and related data
  */
@@ -39,33 +37,27 @@ const BeneficiaryDetailPage = () => {
   const navigate = useNavigate();
   const { hasRole } = useAuth();
   const { addToast } = useToast();
-  
   // State
   const [beneficiary, setBeneficiary] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingTab, setIsLoadingTab] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  
   // Data for different tabs
   const [evaluations, setEvaluations] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [trainers, setTrainers] = useState([]);
   const [progress, setProgress] = useState({});
   const [documents, setDocuments] = useState([]);
-  
   // Check if user can edit beneficiaries
   const canManage = hasRole(['super_admin', 'tenant_admin', 'trainer']);
-  
   // Fetch beneficiary data
   useEffect(() => {
     const fetchBeneficiary = async () => {
       try {
         setIsLoading(true);
-        
         const response = await api.get(`/api/beneficiaries/${id}`);
         setBeneficiary(response.data);
-        
       } catch (error) {
         console.error('Error fetching beneficiary:', error);
         addToast({
@@ -73,51 +65,41 @@ const BeneficiaryDetailPage = () => {
           title: 'Failed to load beneficiary',
           message: error.response?.data?.message || 'An unexpected error occurred'
         });
-        
         // Navigate back on error
         navigate('/beneficiaries');
       } finally {
         setIsLoading(false);
       }
     };
-    
     fetchBeneficiary();
   }, [id, navigate, addToast]);
-  
   // Fetch tab data when tab changes
   useEffect(() => {
     if (!beneficiary) return;
-    
     const fetchTabData = async () => {
       setIsLoadingTab(true);
-      
       try {
         switch (activeTab) {
           case 'evaluations':
             const evaluationsResponse = await api.get(`/api/beneficiaries/${id}/evaluations`);
             setEvaluations(evaluationsResponse.data.evaluations || []);
             break;
-            
           case 'sessions':
             const sessionsResponse = await api.get(`/api/beneficiaries/${id}/sessions`);
             setSessions(sessionsResponse.data.sessions || []);
             break;
-            
           case 'trainers':
             const trainersResponse = await api.get(`/api/beneficiaries/${id}/trainers`);
-            setTrainers(trainersResponse.data);
+            setTrainers(trainersResponse.data.trainers || []);
             break;
-            
           case 'progress':
             const progressResponse = await api.get(`/api/beneficiaries/${id}/progress`);
-            setProgress(progressResponse.data);
+            setProgress(progressResponse.data.progress || {});
             break;
-            
           case 'documents':
             const documentsResponse = await api.get(`/api/beneficiaries/${id}/documents`);
             setDocuments(documentsResponse.data.documents || []);
             break;
-            
           default:
             break;
         }
@@ -132,30 +114,24 @@ const BeneficiaryDetailPage = () => {
         setIsLoadingTab(false);
       }
     };
-    
     if (activeTab !== 'overview') {
       fetchTabData();
     }
   }, [activeTab, id, beneficiary, addToast]);
-  
   // Handle edit beneficiary
   const handleEdit = () => {
     navigate(`/beneficiaries/${id}/edit`);
   };
-  
   // Handle delete confirmation
   const handleDeleteConfirm = async () => {
     try {
       setIsLoading(true);
-      
       await api.delete(`/api/beneficiaries/${id}`);
-      
       addToast({
         type: 'success',
         title: 'Beneficiary deleted',
         message: 'The beneficiary has been successfully deleted.'
       });
-      
       navigate('/beneficiaries');
     } catch (error) {
       console.error('Error deleting beneficiary:', error);
@@ -169,7 +145,6 @@ const BeneficiaryDetailPage = () => {
       setIsLoading(false);
     }
   };
-  
   // Render status badge
   const renderStatusBadge = (status) => {
     const statusStyles = {
@@ -178,14 +153,12 @@ const BeneficiaryDetailPage = () => {
       pending: 'bg-yellow-100 text-yellow-800',
       completed: 'bg-blue-100 text-blue-800'
     };
-    
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status] || 'bg-gray-100 text-gray-800'}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
   };
-  
   // Loading state
   if (isLoading) {
     return (
@@ -194,7 +167,6 @@ const BeneficiaryDetailPage = () => {
       </div>
     );
   }
-  
   // Not found state
   if (!beneficiary) {
     return (
@@ -212,7 +184,6 @@ const BeneficiaryDetailPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="container mx-auto py-8 px-4">
       {/* Header with navigation and actions */}
@@ -225,7 +196,6 @@ const BeneficiaryDetailPage = () => {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Beneficiaries
         </Button>
-        
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold">{beneficiary.first_name} {beneficiary.last_name}</h1>
@@ -234,7 +204,6 @@ const BeneficiaryDetailPage = () => {
               {renderStatusBadge(beneficiary.status)}
             </div>
           </div>
-          
           {canManage && (
             <div className="flex gap-3">
               <Button
@@ -244,7 +213,6 @@ const BeneficiaryDetailPage = () => {
                 <Trash className="h-4 w-4 mr-2" />
                 Delete
               </Button>
-              
               <Button onClick={handleEdit}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
@@ -253,7 +221,6 @@ const BeneficiaryDetailPage = () => {
           )}
         </div>
       </div>
-      
       {/* Main content with sidebar and tabs */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar */}
@@ -268,18 +235,14 @@ const BeneficiaryDetailPage = () => {
                   size="xl"
                   className="mb-4"
                 />
-                
                 <h2 className="text-xl font-semibold">
                   {beneficiary.first_name} {beneficiary.last_name}
                 </h2>
-                
                 <p className="text-muted-foreground">{beneficiary.email}</p>
-                
                 <div className="mt-2">
                   {renderStatusBadge(beneficiary.status)}
                 </div>
               </div>
-              
               <div className="mt-6 border-t pt-6 space-y-4">
                 {beneficiary.phone && (
                   <div className="flex items-center">
@@ -290,7 +253,6 @@ const BeneficiaryDetailPage = () => {
                     </div>
                   </div>
                 )}
-                
                 {beneficiary.address && (
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 text-gray-500 mr-3" />
@@ -306,7 +268,6 @@ const BeneficiaryDetailPage = () => {
                     </div>
                   </div>
                 )}
-                
                 {beneficiary.birth_date && (
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 text-gray-500 mr-3" />
@@ -316,7 +277,6 @@ const BeneficiaryDetailPage = () => {
                     </div>
                   </div>
                 )}
-                
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 text-gray-500 mr-3" />
                   <div>
@@ -324,7 +284,6 @@ const BeneficiaryDetailPage = () => {
                     <p className="text-sm text-muted-foreground">{formatDate(beneficiary.created_at)}</p>
                   </div>
                 </div>
-                
                 {beneficiary.nationality && (
                   <div className="flex items-center">
                     <Globe className="h-4 w-4 text-gray-500 mr-3" />
@@ -335,27 +294,22 @@ const BeneficiaryDetailPage = () => {
                   </div>
                 )}
               </div>
-              
               {/* Quick stats */}
               <div className="mt-6 border-t pt-6">
                 <h3 className="text-sm font-medium mb-4">Quick Stats</h3>
-                
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-3 rounded-md">
                     <div className="text-xl font-semibold">{beneficiary.evaluation_count || 0}</div>
                     <div className="text-xs text-gray-500">Evaluations</div>
                   </div>
-                  
                   <div className="bg-gray-50 p-3 rounded-md">
                     <div className="text-xl font-semibold">{beneficiary.completed_evaluation_count || 0}</div>
                     <div className="text-xs text-gray-500">Completed</div>
                   </div>
-                  
                   <div className="bg-gray-50 p-3 rounded-md">
                     <div className="text-xl font-semibold">{beneficiary.session_count || 0}</div>
                     <div className="text-xs text-gray-500">Sessions</div>
                   </div>
-                  
                   <div className="bg-gray-50 p-3 rounded-md">
                     <div className="text-xl font-semibold">{beneficiary.trainer_count || 0}</div>
                     <div className="text-xs text-gray-500">Trainers</div>
@@ -365,7 +319,6 @@ const BeneficiaryDetailPage = () => {
             </CardContent>
           </Card>
         </div>
-        
         {/* Main content tabs */}
         <div className="lg:col-span-3">
           <Card>
@@ -380,7 +333,6 @@ const BeneficiaryDetailPage = () => {
                   <TabTrigger value="documents">Documents</TabTrigger>
                 </TabsList>
               </CardHeader>
-              
               {/* Overview tab */}
               <TabContent value="overview">
                 <CardContent className="pt-6">
@@ -393,17 +345,16 @@ const BeneficiaryDetailPage = () => {
                       <p className="text-gray-500 italic">No bio information available.</p>
                     )}
                   </div>
-                  
                   {/* Additional details */}
                   {beneficiary.additional_details && Object.keys(beneficiary.additional_details).length > 0 && (
                     <div className="mb-6">
                       <h3 className="text-lg font-medium mb-3">Additional Details</h3>
                       <div className="bg-gray-50 rounded-md p-4">
                         <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                          {Object.entries(beneficiary.additional_details).map(([key, value]) => (
+                          {Object.entries(beneficiary.additional_details || {}).map(([key, value]) => (
                             <div key={key} className="py-2">
                               <dt className="text-sm font-medium text-gray-500">
-                                {key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                {key ? key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : 'Unknown'}
                               </dt>
                               <dd className="mt-1 text-sm text-gray-900">{value}</dd>
                             </div>
@@ -412,7 +363,6 @@ const BeneficiaryDetailPage = () => {
                       </div>
                     </div>
                   )}
-                  
                   {/* Notes section */}
                   <div className="mb-6">
                     <div className="flex justify-between items-center mb-3">
@@ -423,7 +373,6 @@ const BeneficiaryDetailPage = () => {
                         </Button>
                       )}
                     </div>
-                    
                     {beneficiary.notes && beneficiary.notes.length > 0 ? (
                       <div className="space-y-4">
                         {beneficiary.notes.map((note) => (
@@ -443,7 +392,6 @@ const BeneficiaryDetailPage = () => {
                       <p className="text-gray-500 italic">No notes have been added yet.</p>
                     )}
                   </div>
-                  
                   {/* Recent activity */}
                   <div>
                     <div className="flex justify-between items-center mb-3">
@@ -452,7 +400,6 @@ const BeneficiaryDetailPage = () => {
                         View All
                       </Button>
                     </div>
-                    
                     {beneficiary.recent_activities && beneficiary.recent_activities.length > 0 ? (
                       <div className="space-y-4">
                         {beneficiary.recent_activities.map((activity, index) => (
@@ -475,7 +422,6 @@ const BeneficiaryDetailPage = () => {
                   </div>
                 </CardContent>
               </TabContent>
-              
               {/* Evaluations tab */}
               <TabContent value="evaluations">
                 <CardContent className="pt-6">
@@ -487,7 +433,6 @@ const BeneficiaryDetailPage = () => {
                       </Button>
                     )}
                   </div>
-                  
                   {isLoadingTab ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
@@ -526,7 +471,6 @@ const BeneficiaryDetailPage = () => {
                                   </Badge>
                                 </div>
                               </div>
-                              
                               <div className="grid grid-cols-2 gap-4 mt-4">
                                 <div className="text-sm">
                                   <p className="text-gray-500">Date</p>
@@ -550,7 +494,6 @@ const BeneficiaryDetailPage = () => {
                                 )}
                               </div>
                             </div>
-                            
                             <div className="bg-gray-50 p-4 md:w-48 flex flex-row md:flex-col justify-between items-center md:items-start gap-2">
                               {evaluation.status === 'completed' && (
                                 <div className="md:mb-4">
@@ -560,7 +503,6 @@ const BeneficiaryDetailPage = () => {
                                   <div className="text-xs text-gray-500">Overall Score</div>
                                 </div>
                               )}
-                              
                               <Link 
                                 to={`/evaluations/${evaluation.id}`}
                                 className="flex items-center text-primary hover:underline text-sm md:mt-auto"
@@ -576,7 +518,6 @@ const BeneficiaryDetailPage = () => {
                   )}
                 </CardContent>
               </TabContent>
-              
               {/* Sessions tab */}
               <TabContent value="sessions">
                 <CardContent className="pt-6">
@@ -588,7 +529,6 @@ const BeneficiaryDetailPage = () => {
                       </Button>
                     )}
                   </div>
-                  
                   {isLoadingTab ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
@@ -626,7 +566,6 @@ const BeneficiaryDetailPage = () => {
                                   </Badge>
                                 </div>
                               </div>
-                              
                               <div className="grid grid-cols-2 gap-4 mt-4">
                                 <div className="text-sm">
                                   <p className="text-gray-500">Date</p>
@@ -646,7 +585,6 @@ const BeneficiaryDetailPage = () => {
                                 </div>
                               </div>
                             </div>
-                            
                             <div className="bg-gray-50 p-4 md:w-48 flex flex-row md:flex-col justify-between items-center md:items-start gap-2">
                               {session.status === 'scheduled' && (
                                 <div className="md:mb-4">
@@ -655,7 +593,6 @@ const BeneficiaryDetailPage = () => {
                                   </div>
                                 </div>
                               )}
-                              
                               <Link 
                                 to={`/sessions/${session.id}`}
                                 className="flex items-center text-primary hover:underline text-sm md:mt-auto"
@@ -671,7 +608,6 @@ const BeneficiaryDetailPage = () => {
                   )}
                 </CardContent>
               </TabContent>
-              
               {/* Trainers tab */}
               <TabContent value="trainers">
                 <CardContent className="pt-6">
@@ -685,7 +621,6 @@ const BeneficiaryDetailPage = () => {
                       </Button>
                     )}
                   </div>
-                  
                   {isLoadingTab ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
@@ -726,7 +661,6 @@ const BeneficiaryDetailPage = () => {
                                 {trainer.session_count} sessions conducted
                               </div>
                             </div>
-                            
                             {canManage && (
                               <Button variant="ghost" size="sm">
                                 Manage
@@ -739,7 +673,6 @@ const BeneficiaryDetailPage = () => {
                   )}
                 </CardContent>
               </TabContent>
-              
               {/* Progress tab */}
               <TabContent value="progress">
                 <CardContent className="pt-6">
@@ -753,7 +686,6 @@ const BeneficiaryDetailPage = () => {
                       </Button>
                     )}
                   </div>
-                  
                   {isLoadingTab ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
@@ -777,14 +709,12 @@ const BeneficiaryDetailPage = () => {
                             {progress.overall_percentage}% Complete
                           </span>
                         </div>
-                        
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
                           <div 
                             className="bg-primary h-2.5 rounded-full" 
                             style={{ width: `${progress.overall_percentage}%` }}
                           ></div>
                         </div>
-                        
                         <div className="grid grid-cols-3 gap-4 mt-4 text-center">
                           <div>
                             <div className="text-2xl font-bold text-primary">
@@ -792,14 +722,12 @@ const BeneficiaryDetailPage = () => {
                             </div>
                             <div className="text-xs text-gray-500">Evaluations Completed</div>
                           </div>
-                          
                           <div>
                             <div className="text-2xl font-bold text-primary">
                               {progress.average_score}%
                             </div>
                             <div className="text-xs text-gray-500">Average Score</div>
                           </div>
-                          
                           <div>
                             <div className="text-2xl font-bold text-primary">
                               {progress.improvement_rate > 0 ? '+' : ''}{progress.improvement_rate}%
@@ -808,11 +736,9 @@ const BeneficiaryDetailPage = () => {
                           </div>
                         </div>
                       </div>
-                      
                       {/* Skills progress */}
                       <div>
                         <h4 className="font-medium mb-3">Skills Progress</h4>
-                        
                         {progress.skills && progress.skills.length > 0 ? (
                           <div className="space-y-4">
                             {progress.skills.map((skill) => (
@@ -826,14 +752,12 @@ const BeneficiaryDetailPage = () => {
                                     {skill.proficiency_level}
                                   </span>
                                 </div>
-                                
                                 <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
                                   <div 
                                     className="bg-primary h-2.5 rounded-full" 
                                     style={{ width: `${skill.progress_percentage}%` }}
                                   ></div>
                                 </div>
-                                
                                 <div className="flex justify-between text-xs text-gray-500">
                                   <span>{skill.progress_percentage}% Mastered</span>
                                   <span>{skill.last_evaluated_at ? `Last evaluated: ${formatDate(skill.last_evaluated_at)}` : 'Not evaluated yet'}</span>
@@ -845,12 +769,10 @@ const BeneficiaryDetailPage = () => {
                           <p className="text-gray-500 italic">No skills data available.</p>
                         )}
                       </div>
-                      
                       {/* Growth areas */}
                       {progress.growth_areas && progress.growth_areas.length > 0 && (
                         <div>
                           <h4 className="font-medium mb-3">Areas for Improvement</h4>
-                          
                           <div className="bg-white border rounded-md p-4 space-y-3">
                             {progress.growth_areas.map((area, index) => (
                               <div key={index} className="flex items-start">
@@ -868,7 +790,6 @@ const BeneficiaryDetailPage = () => {
                   )}
                 </CardContent>
               </TabContent>
-              
               {/* Documents tab */}
               <TabContent value="documents">
                 <CardContent className="pt-6">
@@ -880,7 +801,6 @@ const BeneficiaryDetailPage = () => {
                       </Button>
                     )}
                   </div>
-                  
                   {isLoadingTab ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
@@ -910,15 +830,14 @@ const BeneficiaryDetailPage = () => {
                                 </div>
                                 <div>
                                   <Badge color={
-                                    document.type === 'evaluation_report' ? 'green' :
-                                    document.type === 'certificate' ? 'blue' :
-                                    document.type === 'application' ? 'purple' : 'gray'
+                                    document.document_type === 'evaluation_report' ? 'green' :
+                                    document.document_type === 'certificate' ? 'blue' :
+                                    document.document_type === 'application' ? 'purple' : 'gray'
                                   }>
-                                    {document.type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                    {document.document_type ? document.document_type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : 'Unknown'}
                                   </Badge>
                                 </div>
                               </div>
-                              
                               <div className="grid grid-cols-2 gap-4 mt-4">
                                 <div className="text-sm">
                                   <p className="text-gray-500">Uploaded</p>
@@ -938,7 +857,6 @@ const BeneficiaryDetailPage = () => {
                                 </div>
                               </div>
                             </div>
-                            
                             <div className="bg-gray-50 p-4 md:w-48 flex flex-row md:flex-col justify-center md:justify-start items-center md:items-start gap-2">
                               <a 
                                 href={document.view_url}
@@ -948,7 +866,6 @@ const BeneficiaryDetailPage = () => {
                               >
                                 View Document
                               </a>
-                              
                               <a 
                                 href={document.download_url}
                                 className="flex items-center text-primary hover:underline text-sm"
@@ -956,7 +873,6 @@ const BeneficiaryDetailPage = () => {
                               >
                                 Download
                               </a>
-                              
                               {canManage && (
                                 <button 
                                   className="flex items-center text-red-600 hover:underline text-sm"
@@ -976,7 +892,6 @@ const BeneficiaryDetailPage = () => {
           </Card>
         </div>
       </div>
-      
       {/* Delete confirmation modal */}
       <Modal
         isOpen={isDeleteModalOpen}
@@ -985,7 +900,6 @@ const BeneficiaryDetailPage = () => {
         <ModalHeader>
           <h3 className="text-lg font-medium text-red-600">Delete Beneficiary</h3>
         </ModalHeader>
-        
         <ModalBody>
           <Alert type="error" title="Warning: This action cannot be undone">
             <p>
@@ -993,7 +907,6 @@ const BeneficiaryDetailPage = () => {
               This will permanently remove their profile, evaluations, and all associated data.
             </p>
           </Alert>
-          
           <div className="mt-4">
             <p className="text-sm text-gray-600 font-medium">This will delete:</p>
             <ul className="mt-2 text-sm text-gray-600 list-disc list-inside space-y-1">
@@ -1005,7 +918,6 @@ const BeneficiaryDetailPage = () => {
             </ul>
           </div>
         </ModalBody>
-        
         <ModalFooter>
           <Button
             variant="outline"
@@ -1027,5 +939,4 @@ const BeneficiaryDetailPage = () => {
     </div>
   );
 };
-
 export default BeneficiaryDetailPage;

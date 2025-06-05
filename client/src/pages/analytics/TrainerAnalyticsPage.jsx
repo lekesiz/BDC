@@ -21,9 +21,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-
 const COLORS = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-
 /**
  * TrainerAnalyticsPage displays performance metrics for trainers
  */
@@ -39,17 +37,14 @@ const TrainerAnalyticsPage = () => {
   const [dateRange, setDateRange] = useState('last30days');
   const [trainerMetrics, setTrainerMetrics] = useState(null);
   const [filterOpen, setFilterOpen] = useState(false);
-  
   // Fetch trainers and metrics
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
         // Fetch trainers list
         const trainersResponse = await api.get('/api/users?role=trainer');
         setTrainers(trainersResponse.data);
-        
         // If an ID is provided, fetch that specific trainer
         if (id) {
           const trainer = trainersResponse.data.find(t => t.id.toString() === id);
@@ -64,7 +59,6 @@ const TrainerAnalyticsPage = () => {
             navigate('/analytics/trainers');
           }
         }
-        
         // Fetch trainer metrics if a trainer is selected
         if (selectedTrainer || id) {
           const trainerId = selectedTrainer?.id || id;
@@ -73,7 +67,6 @@ const TrainerAnalyticsPage = () => {
               date_range: dateRange
             }
           });
-          
           setTrainerMetrics(metricsResponse.data);
         }
       } catch (error) {
@@ -87,21 +80,17 @@ const TrainerAnalyticsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchData();
   }, [toast, id, selectedTrainer, dateRange, navigate]);
-  
   // Handle date range change
   const handleDateRangeChange = (range) => {
     setDateRange(range);
   };
-  
   // Filter trainers based on search term
   const filteredTrainers = trainers.filter(trainer => 
     trainer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     trainer.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
   // Format date range for display
   const formatDateRange = () => {
     switch(dateRange) {
@@ -119,11 +108,9 @@ const TrainerAnalyticsPage = () => {
         return 'Last 30 Days';
     }
   };
-  
   // Export trainer metrics
   const exportTrainerMetrics = async (format) => {
     if (!selectedTrainer && !id) return;
-    
     try {
       const trainerId = selectedTrainer?.id || id;
       const response = await api.get(`/api/analytics/trainers/${trainerId}/export`, {
@@ -133,7 +120,6 @@ const TrainerAnalyticsPage = () => {
         },
         responseType: 'blob'
       });
-      
       // Create a URL for the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -142,7 +128,6 @@ const TrainerAnalyticsPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      
       toast({
         title: 'Success',
         description: `Trainer metrics exported successfully as ${format.toUpperCase()}`,
@@ -157,7 +142,6 @@ const TrainerAnalyticsPage = () => {
       });
     }
   };
-  
   // Render specific trainer analytics view
   const renderTrainerAnalytics = () => {
     if (!trainerMetrics) {
@@ -167,7 +151,6 @@ const TrainerAnalyticsPage = () => {
         </div>
       );
     }
-    
     const { 
       performance, 
       beneficiaryMetrics, 
@@ -176,7 +159,6 @@ const TrainerAnalyticsPage = () => {
       timeAllocation,
       skillsRating
     } = trainerMetrics;
-    
     // Prepare session type data
     const sessionTypeData = sessionMetrics?.byType 
       ? Object.entries(sessionMetrics.byType).map(([name, value]) => ({
@@ -184,7 +166,6 @@ const TrainerAnalyticsPage = () => {
           value
         }))
       : [];
-    
     // Prepare time allocation data
     const timeAllocationData = timeAllocation
       ? Object.entries(timeAllocation).map(([name, value]) => ({
@@ -192,10 +173,8 @@ const TrainerAnalyticsPage = () => {
           value
         }))
       : [];
-    
     // Prepare skills rating data
     const skillsRatingData = skillsRating || [];
-    
     return (
       <div className="space-y-6">
         {/* Trainer overview stats */}
@@ -221,7 +200,6 @@ const TrainerAnalyticsPage = () => {
               </div>
             </div>
           </Card>
-          
           <Card className="p-4">
             <div className="flex justify-between items-start">
               <div>
@@ -243,7 +221,6 @@ const TrainerAnalyticsPage = () => {
               </div>
             </div>
           </Card>
-          
           <Card className="p-4">
             <div className="flex justify-between items-start">
               <div>
@@ -265,7 +242,6 @@ const TrainerAnalyticsPage = () => {
               </div>
             </div>
           </Card>
-          
           <Card className="p-4">
             <div className="flex justify-between items-start">
               <div>
@@ -288,7 +264,6 @@ const TrainerAnalyticsPage = () => {
             </div>
           </Card>
         </div>
-        
         {/* Performance metrics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="p-6">
@@ -322,7 +297,6 @@ const TrainerAnalyticsPage = () => {
               )}
             </div>
           </Card>
-          
           <Card className="p-6">
             <h2 className="text-lg font-medium mb-4">Time Allocation</h2>
             <div className="h-64">
@@ -355,7 +329,6 @@ const TrainerAnalyticsPage = () => {
             </div>
           </Card>
         </div>
-        
         {/* Skills rating */}
         <Card className="p-6">
           <h2 className="text-lg font-medium mb-4">Skills Rating</h2>
@@ -387,11 +360,9 @@ const TrainerAnalyticsPage = () => {
             )}
           </div>
         </Card>
-        
         {/* Beneficiary outcomes */}
         <Card className="p-6">
           <h2 className="text-lg font-medium mb-4">Beneficiary Outcomes</h2>
-          
           {beneficiaryMetrics?.outcomes ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -403,7 +374,6 @@ const TrainerAnalyticsPage = () => {
                   of beneficiaries completed their program
                 </p>
               </div>
-              
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-medium mb-2">Skill Improvement</h3>
                 <div className="text-3xl font-bold text-green-600">
@@ -413,7 +383,6 @@ const TrainerAnalyticsPage = () => {
                   average skill improvement
                 </p>
               </div>
-              
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-medium mb-2">Placement Rate</h3>
                 <div className="text-3xl font-bold text-blue-600">
@@ -430,12 +399,10 @@ const TrainerAnalyticsPage = () => {
             </div>
           )}
         </Card>
-        
         {/* Evaluation metrics */}
         {evaluationMetrics && (
           <Card className="p-6">
             <h2 className="text-lg font-medium mb-4">Evaluation Insights</h2>
-            
             <div className="space-y-4">
               <div className="flex items-center">
                 <div className="w-40 text-sm text-gray-500">Pass Rate</div>
@@ -449,7 +416,6 @@ const TrainerAnalyticsPage = () => {
                 </div>
                 <div className="w-16 text-right font-medium">{evaluationMetrics.passRate}%</div>
               </div>
-              
               <div className="flex items-center">
                 <div className="w-40 text-sm text-gray-500">Avg. Score</div>
                 <div className="flex-1">
@@ -462,7 +428,6 @@ const TrainerAnalyticsPage = () => {
                 </div>
                 <div className="w-16 text-right font-medium">{evaluationMetrics.avgScore}%</div>
               </div>
-              
               <div className="flex items-center">
                 <div className="w-40 text-sm text-gray-500">Improvement Rate</div>
                 <div className="flex-1">
@@ -475,7 +440,6 @@ const TrainerAnalyticsPage = () => {
                 </div>
                 <div className="w-16 text-right font-medium">{evaluationMetrics.improvementRate}%</div>
               </div>
-              
               <div className="flex items-center">
                 <div className="w-40 text-sm text-gray-500">Feedback Quality</div>
                 <div className="flex-1">
@@ -489,7 +453,6 @@ const TrainerAnalyticsPage = () => {
                 <div className="w-16 text-right font-medium">{evaluationMetrics.feedbackQuality}/5</div>
               </div>
             </div>
-            
             {evaluationMetrics.insights && (
               <div className="mt-6 bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-medium mb-2">Key Insights</h3>
@@ -505,7 +468,6 @@ const TrainerAnalyticsPage = () => {
       </div>
     );
   };
-  
   // Render trainers list
   const renderTrainersList = () => {
     return (
@@ -522,7 +484,6 @@ const TrainerAnalyticsPage = () => {
             />
           </div>
         </div>
-        
         <Card>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -605,7 +566,6 @@ const TrainerAnalyticsPage = () => {
       </div>
     );
   };
-  
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
@@ -621,7 +581,6 @@ const TrainerAnalyticsPage = () => {
               <ArrowLeft className="w-5 h-5" />
             </button>
           )}
-          
           <div>
             <h1 className="text-2xl font-bold">
               {selectedTrainer || id 
@@ -635,7 +594,6 @@ const TrainerAnalyticsPage = () => {
             )}
           </div>
         </div>
-        
         {(selectedTrainer || id) && (
           <div className="flex space-x-2">
             <div className="relative">
@@ -648,7 +606,6 @@ const TrainerAnalyticsPage = () => {
                 Date Range
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
-              
               {filterOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border p-4">
                   <div className="grid grid-cols-1 gap-2">
@@ -706,7 +663,6 @@ const TrainerAnalyticsPage = () => {
                 </div>
               )}
             </div>
-            
             <div className="relative">
               <Button
                 variant="outline"
@@ -717,7 +673,6 @@ const TrainerAnalyticsPage = () => {
                 Export
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
-              
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border p-2 hidden group-hover:block">
                 <button
                   className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
@@ -742,7 +697,6 @@ const TrainerAnalyticsPage = () => {
           </div>
         )}
       </div>
-      
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <Loader className="w-10 h-10 text-primary animate-spin" />
@@ -755,5 +709,4 @@ const TrainerAnalyticsPage = () => {
     </div>
   );
 };
-
 export default TrainerAnalyticsPage;

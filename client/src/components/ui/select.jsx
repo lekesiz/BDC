@@ -1,7 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
 /**
  * Select component - A custom dropdown select element
  * 
@@ -22,9 +21,7 @@ export const Select = React.forwardRef(({
   ...props 
 }, ref) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  
   const selectedOption = options.find(opt => opt.value === value);
-  
   return (
     <div className="relative" ref={ref}>
       <button
@@ -44,7 +41,6 @@ export const Select = React.forwardRef(({
         </span>
         <ChevronDown className="h-4 w-4 opacity-50" />
       </button>
-      
       {isOpen && (
         <div className="absolute z-50 mt-1 w-full rounded-md border bg-background shadow-lg">
           {options.map((option) => (
@@ -69,7 +65,5 @@ export const Select = React.forwardRef(({
     </div>
   );
 });
-
 Select.displayName = "Select";
-
 export default Select;

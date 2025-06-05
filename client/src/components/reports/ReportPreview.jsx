@@ -4,7 +4,6 @@ import { FileText, Calendar, User, Building } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
-
 const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) => {
   // Simulate report metadata
   const metadata = {
@@ -13,7 +12,6 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
     generatedAt: new Date(),
     totalPages: Math.ceil(sections.length * 1.5),
   };
-
   const renderWidgetPreview = (widget) => {
     switch (widget.type) {
       case 'chart':
@@ -24,7 +22,6 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
             </p>
           </div>
         );
-      
       case 'kpi':
         return (
           <div className="bg-gray-100 dark:bg-gray-700 rounded p-4">
@@ -36,7 +33,6 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
             </p>
           </div>
         );
-      
       case 'table':
         return (
           <div className="bg-gray-100 dark:bg-gray-700 rounded p-4 h-32 flex items-center justify-center">
@@ -45,7 +41,6 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
             </p>
           </div>
         );
-      
       case 'text':
         return (
           <div className="bg-gray-100 dark:bg-gray-700 rounded p-4">
@@ -57,7 +52,6 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
             />
           </div>
         );
-      
       case 'image':
         return (
           <div className="bg-gray-100 dark:bg-gray-700 rounded p-4 h-32 flex items-center justify-center">
@@ -66,7 +60,6 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
             </p>
           </div>
         );
-      
       default:
         return (
           <div className="bg-gray-100 dark:bg-gray-700 rounded p-4 h-20 flex items-center justify-center">
@@ -77,7 +70,6 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
         );
     }
   };
-
   const getLayoutClass = (layout) => {
     switch (layout) {
       case 'two-column':
@@ -88,7 +80,6 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
         return 'space-y-2';
     }
   };
-
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -101,9 +92,7 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
           </p>
         )}
       </div>
-
       <Separator />
-
       {/* Metadata */}
       <div className="space-y-2 text-xs">
         <div className="flex items-center justify-between">
@@ -124,9 +113,7 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
           <span>{format(metadata.generatedAt, 'PPP')}</span>
         </div>
       </div>
-
       <Separator />
-
       {/* Sections Preview */}
       <ScrollArea className="h-[calc(100vh-400px)]">
         <div className="space-y-4">
@@ -163,9 +150,7 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
           )}
         </div>
       </ScrollArea>
-
       <Separator />
-
       {/* Footer */}
       <div className="text-center text-xs text-gray-500 dark:text-gray-400">
         <p>Preview • {metadata.totalPages} estimated pages</p>
@@ -173,5 +158,4 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
     </div>
   );
 };
-
 export default ReportPreview;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 import { 
   Calculator, 
   Link, 
@@ -24,7 +24,6 @@ import {
   Building
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart as RechartsPieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 const PennylaneIntegrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -33,7 +32,6 @@ const PennylaneIntegrationPage = () => {
     apiKey: '',
     companyId: ''
   });
-
   const accountingMetrics = {
     totalRevenue: 450000,
     totalExpenses: 320000,
@@ -44,7 +42,6 @@ const PennylaneIntegrationPage = () => {
     overduePayments: 5,
     bankBalance: 125000
   };
-
   const monthlyData = [
     { month: 'Jan', revenue: 65000, expenses: 45000, profit: 20000 },
     { month: 'Feb', revenue: 72000, expenses: 48000, profit: 24000 },
@@ -53,7 +50,6 @@ const PennylaneIntegrationPage = () => {
     { month: 'May', revenue: 82000, expenses: 55000, profit: 27000 },
     { month: 'Jun', revenue: 88000, expenses: 60000, profit: 28000 }
   ];
-
   const expenseCategories = [
     { category: 'Salaries', amount: 180000, percentage: 56 },
     { category: 'Training Materials', amount: 45000, percentage: 14 },
@@ -62,7 +58,6 @@ const PennylaneIntegrationPage = () => {
     { category: 'Marketing', amount: 20000, percentage: 6 },
     { category: 'Other', amount: 12000, percentage: 4 }
   ];
-
   const recentTransactions = [
     { id: 1, date: '2024-11-17', description: 'Program Fee - Python Training', amount: 2500, type: 'income' },
     { id: 2, date: '2024-11-17', description: 'Instructor Payment - John Doe', amount: -1200, type: 'expense' },
@@ -70,14 +65,12 @@ const PennylaneIntegrationPage = () => {
     { id: 4, date: '2024-11-16', description: 'Grant from Foundation', amount: 25000, type: 'income' },
     { id: 5, date: '2024-11-15', description: 'Software Licenses', amount: -450, type: 'expense' }
   ];
-
   const syncSettings = {
     autoSync: true,
     syncInterval: '1h',
     syncCategories: ['invoices', 'expenses', 'bank', 'tax'],
     reconciliation: true
   };
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Calculator },
     { id: 'accounting', label: 'Accounting', icon: Building },
@@ -86,7 +79,6 @@ const PennylaneIntegrationPage = () => {
     { id: 'sync', label: 'Sync', icon: RefreshCw },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
-
   const handleConnect = () => {
     if (apiCredentials.apiKey && apiCredentials.companyId) {
       setLoading(true);
@@ -96,16 +88,13 @@ const PennylaneIntegrationPage = () => {
       }, 2000);
     }
   };
-
   const handleSync = (type) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 3000);
   };
-
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -128,7 +117,6 @@ const PennylaneIntegrationPage = () => {
           </Button>
         )}
       </div>
-
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -152,7 +140,6 @@ const PennylaneIntegrationPage = () => {
           })}
         </nav>
       </div>
-
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <Card>
@@ -182,7 +169,6 @@ const PennylaneIntegrationPage = () => {
                   </div>
                 )}
               </div>
-
               {!isConnected && (
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-3">
@@ -207,7 +193,6 @@ const PennylaneIntegrationPage = () => {
                   </div>
                 </div>
               )}
-
               {isConnected && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -230,7 +215,6 @@ const PennylaneIntegrationPage = () => {
               )}
             </div>
           </Card>
-
           {isConnected && (
             <>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -253,7 +237,6 @@ const PennylaneIntegrationPage = () => {
                     </div>
                   </div>
                 </Card>
-
                 <Card>
                   <div className="p-6">
                     <h3 className="text-lg font-semibold mb-4">Expense Categories</h3>
@@ -281,7 +264,6 @@ const PennylaneIntegrationPage = () => {
                   </div>
                 </Card>
               </div>
-
               <Card>
                 <div className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
@@ -321,7 +303,6 @@ const PennylaneIntegrationPage = () => {
           )}
         </div>
       )}
-
       {activeTab === 'accounting' && isConnected && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -337,7 +318,6 @@ const PennylaneIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -350,7 +330,6 @@ const PennylaneIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -364,7 +343,6 @@ const PennylaneIntegrationPage = () => {
               </div>
             </Card>
           </div>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
@@ -411,7 +389,6 @@ const PennylaneIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Chart of Accounts</h3>
@@ -451,7 +428,6 @@ const PennylaneIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'invoices' && isConnected && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -467,7 +443,6 @@ const PennylaneIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -480,7 +455,6 @@ const PennylaneIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -494,7 +468,6 @@ const PennylaneIntegrationPage = () => {
               </div>
             </Card>
           </div>
-
           <Card>
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -566,7 +539,6 @@ const PennylaneIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'expenses' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -585,7 +557,6 @@ const PennylaneIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -651,7 +622,6 @@ const PennylaneIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'sync' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -701,7 +671,6 @@ const PennylaneIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Sync History</h3>
@@ -741,7 +710,6 @@ const PennylaneIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'settings' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -762,7 +730,6 @@ const PennylaneIntegrationPage = () => {
                     <Button variant="secondary">Update</Button>
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Company ID
@@ -773,7 +740,6 @@ const PennylaneIntegrationPage = () => {
                     onChange={(e) => setApiCredentials({...apiCredentials, companyId: e.target.value})}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     API Endpoint
@@ -788,7 +754,6 @@ const PennylaneIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Sync Settings</h3>
@@ -807,7 +772,6 @@ const PennylaneIntegrationPage = () => {
                     Automatically sync data at regular intervals
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Sync Interval
@@ -823,7 +787,6 @@ const PennylaneIntegrationPage = () => {
                     <option value="1d">Daily</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Data Categories
@@ -842,7 +805,6 @@ const PennylaneIntegrationPage = () => {
                     ))}
                   </div>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input 
@@ -857,7 +819,6 @@ const PennylaneIntegrationPage = () => {
                     Automatically reconcile bank transactions
                   </p>
                 </div>
-
                 <div className="pt-4">
                   <Button variant="primary">Save Settings</Button>
                 </div>
@@ -869,5 +830,4 @@ const PennylaneIntegrationPage = () => {
     </div>
   );
 };
-
 export default PennylaneIntegrationPage;

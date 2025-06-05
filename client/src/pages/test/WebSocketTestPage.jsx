@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSocket } from '../../contexts/SocketContext';
 import { useAuth } from '../../hooks/useAuth';
-
 const WebSocketTestPage = () => {
   const { connected, emit, on, off } = useSocket();
   const { user } = useAuth();
@@ -10,7 +9,6 @@ const WebSocketTestPage = () => {
   const [message, setMessage] = useState('');
   const [customEvent, setCustomEvent] = useState('test_event');
   const [customData, setCustomData] = useState('');
-
   useEffect(() => {
     // Subscribe to messages
     const handleMessage = (data) => {
@@ -20,7 +18,6 @@ const WebSocketTestPage = () => {
         timestamp: new Date().toISOString()
       }]);
     };
-
     const handleTestEvent = (data) => {
       setMessages(prev => [...prev, {
         type: 'custom',
@@ -29,20 +26,16 @@ const WebSocketTestPage = () => {
         timestamp: new Date().toISOString()
       }]);
     };
-
     on('message', handleMessage);
     on('test_event', handleTestEvent);
-
     // Join test room
     emit('join_room', { room });
-
     return () => {
       off('message', handleMessage);
       off('test_event', handleTestEvent);
       emit('leave_room', { room });
     };
   }, [room]);
-
   const sendMessage = () => {
     if (message.trim()) {
       emit('send_message', {
@@ -53,24 +46,20 @@ const WebSocketTestPage = () => {
       setMessage('');
     }
   };
-
   const sendCustomEvent = () => {
     if (customEvent && customData) {
       emit(customEvent, customData);
     }
   };
-
   const joinNewRoom = () => {
     emit('leave_room', { room: room });
     const newRoom = `room_${Date.now()}`;
     setRoom(newRoom);
     emit('join_room', { room: newRoom });
   };
-
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">WebSocket Test Page</h1>
-      
       <div className="mb-6 p-4 bg-gray-100 rounded">
         <p className="font-semibold">
           Connection Status: 
@@ -81,7 +70,6 @@ const WebSocketTestPage = () => {
         <p>Current Room: {room}</p>
         <p>User: {user?.username || 'Unknown'}</p>
       </div>
-
       <div className="grid gap-6 md:grid-cols-2">
         {/* Send Message */}
         <div className="bg-white rounded-lg shadow p-4">
@@ -104,7 +92,6 @@ const WebSocketTestPage = () => {
             </button>
           </div>
         </div>
-
         {/* Send Custom Event */}
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="text-xl font-semibold mb-4">Send Custom Event</h2>
@@ -133,7 +120,6 @@ const WebSocketTestPage = () => {
           </div>
         </div>
       </div>
-
       {/* Room Controls */}
       <div className="mt-6 bg-white rounded-lg shadow p-4">
         <h2 className="text-xl font-semibold mb-4">Room Controls</h2>
@@ -145,7 +131,6 @@ const WebSocketTestPage = () => {
           Join New Room
         </button>
       </div>
-
       {/* Messages */}
       <div className="mt-6 bg-white rounded-lg shadow p-4">
         <h2 className="text-xl font-semibold mb-4">Messages</h2>
@@ -173,5 +158,4 @@ const WebSocketTestPage = () => {
     </div>
   );
 };
-
 export default WebSocketTestPage;

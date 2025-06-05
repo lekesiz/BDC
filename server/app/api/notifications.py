@@ -9,6 +9,8 @@ from app.models.notification import Notification
 from app.models.user import User
 from app.container import get_container
 
+from app.utils.logging import logger
+
 notifications_bp = Blueprint('notifications', __name__)
 
 

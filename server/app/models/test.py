@@ -77,6 +77,16 @@ class TestSet(db.Model):
     max_attempts = Column(Integer, default=1)  # 0 means unlimited
     show_results = Column(Boolean, default=True)
     
+    # Randomization settings
+    randomization_enabled = Column(Boolean, default=True)
+    randomization_strategy = Column(String(50), default='simple_random')
+    randomization_config = Column(JSON, default=dict)
+    question_order_template = Column(String(50), nullable=True)
+    anchor_questions = Column(JSON, default=dict)
+    answer_randomization = Column(Boolean, default=True)
+    blocking_rules = Column(JSON, default=list)
+    time_based_seed = Column(Boolean, default=False)
+    
     # Status
     status = Column(String(20), default='draft')  # draft, active, archived
     is_template = Column(Boolean, default=False)
@@ -109,6 +119,14 @@ class TestSet(db.Model):
             'allow_resume': self.allow_resume,
             'max_attempts': self.max_attempts,
             'show_results': self.show_results,
+            'randomization_enabled': self.randomization_enabled,
+            'randomization_strategy': self.randomization_strategy,
+            'randomization_config': self.randomization_config,
+            'question_order_template': self.question_order_template,
+            'anchor_questions': self.anchor_questions,
+            'answer_randomization': self.answer_randomization,
+            'blocking_rules': self.blocking_rules,
+            'time_based_seed': self.time_based_seed,
             'status': self.status,
             'is_template': self.is_template,
             'created_at': self.created_at.isoformat(),
@@ -198,6 +216,11 @@ class TestSession(db.Model):
     max_score = Column(Float, nullable=True)
     passed = Column(Boolean, nullable=True)
     
+    # Randomization tracking
+    question_order = Column(JSON, nullable=True)  # Order of questions presented
+    randomization_seed = Column(String(255), nullable=True)  # Seed used for reproducibility
+    answer_mappings = Column(JSON, nullable=True)  # Answer option mappings per question
+    
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -220,6 +243,9 @@ class TestSession(db.Model):
             'score': self.score,
             'max_score': self.max_score,
             'passed': self.passed,
+            'question_order': self.question_order,
+            'randomization_seed': self.randomization_seed,
+            'answer_mappings': self.answer_mappings,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

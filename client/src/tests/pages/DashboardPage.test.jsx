@@ -5,7 +5,6 @@ import DashboardPage from '../../pages/dashboard/DashboardPage';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../lib/api';
 import { API_ENDPOINTS } from '../../lib/constants';
-
 // Mock modules
 vi.mock('../../hooks/useAuth');
 vi.mock('../../lib/api', () => ({
@@ -26,14 +25,12 @@ vi.mock('../../lib/constants', () => ({
     }
   }
 }));
-
 describe('DashboardPage', () => {
   beforeEach(() => {
     useAuth.mockReturnValue({
       user: { id: 1, first_name: 'Test', name: 'Test User', role: 'trainer' },
       isAuthenticated: true
     });
-    
     // Setup default mock responses
     api.get.mockImplementation((url) => {
       switch (url) {
@@ -62,68 +59,54 @@ describe('DashboardPage', () => {
       }
     });
   });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
-
   it('renders dashboard components', async () => {
     render(
       <BrowserRouter>
         <DashboardPage />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       // Check for dashboard header
       expect(screen.getByRole('heading', { name: /dashboard/i })).toBeInTheDocument();
-      
       // Check for the welcome message
       expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
-      
       // Check for quick actions section
       expect(screen.getByText(/quick actions/i)).toBeInTheDocument();
     });
   });
-
   it('shows loading state', () => {
     // Force all API calls to hang
     api.get.mockImplementation(() => new Promise(() => {}));
-
     render(
       <BrowserRouter>
         <DashboardPage />
       </BrowserRouter>
     );
-
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
-
   it('handles error state', async () => {
     // Force API to reject
     api.get.mockRejectedValue(new Error('Failed to fetch'));
-
     render(
       <BrowserRouter>
         <DashboardPage />
       </BrowserRouter>
     );
-
     // Wait for the loading state to finish
     await waitFor(() => {
       expect(screen.queryByText(/loading dashboard data/i)).not.toBeInTheDocument();
     });
-    
     // Use more specific error message to avoid duplicate matches
     expect(screen.getByText(/Error fetching dashboard data/i)).toBeInTheDocument();
   });
-
   it('renders different content based on user role', async () => {
     useAuth.mockReturnValue({
       user: { id: 1, first_name: 'Admin', name: 'Admin User', role: 'super_admin' },
       isAuthenticated: true
     });
-
     // Update API response for admin role
     api.get.mockImplementation((url) => {
       switch (url) {
@@ -150,20 +133,17 @@ describe('DashboardPage', () => {
           return Promise.resolve({ data: {} });
       }
     });
-
     render(
       <BrowserRouter>
         <DashboardPage />
       </BrowserRouter>
     );
-
     // For a super_admin, check that we see their name and role-specific content
     await waitFor(() => {
       expect(screen.getByText(/admin/i)).toBeInTheDocument();
       expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
     });
   });
-
   it('renders recent activities', async () => {
     // Mock the API to return activities
     api.get.mockImplementation((url) => {
@@ -198,19 +178,16 @@ describe('DashboardPage', () => {
           return Promise.resolve({ data: {} });
       }
     });
-
     render(
       <BrowserRouter>
         <DashboardPage />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       expect(screen.getByText(/recent evaluations/i)).toBeInTheDocument();
       expect(screen.getByText(/javascript test/i)).toBeInTheDocument();
     });
   });
-
   it('renders appointment information', async () => {
     // Mock the API to return upcoming appointments
     api.get.mockImplementation((url) => {
@@ -245,32 +222,26 @@ describe('DashboardPage', () => {
           return Promise.resolve({ data: {} });
       }
     });
-
     render(
       <BrowserRouter>
         <DashboardPage />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       // Check for the specific meeting title which is unique in this context
       expect(screen.getByText(/system update meeting/i)).toBeInTheDocument();
-      
       // Check for the meeting details
       expect(screen.getByText(/john doe/i)).toBeInTheDocument();
     });
   });
-
   it('fetches data on mount', async () => {
     // Reset mocks to track calls
     api.get.mockClear();
-    
     render(
       <BrowserRouter>
         <DashboardPage />
       </BrowserRouter>
     );
-
     await waitFor(() => {
       // Verify all expected endpoints were called
       expect(api.get).toHaveBeenCalledWith(API_ENDPOINTS.ANALYTICS.DASHBOARD);

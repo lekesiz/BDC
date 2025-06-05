@@ -1,6 +1,5 @@
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-
 /**
  * Combines multiple class names using clsx and tailwind-merge
  * This allows for conditional and dynamic class names that are properly merged
@@ -12,7 +11,6 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
-
 /**
  * Format a date string into a human-readable format
  * 
@@ -22,19 +20,15 @@ export function cn(...inputs) {
  */
 export function formatDate(dateString, options = {}) {
   if (!dateString) return '';
-  
   const date = new Date(dateString);
-  
   const defaultOptions = {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     ...options
   };
-  
   return new Intl.DateTimeFormat('en-US', defaultOptions).format(date);
 }
-
 /**
  * Format a date with time
  * 
@@ -50,7 +44,6 @@ export function formatDateTime(dateString) {
     minute: '2-digit'
   });
 }
-
 /**
  * Truncate a string to a specified length and add an ellipsis
  * 
@@ -60,12 +53,9 @@ export function formatDateTime(dateString) {
  */
 export function truncate(str, length = 50) {
   if (!str) return '';
-  
   if (str.length <= length) return str;
-  
   return str.slice(0, length) + '...';
 }
-
 /**
  * Capitalize the first letter of a string
  * 
@@ -74,10 +64,8 @@ export function truncate(str, length = 50) {
  */
 export function capitalize(str) {
   if (!str) return '';
-  
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
-
 /**
  * Format a snake_case or kebab-case string to Title Case
  * 
@@ -86,16 +74,12 @@ export function capitalize(str) {
  */
 export function formatTitle(str) {
   if (!str) return '';
-  
   // Replace underscores and hyphens with spaces
   const words = str.replace(/[_-]/g, ' ').split(' ');
-  
   // Capitalize each word
   const capitalizedWords = words.map(word => capitalize(word));
-  
   return capitalizedWords.join(' ');
 }
-
 /**
  * Get initials from a name (first letter of first and last name)
  * 
@@ -104,14 +88,10 @@ export function formatTitle(str) {
  */
 export function getInitials(name) {
   if (!name) return '';
-  
   const names = name.split(' ');
-  
   if (names.length === 1) return names[0].charAt(0).toUpperCase();
-  
   return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
 }
-
 /**
  * Parse JWT token to get payload data
  * 
@@ -120,7 +100,6 @@ export function getInitials(name) {
  */
 export function parseJwt(token) {
   if (!token) return null;
-  
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -130,13 +109,11 @@ export function parseJwt(token) {
         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     );
-    
     return JSON.parse(jsonPayload);
   } catch (error) {
     return null;
   }
 }
-
 /**
  * Format bytes to human readable format
  * 
@@ -146,16 +123,12 @@ export function parseJwt(token) {
  */
 export function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
-  
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-  
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
-
 /**
  * Check if a JWT token is expired
  * 
@@ -164,14 +137,10 @@ export function formatBytes(bytes, decimals = 2) {
  */
 export function isTokenExpired(token) {
   const payload = parseJwt(token);
-  
   if (!payload || !payload.exp) return true;
-  
   const currentTime = Date.now() / 1000;
-  
   return payload.exp < currentTime;
 }
-
 /**
  * Convert bytes to a human-readable size format
  * 
@@ -181,16 +150,12 @@ export function isTokenExpired(token) {
  */
 export function formatFileSize(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
-  
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-  
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
-
 /**
  * Deep clone an object
  * 
@@ -200,7 +165,6 @@ export function formatFileSize(bytes, decimals = 2) {
 export function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
-
 /**
  * Generate a random ID string
  * 
@@ -210,10 +174,8 @@ export function deepClone(obj) {
 export function generateId(length = 8) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
-  
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  
   return result;
 }

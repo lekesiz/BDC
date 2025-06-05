@@ -1,13 +1,11 @@
 // Helper functions for frontend testing
 export const checkPageHealth = () => {
   const issues = [];
-  
   // Check for React error boundaries
   const errorBoundaries = document.querySelectorAll('[data-error-boundary]');
   if (errorBoundaries.length > 0) {
     issues.push('Error boundary triggered');
   }
-  
   // Check for infinite loading
   const spinners = document.querySelectorAll('.animate-spin');
   if (spinners.length > 0) {
@@ -19,7 +17,6 @@ export const checkPageHealth = () => {
       }
     }, 3000);
   }
-  
   // Check for error messages
   const errorMessages = document.querySelectorAll('.text-red-600, .text-red-500, .bg-red-50');
   errorMessages.forEach(el => {
@@ -28,13 +25,11 @@ export const checkPageHealth = () => {
       issues.push(`Error message: ${text.substring(0, 50)}...`);
     }
   });
-  
   // Check for empty content
   const mainContent = document.querySelector('main');
   if (mainContent && mainContent.children.length === 0) {
     issues.push('Page has no content');
   }
-  
   // Check for network errors
   const networkErrors = [];
   const originalFetch = window.fetch;
@@ -50,10 +45,8 @@ export const checkPageHealth = () => {
       throw error;
     }
   };
-  
   return { issues, networkErrors };
 };
-
 // Auto-navigate and test all pages
 export const runAutomatedTest = async () => {
   const pages = [
@@ -69,13 +62,10 @@ export const runAutomatedTest = async () => {
     '/settings',
     '/portal'
   ];
-  
   const results = [];
-  
   for (const page of pages) {
     window.location.href = page;
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
     const health = checkPageHealth();
     results.push({
       page,
@@ -84,7 +74,6 @@ export const runAutomatedTest = async () => {
       networkErrors: health.networkErrors
     });
   }
-  
   console.table(results);
   return results;
 };

@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * EmptyState component for showing empty states
  * 
@@ -49,5 +48,4 @@ const EmptyState = ({
     </div>
   );
 };
-
 export default EmptyState;

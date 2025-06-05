@@ -9,7 +9,6 @@ import {
   Clipboard,
   BarChart
 } from 'lucide-react';
-
 /**
  * ActivityTimeline component displays a timeline of recent activities in the system
  * @param {Object} props - Component props
@@ -23,7 +22,6 @@ export const ActivityTimeline = ({ data = [] }) => {
       </div>
     );
   }
-  
   // Get icon based on activity type
   const getActivityIcon = (type) => {
     switch (type) {
@@ -43,13 +41,11 @@ export const ActivityTimeline = ({ data = [] }) => {
         return <Calendar className="w-5 h-5 text-gray-500" />;
     }
   };
-  
   // Format activity date
   const formatActivityDate = (dateString) => {
     const date = new Date(dateString);
     return format(date, 'dd MMM yyyy, HH:mm', { locale: tr });
   };
-  
   return (
     <div className="flow-root max-h-80 overflow-y-auto pr-2">
       <ul className="-mb-8">
@@ -99,5 +95,4 @@ export const ActivityTimeline = ({ data = [] }) => {
     </div>
   );
 };
-
 export default ActivityTimeline;

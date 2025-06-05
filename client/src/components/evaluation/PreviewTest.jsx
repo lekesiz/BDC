@@ -3,31 +3,25 @@ import { Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { QUESTION_TYPES } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-
 /**
  * PreviewTest component that shows how the test will appear to users
  */
 const PreviewTest = ({ test }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const { questions, title, description, instructions, time_limit } = test;
-
   const hasPrevious = currentQuestionIndex > 0;
   const hasNext = currentQuestionIndex < questions.length - 1;
-
   const goToPrevious = () => {
     if (hasPrevious) {
       setCurrentQuestionIndex(prev => prev - 1);
     }
   };
-
   const goToNext = () => {
     if (hasNext) {
       setCurrentQuestionIndex(prev => prev + 1);
     }
   };
-
   const currentQuestion = questions[currentQuestionIndex];
-
   return (
     <div className="container mx-auto">
       <Card className="mb-4 p-6">
@@ -35,19 +29,16 @@ const PreviewTest = ({ test }) => {
           <h1 className="text-2xl font-bold">{title || 'Untitled Test'}</h1>
           <p className="text-gray-700 mt-2">{description || 'No description provided'}</p>
         </div>
-
         {instructions && (
           <div className="mb-4 bg-gray-50 p-4 rounded-lg">
             <h2 className="text-lg font-semibold mb-2">Instructions</h2>
             <p className="text-gray-700">{instructions}</p>
           </div>
         )}
-
         <div className="flex items-center justify-between">
           <div className="flex items-center text-sm text-gray-600">
             <span>Total Questions: <strong>{questions.length}</strong></span>
           </div>
-          
           {time_limit > 0 && (
             <div className="flex items-center text-sm text-gray-600">
               <Clock className="w-4 h-4 mr-1" />
@@ -56,7 +47,6 @@ const PreviewTest = ({ test }) => {
           )}
         </div>
       </Card>
-
       <div className="mb-4 bg-white p-3 rounded-lg shadow flex items-center justify-between sticky top-0 z-10">
         <Button
           variant="outline"
@@ -68,11 +58,9 @@ const PreviewTest = ({ test }) => {
           <ChevronLeft className="w-4 h-4 mr-1" />
           Previous
         </Button>
-        
         <span className="text-sm font-medium">
           Question {currentQuestionIndex + 1} of {questions.length}
         </span>
-        
         <Button
           variant="outline"
           size="sm"
@@ -84,7 +72,6 @@ const PreviewTest = ({ test }) => {
           <ChevronRight className="w-4 h-4 ml-1" />
         </Button>
       </div>
-
       <Card className="p-6">
         {currentQuestion ? (
           <div>
@@ -97,7 +84,6 @@ const PreviewTest = ({ test }) => {
               </h3>
               <p className="text-gray-800">{currentQuestion.question_text || 'No question text provided'}</p>
             </div>
-
             <div className="space-y-4">
               {currentQuestion.question_type === QUESTION_TYPES.MULTIPLE_CHOICE && (
                 <div className="space-y-2">
@@ -113,7 +99,6 @@ const PreviewTest = ({ test }) => {
                   ))}
                 </div>
               )}
-
               {currentQuestion.question_type === QUESTION_TYPES.TEXT && (
                 <div>
                   <textarea
@@ -123,7 +108,6 @@ const PreviewTest = ({ test }) => {
                   ></textarea>
                 </div>
               )}
-
               {currentQuestion.question_type === QUESTION_TYPES.TRUE_FALSE && (
                 <div className="space-y-2">
                   <label className="flex items-start p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
@@ -144,7 +128,6 @@ const PreviewTest = ({ test }) => {
                   </label>
                 </div>
               )}
-
               {currentQuestion.question_type === QUESTION_TYPES.MATCHING && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -155,7 +138,6 @@ const PreviewTest = ({ test }) => {
                       </div>
                     ))}
                   </div>
-                  
                   <div className="space-y-2">
                     <h4 className="font-medium">Right Items</h4>
                     {currentQuestion.matches?.map((match, i) => (
@@ -173,7 +155,6 @@ const PreviewTest = ({ test }) => {
                   </div>
                 </div>
               )}
-
               {currentQuestion.question_type === QUESTION_TYPES.ORDERING && (
                 <div className="space-y-2">
                   <h4 className="font-medium">Arrange items in the correct order:</h4>
@@ -200,7 +181,6 @@ const PreviewTest = ({ test }) => {
           </div>
         )}
       </Card>
-
       <div className="mt-4 flex justify-between">
         <Button
           variant="outline"
@@ -211,13 +191,11 @@ const PreviewTest = ({ test }) => {
           <ChevronLeft className="w-4 h-4 mr-1" />
           Previous
         </Button>
-        
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-500">
             Question {currentQuestionIndex + 1} of {questions.length}
           </span>
         </div>
-        
         <Button
           variant="outline"
           onClick={goToNext}
@@ -231,5 +209,4 @@ const PreviewTest = ({ test }) => {
     </div>
   );
 };
-
 export default PreviewTest;

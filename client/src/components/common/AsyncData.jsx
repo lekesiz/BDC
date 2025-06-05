@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ErrorState } from './ErrorStates';
 import { CardSkeleton, TableSkeleton, ContentLoader } from './LoadingAnimations';
 import { useAsyncOperation } from '@/hooks/useAsyncOperation';
-
 /**
  * Comprehensive async data component with loading, error, and empty states
  */
@@ -12,31 +11,25 @@ export const AsyncData = ({
   fetchData,
   params = {},
   dependencies = [],
-  
   // State components
   loadingComponent,
   errorComponent,
   emptyComponent,
-  
   // Display options
   showRetry = true,
   skeletonType = 'card',
   skeletonProps = {},
   errorProps = {},
   emptyMessage = "No data available",
-  
   // Animation
   animate = true,
   animationDuration = 0.3,
-  
   // Render function
   children,
   render,
-  
   // Callbacks
   onSuccess,
   onError,
-  
   className = ""
 }) => {
   const {
@@ -50,23 +43,19 @@ export const AsyncData = ({
     onError,
     showErrorToast: false
   });
-
   React.useEffect(() => {
     execute(() => fetchData(params));
   }, dependencies);
-
   // Loading state
   if (loading && !data) {
     if (loadingComponent) {
       return loadingComponent;
     }
-
     const SkeletonComponent = {
       card: CardSkeleton,
       table: TableSkeleton,
       content: ContentLoader
     }[skeletonType] || CardSkeleton;
-
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -78,13 +67,11 @@ export const AsyncData = ({
       </motion.div>
     );
   }
-
   // Error state
   if (error && !data) {
     if (errorComponent) {
       return errorComponent;
     }
-
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -100,13 +87,11 @@ export const AsyncData = ({
       </motion.div>
     );
   }
-
   // Empty state
   if (!data || (Array.isArray(data) && data.length === 0)) {
     if (emptyComponent) {
       return emptyComponent;
     }
-
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -118,14 +103,11 @@ export const AsyncData = ({
       </motion.div>
     );
   }
-
   // Success state with data
   const content = render ? render(data) : children(data);
-
   if (!animate) {
     return <div className={className}>{content}</div>;
   }
-
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -141,7 +123,6 @@ export const AsyncData = ({
     </AnimatePresence>
   );
 };
-
 /**
  * Paginated async data component
  */
@@ -149,26 +130,21 @@ export const AsyncPaginatedData = ({
   fetchData,
   initialPage = 1,
   pageSize = 10,
-  
   // Components
   loadingComponent,
   errorComponent,
   emptyComponent,
   paginationComponent,
-  
   // Options
   showPageSizeSelector = true,
   pageSizeOptions = [10, 25, 50, 100],
-  
   // Render
   children,
   render,
-  
   className = ""
 }) => {
   const [page, setPage] = React.useState(initialPage);
   const [perPage, setPerPage] = React.useState(pageSize);
-  
   const {
     loading,
     error,
@@ -176,32 +152,25 @@ export const AsyncPaginatedData = ({
     execute,
     retry
   } = useAsyncOperation();
-
   const fetchPageData = React.useCallback(() => {
     return execute(() => fetchData({ page, per_page: perPage }));
   }, [page, perPage, fetchData, execute]);
-
   React.useEffect(() => {
     fetchPageData();
   }, [fetchPageData]);
-
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
-
   const handlePageSizeChange = (newSize) => {
     setPerPage(newSize);
     setPage(1); // Reset to first page when changing page size
   };
-
   if (loading && !data) {
     return loadingComponent || <TableSkeleton />;
   }
-
   if (error && !data) {
     return errorComponent || <ErrorState error={error} onRetry={retry} />;
   }
-
   if (!data || data.items?.length === 0) {
     return emptyComponent || (
       <div className="text-center py-12">
@@ -209,9 +178,7 @@ export const AsyncPaginatedData = ({
       </div>
     );
   }
-
   const content = render ? render(data.items) : children(data.items);
-  
   const defaultPagination = (
     <div className="mt-6 flex items-center justify-between">
       <div className="flex items-center gap-2">
@@ -231,7 +198,6 @@ export const AsyncPaginatedData = ({
           </>
         )}
       </div>
-      
       <div className="flex items-center gap-2">
         <button
           onClick={() => handlePageChange(page - 1)}
@@ -253,7 +219,6 @@ export const AsyncPaginatedData = ({
       </div>
     </div>
   );
-
   return (
     <div className={className}>
       {content}
@@ -261,7 +226,6 @@ export const AsyncPaginatedData = ({
     </div>
   );
 };
-
 /**
  * Infinite scroll async data component
  */
@@ -269,51 +233,40 @@ export const AsyncInfiniteData = ({
   fetchData,
   pageSize = 20,
   threshold = 100,
-  
   // Components
   loadingComponent,
   errorComponent,
   emptyComponent,
   loadMoreComponent,
-  
   // Render
   children,
   render,
-  
   className = ""
 }) => {
   const [page, setPage] = React.useState(1);
   const [items, setItems] = React.useState([]);
   const [hasMore, setHasMore] = React.useState(true);
-  
   const observerRef = React.useRef();
   const loadMoreRef = React.useRef();
-  
   const {
     loading,
     error,
     execute
   } = useAsyncOperation();
-
   const loadMore = React.useCallback(async () => {
     if (loading || !hasMore) return;
-    
     const result = await execute(() => fetchData({ page, per_page: pageSize }));
-    
     if (result) {
       setItems(prev => [...prev, ...result.items]);
       setHasMore(result.has_next);
       setPage(prev => prev + 1);
     }
   }, [page, pageSize, loading, hasMore, fetchData, execute]);
-
   React.useEffect(() => {
     loadMore();
   }, []);
-
   React.useEffect(() => {
     if (loading) return;
-    
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasMore) {
@@ -322,28 +275,22 @@ export const AsyncInfiniteData = ({
       },
       { threshold: 0.1, rootMargin: `${threshold}px` }
     );
-    
     observerRef.current = observer;
-    
     if (loadMoreRef.current) {
       observer.observe(loadMoreRef.current);
     }
-    
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
     };
   }, [loading, hasMore, loadMore, threshold]);
-
   if (loading && items.length === 0) {
     return loadingComponent || <CardSkeleton />;
   }
-
   if (error && items.length === 0) {
     return errorComponent || <ErrorState error={error} />;
   }
-
   if (items.length === 0) {
     return emptyComponent || (
       <div className="text-center py-12">
@@ -351,13 +298,10 @@ export const AsyncInfiniteData = ({
       </div>
     );
   }
-
   const content = render ? render(items) : children(items);
-
   return (
     <div className={className}>
       {content}
-      
       {hasMore && (
         <div ref={loadMoreRef} className="py-4">
           {loading ? (
@@ -374,7 +318,6 @@ export const AsyncInfiniteData = ({
           )}
         </div>
       )}
-      
       {!hasMore && items.length > 0 && (
         <div className="text-center py-4 text-gray-500 text-sm">
           No more items to load

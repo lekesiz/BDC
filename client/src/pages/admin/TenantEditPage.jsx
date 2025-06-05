@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
-
 /**
  * Tenant Edit Page
  */
@@ -32,7 +31,6 @@ const TenantEditPage = () => {
     max_beneficiaries: 50,
     is_active: true
   });
-  
   // Fetch tenant details
   useEffect(() => {
     const fetchTenant = async () => {
@@ -61,24 +59,19 @@ const TenantEditPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchTenant();
   }, [id, addToast]);
-  
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     try {
       setIsSaving(true);
       const response = await api.put(`/api/tenants/${id}`, formData);
-      
       addToast({
         title: 'Success',
         message: 'Tenant updated successfully',
         type: 'success',
       });
-      
       navigate(`/admin/tenants/${id}`);
     } catch (error) {
       console.error('Error updating tenant:', error);
@@ -91,7 +84,6 @@ const TenantEditPage = () => {
       setIsSaving(false);
     }
   };
-  
   // Handle input change
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -100,7 +92,6 @@ const TenantEditPage = () => {
       [name]: type === 'checkbox' ? checked : value
     }));
   };
-  
   if (isLoading) {
     return (
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -110,7 +101,6 @@ const TenantEditPage = () => {
       </div>
     );
   }
-  
   if (!tenant) {
     return (
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -127,7 +117,6 @@ const TenantEditPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       {/* Header */}
@@ -146,7 +135,6 @@ const TenantEditPage = () => {
           </h2>
         </div>
       </div>
-      
       {/* Edit Form */}
       <form onSubmit={handleSubmit}>
         <div className="grid gap-6">
@@ -154,7 +142,6 @@ const TenantEditPage = () => {
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-medium mb-4">Basic Information</h3>
-              
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -170,7 +157,6 @@ const TenantEditPage = () => {
                     className="w-full"
                   />
                 </div>
-                
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                     Email
@@ -184,7 +170,6 @@ const TenantEditPage = () => {
                     className="w-full"
                   />
                 </div>
-                
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                     Phone
@@ -198,7 +183,6 @@ const TenantEditPage = () => {
                     className="w-full"
                   />
                 </div>
-                
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
                     Address
@@ -215,12 +199,10 @@ const TenantEditPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Subscription Settings */}
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-medium mb-4">Subscription Settings</h3>
-              
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <label htmlFor="plan" className="block text-sm font-medium text-gray-700 mb-1">
@@ -239,7 +221,6 @@ const TenantEditPage = () => {
                     <option value="enterprise">Enterprise</option>
                   </select>
                 </div>
-                
                 <div>
                   <label htmlFor="is_active" className="block text-sm font-medium text-gray-700 mb-1">
                     Status
@@ -255,7 +236,6 @@ const TenantEditPage = () => {
                     <option value="false">Inactive</option>
                   </select>
                 </div>
-                
                 <div>
                   <label htmlFor="max_users" className="block text-sm font-medium text-gray-700 mb-1">
                     Max Users
@@ -270,7 +250,6 @@ const TenantEditPage = () => {
                     className="w-full"
                   />
                 </div>
-                
                 <div>
                   <label htmlFor="max_beneficiaries" className="block text-sm font-medium text-gray-700 mb-1">
                     Max Beneficiaries
@@ -288,7 +267,6 @@ const TenantEditPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4">
             <Button
@@ -320,5 +298,4 @@ const TenantEditPage = () => {
     </div>
   );
 };
-
 export default TenantEditPage;

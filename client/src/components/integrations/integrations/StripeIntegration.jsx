@@ -18,7 +18,6 @@ import {
   Shield,
   FileText
 } from 'lucide-react';
-
 const StripeIntegration = ({ integration, onBack }) => {
   const [accountInfo, setAccountInfo] = useState({
     accountId: 'acct_1234567890',
@@ -28,7 +27,6 @@ const StripeIntegration = ({ integration, onBack }) => {
     payoutsEnabled: true,
     chargesEnabled: true
   });
-
   const [financialStats, setFinancialStats] = useState({
     revenue: {
       today: 2456.78,
@@ -46,7 +44,6 @@ const StripeIntegration = ({ integration, onBack }) => {
       canceled: 12
     }
   });
-
   const [paymentMethods, setPaymentMethods] = useState({
     card: true,
     sepa: true,
@@ -55,14 +52,12 @@ const StripeIntegration = ({ integration, onBack }) => {
     bankTransfer: false,
     ideal: false
   });
-
   const [products, setProducts] = useState([
     { id: '1', name: 'Python Programming Course', price: 299, currency: 'EUR', sales: 145, status: 'active' },
     { id: '2', name: 'Web Development Bootcamp', price: 499, currency: 'EUR', sales: 89, status: 'active' },
     { id: '3', name: 'Monthly Subscription', price: 49, currency: 'EUR', sales: 234, status: 'active', recurring: true },
     { id: '4', name: 'Annual Subscription', price: 399, currency: 'EUR', sales: 67, status: 'active', recurring: true }
   ]);
-
   const configFields = [
     {
       name: 'publishableKey',
@@ -103,7 +98,6 @@ const StripeIntegration = ({ integration, onBack }) => {
       description: 'Let Stripe calculate taxes automatically'
     }
   ];
-
   const webhookEvents = [
     'payment_intent.succeeded',
     'payment_intent.failed',
@@ -115,7 +109,6 @@ const StripeIntegration = ({ integration, onBack }) => {
     'invoice.paid',
     'invoice.payment_failed'
   ];
-
   const apiEndpoints = [
     {
       method: 'POST',
@@ -138,14 +131,12 @@ const StripeIntegration = ({ integration, onBack }) => {
       description: 'Process a refund'
     }
   ];
-
   const recentTransactions = [
     { id: '1', customer: 'John Doe', amount: 299, currency: 'EUR', status: 'succeeded', time: '5 minutes ago', description: 'Python Programming Course' },
     { id: '2', customer: 'Jane Smith', amount: 49, currency: 'EUR', status: 'succeeded', time: '30 minutes ago', description: 'Monthly Subscription' },
     { id: '3', customer: 'Mike Johnson', amount: 499, currency: 'EUR', status: 'processing', time: '1 hour ago', description: 'Web Development Bootcamp' },
     { id: '4', customer: 'Sarah Wilson', amount: 399, currency: 'EUR', status: 'failed', time: '2 hours ago', description: 'Annual Subscription', error: 'Card declined' }
   ];
-
   const customOverview = (
     <>
       {/* Account Overview */}
@@ -183,7 +174,6 @@ const StripeIntegration = ({ integration, onBack }) => {
               )}
             </div>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
@@ -214,7 +204,6 @@ const StripeIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Payment Methods */}
       <Card>
         <div className="p-6">
@@ -245,7 +234,6 @@ const StripeIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Products & Prices */}
       <Card>
         <div className="p-6">
@@ -286,7 +274,6 @@ const StripeIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Recent Transactions */}
       <Card>
         <div className="p-6">
@@ -326,7 +313,6 @@ const StripeIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Quick Actions */}
       <Card>
         <div className="p-6">
@@ -363,7 +349,6 @@ const StripeIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Compliance Alert */}
       <Alert variant="info">
         <Shield className="w-4 h-4" />
@@ -376,7 +361,6 @@ const StripeIntegration = ({ integration, onBack }) => {
       </Alert>
     </>
   );
-
   return (
     <BaseIntegration
       integration={integration}
@@ -389,5 +373,4 @@ const StripeIntegration = ({ integration, onBack }) => {
     </BaseIntegration>
   );
 };
-
 export default StripeIntegration;

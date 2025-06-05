@@ -4,7 +4,6 @@ import {
   ArrowLeft, Save, Plus, Trash2, GripVertical, 
   FileText, Settings, HelpCircle
 } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +24,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-
 /**
  * TrainerAssessmentEditPage allows trainers to edit existing assessment templates
  */
@@ -39,7 +37,6 @@ const TrainerAssessmentEditPage = () => {
   const [error, setError] = useState(null);
   const [originalTemplate, setOriginalTemplate] = useState(null);
   const [showDiscardDialog, setShowDiscardDialog] = useState(false);
-  
   // Basic info state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -48,7 +45,6 @@ const TrainerAssessmentEditPage = () => {
   const [skills, setSkills] = useState([]);
   const [newSkill, setNewSkill] = useState('');
   const [isPublished, setIsPublished] = useState(false);
-  
   // Quiz state
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState({
@@ -59,7 +55,6 @@ const TrainerAssessmentEditPage = () => {
     points: 10,
     explanation: ''
   });
-  
   // Project state
   const [requirements, setRequirements] = useState([]);
   const [currentRequirement, setCurrentRequirement] = useState({
@@ -68,7 +63,6 @@ const TrainerAssessmentEditPage = () => {
   });
   const [rubric, setRubric] = useState({});
   const [resources, setResources] = useState([]);
-  
   // Settings state
   const [settings, setSettings] = useState({
     timeLimit: 0,
@@ -83,29 +77,21 @@ const TrainerAssessmentEditPage = () => {
     notifyBeforeDue: true,
     notifyOnGrade: true
   });
-  
   // Load template data
   useEffect(() => {
     let isMounted = true;
-    
     const fetchTemplate = async () => {
       try {
         if (!isMounted) return;
-        
         setIsLoading(true);
         setError(null);
-        
         const response = await fetch(`/api/assessment/templates/${id}`);
         if (!isMounted) return;
-        
         if (!response.ok) throw new Error('Failed to fetch template');
         const templateData = await response.json();
-        
         if (!isMounted) return;
-        
         // Store original template for comparison
         setOriginalTemplate(templateData);
-        
         // Populate state with template data
         setTitle(templateData.title || '');
         setDescription(templateData.description || '');
@@ -113,7 +99,6 @@ const TrainerAssessmentEditPage = () => {
         setCategory(templateData.category || '');
         setSkills(templateData.skills || []);
         setIsPublished(templateData.is_published || false);
-        
         if (templateData.type === 'quiz') {
           setQuestions(templateData.questions || []);
         } else {
@@ -121,14 +106,12 @@ const TrainerAssessmentEditPage = () => {
           setRubric(templateData.rubric || {});
           setResources(templateData.resources || []);
         }
-        
         setSettings({
           ...settings,
           ...templateData.settings
         });
       } catch (err) {
         if (!isMounted) return;
-        
         console.error('Error fetching template:', err);
         setError(err.message);
         toast({
@@ -142,18 +125,14 @@ const TrainerAssessmentEditPage = () => {
         }
       }
     };
-    
     fetchTemplate();
-    
     return () => {
       isMounted = false;
     };
   }, [id]);
-  
   // Check if there are unsaved changes
   const hasUnsavedChanges = () => {
     if (!originalTemplate) return false;
-    
     // Compare current state with original template
     return (
       title !== originalTemplate.title ||
@@ -166,7 +145,6 @@ const TrainerAssessmentEditPage = () => {
       JSON.stringify(settings) !== JSON.stringify(originalTemplate.settings || {})
     );
   };
-  
   // Handle navigation away with unsaved changes
   const handleNavigate = (path) => {
     if (hasUnsavedChanges()) {
@@ -175,7 +153,6 @@ const TrainerAssessmentEditPage = () => {
       navigate(path);
     }
   };
-  
   // Add skill
   const handleAddSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill.trim())) {
@@ -183,12 +160,10 @@ const TrainerAssessmentEditPage = () => {
       setNewSkill('');
     }
   };
-  
   // Remove skill
   const handleRemoveSkill = (skillToRemove) => {
     setSkills(skills.filter(skill => skill !== skillToRemove));
   };
-  
   // Add question
   const handleAddQuestion = () => {
     if (!currentQuestion.question.trim()) {
@@ -199,7 +174,6 @@ const TrainerAssessmentEditPage = () => {
       });
       return;
     }
-    
     // Validate based on question type
     if (currentQuestion.type === 'multipleChoice' || currentQuestion.type === 'multipleAnswer') {
       const validOptions = currentQuestion.options.filter(opt => opt.trim());
@@ -213,7 +187,6 @@ const TrainerAssessmentEditPage = () => {
       }
       currentQuestion.options = validOptions;
     }
-    
     setQuestions([...questions, { ...currentQuestion, id: Date.now() }]);
     setCurrentQuestion({
       type: 'multipleChoice',
@@ -224,17 +197,14 @@ const TrainerAssessmentEditPage = () => {
       explanation: ''
     });
   };
-  
   // Remove question
   const handleRemoveQuestion = (questionId) => {
     setQuestions(questions.filter(q => q.id !== questionId));
   };
-  
   // Update existing question
   const handleUpdateQuestion = (questionId, updatedQuestion) => {
     setQuestions(questions.map(q => q.id === questionId ? updatedQuestion : q));
   };
-  
   // Update question type
   const handleQuestionTypeChange = (newType) => {
     setCurrentQuestion(prev => {
@@ -242,7 +212,6 @@ const TrainerAssessmentEditPage = () => {
         ...prev,
         type: newType
       };
-      
       switch (newType) {
         case 'multipleChoice':
           return {
@@ -271,7 +240,6 @@ const TrainerAssessmentEditPage = () => {
       }
     });
   };
-  
   // Add requirement
   const handleAddRequirement = () => {
     if (!currentRequirement.description.trim()) {
@@ -282,24 +250,20 @@ const TrainerAssessmentEditPage = () => {
       });
       return;
     }
-    
     setRequirements([...requirements, { ...currentRequirement, id: Date.now() }]);
     setCurrentRequirement({
       description: '',
       points: 10
     });
   };
-  
   // Remove requirement
   const handleRemoveRequirement = (requirementId) => {
     setRequirements(requirements.filter(r => r.id !== requirementId));
   };
-  
   // Update existing requirement
   const handleUpdateRequirement = (requirementId, updatedRequirement) => {
     setRequirements(requirements.map(r => r.id === requirementId ? updatedRequirement : r));
   };
-  
   // Save assessment
   const handleSave = async (publish = null) => {
     // Validate basic info
@@ -312,7 +276,6 @@ const TrainerAssessmentEditPage = () => {
       setActiveTab('basic');
       return;
     }
-    
     if (!description.trim()) {
       toast({
         title: 'Error',
@@ -322,7 +285,6 @@ const TrainerAssessmentEditPage = () => {
       setActiveTab('basic');
       return;
     }
-    
     // Validate content
     if (type === 'quiz' && questions.length === 0) {
       toast({
@@ -333,7 +295,6 @@ const TrainerAssessmentEditPage = () => {
       setActiveTab('content');
       return;
     }
-    
     if (type === 'project' && requirements.length === 0) {
       toast({
         title: 'Error',
@@ -343,10 +304,8 @@ const TrainerAssessmentEditPage = () => {
       setActiveTab('content');
       return;
     }
-    
     try {
       setIsSaving(true);
-      
       const templateData = {
         title,
         description,
@@ -358,7 +317,6 @@ const TrainerAssessmentEditPage = () => {
         ...(type === 'quiz' ? { questions } : { requirements, rubric, resources }),
         updated_at: new Date().toISOString()
       };
-      
       const response = await fetch(`/api/assessment/templates/${id}`, {
         method: 'PUT',
         headers: {
@@ -366,18 +324,14 @@ const TrainerAssessmentEditPage = () => {
         },
         body: JSON.stringify(templateData),
       });
-      
       if (!response.ok) throw new Error('Failed to update assessment');
-      
       const updatedTemplate = await response.json();
       setOriginalTemplate(updatedTemplate);
-      
       toast({
         title: 'Success',
         description: 'Assessment updated successfully',
         type: 'success',
       });
-      
       if (publish !== null) {
         setIsPublished(publish);
       }
@@ -392,7 +346,6 @@ const TrainerAssessmentEditPage = () => {
       setIsSaving(false);
     }
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -401,7 +354,6 @@ const TrainerAssessmentEditPage = () => {
       </div>
     );
   }
-  
   // Render error state
   if (error || !originalTemplate) {
     return (
@@ -416,7 +368,6 @@ const TrainerAssessmentEditPage = () => {
             Back to Assessments
           </Button>
         </div>
-        
         <Card className="p-6 text-center">
           <div className="text-red-500 mb-4">
             <FileText className="w-12 h-12 mx-auto" />
@@ -430,7 +381,6 @@ const TrainerAssessmentEditPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -449,7 +399,6 @@ const TrainerAssessmentEditPage = () => {
             <p className="text-gray-600">{originalTemplate.title}</p>
           </div>
         </div>
-        
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -484,7 +433,6 @@ const TrainerAssessmentEditPage = () => {
           )}
         </div>
       </div>
-      
       {/* Status badges */}
       <div className="flex gap-2 mb-6">
         <Badge className={isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
@@ -499,7 +447,6 @@ const TrainerAssessmentEditPage = () => {
           </Badge>
         )}
       </div>
-      
       {/* Tabs */}
       <Tabs
         value={activeTab}
@@ -520,7 +467,6 @@ const TrainerAssessmentEditPage = () => {
             Settings
           </Tabs.TabTrigger>
         </Tabs.TabsList>
-        
         {/* Basic Information Tab */}
         <Tabs.TabContent value="basic">
           <Card className="p-6">
@@ -536,7 +482,6 @@ const TrainerAssessmentEditPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Description */}
               <div>
                 <Label htmlFor="description">Description *</Label>
@@ -549,7 +494,6 @@ const TrainerAssessmentEditPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Type - Read only for existing assessments */}
               <div>
                 <Label>Assessment Type</Label>
@@ -562,7 +506,6 @@ const TrainerAssessmentEditPage = () => {
                   </p>
                 </div>
               </div>
-              
               {/* Category */}
               <div>
                 <Label htmlFor="category">Category</Label>
@@ -583,7 +526,6 @@ const TrainerAssessmentEditPage = () => {
                   <Select.Option value="other">Other</Select.Option>
                 </Select>
               </div>
-              
               {/* Skills */}
               <div>
                 <Label htmlFor="skills">Skills</Label>
@@ -603,7 +545,6 @@ const TrainerAssessmentEditPage = () => {
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
-                
                 {skills.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {skills.map(skill => (
@@ -623,7 +564,6 @@ const TrainerAssessmentEditPage = () => {
             </div>
           </Card>
         </Tabs.TabContent>
-        
         {/* Content Tab */}
         <Tabs.TabContent value="content">
           {type === 'quiz' ? (
@@ -633,7 +573,6 @@ const TrainerAssessmentEditPage = () => {
               {questions.length > 0 && (
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Questions ({questions.length})</h3>
-                  
                   <div className="space-y-4">
                     {questions.map((question, index) => (
                       <div key={question.id} className="p-4 border rounded-lg">
@@ -649,7 +588,6 @@ const TrainerAssessmentEditPage = () => {
                                 placeholder="Question text"
                                 className="mb-2"
                               />
-                              
                               <div className="flex items-center gap-2 mb-2">
                                 <Select
                                   value={question.type}
@@ -660,7 +598,6 @@ const TrainerAssessmentEditPage = () => {
                                   <Select.Option value="trueFalse">True/False</Select.Option>
                                   <Select.Option value="shortAnswer">Short Answer</Select.Option>
                                 </Select>
-                                
                                 <Input
                                   type="number"
                                   value={question.points}
@@ -671,7 +608,6 @@ const TrainerAssessmentEditPage = () => {
                                 />
                                 <span className="text-sm text-gray-500">points</span>
                               </div>
-                              
                               {/* Question specific fields */}
                               {question.type === 'multipleChoice' && (
                                 <div className="space-y-2">
@@ -696,7 +632,6 @@ const TrainerAssessmentEditPage = () => {
                                   ))}
                                 </div>
                               )}
-                              
                               {question.type === 'trueFalse' && (
                                 <RadioGroup
                                   value={String(question.correctAnswer)}
@@ -713,7 +648,6 @@ const TrainerAssessmentEditPage = () => {
                                   </div>
                                 </RadioGroup>
                               )}
-                              
                               {question.type === 'shortAnswer' && (
                                 <Input
                                   value={question.correctAnswer}
@@ -721,7 +655,6 @@ const TrainerAssessmentEditPage = () => {
                                   placeholder="Correct answer(s) separated by | for alternatives"
                                 />
                               )}
-                              
                               <div className="mt-2">
                                 <Input
                                   value={question.explanation || ''}
@@ -731,7 +664,6 @@ const TrainerAssessmentEditPage = () => {
                               </div>
                             </div>
                           </div>
-                          
                           <Button
                             variant="ghost"
                             size="sm"
@@ -744,7 +676,6 @@ const TrainerAssessmentEditPage = () => {
                       </div>
                     ))}
                   </div>
-                  
                   <div className="mt-4 text-center">
                     <p className="text-sm text-gray-600">
                       Total Points: {questions.reduce((sum, q) => sum + q.points, 0)}
@@ -752,11 +683,9 @@ const TrainerAssessmentEditPage = () => {
                   </div>
                 </Card>
               )}
-              
               {/* Add Question Form */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Add New Question</h3>
-                
                 <div className="space-y-4">
                   {/* Question Type */}
                   <div>
@@ -772,7 +701,6 @@ const TrainerAssessmentEditPage = () => {
                       <Select.Option value="shortAnswer">Short Answer</Select.Option>
                     </Select>
                   </div>
-                  
                   {/* Question Text */}
                   <div>
                     <Label htmlFor="questionText">Question</Label>
@@ -785,7 +713,6 @@ const TrainerAssessmentEditPage = () => {
                       className="mt-1"
                     />
                   </div>
-                  
                   {/* Options for Multiple Choice */}
                   {currentQuestion.type === 'multipleChoice' && (
                     <div>
@@ -813,7 +740,6 @@ const TrainerAssessmentEditPage = () => {
                       </div>
                     </div>
                   )}
-                  
                   {/* True/False Options */}
                   {currentQuestion.type === 'trueFalse' && (
                     <div>
@@ -834,7 +760,6 @@ const TrainerAssessmentEditPage = () => {
                       </RadioGroup>
                     </div>
                   )}
-                  
                   {/* Short Answer */}
                   {currentQuestion.type === 'shortAnswer' && (
                     <div>
@@ -848,7 +773,6 @@ const TrainerAssessmentEditPage = () => {
                       />
                     </div>
                   )}
-                  
                   {/* Points */}
                   <div>
                     <Label htmlFor="points">Points</Label>
@@ -862,7 +786,6 @@ const TrainerAssessmentEditPage = () => {
                       className="mt-1"
                     />
                   </div>
-                  
                   {/* Explanation */}
                   <div>
                     <Label htmlFor="explanation">Explanation (Optional)</Label>
@@ -875,7 +798,6 @@ const TrainerAssessmentEditPage = () => {
                       className="mt-1"
                     />
                   </div>
-                  
                   <Button onClick={handleAddQuestion} className="w-full">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Question
@@ -890,7 +812,6 @@ const TrainerAssessmentEditPage = () => {
               {requirements.length > 0 && (
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Requirements ({requirements.length})</h3>
-                  
                   <div className="space-y-3">
                     {requirements.map((requirement, index) => (
                       <div key={requirement.id} className="p-4 border rounded-lg">
@@ -920,7 +841,6 @@ const TrainerAssessmentEditPage = () => {
                               </div>
                             </div>
                           </div>
-                          
                           <Button
                             variant="ghost"
                             size="sm"
@@ -933,7 +853,6 @@ const TrainerAssessmentEditPage = () => {
                       </div>
                     ))}
                   </div>
-                  
                   <div className="mt-4 text-center">
                     <p className="text-sm text-gray-600">
                       Total Points: {requirements.reduce((sum, r) => sum + r.points, 0)}
@@ -941,11 +860,9 @@ const TrainerAssessmentEditPage = () => {
                   </div>
                 </Card>
               )}
-              
               {/* Add Requirement Form */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Add New Requirement</h3>
-                
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="requirementDesc">Requirement Description</Label>
@@ -958,7 +875,6 @@ const TrainerAssessmentEditPage = () => {
                       className="mt-1"
                     />
                   </div>
-                  
                   <div>
                     <Label htmlFor="requirementPoints">Points</Label>
                     <Input
@@ -971,21 +887,18 @@ const TrainerAssessmentEditPage = () => {
                       className="mt-1"
                     />
                   </div>
-                  
                   <Button onClick={handleAddRequirement} className="w-full">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Requirement
                   </Button>
                 </div>
               </Card>
-              
               {/* Resources */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Resources</h3>
                 <p className="text-sm text-gray-600 mb-4">
                   Add helpful resources for students working on this project
                 </p>
-                
                 <Button variant="outline" className="w-full" disabled>
                   <Plus className="w-4 h-4 mr-2" />
                   Add Resource
@@ -994,14 +907,12 @@ const TrainerAssessmentEditPage = () => {
             </div>
           )}
         </Tabs.TabContent>
-        
         {/* Settings Tab */}
         <Tabs.TabContent value="settings">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Basic Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Basic Settings</h3>
-              
               <div className="space-y-4">
                 {type === 'quiz' && (
                   <>
@@ -1017,7 +928,6 @@ const TrainerAssessmentEditPage = () => {
                       />
                       <p className="text-sm text-gray-600 mt-1">0 = No time limit</p>
                     </div>
-                    
                     <div>
                       <Label htmlFor="attempts">Attempts Allowed</Label>
                       <Input
@@ -1031,7 +941,6 @@ const TrainerAssessmentEditPage = () => {
                     </div>
                   </>
                 )}
-                
                 <div>
                   <Label htmlFor="passingScore">Passing Score (%)</Label>
                   <Input
@@ -1044,7 +953,6 @@ const TrainerAssessmentEditPage = () => {
                     className="mt-1"
                   />
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="allowLate">Allow Late Submission</Label>
@@ -1056,7 +964,6 @@ const TrainerAssessmentEditPage = () => {
                     onCheckedChange={(checked) => setSettings({ ...settings, allowLateSubmission: checked })}
                   />
                 </div>
-                
                 {settings.allowLateSubmission && (
                   <div>
                     <Label htmlFor="latePenalty">Late Penalty (% per day)</Label>
@@ -1073,12 +980,10 @@ const TrainerAssessmentEditPage = () => {
                 )}
               </div>
             </Card>
-            
             {/* Quiz Settings */}
             {type === 'quiz' && (
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Quiz Settings</h3>
-                
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -1091,7 +996,6 @@ const TrainerAssessmentEditPage = () => {
                       onCheckedChange={(checked) => setSettings({ ...settings, shuffleQuestions: checked })}
                     />
                   </div>
-                  
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="showCorrectAnswers">Show Correct Answers</Label>
@@ -1103,7 +1007,6 @@ const TrainerAssessmentEditPage = () => {
                       onCheckedChange={(checked) => setSettings({ ...settings, showCorrectAnswers: checked })}
                     />
                   </div>
-                  
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="autoGrade">Auto-grading</Label>
@@ -1118,11 +1021,9 @@ const TrainerAssessmentEditPage = () => {
                 </div>
               </Card>
             )}
-            
             {/* Notification Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Notifications</h3>
-              
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -1135,7 +1036,6 @@ const TrainerAssessmentEditPage = () => {
                     onCheckedChange={(checked) => setSettings({ ...settings, notifyOnSubmission: checked })}
                   />
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="notifyDue">Before Due Date</Label>
@@ -1147,7 +1047,6 @@ const TrainerAssessmentEditPage = () => {
                     onCheckedChange={(checked) => setSettings({ ...settings, notifyBeforeDue: checked })}
                   />
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="notifyGrade">On Grading</Label>
@@ -1164,7 +1063,6 @@ const TrainerAssessmentEditPage = () => {
           </div>
         </Tabs.TabContent>
       </Tabs>
-      
       {/* Discard Changes Dialog */}
       <Dialog open={showDiscardDialog} onOpenChange={setShowDiscardDialog}>
         <DialogContent>
@@ -1193,5 +1091,4 @@ const TrainerAssessmentEditPage = () => {
     </div>
   );
 };
-
 export default TrainerAssessmentEditPage;

@@ -22,7 +22,6 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useToast } from '../../components/ui/use-toast';
-
 const cacheTypes = [
   {
     id: 'redis',
@@ -61,7 +60,6 @@ const cacheTypes = [
     enabled: true
   }
 ];
-
 const CachingSystemPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -86,13 +84,11 @@ const CachingSystemPage = () => {
     warmupEnabled: false,
     preloadEnabled: true
   });
-
   useEffect(() => {
     fetchCacheStats();
     fetchCacheMetrics();
     fetchCacheKeys();
   }, [selectedCache]);
-
   const fetchCacheStats = async () => {
     try {
       const response = await fetch('/api/admin/cache/stats', {
@@ -100,7 +96,6 @@ const CachingSystemPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setCacheStats(data.stats);
@@ -109,7 +104,6 @@ const CachingSystemPage = () => {
       console.error('Error fetching cache stats:', error);
     }
   };
-
   const fetchCacheMetrics = async () => {
     try {
       const response = await fetch(`/api/admin/cache/${selectedCache}/metrics`, {
@@ -117,7 +111,6 @@ const CachingSystemPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setCacheMetrics(data.metrics || []);
@@ -126,7 +119,6 @@ const CachingSystemPage = () => {
       console.error('Error fetching cache metrics:', error);
     }
   };
-
   const fetchCacheKeys = async () => {
     setLoading(true);
     try {
@@ -135,7 +127,6 @@ const CachingSystemPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setCacheKeys(data.keys || []);
@@ -146,12 +137,10 @@ const CachingSystemPage = () => {
       setLoading(false);
     }
   };
-
   const clearCache = async (cacheType = null) => {
     if (!confirm(`Are you sure you want to clear ${cacheType || 'all'} cache?`)) {
       return;
     }
-    
     try {
       const response = await fetch('/api/admin/cache/clear', {
         method: 'POST',
@@ -161,7 +150,6 @@ const CachingSystemPage = () => {
         },
         body: JSON.stringify({ cacheType })
       });
-      
       if (response.ok) {
         showToast(`${cacheType || 'All'} cache cleared successfully`, 'success');
         fetchCacheStats();
@@ -171,7 +159,6 @@ const CachingSystemPage = () => {
       showToast('Error clearing cache', 'error');
     }
   };
-
   const invalidateKey = async (key) => {
     try {
       const response = await fetch(`/api/admin/cache/${selectedCache}/invalidate`, {
@@ -182,7 +169,6 @@ const CachingSystemPage = () => {
         },
         body: JSON.stringify({ key })
       });
-      
       if (response.ok) {
         showToast('Cache key invalidated', 'success');
         fetchCacheKeys();
@@ -191,7 +177,6 @@ const CachingSystemPage = () => {
       showToast('Error invalidating key', 'error');
     }
   };
-
   const updateCacheConfig = async (config) => {
     try {
       const response = await fetch(`/api/admin/cache/${selectedCache}/config`, {
@@ -202,7 +187,6 @@ const CachingSystemPage = () => {
         },
         body: JSON.stringify(config)
       });
-      
       if (response.ok) {
         setCacheConfig(config);
         showToast('Cache configuration updated', 'success');
@@ -211,7 +195,6 @@ const CachingSystemPage = () => {
       showToast('Error updating configuration', 'error');
     }
   };
-
   const warmupCache = async () => {
     try {
       const response = await fetch('/api/admin/cache/warmup', {
@@ -220,7 +203,6 @@ const CachingSystemPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         showToast('Cache warmup initiated', 'success');
       }
@@ -228,7 +210,6 @@ const CachingSystemPage = () => {
       showToast('Error warming up cache', 'error');
     }
   };
-
   const formatBytes = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -236,14 +217,12 @@ const CachingSystemPage = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
-
   // Spinner component definition
   const Spinner = () => (
     <div className="flex justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
   );
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'active':
@@ -256,7 +235,6 @@ const CachingSystemPage = () => {
         return 'text-yellow-600 bg-yellow-100';
     }
   };
-
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Stats Grid */}
@@ -275,7 +253,6 @@ const CachingSystemPage = () => {
             <TrendingUp className="w-8 h-8 text-green-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -290,7 +267,6 @@ const CachingSystemPage = () => {
             <Clock className="w-8 h-8 text-primary" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -303,7 +279,6 @@ const CachingSystemPage = () => {
             <Database className="w-8 h-8 text-blue-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -317,7 +292,6 @@ const CachingSystemPage = () => {
           </div>
         </Card>
       </div>
-
       {/* Cache Systems */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {cacheTypes.map(cache => (
@@ -345,7 +319,6 @@ const CachingSystemPage = () => {
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
-            
             {cache.memory && (
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
@@ -360,7 +333,6 @@ const CachingSystemPage = () => {
                 </div>
               </div>
             )}
-            
             <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
               <div>
                 <p className="text-gray-600">Hit Rate</p>
@@ -373,7 +345,6 @@ const CachingSystemPage = () => {
                 </div>
               )}
             </div>
-            
             <div className="flex space-x-2 mt-4">
               <Button
                 size="sm"
@@ -397,7 +368,6 @@ const CachingSystemPage = () => {
           </Card>
         ))}
       </div>
-
       {/* Performance Chart */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Cache Performance</h3>
@@ -407,7 +377,6 @@ const CachingSystemPage = () => {
       </Card>
     </div>
   );
-
   const renderDetails = () => (
     <div className="space-y-6">
       {/* Cache Selection */}
@@ -423,7 +392,6 @@ const CachingSystemPage = () => {
           </Button>
         ))}
       </div>
-
       {/* Cache Keys */}
       <Card>
         <div className="flex justify-between items-center mb-4">
@@ -446,7 +414,6 @@ const CachingSystemPage = () => {
             </Button>
           </div>
         </div>
-
         {loading ? (
           <div className="flex justify-center py-8">
             <Spinner />
@@ -496,12 +463,10 @@ const CachingSystemPage = () => {
       </Card>
     </div>
   );
-
   const renderConfiguration = () => (
     <div className="space-y-6">
       <Card>
         <h3 className="font-semibold text-lg mb-4">Cache Configuration</h3>
-        
         <div className="space-y-4">
           {/* TTL Setting */}
           <div>
@@ -516,7 +481,6 @@ const CachingSystemPage = () => {
               })}
             />
           </div>
-
           {/* Max Size */}
           <div>
             <label className="block text-sm font-medium mb-1">Max Cache Size (MB)</label>
@@ -530,7 +494,6 @@ const CachingSystemPage = () => {
               })}
             />
           </div>
-
           {/* Eviction Policy */}
           <div>
             <label className="block text-sm font-medium mb-1">Eviction Policy</label>
@@ -548,7 +511,6 @@ const CachingSystemPage = () => {
               <option value="random">Random</option>
             </select>
           </div>
-
           {/* Compression */}
           <div className="flex items-center justify-between">
             <div>
@@ -568,7 +530,6 @@ const CachingSystemPage = () => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           {/* Cache Warmup */}
           <div className="flex items-center justify-between">
             <div>
@@ -588,7 +549,6 @@ const CachingSystemPage = () => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           {/* Preload */}
           <div className="flex items-center justify-between">
             <div>
@@ -608,7 +568,6 @@ const CachingSystemPage = () => {
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
           <div className="flex space-x-2 pt-4">
             <Button
               onClick={() => updateCacheConfig(cacheConfig)}
@@ -624,11 +583,9 @@ const CachingSystemPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Cache Strategies */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Cache Strategies</h3>
-        
         <div className="space-y-4">
           {[
             {
@@ -688,13 +645,11 @@ const CachingSystemPage = () => {
       </Card>
     </div>
   );
-
   const renderOptimization = () => (
     <div className="space-y-6">
       {/* Optimization Suggestions */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Optimization Suggestions</h3>
-        
         <div className="space-y-3">
           {[
             {
@@ -744,11 +699,9 @@ const CachingSystemPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Cache Analysis */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Cache Analysis</h3>
-        
         <div className="grid grid-cols-2 gap-6">
           <div>
             <h4 className="font-medium mb-3">Top Cached Items</h4>
@@ -770,7 +723,6 @@ const CachingSystemPage = () => {
               ))}
             </div>
           </div>
-          
           <div>
             <h4 className="font-medium mb-3">Cache Misses</h4>
             <div className="space-y-2">
@@ -792,11 +744,9 @@ const CachingSystemPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Actions */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Cache Operations</h3>
-        
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Button
             onClick={warmupCache}
@@ -805,7 +755,6 @@ const CachingSystemPage = () => {
             <Zap className="w-4 h-4 mr-2" />
             Warmup Cache
           </Button>
-          
           <Button
             onClick={() => clearCache()}
             variant="secondary"
@@ -813,7 +762,6 @@ const CachingSystemPage = () => {
             <Trash2 className="w-4 h-4 mr-2" />
             Clear All Caches
           </Button>
-          
           <Button
             onClick={fetchCacheStats}
             variant="secondary"
@@ -821,7 +769,6 @@ const CachingSystemPage = () => {
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh Stats
           </Button>
-          
           <Button
             onClick={() => navigate('/admin/database-optimization')}
             variant="secondary"
@@ -833,7 +780,6 @@ const CachingSystemPage = () => {
       </Card>
     </div>
   );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -845,7 +791,6 @@ const CachingSystemPage = () => {
           Back to Settings
         </Button>
       </div>
-
       {/* Tabs */}
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
@@ -864,7 +809,6 @@ const CachingSystemPage = () => {
           ))}
         </nav>
       </div>
-
       {/* Tab Content */}
       {activeTab === 'overview' && renderOverview()}
       {activeTab === 'details' && renderDetails()}
@@ -873,5 +817,4 @@ const CachingSystemPage = () => {
     </div>
   );
 };
-
 export default CachingSystemPage;

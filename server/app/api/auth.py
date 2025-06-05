@@ -8,8 +8,10 @@ from app.schemas import (
     LoginSchema, RegisterSchema, TokenSchema, RefreshTokenSchema,
     ResetPasswordRequestSchema, ResetPasswordSchema, ChangePasswordSchema
 )
-from app.core.improved_container import get_auth_service
+from app.core.container import get_auth_service
 from app.services.interfaces.auth_service_interface import IAuthService
+
+from app.utils.logging import logger
 
 
 auth_bp = Blueprint('auth', __name__)

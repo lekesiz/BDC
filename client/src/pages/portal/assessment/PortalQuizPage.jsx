@@ -8,7 +8,6 @@ import { Alert } from '../../../components/ui/alert';
 import { Badge } from '../../../components/ui/badge';
 import { toast } from '../../../hooks/useToast';
 import Quiz from '../../../components/portal/assessment/Quiz';
-
 /**
  * PortalQuizPage handles the quiz-taking experience with improved UX
  */
@@ -22,25 +21,21 @@ const PortalQuizPage = () => {
   const [showConfirmation, setShowConfirmation] = useState(true);
   const [quizStarted, setQuizStarted] = useState(false);
   const [previousAttempt, setPreviousAttempt] = useState(null);
-  
   // Fetch assessment and quiz data
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
         setErrorMessage(null);
-        
         // Fetch assessment metadata and quiz data
         const [assessmentRes, quizRes, attemptRes] = await Promise.all([
           axios.get(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}`),
           axios.get(`/api/portal/assessments/${assessmentId}/quiz`),
           axios.get(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}/last-attempt`)
         ]);
-        
         setAssessment(assessmentRes.data);
         setQuizData(quizRes.data);
         setPreviousAttempt(attemptRes.data);
-        
         // If there's an incomplete attempt, resume it
         if (attemptRes.data?.status === 'in_progress') {
           setShowConfirmation(false);
@@ -58,10 +53,8 @@ const PortalQuizPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchData();
   }, [assessmentId, assignmentId]);
-  
   // Handle quiz start
   const handleStartQuiz = async () => {
     try {
@@ -78,20 +71,17 @@ const PortalQuizPage = () => {
       });
     }
   };
-  
   // Handle quiz completion
   const handleQuizComplete = async (results) => {
     try {
       // Submit results to server
       await axios.post(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}/submit`, results);
-      
       // Show success message
       toast({
         title: 'Success',
         description: 'Quiz completed successfully',
         variant: 'success',
       });
-      
       // Navigate to results page
       navigate(`/portal/assessments/results/${assessmentId}/${assignmentId}`);
     } catch (error) {
@@ -103,7 +93,6 @@ const PortalQuizPage = () => {
       });
     }
   };
-  
   // Handle exit quiz
   const handleExitQuiz = () => {
     if (quizStarted) {
@@ -115,7 +104,6 @@ const PortalQuizPage = () => {
       navigate('/portal/assessments');
     }
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -124,7 +112,6 @@ const PortalQuizPage = () => {
       </div>
     );
   }
-  
   // Render error state
   if (errorMessage) {
     return (
@@ -140,13 +127,11 @@ const PortalQuizPage = () => {
       </div>
     );
   }
-  
   // Render confirmation screen
   if (showConfirmation && !quizStarted) {
     const attemptsUsed = previousAttempt?.attemptNumber || 0;
     const attemptsRemaining = assessment.attemptsAllowed - attemptsUsed;
     const canRetake = attemptsRemaining > 0;
-    
     return (
       <div className="container mx-auto py-6 px-4 max-w-4xl">
         <Card className="p-8">
@@ -154,7 +139,6 @@ const PortalQuizPage = () => {
             <h1 className="text-2xl font-bold mb-2">{assessment.title}</h1>
             <p className="text-gray-600">{assessment.description}</p>
           </div>
-          
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             {/* Quiz Details */}
             <div className="space-y-4">
@@ -169,7 +153,6 @@ const PortalQuizPage = () => {
                     <p className="text-sm text-gray-600">{quizData.questions.length} questions</p>
                   </div>
                 </div>
-                
                 {assessment.timeLimit && (
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
@@ -181,7 +164,6 @@ const PortalQuizPage = () => {
                     </div>
                   </div>
                 )}
-                
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
                     <CheckCircle className="h-4 w-4 text-purple-600" />
@@ -191,7 +173,6 @@ const PortalQuizPage = () => {
                     <p className="text-sm text-gray-600">{assessment.passingScore}%</p>
                   </div>
                 </div>
-                
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
                     <Info className="h-4 w-4 text-orange-600" />
@@ -205,7 +186,6 @@ const PortalQuizPage = () => {
                 </div>
               </div>
             </div>
-            
             {/* Instructions */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold mb-3">Instructions</h3>
@@ -235,7 +215,6 @@ const PortalQuizPage = () => {
               </ul>
             </div>
           </div>
-          
           {/* Previous Attempt Info */}
           {previousAttempt && previousAttempt.status === 'completed' && (
             <Alert className="mb-6">
@@ -249,7 +228,6 @@ const PortalQuizPage = () => {
               </div>
             </Alert>
           )}
-          
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 justify-between">
             <Button 
@@ -259,7 +237,6 @@ const PortalQuizPage = () => {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Assessments
             </Button>
-            
             {canRetake ? (
               <Button 
                 onClick={handleStartQuiz}
@@ -280,7 +257,6 @@ const PortalQuizPage = () => {
       </div>
     );
   }
-  
   // Render quiz component with improved props
   return (
     <div className="min-h-screen bg-gray-50">
@@ -298,7 +274,6 @@ const PortalQuizPage = () => {
           </div>
         </div>
       </div>
-      
       <div className="container mx-auto py-6 px-4 max-w-4xl">
         <Quiz 
           quizData={quizData}
@@ -323,5 +298,4 @@ const PortalQuizPage = () => {
     </div>
   );
 };
-
 export default PortalQuizPage;

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { fadeInUp } from '@/lib/animations';
-
 export const AnimatedForm = ({ children, className, onSubmit, ...props }) => {
   return (
     <motion.form
@@ -16,7 +15,6 @@ export const AnimatedForm = ({ children, className, onSubmit, ...props }) => {
     </motion.form>
   );
 };
-
 export const AnimatedFormField = ({ children, className, ...props }) => {
   return (
     <motion.div
@@ -30,7 +28,6 @@ export const AnimatedFormField = ({ children, className, ...props }) => {
     </motion.div>
   );
 };
-
 export const AnimatedFormError = ({ children, className, ...props }) => {
   return (
     <motion.div

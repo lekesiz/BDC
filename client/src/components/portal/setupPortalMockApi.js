@@ -19,23 +19,19 @@ import {
   deleteNotification,
   updateNotificationSettings
 } from './mockPortalData';
-
 // Import assessment mock API
 import { setupAssessmentMockApi } from './assessment/setupAssessmentMockApi';
-
 /**
  * Setup mock API handlers for student portal
  */
 export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Setup assessment mock API
   setupAssessmentMockApi(api, originalGet, originalPost, originalPut, originalDelete);
-  
   // Override API methods with mock implementations
   const baseGet = api.get;
   const basePost = api.post;
   const basePut = api.put;
   const baseDelete = api.delete;
-  
   api.get = function(url, config) {
     // Portal Dashboard
     if (url === '/api/portal/dashboard') {
@@ -48,7 +44,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Portal Courses
     if (url === '/api/portal/courses') {
       const courses = getPortalCourses();
@@ -60,13 +55,11 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Module Detail
     const moduleMatch = url.match(/^\/api\/portal\/courses\/modules\/(\d+)$/);
     if (moduleMatch) {
       const moduleId = moduleMatch[1];
       const moduleDetail = getPortalModuleDetail(moduleId);
-      
       if (!moduleDetail) {
         return Promise.reject({
           response: {
@@ -75,7 +68,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
           }
         });
       }
-      
       return Promise.resolve({
         data: moduleDetail,
         status: 200,
@@ -84,14 +76,12 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Portal Calendar
     if (url.startsWith('/api/portal/calendar')) {
       const queryString = url.split('?')[1] || '';
       const params = new URLSearchParams(queryString);
       const month = params.get('month');
       const year = params.get('year');
-      
       const calendar = getPortalCalendar(month, year);
       return Promise.resolve({
         data: calendar,
@@ -101,13 +91,11 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Session Detail
     const sessionMatch = url.match(/^\/api\/portal\/sessions\/(\d+)$/);
     if (sessionMatch) {
       const sessionId = sessionMatch[1];
       const session = getSessionDetail(sessionId);
-      
       if (!session) {
         return Promise.reject({
           response: {
@@ -116,7 +104,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
           }
         });
       }
-      
       return Promise.resolve({
         data: session,
         status: 200,
@@ -125,7 +112,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Portal Resources
     if (url === '/api/portal/resources') {
       const resources = getPortalResources();
@@ -137,7 +123,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Portal Achievements
     if (url === '/api/portal/achievements') {
       const achievements = getPortalAchievements();
@@ -149,7 +134,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Portal Profile
     if (url === '/api/portal/profile') {
       const profile = getPortalProfile();
@@ -161,7 +145,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Portal Skills
     if (url === '/api/portal/skills') {
       const skills = getPortalSkills();
@@ -173,7 +156,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Portal Progress
     if (url === '/api/portal/progress') {
       const progress = getPortalProgress();
@@ -185,7 +167,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Portal Notifications
     if (url.startsWith('/api/portal/notifications')) {
       const queryString = url.split('?')[1] || '';
@@ -193,7 +174,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
       const filter = params.get('filter') || 'all';
       const page = parseInt(params.get('page') || '1');
       const limit = parseInt(params.get('limit') || '10');
-      
       const notifications = getPortalNotifications(filter, page, limit);
       return Promise.resolve({
         data: notifications,
@@ -203,18 +183,15 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Fall back to base get method (which includes assessment endpoints)
     return baseGet(url, config);
   };
-  
   api.post = function(url, data, config) {
     // Complete Lesson
     const completeMatch = url.match(/^\/api\/portal\/lessons\/(\d+)\/complete$/);
     if (completeMatch) {
       const lessonId = completeMatch[1];
       const result = completeLesson(lessonId);
-      
       return Promise.resolve({
         data: result,
         status: 200,
@@ -223,13 +200,11 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Download Resource
     const downloadMatch = url.match(/^\/api\/portal\/resources\/(\d+)\/download$/);
     if (downloadMatch) {
       const resourceId = downloadMatch[1];
       const result = downloadResource(resourceId);
-      
       if (!result) {
         return Promise.reject({
           response: {
@@ -238,7 +213,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
           }
         });
       }
-      
       return Promise.resolve({
         data: result,
         status: 200,
@@ -247,13 +221,11 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Download Certificate
     const certificateMatch = url.match(/^\/api\/portal\/certificates\/(\d+)\/download$/);
     if (certificateMatch) {
       const certificateId = certificateMatch[1];
       const result = downloadCertificate(certificateId);
-      
       if (!result) {
         return Promise.reject({
           response: {
@@ -262,7 +234,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
           }
         });
       }
-      
       return Promise.resolve({
         data: result,
         status: 200,
@@ -271,13 +242,11 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Mark Notification as Read
     const readMatch = url.match(/^\/api\/portal\/notifications\/(\d+)\/read$/);
     if (readMatch) {
       const notificationId = readMatch[1];
       const result = markNotificationAsRead(notificationId);
-      
       if (!result) {
         return Promise.reject({
           response: {
@@ -286,7 +255,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
           }
         });
       }
-      
       return Promise.resolve({
         data: result,
         status: 200,
@@ -295,11 +263,9 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Mark All Notifications as Read
     if (url === '/api/portal/notifications/read-all') {
       const result = markAllNotificationsAsRead();
-      
       return Promise.resolve({
         data: result,
         status: 200,
@@ -308,16 +274,13 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Fall back to base post method (which includes assessment endpoints)
     return basePost(url, data, config);
   };
-  
   api.put = function(url, data, config) {
     // Update Profile
     if (url === '/api/portal/profile') {
       const result = updatePortalProfile(data);
-      
       return Promise.resolve({
         data: result,
         status: 200,
@@ -326,11 +289,9 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Update Notification Settings
     if (url === '/api/portal/notifications/settings') {
       const result = updateNotificationSettings(data);
-      
       return Promise.resolve({
         data: result,
         status: 200,
@@ -339,18 +300,15 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Fall back to base put method
     return basePut(url, data, config);
   };
-  
   api.delete = function(url, config) {
     // Delete Notification
     const deleteMatch = url.match(/^\/api\/portal\/notifications\/(\d+)$/);
     if (deleteMatch) {
       const notificationId = deleteMatch[1];
       const result = deleteNotification(notificationId);
-      
       if (!result) {
         return Promise.reject({
           response: {
@@ -359,7 +317,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
           }
         });
       }
-      
       return Promise.resolve({
         data: result,
         status: 200,
@@ -368,7 +325,6 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
         config: config
       });
     }
-    
     // Fall back to base delete method
     return baseDelete(url, config);
   };

@@ -8,6 +8,8 @@ from app.core.cache_manager import cache_manager, invalidate_beneficiary_cache
 from app.schemas.beneficiary import BeneficiarySchema
 from app.schemas.user import UserSchema
 
+from app.utils.logging import logger
+
 
 cached_bp = Blueprint('cached_v2', __name__, url_prefix='/api/v2/cached')
 beneficiary_schema = BeneficiarySchema()

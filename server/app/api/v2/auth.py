@@ -7,6 +7,8 @@ from app.schemas.user import UserSchema
 from app.schemas.auth import LoginSchema
 from app.utils.decorators import validate_request
 
+from app.utils.logging import logger
+
 
 auth_bp_v2 = Blueprint('auth_v2', __name__, url_prefix='/api/v2/auth')
 user_schema = UserSchema()

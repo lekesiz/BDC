@@ -1,41 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Send, 
-  Search, 
-  Plus, 
-  MoreVertical, 
-  Paperclip, 
-  Image, 
-  User, 
-  Check, 
-  ArrowLeft,
-  Clock,
-  Users,
-  ChevronDown,
-  Phone,
-  Video
-} from 'lucide-react';
-import api from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { useToast } from '@/components/ui/toast';
-import { useAuth } from '@/hooks/useAuth';
-import { format, formatDistanceToNow } from 'date-fns';
-import { tr } from 'date-fns/locale';
-
-/**
- * MessagingPage displays a messaging interface for communicating with other users
- */
-const MessagingPage = () => {
+import axios from 'axios';
+import { FaSearch, FaPaperPlane, FaSmile, FaPaperclip, FaVideo, FaPhone, FaEllipsisV, FaCheck, FaCheckDouble, FaTimes, FaPlus, FaUser, FaUsers, FaStar, FaTrash, FaArchive, FaTag } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+const MessagingPageV2 = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user } = useAuth();
   const messagesEndRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const fileInputRef = useRef(null);
+  const [loading, setLoading] = useState(true);
   const [conversations, setConversations] = useState([]);
-  const [filteredConversations, setFilteredConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -43,653 +16,656 @@ const MessagingPage = () => {
   const [showNewConversation, setShowNewConversation] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [userSearchTerm, setUserSearchTerm] = useState('');
-  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
-  const [showMobileConversation, setShowMobileConversation] = useState(false);
-
-  // Fetch conversations
+  const [groupName, setGroupName] = useState('');
+  const [typing, setTyping] = useState(false);
+  const [userTyping, setUserTyping] = useState({});
+  const [attachments, setAttachments] = useState([]);
+  const [showAttachments, setShowAttachments] = useState(false);
+  const [filterTag, setFilterTag] = useState('all');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
+  const tags = [
+    { id: 'all', name: 'Tüm Mesajlar', icon: FaEllipsisV },
+    { id: 'unread', name: 'Okunmamış', icon: FaCheckDouble },
+    { id: 'starred', name: 'Yıldızlı', icon: FaStar },
+    { id: 'archived', name: 'Arşivlenmiş', icon: FaArchive }
+  ];
+  const emojis = ['😀', '😁', '😂', '😊', '😍', '🤔', '😎', '😔', '😡', '👍', '👎', '❤️', '💔', '🎉', '🔥'];
   useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        setIsLoading(true);
-        const response = await api.get('/api/messages/threads');
-        setConversations(response.data.threads || []);
-        setFilteredConversations(response.data.threads || []);
-      } catch (error) {
-        console.error('Error fetching conversations:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load conversations',
-          type: 'error',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     fetchConversations();
-  }, []); // Remove toast dependency to prevent infinite loop
-
-  // Filter conversations based on search term
+    connectWebSocket();
+    return () => disconnectWebSocket();
+  }, []);
   useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredConversations(conversations);
-      return;
+    if (selectedConversation) {
+      fetchMessages(selectedConversation.id);
+      markAsRead(selectedConversation.id);
     }
-    
-    const filtered = conversations.filter(
-      conversation => 
-        conversation.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        conversation.participants.some(
-          p => p.name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-    );
-    
-    setFilteredConversations(filtered);
-  }, [conversations, searchTerm]);
-
-  // Fetch messages for selected conversation
+  }, [selectedConversation]);
   useEffect(() => {
-    const fetchMessages = async () => {
-      if (!selectedConversation) return;
-      
-      try {
-        const response = await api.get(`/api/messages/threads/${selectedConversation.id}/messages`);
-        setMessages(response.data.messages || []);
-        
-        // Mark messages as read
-        if (selectedConversation.unread_count > 0) {
-          await api.post(`/api/conversations/${selectedConversation.id}/mark-read`);
-          
-          // Update conversation in the list
-          setConversations(prev => 
-            prev.map(conv => 
-              conv.id === selectedConversation.id 
-                ? { ...conv, unread_count: 0 } 
-                : conv
-            )
-          );
-        }
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load messages',
-          type: 'error',
-        });
-      }
-    };
-    
-    fetchMessages();
-  }, [selectedConversation]); // Remove toast dependency to prevent infinite loop
-
-  // Scroll to bottom of messages
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    scrollToBottom();
   }, [messages]);
-
-  // Search for users when creating a new conversation
-  useEffect(() => {
-    const searchUsers = async () => {
-      if (!userSearchTerm || userSearchTerm.length < 2) {
-        setSearchResults([]);
-        return;
-      }
-      
-      try {
-        const response = await api.get('/api/users/search', {
-          params: { query: userSearchTerm }
-        });
-        
-        // Filter out already selected users
-        const filteredResults = response.data.filter(
-          user => !selectedUsers.some(selectedUser => selectedUser.id === user.id)
-        );
-        
-        setSearchResults(filteredResults);
-      } catch (error) {
-        console.error('Error searching users:', error);
-      }
+  const connectWebSocket = () => {
+    // WebSocket connection for real-time messaging
+    const ws = new WebSocket('ws://localhost:8000/ws/messaging');
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      handleWebSocketMessage(data);
     };
-    
-    const debounceTimeout = setTimeout(searchUsers, 300);
-    
-    return () => clearTimeout(debounceTimeout);
-  }, [userSearchTerm, selectedUsers]);
-
-  // Add user to selected list
-  const addUser = (userToAdd) => {
-    setSelectedUsers([...selectedUsers, userToAdd]);
-    setUserSearchTerm('');
-    setSearchResults([]);
+    window.ws = ws;
   };
-
-  // Remove user from selected list
-  const removeUser = (userId) => {
-    setSelectedUsers(selectedUsers.filter(u => u.id !== userId));
-  };
-
-  // Send a message
-  const sendMessage = async () => {
-    if (!newMessage.trim() || !selectedConversation) return;
-    
-    try {
-      const response = await api.post(`/api/conversations/${selectedConversation.id}/messages`, {
-        content: newMessage
-      });
-      
-      // Add new message to the list
-      setMessages([...messages, response.data]);
-      
-      // Update conversation in the list
-      setConversations(prev => {
-        const updatedConversations = prev.map(conv => {
-          if (conv.id === selectedConversation.id) {
-            return {
-              ...conv,
-              last_message: {
-                content: newMessage,
-                created_at: new Date().toISOString(),
-                sender_id: user.id,
-                sender_name: user.name
-              },
-              updated_at: new Date().toISOString()
-            };
-          }
-          return conv;
-        });
-        
-        // Sort conversations by updated_at
-        return [...updatedConversations].sort((a, b) => 
-          new Date(b.updated_at) - new Date(a.updated_at)
-        );
-      });
-      
-      // Clear the input field
-      setNewMessage('');
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to send message',
-        type: 'error',
-      });
+  const disconnectWebSocket = () => {
+    if (window.ws) {
+      window.ws.close();
     }
   };
-
-  // Create new conversation
-  const createConversation = async () => {
-    if (selectedUsers.length === 0) {
-      toast({
-        title: 'Error',
-        description: 'Please select at least one user',
-        type: 'error',
+  const handleWebSocketMessage = (data) => {
+    switch (data.type) {
+      case 'new_message':
+        if (selectedConversation?.id === data.conversation_id) {
+          setMessages(prev => [...prev, data.message]);
+        }
+        updateConversationLastMessage(data.conversation_id, data.message);
+        break;
+      case 'typing':
+        setUserTyping(prev => ({ ...prev, [data.user_id]: data.is_typing }));
+        break;
+      case 'read_receipt':
+        updateMessageReadStatus(data.message_id);
+        break;
+      case 'online_status':
+        setOnlineUsers(data.online_users);
+        break;
+    }
+  };
+  const fetchConversations = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('/api/messaging/conversations');
+      setConversations(response.data);
+      // Calculate unread counts
+      const counts = {};
+      response.data.forEach(conv => {
+        counts[conv.id] = conv.unread_count || 0;
       });
+      setUnreadCounts(counts);
+    } catch (error) {
+      toast.error('Konuşmalar yüklenemedi');
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchMessages = async (conversationId) => {
+    try {
+      const response = await axios.get(`/api/messaging/conversations/${conversationId}/messages`);
+      setMessages(response.data);
+    } catch (error) {
+      toast.error('Mesajlar yüklenemedi');
+    }
+  };
+  const sendMessage = async () => {
+    if (!newMessage.trim() && attachments.length === 0) return;
+    const formData = new FormData();
+    formData.append('content', newMessage);
+    formData.append('conversation_id', selectedConversation.id);
+    attachments.forEach((file, index) => {
+      formData.append(`attachments[${index}]`, file);
+    });
+    try {
+      const response = await axios.post('/api/messaging/messages', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setMessages([...messages, response.data]);
+      setNewMessage('');
+      setAttachments([]);
+      updateConversationLastMessage(selectedConversation.id, response.data);
+      scrollToBottom();
+    } catch (error) {
+      toast.error('Mesaj gönderilemedi');
+    }
+  };
+  const createConversation = async () => {
+    if (selectedUsers.length === 0) return;
+    try {
+      const data = {
+        participants: selectedUsers.map(u => u.id),
+        is_group: selectedUsers.length > 1,
+        name: groupName || null
+      };
+      const response = await axios.post('/api/messaging/conversations', data);
+      setConversations([response.data, ...conversations]);
+      setSelectedConversation(response.data);
+      setShowNewConversation(false);
+      setSelectedUsers([]);
+      setGroupName('');
+    } catch (error) {
+      toast.error('Konuşma oluşturulamadı');
+    }
+  };
+  const searchUsers = async (term) => {
+    if (!term || term.length < 2) {
+      setSearchResults([]);
       return;
     }
-    
     try {
-      setIsCreatingConversation(true);
-      
-      const response = await api.post('/api/conversations', {
-        participant_ids: selectedUsers.map(u => u.id)
-      });
-      
-      // Add new conversation to the list
-      setConversations([response.data, ...conversations]);
-      
-      // Select the new conversation
-      setSelectedConversation(response.data);
-      
-      // Reset state
-      setSelectedUsers([]);
-      setShowNewConversation(false);
-      setShowMobileConversation(true);
-      
-      toast({
-        title: 'Success',
-        description: 'Conversation created successfully',
-        type: 'success',
-      });
+      const response = await axios.get('/api/users/search', { params: { q: term } });
+      setSearchResults(response.data);
     } catch (error) {
-      console.error('Error creating conversation:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create conversation',
-        type: 'error',
-      });
-    } finally {
-      setIsCreatingConversation(false);
+      console.error('Kullanıcı araması başarısız:', error);
     }
   };
-
-  // Handle conversation selection
-  const handleSelectConversation = (conversation) => {
-    setSelectedConversation(conversation);
-    setShowMobileConversation(true);
+  const markAsRead = async (conversationId) => {
+    try {
+      await axios.put(`/api/messaging/conversations/${conversationId}/read`);
+      setUnreadCounts(prev => ({ ...prev, [conversationId]: 0 }));
+    } catch (error) {
+      console.error('Okundu işareti başarısız:', error);
+    }
   };
-
-  // Format the conversation title
-  const getConversationTitle = (conversation) => {
-    if (conversation.title) return conversation.title;
-    
-    return conversation.participants
-      .filter(p => p.id !== user?.id)
-      .map(p => p.name)
-      .join(', ');
+  const deleteConversation = async (conversationId) => {
+    if (window.confirm('Bu konuşmayı silmek istediğinizden emin misiniz?')) {
+      try {
+        await axios.delete(`/api/messaging/conversations/${conversationId}`);
+        setConversations(conversations.filter(c => c.id !== conversationId));
+        if (selectedConversation?.id === conversationId) {
+          setSelectedConversation(null);
+          setMessages([]);
+        }
+        toast.success('Konuşma silindi');
+      } catch (error) {
+        toast.error('Silme işlemi başarısız');
+      }
+    }
   };
-
-  // Render conversation list
-  const renderConversationList = () => {
-    if (showNewConversation) {
-      return (
-        <div className="h-full flex flex-col">
-          <div className="px-4 py-3 border-b flex items-center">
-            <button
-              className="mr-3 p-1 rounded-full hover:bg-gray-100"
-              onClick={() => setShowNewConversation(false)}
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h2 className="text-lg font-medium">New Conversation</h2>
-          </div>
-          
-          <div className="p-4">
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Add Participants
-              </label>
-              
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <Input
-                  type="text"
-                  placeholder="Search users by name or email..."
-                  value={userSearchTerm}
-                  onChange={(e) => setUserSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              
-              {searchResults.length > 0 && (
-                <div className="mt-2 border rounded-md overflow-hidden max-h-60 overflow-y-auto">
-                  {searchResults.map(userResult => (
-                    <div 
-                      key={userResult.id}
-                      className="p-3 hover:bg-gray-50 cursor-pointer flex items-center justify-between border-b last:border-b-0"
-                      onClick={() => addUser(userResult)}
-                    >
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center mr-2 text-xs">
-                          {userResult.name?.charAt(0) || 'U'}
-                        </div>
-                        <div>
-                          <div className="font-medium">{userResult.name}</div>
-                          <div className="text-xs text-gray-500">{userResult.email}</div>
-                        </div>
-                      </div>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-gray-500"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            {selectedUsers.length > 0 && (
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Selected Participants
-                </label>
-                
-                <div className="flex flex-wrap gap-2">
-                  {selectedUsers.map(selectedUser => (
-                    <div 
-                      key={selectedUser.id}
-                      className="flex items-center bg-gray-100 rounded-full px-3 py-1"
-                    >
-                      <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center mr-2 text-xs">
-                        {selectedUser.name?.charAt(0) || 'U'}
-                      </div>
-                      <span className="mr-2">{selectedUser.name}</span>
-                      <button
-                        className="text-gray-500 hover:text-gray-700"
-                        onClick={() => removeUser(selectedUser.id)}
-                      >
-                        <span className="sr-only">Remove</span>
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
+  const archiveConversation = async (conversationId) => {
+    try {
+      await axios.put(`/api/messaging/conversations/${conversationId}/archive`);
+      const conversation = conversations.find(c => c.id === conversationId);
+      conversation.is_archived = !conversation.is_archived;
+      setConversations([...conversations]);
+      toast.success(conversation.is_archived ? 'Arşivlendi' : 'Arşivden çıkarıldı');
+    } catch (error) {
+      toast.error('İşlem başarısız');
+    }
+  };
+  const starConversation = async (conversationId) => {
+    try {
+      await axios.put(`/api/messaging/conversations/${conversationId}/star`);
+      const conversation = conversations.find(c => c.id === conversationId);
+      conversation.is_starred = !conversation.is_starred;
+      setConversations([...conversations]);
+    } catch (error) {
+      console.error('Yıldızlama başarısız:', error);
+    }
+  };
+  const handleTyping = (isTyping) => {
+    if (window.ws && selectedConversation) {
+      window.ws.send(JSON.stringify({
+        type: 'typing',
+        conversation_id: selectedConversation.id,
+        is_typing: isTyping
+      }));
+    }
+  };
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    setAttachments([...attachments, ...files]);
+  };
+  const removeAttachment = (index) => {
+    setAttachments(attachments.filter((_, i) => i !== index));
+  };
+  const updateConversationLastMessage = (conversationId, message) => {
+    setConversations(prevConversations => 
+      prevConversations.map(conv => 
+        conv.id === conversationId
+          ? { ...conv, last_message: message, updated_at: message.created_at }
+          : conv
+      ).sort((a, b) => {
+        const dateA = a.updated_at ? new Date(a.updated_at) : new Date(0);
+        const dateB = b.updated_at ? new Date(b.updated_at) : new Date(0);
+        return dateB - dateA;
+      })
+    );
+  };
+  const updateMessageReadStatus = (messageId) => {
+    setMessages(prevMessages =>
+      prevMessages.map(msg =>
+        msg.id === messageId ? { ...msg, is_read: true } : msg
+      )
+    );
+  };
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  const filteredConversations = conversations.filter(conv => {
+    if (filterTag === 'unread' && !conv.unread_count) return false;
+    if (filterTag === 'starred' && !conv.is_starred) return false;
+    if (filterTag === 'archived' && !conv.is_archived) return false;
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      return conv.name?.toLowerCase().includes(searchLower) ||
+             conv.participants?.some(p => p.name.toLowerCase().includes(searchLower));
+    }
+    return true;
+  });
+  const renderMessage = (message, index) => {
+    const isOwn = message.sender_id === 'current_user_id'; // Replace with actual user ID
+    const showAvatar = index === 0 || messages[index - 1]?.sender_id !== message.sender_id;
+    return (
+      <div key={message.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-4`}>
+        {!isOwn && showAvatar && (
+          <img
+            src={message.sender_avatar || '/assets/avatar-placeholder.png'}
+            alt={message.sender_name}
+            className="w-8 h-8 rounded-full mr-3"
+          />
+        )}
+        {!isOwn && !showAvatar && <div className="w-8 mr-3" />}
+        <div className={`max-w-xs lg:max-w-md ${isOwn ? 'items-end' : 'items-start'}`}>
+          {!isOwn && showAvatar && (
+            <p className="text-xs text-gray-600 mb-1">{message.sender_name}</p>
+          )}
+          <div className={`rounded-lg px-4 py-2 ${
+            isOwn ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+          }`}>
+            <p className="text-sm">{message.content}</p>
+            {message.attachments?.length > 0 && (
+              <div className="mt-2 space-y-1">
+                {message.attachments.map((attachment, idx) => (
+                  <a
+                    key={idx}
+                    href={attachment.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center text-sm underline"
+                  >
+                    <FaPaperclip className="mr-1" />
+                    {attachment.name}
+                  </a>
+                ))}
               </div>
             )}
-            
-            <Button
-              onClick={createConversation}
-              disabled={selectedUsers.length === 0 || isCreatingConversation}
-              className="w-full"
-            >
-              {isCreatingConversation ? 'Creating...' : 'Start Conversation'}
-            </Button>
+          </div>
+          <div className="flex items-center mt-1 text-xs text-gray-500">
+            <span>
+              {message.created_at && !isNaN(new Date(message.created_at).getTime())
+                ? new Date(message.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+                : 'unknown'
+              }
+            </span>
+            {isOwn && (
+              <span className="ml-2">
+                {message.is_read ? <FaCheckDouble className="text-blue-500" /> : <FaCheck />}
+              </span>
+            )}
           </div>
         </div>
-      );
-    }
-    
+      </div>
+    );
+  };
+  if (loading) {
     return (
-      <div className="h-full flex flex-col">
-        <div className="px-4 py-3 border-b flex justify-between items-center">
-          <h2 className="text-lg font-medium">Messages</h2>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => setShowNewConversation(true)}
-          >
-            <Plus className="h-5 w-5" />
-          </Button>
-        </div>
-        
-        <div className="p-3">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+  return (
+    <div className="h-screen bg-gray-50 flex">
+      {/* Conversations Sidebar */}
+      <div className="w-80 bg-white border-r flex flex-col">
+        {/* Header */}
+        <div className="p-4 border-b">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-xl font-bold">Mesajlar</h1>
+            <button
+              onClick={() => setShowNewConversation(true)}
+              className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600"
+            >
+              <FaPlus />
+            </button>
+          </div>
+          {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            <Input
+            <input
               type="text"
-              placeholder="Search conversations..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              placeholder="Konuşma ara..."
+              className="w-full pl-10 pr-4 py-2 border rounded-lg"
             />
+            <FaSearch className="absolute left-3 top-3 text-gray-400" />
+          </div>
+          {/* Filter Tags */}
+          <div className="flex space-x-2 mt-3 overflow-x-auto">
+            {tags.map(tag => (
+              <button
+                key={tag.id}
+                onClick={() => setFilterTag(tag.id)}
+                className={`flex items-center px-3 py-1 rounded-full text-sm whitespace-nowrap ${
+                  filterTag === tag.id
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <tag.icon className="mr-1" />
+                {tag.name}
+              </button>
+            ))}
           </div>
         </div>
-        
+        {/* Conversations List */}
         <div className="flex-1 overflow-y-auto">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-full">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : filteredConversations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center p-4">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <Send className="h-8 w-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">No conversations</h3>
-              <p className="text-gray-500 mb-4">
-                Start a new conversation by clicking the plus button.
-              </p>
-              <Button 
-                onClick={() => setShowNewConversation(true)}
-                className="flex items-center"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New Conversation
-              </Button>
+          {filteredConversations.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Konuşma bulunamadı</p>
             </div>
           ) : (
-            <div className="divide-y">
-              {filteredConversations.map(conversation => (
-                <div
-                  key={conversation.id}
-                  className={`flex p-3 cursor-pointer hover:bg-gray-50 ${
-                    selectedConversation?.id === conversation.id ? 'bg-gray-50' : ''
-                  }`}
-                  onClick={() => handleSelectConversation(conversation)}
-                >
-                  <div className="flex-shrink-0 mr-3">
-                    {conversation.is_group ? (
-                      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-600">
-                        <Users className="w-6 h-6" />
-                      </div>
-                    ) : (
-                      <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-lg">
-                        {conversation.participants.find(p => p.id !== user?.id)?.name?.charAt(0) || 'G'}
-                      </div>
+            filteredConversations.map(conversation => (
+              <div
+                key={conversation.id}
+                onClick={() => setSelectedConversation(conversation)}
+                className={`p-4 hover:bg-gray-50 cursor-pointer border-b ${
+                  selectedConversation?.id === conversation.id ? 'bg-blue-50' : ''
+                }`}
+              >
+                <div className="flex items-start">
+                  <div className="relative">
+                    <img
+                      src={conversation.avatar || '/assets/avatar-placeholder.png'}
+                      alt={conversation.name}
+                      className="w-12 h-12 rounded-full"
+                    />
+                    {onlineUsers.includes(conversation.participants?.[0]?.id) && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                     )}
                   </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-baseline">
-                      <h3 className={`text-sm font-medium truncate ${conversation.unread_count > 0 ? 'text-gray-900' : 'text-gray-700'}`}>
-                        {getConversationTitle(conversation)}
-                      </h3>
+                  <div className="ml-3 flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium">{conversation.name}</h3>
                       <span className="text-xs text-gray-500">
-                        {formatDistanceToNow(new Date(conversation.updated_at), {
-                          addSuffix: false,
-                          locale: tr
-                        })}
+                        {conversation.updated_at && !isNaN(new Date(conversation.updated_at).getTime())
+                          ? new Date(conversation.updated_at).toLocaleDateString('tr-TR')
+                          : 'recent'
+                        }
                       </span>
                     </div>
-                    
-                    <div className="flex items-center">
-                      <p className={`text-sm truncate mr-2 ${conversation.unread_count > 0 ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
-                        {conversation.last_message?.sender_id === user?.id ? (
-                          <span className="text-xs text-gray-500 mr-1">You:</span>
-                        ) : (
-                          conversation.last_message?.sender_name && (
-                            <span className="text-xs text-gray-500 mr-1">{conversation.last_message.sender_name.split(' ')[0]}:</span>
-                          )
-                        )}
-                        {conversation.last_message?.content || 'No messages yet'}
-                      </p>
-                      
-                      {conversation.unread_count > 0 && (
-                        <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-primary rounded-full">
-                          {conversation.unread_count}
+                    <p className="text-sm text-gray-600 truncate">
+                      {conversation.last_message?.content || 'Henüz mesaj yok'}
+                    </p>
+                    <div className="flex items-center mt-1">
+                      {conversation.is_starred && <FaStar className="text-yellow-500 mr-2" />}
+                      {unreadCounts[conversation.id] > 0 && (
+                        <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
+                          {unreadCounts[conversation.id]}
                         </span>
                       )}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))
           )}
         </div>
       </div>
-    );
-  };
-
-  // Render conversation detail
-  const renderConversationDetail = () => {
-    if (!selectedConversation) {
-      return (
-        <div className="flex flex-col items-center justify-center h-full text-center p-4 text-gray-500">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-            <Send className="h-8 w-8 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-1">No conversation selected</h3>
-          <p>Select a conversation from the list or start a new one.</p>
-        </div>
-      );
-    }
-    
-    return (
-      <div className="flex flex-col h-full">
-        {/* Conversation header */}
-        <div className="px-4 py-3 border-b flex items-center justify-between">
-          <div className="flex items-center">
-            {/* Show back button in mobile view */}
-            <div className="md:hidden mr-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowMobileConversation(false)}
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </div>
-            
+      {/* Chat Area */}
+      {selectedConversation ? (
+        <div className="flex-1 flex flex-col">
+          {/* Chat Header */}
+          <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
             <div className="flex items-center">
-              <div className="flex-shrink-0 mr-3">
-                {selectedConversation.is_group ? (
-                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600">
-                    <Users className="w-5 h-5" />
+              <img
+                src={selectedConversation.avatar || '/assets/avatar-placeholder.png'}
+                alt={selectedConversation.name}
+                className="w-10 h-10 rounded-full mr-3"
+              />
+              <div>
+                <h2 className="font-semibold">{selectedConversation.name}</h2>
+                {Object.values(userTyping).some(t => t) && (
+                  <p className="text-sm text-gray-600">yazıyor...</p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => starConversation(selectedConversation.id)}
+                className={`text-gray-600 hover:text-gray-800 ${
+                  selectedConversation.is_starred ? 'text-yellow-500' : ''
+                }`}
+              >
+                <FaStar />
+              </button>
+              <button className="text-gray-600 hover:text-gray-800">
+                <FaPhone />
+              </button>
+              <button className="text-gray-600 hover:text-gray-800">
+                <FaVideo />
+              </button>
+              <div className="relative">
+                <button className="text-gray-600 hover:text-gray-800">
+                  <FaEllipsisV />
+                </button>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden">
+                  <button
+                    onClick={() => archiveConversation(selectedConversation.id)}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-50"
+                  >
+                    <FaArchive className="inline mr-2" />
+                    {selectedConversation.is_archived ? 'Arşivden Çıkar' : 'Arşivle'}
+                  </button>
+                  <button
+                    onClick={() => deleteConversation(selectedConversation.id)}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600"
+                  >
+                    <FaTrash className="inline mr-2" />
+                    Sil
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+            {messages.map((message, index) => renderMessage(message, index))}
+            <div ref={messagesEndRef} />
+          </div>
+          {/* Message Input */}
+          <div className="bg-white border-t p-4">
+            {attachments.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-2">
+                {attachments.map((file, index) => (
+                  <div key={index} className="bg-gray-100 rounded-lg px-3 py-2 flex items-center">
+                    <FaPaperclip className="mr-2 text-gray-600" />
+                    <span className="text-sm">{file.name}</span>
+                    <button
+                      onClick={() => removeAttachment(index)}
+                      className="ml-2 text-red-500 hover:text-red-600"
+                    >
+                      <FaTimes />
+                    </button>
                   </div>
-                ) : (
-                  <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center">
-                    {selectedConversation.participants.find(p => p.id !== user?.id)?.name?.charAt(0) || 'G'}
+                ))}
+              </div>
+            )}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                <FaPaperclip />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <div className="relative">
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  <FaSmile />
+                </button>
+                {showEmojiPicker && (
+                  <div className="absolute bottom-10 left-0 bg-white border rounded-lg shadow-lg p-2 grid grid-cols-5 gap-2">
+                    {emojis.map(emoji => (
+                      <button
+                        key={emoji}
+                        onClick={() => {
+                          setNewMessage(newMessage + emoji);
+                          setShowEmojiPicker(false);
+                        }}
+                        className="text-xl hover:bg-gray-100 p-1 rounded"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
-              
-              <div>
-                <h3 className="font-medium">
-                  {getConversationTitle(selectedConversation)}
-                </h3>
-                <p className="text-xs text-gray-500">
-                  {selectedConversation.is_group 
-                    ? `${selectedConversation.participants.length} participants`
-                    : 'Online'}
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon">
-              <Phone className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Video className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-        
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <Send className="h-8 w-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">No messages yet</h3>
-              <p>Start the conversation by sending a message.</p>
-            </div>
-          ) : (
-            <>
-              {messages.map((message, index) => {
-                const isCurrentUser = message.sender_id === user?.id;
-                const showSender = index === 0 || messages[index - 1].sender_id !== message.sender_id;
-                
-                return (
-                  <div 
-                    key={message.id}
-                    className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div className={`max-w-[75%] ${showSender ? 'mt-4' : 'mt-1'}`}>
-                      {!isCurrentUser && showSender && (
-                        <div className="flex items-center mb-1">
-                          <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs mr-2">
-                            {message.sender_name?.charAt(0) || 'U'}
-                          </div>
-                          <span className="text-sm font-medium">{message.sender_name}</span>
-                        </div>
-                      )}
-                      
-                      <div
-                        className={`rounded-lg p-3 text-sm ${
-                          isCurrentUser 
-                            ? 'bg-primary text-white rounded-tr-none' 
-                            : 'bg-gray-100 text-gray-900 rounded-tl-none'
-                        }`}
-                      >
-                        {message.content}
-                      </div>
-                      
-                      <div className={`text-xs text-gray-500 mt-1 ${isCurrentUser ? 'text-right' : ''}`}>
-                        {format(new Date(message.created_at), 'HH:mm')}
-                        {isCurrentUser && (
-                          <span className="ml-1">
-                            <Check className="w-3 h-3 inline text-gray-500" />
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-              <div ref={messagesEndRef} />
-            </>
-          )}
-        </div>
-        
-        {/* Message input */}
-        <div className="border-t p-3">
-          <div className="flex items-end">
-            <Button variant="ghost" size="icon" className="flex-shrink-0 mr-2">
-              <Paperclip className="h-5 w-5" />
-            </Button>
-            
-            <div className="flex-1 rounded-lg border border-gray-300 bg-white relative">
-              <textarea
-                className="block w-full p-3 resize-none focus:outline-none rounded-lg"
-                rows={2}
-                placeholder="Type a message..."
+              <input
+                type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                  }
-                }}
+                onFocus={() => handleTyping(true)}
+                onBlur={() => handleTyping(false)}
+                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                placeholder="Mesajınızı yazın..."
+                className="flex-1 px-4 py-2 border rounded-lg"
               />
-              
-              <div className="absolute bottom-2 right-2 flex space-x-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Image className="h-5 w-5" />
-                </Button>
+              <button
+                onClick={sendMessage}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              >
+                <FaPaperPlane />
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <p className="text-xl text-gray-600 mb-4">Bir konuşma seçin</p>
+            <button
+              onClick={() => setShowNewConversation(true)}
+              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+            >
+              Yeni Konuşma Başlat
+            </button>
+          </div>
+        </div>
+      )}
+      {/* New Conversation Modal */}
+      {showNewConversation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full">
+            <div className="flex justify-between items-center p-6 border-b">
+              <h3 className="text-lg font-semibold">Yeni Konuşma</h3>
+              <button
+                onClick={() => setShowNewConversation(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="Kullanıcı ara..."
+                  onChange={(e) => searchUsers(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+              {/* Search Results */}
+              {searchResults.length > 0 && (
+                <div className="mb-4 max-h-48 overflow-y-auto">
+                  {searchResults.map(user => (
+                    <div
+                      key={user.id}
+                      onClick={() => {
+                        if (!selectedUsers.find(u => u.id === user.id)) {
+                          setSelectedUsers([...selectedUsers, user]);
+                        }
+                      }}
+                      className="p-3 hover:bg-gray-50 cursor-pointer flex items-center justify-between"
+                    >
+                      <div className="flex items-center">
+                        <img
+                          src={user.avatar || '/assets/avatar-placeholder.png'}
+                          alt={user.name}
+                          className="w-10 h-10 rounded-full mr-3"
+                        />
+                        <div>
+                          <p className="font-medium">{user.name}</p>
+                          <p className="text-sm text-gray-600">{user.email}</p>
+                        </div>
+                      </div>
+                      {selectedUsers.find(u => u.id === user.id) && (
+                        <FaCheck className="text-green-500" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Selected Users */}
+              {selectedUsers.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm font-medium mb-2">Seçilen Kullanıcılar:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedUsers.map(user => (
+                      <span
+                        key={user.id}
+                        className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center"
+                      >
+                        {user.name}
+                        <button
+                          onClick={() => setSelectedUsers(selectedUsers.filter(u => u.id !== user.id))}
+                          className="ml-2 text-blue-600 hover:text-blue-800"
+                        >
+                          <FaTimes />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* Group Name */}
+              {selectedUsers.length > 1 && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2">Grup Adı</label>
+                  <input
+                    type="text"
+                    value={groupName}
+                    onChange={(e) => setGroupName(e.target.value)}
+                    placeholder="Grup adı (opsiyonel)"
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
+              )}
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setShowNewConversation(false)}
+                  className="px-4 py-2 border rounded hover:bg-gray-50"
+                >
+                  İptal
+                </button>
+                <button
+                  onClick={createConversation}
+                  disabled={selectedUsers.length === 0}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+                >
+                  Başlat
+                </button>
               </div>
             </div>
-            
-            <Button 
-              variant="primary" 
-              size="icon" 
-              className="ml-2 flex-shrink-0"
-              disabled={!newMessage.trim()}
-              onClick={sendMessage}
-            >
-              <Send className="h-5 w-5" />
-            </Button>
           </div>
         </div>
-      </div>
-    );
-  };
-
-  return (
-    <div className="container mx-auto py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Messaging</h1>
-      </div>
-      
-      <Card className="h-[calc(100vh-10rem)]">
-        <div className="flex h-full">
-          {/* Conversation list - hidden on mobile when a conversation is selected */}
-          <div className={`w-full md:w-1/3 border-r 
-                           ${showMobileConversation ? 'hidden md:block' : 'block'}`}>
-            {renderConversationList()}
-          </div>
-          
-          {/* Conversation detail - shown on mobile only when a conversation is selected */}
-          <div className={`w-full md:w-2/3 
-                           ${showMobileConversation ? 'block' : 'hidden md:block'}`}>
-            {renderConversationDetail()}
-          </div>
-        </div>
-      </Card>
+      )}
     </div>
   );
 };
-
-export default MessagingPage;
+export default MessagingPageV2;

@@ -5,7 +5,6 @@ import {
   Send, HelpCircle, ChevronRight
 } from 'lucide-react';
 import { format, addDays, addWeeks } from 'date-fns';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +17,6 @@ import { Table } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Tabs } from '@/components/ui/tabs';
-
 /**
  * TrainerAssignAssessmentPage allows trainers to assign assessments to courses, groups, or individuals
  */
@@ -30,17 +28,14 @@ const TrainerAssignAssessmentPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAssigning, setIsAssigning] = useState(false);
-  
   // Template data
   const [template, setTemplate] = useState(null);
-  
   // Assignment data
   const [assignmentTitle, setAssignmentTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState(null);
   const [availableFrom, setAvailableFrom] = useState(new Date());
   const [instructions, setInstructions] = useState('');
-  
   // Recipients
   const [courses, setCourses] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -48,7 +43,6 @@ const TrainerAssignAssessmentPage = () => {
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedGroups, setSelectedGroups] = useState([]);
   const [selectedIndividuals, setSelectedIndividuals] = useState([]);
-  
   // Settings
   const [settings, setSettings] = useState({
     attemptsAllowed: 1,
@@ -59,28 +53,21 @@ const TrainerAssignAssessmentPage = () => {
     reminderBeforeDue: true,
     showResultsAfterCompletion: true
   });
-  
   // Load template and recipients data
   useEffect(() => {
     let isMounted = true;
-    
     const fetchData = async () => {
       try {
         if (!isMounted) return;
-        
         setIsLoading(true);
         setError(null);
-        
         // Fetch template details
         const templateResponse = await fetch(`/api/assessment/templates/${id}`);
         if (!isMounted) return;
-        
         if (!templateResponse.ok) throw new Error('Failed to fetch template');
         const templateData = await templateResponse.json();
-        
         if (!isMounted) return;
         setTemplate(templateData);
-        
         // Set default values from template
         setAssignmentTitle(templateData.title);
         setDescription(templateData.description);
@@ -90,39 +77,29 @@ const TrainerAssignAssessmentPage = () => {
           attemptsAllowed: templateData.settings?.attemptsAllowed || 1,
           passingScore: templateData.settings?.passingScore || 70
         }));
-        
         // Fetch available courses
         const coursesResponse = await fetch('/api/courses');
         if (!isMounted) return;
-        
         if (!coursesResponse.ok) throw new Error('Failed to fetch courses');
         const coursesData = await coursesResponse.json();
-        
         if (!isMounted) return;
         setCourses(coursesData);
-        
         // Fetch available groups
         const groupsResponse = await fetch('/api/groups');
         if (!isMounted) return;
-        
         if (!groupsResponse.ok) throw new Error('Failed to fetch groups');
         const groupsData = await groupsResponse.json();
-        
         if (!isMounted) return;
         setGroups(groupsData);
-        
         // Fetch individuals (students/trainees)
         const individualsResponse = await fetch('/api/users?role=student');
         if (!isMounted) return;
-        
         if (!individualsResponse.ok) throw new Error('Failed to fetch students');
         const individualsData = await individualsResponse.json();
-        
         if (!isMounted) return;
         setIndividuals(individualsData);
       } catch (err) {
         if (!isMounted) return;
-        
         console.error('Error fetching data:', err);
         setError(err.message);
         toast({
@@ -136,14 +113,11 @@ const TrainerAssignAssessmentPage = () => {
         }
       }
     };
-    
     fetchData();
-    
     return () => {
       isMounted = false;
     };
   }, [id, toast]);
-  
   // Handle assignment
   const handleAssign = async () => {
     // Validate required fields
@@ -155,7 +129,6 @@ const TrainerAssignAssessmentPage = () => {
       });
       return;
     }
-    
     if (!dueDate) {
       toast({
         title: 'Error',
@@ -164,7 +137,6 @@ const TrainerAssignAssessmentPage = () => {
       });
       return;
     }
-    
     // Validate recipients
     const hasRecipients = selectedCourse || selectedGroups.length > 0 || selectedIndividuals.length > 0;
     if (!hasRecipients) {
@@ -175,10 +147,8 @@ const TrainerAssignAssessmentPage = () => {
       });
       return;
     }
-    
     try {
       setIsAssigning(true);
-      
       const assignmentData = {
         template_id: id,
         title: assignmentTitle,
@@ -194,7 +164,6 @@ const TrainerAssignAssessmentPage = () => {
         },
         created_at: new Date().toISOString()
       };
-      
       const response = await fetch('/api/assessment/assign', {
         method: 'POST',
         headers: {
@@ -202,17 +171,13 @@ const TrainerAssignAssessmentPage = () => {
         },
         body: JSON.stringify(assignmentData),
       });
-      
       if (!response.ok) throw new Error('Failed to assign assessment');
-      
       const assignment = await response.json();
-      
       toast({
         title: 'Success',
         description: 'Assessment assigned successfully',
         type: 'success',
       });
-      
       navigate(`/assessment/assigned/${assignment.id}`);
     } catch (err) {
       console.error('Error assigning assessment:', err);
@@ -225,26 +190,20 @@ const TrainerAssignAssessmentPage = () => {
       setIsAssigning(false);
     }
   };
-  
   // Calculate total recipients
   const calculateTotalRecipients = () => {
     let total = 0;
-    
     if (selectedCourse) {
       const course = courses.find(c => c.id === selectedCourse);
       total += course?.student_count || 0;
     }
-    
     selectedGroups.forEach(groupId => {
       const group = groups.find(g => g.id === groupId);
       total += group?.member_count || 0;
     });
-    
     total += selectedIndividuals.length;
-    
     return total;
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -253,7 +212,6 @@ const TrainerAssignAssessmentPage = () => {
       </div>
     );
   }
-  
   // Render error state
   if (error || !template) {
     return (
@@ -268,7 +226,6 @@ const TrainerAssignAssessmentPage = () => {
             Back to Assessments
           </Button>
         </div>
-        
         <Card className="p-6 text-center">
           <div className="text-red-500 mb-4">
             <HelpCircle className="w-12 h-12 mx-auto" />
@@ -282,10 +239,8 @@ const TrainerAssignAssessmentPage = () => {
       </div>
     );
   }
-  
   const totalRecipients = calculateTotalRecipients();
   const isQuiz = template.type === 'quiz';
-  
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -304,7 +259,6 @@ const TrainerAssignAssessmentPage = () => {
             <p className="text-gray-600">{template.title}</p>
           </div>
         </div>
-        
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -325,7 +279,6 @@ const TrainerAssignAssessmentPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Assessment info card */}
       <Card className="p-6 mb-6">
         <div className="flex items-start justify-between">
@@ -356,14 +309,12 @@ const TrainerAssignAssessmentPage = () => {
           </div>
         </div>
       </Card>
-      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Assignment Details */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Information */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Assignment Details</h3>
-            
             <div className="space-y-4">
               {/* Title */}
               <div>
@@ -376,7 +327,6 @@ const TrainerAssignAssessmentPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Description */}
               <div>
                 <Label htmlFor="description">Description</Label>
@@ -389,7 +339,6 @@ const TrainerAssignAssessmentPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Due Date */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -402,7 +351,6 @@ const TrainerAssignAssessmentPage = () => {
                     className="mt-1"
                   />
                 </div>
-                
                 <div>
                   <Label htmlFor="due">Due Date *</Label>
                   <DatePicker
@@ -414,7 +362,6 @@ const TrainerAssignAssessmentPage = () => {
                   />
                 </div>
               </div>
-              
               {/* Quick date options */}
               <div className="flex gap-2">
                 <span className="text-sm text-gray-600">Quick set:</span>
@@ -440,7 +387,6 @@ const TrainerAssignAssessmentPage = () => {
                   1 month
                 </Button>
               </div>
-              
               {/* Instructions */}
               <div>
                 <Label htmlFor="instructions">Instructions for Students</Label>
@@ -455,11 +401,9 @@ const TrainerAssignAssessmentPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Recipients */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Recipients</h3>
-            
             <Tabs
               value={activeTab}
               onValueChange={setActiveTab}
@@ -479,7 +423,6 @@ const TrainerAssignAssessmentPage = () => {
                   Individuals
                 </Tabs.TabTrigger>
               </Tabs.TabsList>
-              
               {/* Course Tab */}
               <Tabs.TabContent value="course">
                 <div>
@@ -497,7 +440,6 @@ const TrainerAssignAssessmentPage = () => {
                       </Select.Option>
                     ))}
                   </Select>
-                  
                   {selectedCourse && (
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-blue-800">
@@ -508,7 +450,6 @@ const TrainerAssignAssessmentPage = () => {
                   )}
                 </div>
               </Tabs.TabContent>
-              
               {/* Groups Tab */}
               <Tabs.TabContent value="groups">
                 <div>
@@ -541,7 +482,6 @@ const TrainerAssignAssessmentPage = () => {
                       <p className="text-gray-500 text-center py-4">No groups available</p>
                     )}
                   </div>
-                  
                   {selectedGroups.length > 0 && (
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-blue-800">
@@ -552,7 +492,6 @@ const TrainerAssignAssessmentPage = () => {
                   )}
                 </div>
               </Tabs.TabContent>
-              
               {/* Individuals Tab */}
               <Tabs.TabContent value="individuals">
                 <div>
@@ -563,7 +502,6 @@ const TrainerAssignAssessmentPage = () => {
                       className="w-full"
                     />
                   </div>
-                  
                   <div className="space-y-2 max-h-60 overflow-y-auto">
                     {individuals.length > 0 ? (
                       individuals.map(individual => (
@@ -592,7 +530,6 @@ const TrainerAssignAssessmentPage = () => {
                       <p className="text-gray-500 text-center py-4">No students available</p>
                     )}
                   </div>
-                  
                   {selectedIndividuals.length > 0 && (
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-blue-800">
@@ -605,13 +542,11 @@ const TrainerAssignAssessmentPage = () => {
             </Tabs>
           </Card>
         </div>
-        
         {/* Settings Sidebar */}
         <div className="space-y-6">
           {/* Assignment Settings */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Assignment Settings</h3>
-            
             <div className="space-y-4">
               {/* Attempts */}
               <div>
@@ -625,7 +560,6 @@ const TrainerAssignAssessmentPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Passing Score */}
               <div>
                 <Label htmlFor="passing">Passing Score (%)</Label>
@@ -639,7 +573,6 @@ const TrainerAssignAssessmentPage = () => {
                   className="mt-1"
                 />
               </div>
-              
               {/* Late Submission */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -652,7 +585,6 @@ const TrainerAssignAssessmentPage = () => {
                     className="h-4 w-4 rounded border-gray-300"
                   />
                 </div>
-                
                 {settings.allowLateSubmission && (
                   <div>
                     <Label htmlFor="penalty">Late Penalty (% per day)</Label>
@@ -668,7 +600,6 @@ const TrainerAssignAssessmentPage = () => {
                   </div>
                 )}
               </div>
-              
               {/* Show Results */}
               <div className="flex items-center justify-between">
                 <Label htmlFor="results">Show Results After Completion</Label>
@@ -682,11 +613,9 @@ const TrainerAssignAssessmentPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Notification Settings */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Notifications</h3>
-            
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label htmlFor="notify">Notify Students Immediately</Label>
@@ -698,7 +627,6 @@ const TrainerAssignAssessmentPage = () => {
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </div>
-              
               <div className="flex items-center justify-between">
                 <Label htmlFor="reminder">Send Reminder Before Due</Label>
                 <input
@@ -711,24 +639,20 @@ const TrainerAssignAssessmentPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Summary */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Assignment Summary</h3>
-            
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Recipients</span>
                 <span className="font-medium">{totalRecipients} students</span>
               </div>
-              
               {dueDate && (
                 <>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Due Date</span>
                     <span className="font-medium">{format(dueDate, 'MMM d, yyyy')}</span>
                   </div>
-                  
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Duration</span>
                     <span className="font-medium">
@@ -737,12 +661,10 @@ const TrainerAssignAssessmentPage = () => {
                   </div>
                 </>
               )}
-              
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Attempts</span>
                 <span className="font-medium">{settings.attemptsAllowed}</span>
               </div>
-              
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Passing Score</span>
                 <span className="font-medium">{settings.passingScore}%</span>
@@ -754,5 +676,4 @@ const TrainerAssignAssessmentPage = () => {
     </div>
   );
 };
-
 export default TrainerAssignAssessmentPage;

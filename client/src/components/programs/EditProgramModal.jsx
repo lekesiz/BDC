@@ -2,7 +2,6 @@ import { Dialog, DialogTrigger, DialogContent, DialogTitle } from '@radix-ui/rea
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import axios from 'axios'
-
 const EditProgramModal = ({ program, onUpdated }) => {
   const [open, setOpen] = useState(false)
   const [formData, setFormData] = useState({
@@ -16,7 +15,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
     objectives: program.objectives || '',
     requirements: program.requirements || ''
   })
-  
   useEffect(() => {
     if (program) {
       setFormData({
@@ -32,7 +30,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
       })
     }
   }, [program])
-  
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({
@@ -40,7 +37,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
       [name]: value
     }))
   }
-  
   const handleSave = async () => {
     try {
       await axios.put(`/api/programs/${program.id}`, formData)
@@ -50,7 +46,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
       console.error('Error updating program:', error)
     }
   }
-  
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -58,7 +53,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
       </DialogTrigger>
       <DialogContent className="p-6 bg-white rounded shadow-xl">
         <DialogTitle className="text-lg font-semibold mb-4">Edit Program</DialogTitle>
-        
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Name</label>
@@ -69,7 +63,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
               onChange={handleChange} 
             />
           </div>
-          
           <div>
             <label className="block text-sm font-medium mb-1">Description</label>
             <textarea 
@@ -80,7 +73,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
               rows={3} 
             />
           </div>
-          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Category</label>
@@ -91,7 +83,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
                 onChange={handleChange} 
               />
             </div>
-            
             <div>
               <label className="block text-sm font-medium mb-1">Level</label>
               <select 
@@ -107,7 +98,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
               </select>
             </div>
           </div>
-          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Status</label>
@@ -123,7 +113,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
                 <option value="archived">Archived</option>
               </select>
             </div>
-            
             <div>
               <label className="block text-sm font-medium mb-1">Duration (weeks)</label>
               <input 
@@ -136,7 +125,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
               />
             </div>
           </div>
-          
           <div>
             <label className="block text-sm font-medium mb-1">Max Participants</label>
             <input 
@@ -148,7 +136,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
               min={0}
             />
           </div>
-          
           <div>
             <label className="block text-sm font-medium mb-1">Learning Objectives</label>
             <textarea 
@@ -159,7 +146,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
               rows={2} 
             />
           </div>
-          
           <div>
             <label className="block text-sm font-medium mb-1">Prerequisites</label>
             <textarea 
@@ -171,7 +157,6 @@ const EditProgramModal = ({ program, onUpdated }) => {
             />
           </div>
         </div>
-        
         <div className="flex gap-3 justify-end mt-6">
           <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={handleSave}>Save Changes</Button>
@@ -180,5 +165,4 @@ const EditProgramModal = ({ program, onUpdated }) => {
     </Dialog>
   );
 };
-
 export default EditProgramModal; 

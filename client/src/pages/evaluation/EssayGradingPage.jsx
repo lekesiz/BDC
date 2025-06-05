@@ -17,13 +17,11 @@ import {
   Award,
   MessageSquare
 } from 'lucide-react';
-
 const EssayGradingPage = () => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [session, setSession] = useState(null);
@@ -31,12 +29,10 @@ const EssayGradingPage = () => {
   const [currentSubmission, setCurrentSubmission] = useState(0);
   const [feedback, setFeedback] = useState({});
   const [scores, setScores] = useState({});
-
   useEffect(() => {
     fetchSessionData();
     fetchSubmissions();
   }, [sessionId]);
-
   const fetchSessionData = async () => {
     try {
       const res = await fetch(`/api/tests/sessions/${sessionId}`, {
@@ -44,9 +40,7 @@ const EssayGradingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch session');
-
       const data = await res.json();
       setSession(data);
     } catch (error) {
@@ -58,7 +52,6 @@ const EssayGradingPage = () => {
       });
     }
   };
-
   const fetchSubmissions = async () => {
     try {
       const res = await fetch(`/api/tests/sessions/${sessionId}/essay-submissions`, {
@@ -66,12 +59,9 @@ const EssayGradingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch submissions');
-
       const data = await res.json();
       setSubmissions(data);
-      
       // Initialize feedback and scores
       const initialFeedback = {};
       const initialScores = {};
@@ -92,7 +82,6 @@ const EssayGradingPage = () => {
       setLoading(false);
     }
   };
-
   const handleSaveGrade = async (submissionId) => {
     setSaving(true);
     try {
@@ -107,14 +96,11 @@ const EssayGradingPage = () => {
           feedback: feedback[submissionId]
         })
       });
-
       if (!res.ok) throw new Error('Failed to save grade');
-
       toast({
         title: 'Success',
         description: 'Grade saved successfully'
       });
-
       // Update submission status
       const updatedSubmissions = submissions.map(sub => 
         sub.id === submissionId 
@@ -133,19 +119,16 @@ const EssayGradingPage = () => {
       setSaving(false);
     }
   };
-
   const handleNext = () => {
     if (currentSubmission < submissions.length - 1) {
       setCurrentSubmission(currentSubmission + 1);
     }
   };
-
   const handlePrevious = () => {
     if (currentSubmission > 0) {
       setCurrentSubmission(currentSubmission - 1);
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -153,7 +136,6 @@ const EssayGradingPage = () => {
       </div>
     );
   }
-
   if (submissions.length === 0) {
     return (
       <div className="text-center py-12">
@@ -170,10 +152,8 @@ const EssayGradingPage = () => {
       </div>
     );
   }
-
   const currentSub = submissions[currentSubmission];
   const gradedCount = submissions.filter(s => s.graded).length;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -192,7 +172,6 @@ const EssayGradingPage = () => {
           </Badge>
         </div>
       </div>
-
       {/* Progress Bar */}
       <div className="bg-gray-200 rounded-full h-2">
         <div
@@ -200,7 +179,6 @@ const EssayGradingPage = () => {
           style={{ width: `${(gradedCount / submissions.length) * 100}%` }}
         />
       </div>
-
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Essay Content */}
@@ -217,7 +195,6 @@ const EssayGradingPage = () => {
                 </Badge>
               )}
             </div>
-
             <div className="space-y-4">
               <div>
                 <h3 className="font-medium text-gray-900 mb-2">Student Information</h3>
@@ -231,21 +208,18 @@ const EssayGradingPage = () => {
                   Submitted: {new Date(currentSub.submitted_at).toLocaleString()}
                 </p>
               </div>
-
               <div>
                 <h3 className="font-medium text-gray-900 mb-2">Essay Question</h3>
                 <p className="text-gray-700 bg-gray-50 p-3 rounded">
                   {currentSub.question}
                 </p>
               </div>
-
               <div>
                 <h3 className="font-medium text-gray-900 mb-2">Student Answer</h3>
                 <div className="bg-gray-50 p-4 rounded whitespace-pre-wrap">
                   {currentSub.answer}
                 </div>
               </div>
-
               <div>
                 <p className="text-sm text-gray-500">
                   Word count: {currentSub.answer.split(/\s+/).length} words
@@ -254,12 +228,10 @@ const EssayGradingPage = () => {
             </div>
           </Card>
         </div>
-
         {/* Grading Panel */}
         <div>
           <Card className="p-6 sticky top-6">
             <h2 className="text-lg font-semibold mb-4">Grading</h2>
-            
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -277,7 +249,6 @@ const EssayGradingPage = () => {
                   className="w-32"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Feedback
@@ -292,7 +263,6 @@ const EssayGradingPage = () => {
                   placeholder="Provide feedback for the student..."
                 />
               </div>
-
               <div>
                 <h3 className="text-sm font-medium text-gray-700 mb-2">Grading Rubric</h3>
                 <div className="text-sm text-gray-600 space-y-1 bg-gray-50 p-3 rounded">
@@ -303,7 +273,6 @@ const EssayGradingPage = () => {
                   <p>• Grammar and spelling</p>
                 </div>
               </div>
-
               <Button
                 onClick={() => handleSaveGrade(currentSub.id)}
                 disabled={saving}
@@ -321,7 +290,6 @@ const EssayGradingPage = () => {
                   </>
                 )}
               </Button>
-
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -347,5 +315,4 @@ const EssayGradingPage = () => {
     </div>
   );
 };
-
 export default EssayGradingPage;

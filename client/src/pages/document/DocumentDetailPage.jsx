@@ -25,7 +25,6 @@ import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow, format } from 'date-fns';
 import { tr } from 'date-fns/locale';
-
 /**
  * DocumentDetailPage displays detailed information about a document
  */
@@ -42,7 +41,6 @@ const DocumentDetailPage = () => {
   const [tabView, setTabView] = useState('details'); // 'details', 'versions', 'comments', 'sharing'
   const [shareLink, setShareLink] = useState('');
   const [sharedUsers, setSharedUsers] = useState([]);
-  
   const getIconForMimeType = (mimeType) => {
     if (mimeType.startsWith('image/')) {
       return <FileImage className="w-12 h-12 text-blue-500" />;
@@ -56,25 +54,20 @@ const DocumentDetailPage = () => {
       return <File className="w-12 h-12 text-gray-500" />;
     }
   };
-
   // Fetch document details
   useEffect(() => {
     const fetchDocumentDetails = async () => {
       try {
         setIsLoading(true);
-        
         // Fetch document details
         const documentResponse = await api.get(`/api/documents/${id}`);
         setDocument(documentResponse.data);
-        
         // Fetch document versions
         const versionsResponse = await api.get(`/api/documents/${id}/versions`);
         setDocumentVersions(versionsResponse.data);
-        
         // Fetch document comments
         const commentsResponse = await api.get(`/api/documents/${id}/comments`);
         setComments(commentsResponse.data);
-        
         // Fetch document sharing information
         const sharingResponse = await api.get(`/api/documents/${id}/sharing`);
         setShareLink(sharingResponse.data.share_link || '');
@@ -90,23 +83,17 @@ const DocumentDetailPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchDocumentDetails();
   }, [id]); // Remove toast dependency to prevent infinite loop
-
   // Toggle document star
   const toggleStar = async () => {
     if (!document) return;
-    
     try {
       const updatedDocument = { ...document, is_starred: !document.is_starred };
-      
       await api.put(`/api/documents/${id}`, {
         is_starred: updatedDocument.is_starred
       });
-      
       setDocument(updatedDocument);
-      
       toast({
         title: 'Success',
         description: updatedDocument.is_starred 
@@ -123,16 +110,13 @@ const DocumentDetailPage = () => {
       });
     }
   };
-
   // Download document
   const downloadDocument = async () => {
     try {
       if (!document) return;
-      
       const response = await api.get(`/api/documents/${id}/download`, {
         responseType: 'blob'
       });
-      
       // Create a blob URL and trigger download
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -140,7 +124,6 @@ const DocumentDetailPage = () => {
       link.setAttribute('download', document.name);
       document.body.appendChild(link);
       link.click();
-      
       // Clean up
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
@@ -153,23 +136,19 @@ const DocumentDetailPage = () => {
       });
     }
   };
-
   // Delete document
   const deleteDocument = async () => {
     // Confirm deletion
     if (!window.confirm('Are you sure you want to delete this document?')) {
       return;
     }
-    
     try {
       await api.delete(`/api/documents/${id}`);
-      
       toast({
         title: 'Success',
         description: 'Document successfully deleted',
         type: 'success',
       });
-      
       // Navigate back to documents list
       navigate('/documents');
     } catch (error) {
@@ -181,19 +160,15 @@ const DocumentDetailPage = () => {
       });
     }
   };
-
   // Add new comment
   const addComment = async () => {
     if (!newComment.trim()) return;
-    
     try {
       const response = await api.post(`/api/documents/${id}/comments`, {
         content: newComment
       });
-      
       setComments(prev => [response.data, ...prev]);
       setNewComment('');
-      
       toast({
         title: 'Success',
         description: 'Comment added successfully',
@@ -208,14 +183,11 @@ const DocumentDetailPage = () => {
       });
     }
   };
-
   // Generate share link
   const generateShareLink = async () => {
     try {
       const response = await api.post(`/api/documents/${id}/share-link`);
-      
       setShareLink(response.data.share_link);
-      
       toast({
         title: 'Success',
         description: 'Share link generated successfully',
@@ -230,27 +202,22 @@ const DocumentDetailPage = () => {
       });
     }
   };
-
   // Copy share link to clipboard
   const copyShareLink = () => {
     if (!shareLink) return;
-    
     navigator.clipboard.writeText(shareLink);
-    
     toast({
       title: 'Success',
       description: 'Share link copied to clipboard',
       type: 'success',
     });
   };
-
   // Download specific version
   const downloadVersion = async (versionId) => {
     try {
       const response = await api.get(`/api/documents/${id}/versions/${versionId}/download`, {
         responseType: 'blob'
       });
-      
       // Create a blob URL and trigger download
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -258,7 +225,6 @@ const DocumentDetailPage = () => {
       link.setAttribute('download', `${document.name} (Version ${versionId})`);
       document.body.appendChild(link);
       link.click();
-      
       // Clean up
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
@@ -271,7 +237,6 @@ const DocumentDetailPage = () => {
       });
     }
   };
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -279,7 +244,6 @@ const DocumentDetailPage = () => {
       </div>
     );
   }
-
   if (!document) {
     return (
       <div className="container mx-auto py-12 text-center">
@@ -292,7 +256,6 @@ const DocumentDetailPage = () => {
       </div>
     );
   }
-
   return (
     <div className="container mx-auto py-6">
       {/* Header with actions */}
@@ -304,7 +267,6 @@ const DocumentDetailPage = () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          
           <div>
             <h1 className="text-2xl font-bold">{document.name}</h1>
             <p className="text-gray-500">
@@ -317,7 +279,6 @@ const DocumentDetailPage = () => {
             </p>
           </div>
         </div>
-        
         <div className="flex space-x-2">
           <Button
             variant="outline"
@@ -328,7 +289,6 @@ const DocumentDetailPage = () => {
             <Star className={`w-4 h-4 mr-1 ${document.is_starred ? 'fill-yellow-500 text-yellow-500' : ''}`} />
             {document.is_starred ? 'Starred' : 'Star'}
           </Button>
-          
           <Button
             variant="outline"
             size="sm"
@@ -338,7 +298,6 @@ const DocumentDetailPage = () => {
             <Download className="w-4 h-4 mr-1" />
             Download
           </Button>
-          
           <Button
             variant="outline"
             size="sm"
@@ -348,7 +307,6 @@ const DocumentDetailPage = () => {
             <Share2 className="w-4 h-4 mr-1" />
             Share
           </Button>
-          
           <Button
             variant="outline"
             size="sm"
@@ -358,7 +316,6 @@ const DocumentDetailPage = () => {
             <Edit className="w-4 h-4 mr-1" />
             Edit
           </Button>
-          
           <Button
             variant="outline"
             size="sm"
@@ -370,7 +327,6 @@ const DocumentDetailPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Tabs navigation */}
       <div className="border-b mb-6">
         <nav className="-mb-px flex space-x-8">
@@ -385,7 +341,6 @@ const DocumentDetailPage = () => {
             <Eye className="w-4 h-4 mr-2" />
             Details
           </button>
-          
           <button
             className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
               tabView === 'versions'
@@ -397,7 +352,6 @@ const DocumentDetailPage = () => {
             <History className="w-4 h-4 mr-2" />
             Versions ({documentVersions.length})
           </button>
-          
           <button
             className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
               tabView === 'comments'
@@ -409,7 +363,6 @@ const DocumentDetailPage = () => {
             <MessageSquare className="w-4 h-4 mr-2" />
             Comments ({comments.length})
           </button>
-          
           <button
             className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
               tabView === 'sharing'
@@ -423,7 +376,6 @@ const DocumentDetailPage = () => {
           </button>
         </nav>
       </div>
-      
       {/* Content based on selected tab */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left column: Document preview/details */}
@@ -445,44 +397,36 @@ const DocumentDetailPage = () => {
                   </div>
                 )}
               </div>
-              
               <h2 className="text-lg font-medium mb-4">Document Details</h2>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                 <div>
                   <div className="text-sm font-medium text-gray-500">Name</div>
                   <div>{document.name}</div>
                 </div>
-                
                 <div>
                   <div className="text-sm font-medium text-gray-500">Type</div>
                   <div>{document.mime_type}</div>
                 </div>
-                
                 <div>
                   <div className="text-sm font-medium text-gray-500">Size</div>
                   <div>{(document.size / 1024).toFixed(2)} KB</div>
                 </div>
-                
                 <div>
                   <div className="text-sm font-medium text-gray-500">Location</div>
                   <div>{document.folder_name || 'Root folder'}</div>
                 </div>
-                
                 <div>
                   <div className="text-sm font-medium text-gray-500">Created</div>
                   <div>
                     {format(new Date(document.created_at), 'PP', { locale: tr })}
                   </div>
                 </div>
-                
                 <div>
                   <div className="text-sm font-medium text-gray-500">Last Modified</div>
                   <div>
                     {format(new Date(document.updated_at), 'PP', { locale: tr })}
                   </div>
                 </div>
-                
                 <div>
                   <div className="text-sm font-medium text-gray-500">Owner</div>
                   <div className="flex items-center">
@@ -492,12 +436,10 @@ const DocumentDetailPage = () => {
                     {document.owner_name || 'You'}
                   </div>
                 </div>
-                
                 <div>
                   <div className="text-sm font-medium text-gray-500">Shared with</div>
                   <div>{sharedUsers.length} people</div>
                 </div>
-                
                 {document.description && (
                   <div className="col-span-2">
                     <div className="text-sm font-medium text-gray-500">Description</div>
@@ -507,11 +449,9 @@ const DocumentDetailPage = () => {
               </div>
             </Card>
           )}
-          
           {tabView === 'versions' && (
             <Card className="p-6">
               <h2 className="text-lg font-medium mb-4">Document Versions</h2>
-              
               {documentVersions.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <History className="w-12 h-12 mx-auto text-gray-300 mb-2" />
@@ -538,7 +478,6 @@ const DocumentDetailPage = () => {
                             })}
                           </div>
                         </div>
-                        
                         <div className="flex space-x-2">
                           <Button
                             variant="outline"
@@ -551,7 +490,6 @@ const DocumentDetailPage = () => {
                           </Button>
                         </div>
                       </div>
-                      
                       <div className="mt-2 text-sm">
                         <div className="flex items-center text-gray-600">
                           <User className="w-4 h-4 mr-1" />
@@ -559,7 +497,6 @@ const DocumentDetailPage = () => {
                             {version.user_name || 'You'} {version.change_type || 'uploaded this file'}
                           </span>
                         </div>
-                        
                         {version.size && (
                           <div className="flex items-center text-gray-600 mt-1">
                             <File className="w-4 h-4 mr-1" />
@@ -573,11 +510,9 @@ const DocumentDetailPage = () => {
               )}
             </Card>
           )}
-          
           {tabView === 'comments' && (
             <Card className="p-6">
               <h2 className="text-lg font-medium mb-4">Comments</h2>
-              
               <div className="mb-6">
                 <textarea
                   value={newComment}
@@ -586,7 +521,6 @@ const DocumentDetailPage = () => {
                   className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   rows={3}
                 ></textarea>
-                
                 <div className="flex justify-end mt-2">
                   <Button 
                     onClick={addComment}
@@ -596,7 +530,6 @@ const DocumentDetailPage = () => {
                   </Button>
                 </div>
               </div>
-              
               {comments.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <MessageSquare className="w-12 h-12 mx-auto text-gray-300 mb-2" />
@@ -610,7 +543,6 @@ const DocumentDetailPage = () => {
                         <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center mr-2 text-xs">
                           {comment.user_name?.charAt(0) || 'U'}
                         </div>
-                        
                         <div className="flex-1">
                           <div className="flex justify-between items-center">
                             <div className="font-medium">
@@ -623,7 +555,6 @@ const DocumentDetailPage = () => {
                               })}
                             </div>
                           </div>
-                          
                           <div className="mt-1">
                             {comment.content}
                           </div>
@@ -635,15 +566,12 @@ const DocumentDetailPage = () => {
               )}
             </Card>
           )}
-          
           {tabView === 'sharing' && (
             <Card className="p-6">
               <h2 className="text-lg font-medium mb-4">Sharing</h2>
-              
               {/* Share link section */}
               <div className="mb-6">
                 <h3 className="text-md font-medium mb-2">Share Link</h3>
-                
                 {shareLink ? (
                   <div className="flex space-x-2">
                     <input
@@ -652,7 +580,6 @@ const DocumentDetailPage = () => {
                       readOnly
                       className="flex-1 p-2 border rounded-md bg-gray-50"
                     />
-                    
                     <Button
                       variant="outline"
                       onClick={copyShareLink}
@@ -665,7 +592,6 @@ const DocumentDetailPage = () => {
                     No share link generated. Create one to share this document with anyone.
                   </div>
                 )}
-                
                 <div className="mt-2">
                   <Button
                     variant={shareLink ? 'outline' : 'default'}
@@ -677,11 +603,9 @@ const DocumentDetailPage = () => {
                   </Button>
                 </div>
               </div>
-              
               {/* Shared with users section */}
               <div>
                 <h3 className="text-md font-medium mb-2">Shared With</h3>
-                
                 <div className="border rounded-lg overflow-hidden">
                   {sharedUsers.length === 0 ? (
                     <div className="text-center py-6 text-gray-500">
@@ -733,7 +657,6 @@ const DocumentDetailPage = () => {
                     </table>
                   )}
                 </div>
-                
                 <div className="mt-4">
                   <Button
                     onClick={() => navigate(`/documents/${id}/share`)}
@@ -747,12 +670,10 @@ const DocumentDetailPage = () => {
             </Card>
           )}
         </div>
-        
         {/* Right column: Activity feed */}
         <div>
           <Card className="p-6">
             <h2 className="text-lg font-medium mb-4">Activity</h2>
-            
             <div className="space-y-6">
               {/* Create new document event */}
               <div className="flex">
@@ -761,7 +682,6 @@ const DocumentDetailPage = () => {
                     <File className="w-4 h-4 text-blue-600" />
                   </div>
                 </div>
-                
                 <div>
                   <div className="font-medium">Document created</div>
                   <div className="text-sm text-gray-500">
@@ -772,7 +692,6 @@ const DocumentDetailPage = () => {
                   </div>
                 </div>
               </div>
-              
               {/* Add version updates */}
               {documentVersions.length > 1 && documentVersions.slice(1).map((version, index) => (
                 <div className="flex" key={`activity-${version.id}`}>
@@ -781,7 +700,6 @@ const DocumentDetailPage = () => {
                       <Edit className="w-4 h-4 text-green-600" />
                     </div>
                   </div>
-                  
                   <div>
                     <div className="font-medium">Document updated</div>
                     <div className="text-sm text-gray-500">
@@ -793,7 +711,6 @@ const DocumentDetailPage = () => {
                   </div>
                 </div>
               ))}
-              
               {/* Add recent comments */}
               {comments.slice(0, 3).map((comment) => (
                 <div className="flex" key={`activity-comment-${comment.id}`}>
@@ -802,7 +719,6 @@ const DocumentDetailPage = () => {
                       <MessageSquare className="w-4 h-4 text-purple-600" />
                     </div>
                   </div>
-                  
                   <div>
                     <div className="font-medium">New comment</div>
                     <div className="text-sm text-gray-500">
@@ -822,5 +738,4 @@ const DocumentDetailPage = () => {
     </div>
   );
 };
-
 export default DocumentDetailPage;

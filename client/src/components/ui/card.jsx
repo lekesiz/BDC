@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Card component for displaying content in a card layout
  */
@@ -16,7 +15,6 @@ const Card = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 Card.displayName = "Card";
-
 /**
  * Card header component
  */
@@ -28,7 +26,6 @@ const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 CardHeader.displayName = "CardHeader";
-
 /**
  * Card title component
  */
@@ -43,7 +40,6 @@ const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 CardTitle.displayName = "CardTitle";
-
 /**
  * Card description component
  */
@@ -55,7 +51,6 @@ const CardDescription = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 CardDescription.displayName = "CardDescription";
-
 /**
  * Card content component
  */
@@ -63,7 +58,6 @@ const CardContent = React.forwardRef(({ className, ...props }, ref) => (
   <div ref={ref} className={cn("p-4 sm:p-6 pt-0", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
-
 /**
  * Card footer component
  */
@@ -75,5 +69,4 @@ const CardFooter = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 CardFooter.displayName = "CardFooter";
-
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };

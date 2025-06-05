@@ -6,7 +6,6 @@ import {
   Brain, Award, PieChart, TrendingUp, User, SortAsc, SortDesc
 } from 'lucide-react';
 import { format } from 'date-fns';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -16,7 +15,6 @@ import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
 import { Progress } from '@/components/ui/progress';
 import { Table } from '@/components/ui/table';
-
 /**
  * TrainerAssessmentResultsPage displays detailed results and analytics
  * for an assigned assessment
@@ -28,38 +26,32 @@ const TrainerAssessmentResultsPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   // State for assessment data
   const [assessment, setAssessment] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [submissions, setSubmissions] = useState([]);
-  
   // State for search and filters
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedScore, setSelectedScore] = useState('all');
   const [sortField, setSortField] = useState('submitted_at');
   const [sortDirection, setSortDirection] = useState('desc');
-  
   // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
         // Fetch assessment details
         const assessmentResponse = await fetch(`/api/assessment/assigned/${id}`);
         if (!assessmentResponse.ok) throw new Error('Failed to fetch assessment details');
         const assessmentData = await assessmentResponse.json();
         setAssessment(assessmentData);
-        
         // Fetch submissions
         const submissionsResponse = await fetch(`/api/assessment/assigned/${id}/submissions`);
         if (!submissionsResponse.ok) throw new Error('Failed to fetch submissions');
         const submissionsData = await submissionsResponse.json();
         setSubmissions(submissionsData);
-        
         // Fetch analytics
         const analyticsResponse = await fetch(`/api/assessment/analytics/assignments/${id}`);
         if (!analyticsResponse.ok) throw new Error('Failed to fetch analytics');
@@ -77,10 +69,8 @@ const TrainerAssessmentResultsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchData();
   }, [id, toast]);
-  
   // Filter and sort submissions
   const filteredSubmissions = submissions.filter(submission => {
     // Apply search filter
@@ -88,7 +78,6 @@ const TrainerAssessmentResultsPage = () => {
       searchTerm === '' || 
       submission.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       submission.student_id.toLowerCase().includes(searchTerm.toLowerCase());
-    
     // Apply status filter
     const matchesStatus = 
       selectedStatus === 'all' || 
@@ -96,7 +85,6 @@ const TrainerAssessmentResultsPage = () => {
       (selectedStatus === 'failed' && !submission.passed) ||
       (selectedStatus === 'completed' && submission.completed) ||
       (selectedStatus === 'in_progress' && !submission.completed);
-    
     // Apply score filter
     let matchesScore = true;
     if (selectedScore !== 'all') {
@@ -121,12 +109,10 @@ const TrainerAssessmentResultsPage = () => {
           matchesScore = true;
       }
     }
-    
     return matchesSearch && matchesStatus && matchesScore;
   }).sort((a, b) => {
     // Apply sorting
     let aValue, bValue;
-    
     switch (sortField) {
       case 'student_name':
         aValue = a.student_name || '';
@@ -145,19 +131,16 @@ const TrainerAssessmentResultsPage = () => {
         aValue = new Date(a.submitted_at || 0).getTime();
         bValue = new Date(b.submitted_at || 0).getTime();
     }
-    
     if (sortDirection === 'asc') {
       return aValue > bValue ? 1 : -1;
     } else {
       return aValue < bValue ? 1 : -1;
     }
   });
-  
   // Handle view submission
   const handleViewSubmission = (submissionId) => {
     navigate(`/assessment/submissions/${submissionId}`);
   };
-  
   // Handle sort change
   const handleSort = (field) => {
     if (sortField === field) {
@@ -167,7 +150,6 @@ const TrainerAssessmentResultsPage = () => {
       setSortDirection('asc');
     }
   };
-  
   // Handle exporting results
   const handleExportCSV = async () => {
     try {
@@ -184,10 +166,8 @@ const TrainerAssessmentResultsPage = () => {
             return value;
           }).join(',');
         }).join('\n');
-        
         return header + rows;
       };
-      
       // Define fields for export
       const fields = [
         { label: 'Student ID', value: item => item.student_id },
@@ -199,10 +179,8 @@ const TrainerAssessmentResultsPage = () => {
         { label: 'Time Spent (minutes)', value: item => item.time_spent || 0 },
         { label: 'Submitted At', value: item => item.submitted_at ? new Date(item.submitted_at).toLocaleString() : 'Not submitted' },
       ];
-      
       // Create CSV content
       const csvContent = createCSV(submissions, fields);
-      
       // Create a blob and download it
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
@@ -212,7 +190,6 @@ const TrainerAssessmentResultsPage = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
       toast({
         title: 'Success',
         description: 'Results exported successfully',
@@ -227,7 +204,6 @@ const TrainerAssessmentResultsPage = () => {
       });
     }
   };
-  
   // Handle exporting detailed analytics
   const handleExportDetailedCSV = async () => {
     try {
@@ -238,12 +214,10 @@ const TrainerAssessmentResultsPage = () => {
         description: 'Generating detailed report...',
         type: 'info',
       });
-      
       // In a real implementation, this might call an API endpoint
       // For now, simulate a delay and then download a basic report
       setTimeout(() => {
         handleExportCSV();
-        
         toast({
           title: 'Success',
           description: 'Detailed analytics report generated',
@@ -259,7 +233,6 @@ const TrainerAssessmentResultsPage = () => {
       });
     }
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -268,7 +241,6 @@ const TrainerAssessmentResultsPage = () => {
       </div>
     );
   }
-  
   // Render error state
   if (error || !assessment) {
     return (
@@ -283,7 +255,6 @@ const TrainerAssessmentResultsPage = () => {
             Back to Assessments
           </Button>
         </div>
-        
         <Card className="p-6 text-center">
           <div className="text-red-500 mb-4">
             <AlertTriangle className="w-12 h-12 mx-auto" />
@@ -297,7 +268,6 @@ const TrainerAssessmentResultsPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -316,7 +286,6 @@ const TrainerAssessmentResultsPage = () => {
             <p className="text-gray-600">Results and Analytics</p>
           </div>
         </div>
-        
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
@@ -336,7 +305,6 @@ const TrainerAssessmentResultsPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Assessment Info Card */}
       <Card className="p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -353,7 +321,6 @@ const TrainerAssessmentResultsPage = () => {
               </p>
             </div>
           </div>
-          
           <div className="flex items-center">
             <Users className="w-8 h-8 text-primary mr-4" />
             <div>
@@ -364,7 +331,6 @@ const TrainerAssessmentResultsPage = () => {
               </p>
             </div>
           </div>
-          
           <div className="flex items-center">
             <CheckCircle className="w-8 h-8 text-green-500 mr-4" />
             <div>
@@ -377,7 +343,6 @@ const TrainerAssessmentResultsPage = () => {
               </p>
             </div>
           </div>
-          
           <div className="flex items-center">
             <Award className="w-8 h-8 text-amber-500 mr-4" />
             <div>
@@ -391,7 +356,6 @@ const TrainerAssessmentResultsPage = () => {
           </div>
         </div>
       </Card>
-      
       {/* Tabs */}
       <Tabs
         value={activeTab}
@@ -412,7 +376,6 @@ const TrainerAssessmentResultsPage = () => {
             Detailed Analytics
           </Tabs.TabTrigger>
         </Tabs.TabsList>
-        
         {/* Overview Tab */}
         <Tabs.TabContent value="overview">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -422,7 +385,6 @@ const TrainerAssessmentResultsPage = () => {
                 <CheckCircle className="w-5 h-5 mr-2 text-primary" />
                 Completion Status
               </h3>
-              
               <div className="space-y-6">
                 <div>
                   <div className="flex justify-between mb-2">
@@ -434,7 +396,6 @@ const TrainerAssessmentResultsPage = () => {
                   </div>
                   <Progress value={(assessment.submissions.completed / assessment.submissions.total) * 100} className="h-2 bg-gray-200" />
                 </div>
-                
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium">In Progress</span>
@@ -445,7 +406,6 @@ const TrainerAssessmentResultsPage = () => {
                   </div>
                   <Progress value={(assessment.submissions.inProgress / assessment.submissions.total) * 100} className="h-2 bg-gray-200 [&>div]:bg-amber-500" />
                 </div>
-                
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium">Not Started</span>
@@ -457,7 +417,6 @@ const TrainerAssessmentResultsPage = () => {
                   <Progress value={(assessment.submissions.notStarted / assessment.submissions.total) * 100} className="h-2 bg-gray-200 [&>div]:bg-gray-500" />
                 </div>
               </div>
-              
               {/* Status counts as bubbles */}
               <div className="flex justify-center space-x-4 mt-8">
                 <div className="flex flex-col items-center">
@@ -466,14 +425,12 @@ const TrainerAssessmentResultsPage = () => {
                   </div>
                   <span className="text-sm text-gray-600">Completed</span>
                 </div>
-                
                 <div className="flex flex-col items-center">
                   <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center mb-2">
                     <span className="text-xl font-bold text-amber-600">{assessment.submissions.inProgress}</span>
                   </div>
                   <span className="text-sm text-gray-600">In Progress</span>
                 </div>
-                
                 <div className="flex flex-col items-center">
                   <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-2">
                     <span className="text-xl font-bold text-gray-600">{assessment.submissions.notStarted}</span>
@@ -482,14 +439,12 @@ const TrainerAssessmentResultsPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Score Distribution Card */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <PieChart className="w-5 h-5 mr-2 text-primary" />
                 Score Distribution
               </h3>
-              
               {analytics && (
                 <div className="space-y-6">
                   {analytics.score_distribution.map((range) => (
@@ -514,7 +469,6 @@ const TrainerAssessmentResultsPage = () => {
                   ))}
                 </div>
               )}
-              
               {/* Average score indicator */}
               {assessment.submissions.averageScore !== null && (
                 <div className="mt-8 p-4 bg-purple-50 rounded-lg text-center">
@@ -530,7 +484,6 @@ const TrainerAssessmentResultsPage = () => {
                 </div>
               )}
             </Card>
-            
             {/* Recent Submissions */}
             <Card className="p-6">
               <div className="flex justify-between items-center mb-4">
@@ -546,7 +499,6 @@ const TrainerAssessmentResultsPage = () => {
                   View All
                 </Button>
               </div>
-              
               <div className="space-y-4">
                 {submissions
                   .filter(s => s.completed)
@@ -585,7 +537,6 @@ const TrainerAssessmentResultsPage = () => {
                       </div>
                     </div>
                   ))}
-                
                 {submissions.filter(s => s.completed).length === 0 && (
                   <div className="text-center py-6 text-gray-500">
                     No completed submissions yet
@@ -593,14 +544,12 @@ const TrainerAssessmentResultsPage = () => {
                 )}
               </div>
             </Card>
-            
             {/* Top Performers */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2 text-primary" />
                 Top Performers
               </h3>
-              
               <div className="space-y-4">
                 {submissions
                   .filter(s => s.completed)
@@ -620,7 +569,6 @@ const TrainerAssessmentResultsPage = () => {
                       </div>
                     </div>
                   ))}
-                  
                 {submissions.filter(s => s.completed).length === 0 && (
                   <div className="text-center py-6 text-gray-500">
                     No completed submissions yet
@@ -630,7 +578,6 @@ const TrainerAssessmentResultsPage = () => {
             </Card>
           </div>
         </Tabs.TabContent>
-        
         {/* Submissions Tab */}
         <Tabs.TabContent value="submissions">
           {/* Filters */}
@@ -645,7 +592,6 @@ const TrainerAssessmentResultsPage = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            
             <Select
               value={selectedStatus}
               onValueChange={setSelectedStatus}
@@ -669,7 +615,6 @@ const TrainerAssessmentResultsPage = () => {
                 <Select.Item value="in_progress">In Progress</Select.Item>
               </Select.Content>
             </Select>
-            
             <Select
               value={selectedScore}
               onValueChange={setSelectedScore}
@@ -691,7 +636,6 @@ const TrainerAssessmentResultsPage = () => {
               </Select.Content>
             </Select>
           </div>
-          
           {/* Submissions Table */}
           <Card className="mb-6 overflow-hidden">
             <div className="overflow-x-auto">
@@ -820,7 +764,6 @@ const TrainerAssessmentResultsPage = () => {
               </Table>
             </div>
           </Card>
-          
           {/* Submissions Summary */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card className="p-4 bg-green-50">
@@ -834,7 +777,6 @@ const TrainerAssessmentResultsPage = () => {
                 <CheckCircle className="w-10 h-10 text-green-500" />
               </div>
             </Card>
-            
             <Card className="p-4 bg-red-50">
               <div className="flex items-center justify-between">
                 <div>
@@ -846,7 +788,6 @@ const TrainerAssessmentResultsPage = () => {
                 <XCircle className="w-10 h-10 text-red-500" />
               </div>
             </Card>
-            
             <Card className="p-4 bg-amber-50">
               <div className="flex items-center justify-between">
                 <div>
@@ -858,7 +799,6 @@ const TrainerAssessmentResultsPage = () => {
                 <Clock className="w-10 h-10 text-amber-500" />
               </div>
             </Card>
-            
             <Card className="p-4 bg-blue-50">
               <div className="flex items-center justify-between">
                 <div>
@@ -872,7 +812,6 @@ const TrainerAssessmentResultsPage = () => {
             </Card>
           </div>
         </Tabs.TabContent>
-        
         {/* Analytics Tab */}
         <Tabs.TabContent value="analytics">
           <div className="grid grid-cols-1 gap-6">
@@ -934,7 +873,6 @@ const TrainerAssessmentResultsPage = () => {
                 </div>
               </Card>
             )}
-            
             {/* Common Mistakes */}
             {analytics && analytics.common_mistakes && analytics.common_mistakes.length > 0 && (
               <Card className="p-6">
@@ -954,7 +892,6 @@ const TrainerAssessmentResultsPage = () => {
                 </div>
               </Card>
             )}
-            
             {/* Skills Performance */}
             {analytics?.type === 'quiz' && (
               <Card className="p-6">
@@ -964,7 +901,6 @@ const TrainerAssessmentResultsPage = () => {
                     // Find analytics for this skill
                     const skillPerformance = assessment.skills_performance?.find(s => s.skill === skill);
                     const percentage = skillPerformance?.average_score || 0;
-                    
                     return (
                       <div key={skill}>
                         <div className="flex justify-between mb-2">
@@ -987,7 +923,6 @@ const TrainerAssessmentResultsPage = () => {
                 </div>
               </Card>
             )}
-            
             {/* Time Distribution */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Time Distribution</h3>
@@ -1002,7 +937,6 @@ const TrainerAssessmentResultsPage = () => {
                     } mins
                   </p>
                 </div>
-                
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <p className="font-medium">Slowest Completion</p>
                   <p className="font-bold text-red-600">
@@ -1012,7 +946,6 @@ const TrainerAssessmentResultsPage = () => {
                     } mins
                   </p>
                 </div>
-                
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <p className="font-medium">Average Completion Time</p>
                   <p className="font-bold text-blue-600">
@@ -1020,11 +953,9 @@ const TrainerAssessmentResultsPage = () => {
                   </p>
                 </div>
               </div>
-              
               {/* Time ranges distribution */}
               <div className="mt-6">
                 <h4 className="text-sm font-medium mb-4">Completion Time Ranges</h4>
-                
                 {/* Simulate time ranges - in a real app, this would come from analytics */}
                 {!analytics?.time_ranges ? (
                   <div className="text-center py-6 text-gray-500">
@@ -1055,7 +986,6 @@ const TrainerAssessmentResultsPage = () => {
                 )}
               </div>
             </Card>
-            
             {/* Students Requiring Attention */}
             {submissions.filter(s => s.completed && !s.passed).length > 0 && (
               <Card className="p-6">
@@ -1063,7 +993,6 @@ const TrainerAssessmentResultsPage = () => {
                   <AlertTriangle className="w-5 h-5 mr-2 text-amber-500" />
                   Students Requiring Attention
                 </h3>
-                
                 <div className="space-y-4">
                   {submissions
                     .filter(s => s.completed && !s.passed)
@@ -1097,5 +1026,4 @@ const TrainerAssessmentResultsPage = () => {
     </div>
   );
 };
-
 export default TrainerAssessmentResultsPage;

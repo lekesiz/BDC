@@ -6,7 +6,6 @@ import ProfileSummaryWidget from './ProfileSummaryWidget';
 import ResourcesWidget from './ResourcesWidget';
 import AchievementsWidget from './AchievementsWidget';
 import AssessmentsWidget from './AssessmentsWidget';
-
 export {
   UpcomingSessionsWidget,
   ProgramProgressWidget,

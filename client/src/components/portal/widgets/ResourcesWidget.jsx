@@ -14,14 +14,12 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-
 /**
  * Displays recent and recommended resources for the student
  */
 const ResourcesWidget = ({ data, isLoading, error }) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  
   // Get icon based on file type
   const getFileIcon = (type) => {
     switch (type.toLowerCase()) {
@@ -59,7 +57,6 @@ const ResourcesWidget = ({ data, isLoading, error }) => {
         return <FileText className="h-5 w-5 text-gray-500" />;
     }
   };
-  
   // Format file size
   const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B';
@@ -67,17 +64,13 @@ const ResourcesWidget = ({ data, isLoading, error }) => {
     else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
     else return (bytes / 1073741824).toFixed(1) + ' GB';
   };
-  
   // Filter resources based on search term
   const getFilteredResources = () => {
     if (!data?.resources) return [];
-    
     const resources = data.resources;
-    
     if (!searchTerm.trim()) {
       return resources.slice(0, 5); // Return the first 5 resources if no search term
     }
-    
     const term = searchTerm.toLowerCase();
     return resources
       .filter(resource => (
@@ -89,7 +82,6 @@ const ResourcesWidget = ({ data, isLoading, error }) => {
       ))
       .slice(0, 5); // Limit to 5 results
   };
-  
   if (isLoading) {
     return (
       <Card className="overflow-hidden h-full">
@@ -102,7 +94,6 @@ const ResourcesWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   if (error) {
     return (
       <Card className="overflow-hidden h-full">
@@ -115,9 +106,7 @@ const ResourcesWidget = ({ data, isLoading, error }) => {
       </Card>
     );
   }
-  
   const filteredResources = getFilteredResources();
-  
   return (
     <Card className="overflow-hidden h-full">
       <div className="p-6 flex justify-between items-center border-b">
@@ -130,7 +119,6 @@ const ResourcesWidget = ({ data, isLoading, error }) => {
           Browse All
         </Button>
       </div>
-      
       <div className="p-4">
         <div className="relative mb-4">
           <Input
@@ -142,7 +130,6 @@ const ResourcesWidget = ({ data, isLoading, error }) => {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
-        
         {filteredResources.length > 0 ? (
           <div className="divide-y">
             {filteredResources.map(resource => (
@@ -164,7 +151,6 @@ const ResourcesWidget = ({ data, isLoading, error }) => {
                       </div>
                     </div>
                   </div>
-                  
                   <Button
                     size="sm"
                     variant="ghost"
@@ -189,7 +175,6 @@ const ResourcesWidget = ({ data, isLoading, error }) => {
           </div>
         )}
       </div>
-      
       <div className="bg-gray-50 p-4 text-center border-t">
         <Button
           variant="link"
@@ -201,5 +186,4 @@ const ResourcesWidget = ({ data, isLoading, error }) => {
     </Card>
   );
 };
-
 export default ResourcesWidget;

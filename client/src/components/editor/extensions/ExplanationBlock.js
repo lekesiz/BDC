@@ -1,14 +1,10 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import ExplanationBlockView from './ExplanationBlockView';
-
 export const ExplanationBlock = Node.create({
   name: 'explanationBlock',
-
   group: 'block',
-
   content: 'block+',
-
   addOptions() {
     return {
       HTMLAttributes: {
@@ -16,7 +12,6 @@ export const ExplanationBlock = Node.create({
       },
     };
   },
-
   parseHTML() {
     return [
       {
@@ -27,7 +22,6 @@ export const ExplanationBlock = Node.create({
       },
     ];
   },
-
   renderHTML({ HTMLAttributes }) {
     return [
       'div',
@@ -37,7 +31,6 @@ export const ExplanationBlock = Node.create({
       0,
     ];
   },
-
   addCommands() {
     return {
       setExplanationBlock:
@@ -57,13 +50,11 @@ export const ExplanationBlock = Node.create({
         },
     };
   },
-
   addKeyboardShortcuts() {
     return {
       'Mod-Shift-e': () => this.editor.commands.toggleExplanationBlock(),
     };
   },
-
   addNodeView() {
     return ReactNodeViewRenderer(ExplanationBlockView);
   },

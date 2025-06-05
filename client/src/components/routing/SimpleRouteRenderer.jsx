@@ -2,55 +2,70 @@
  * Simplified route renderer for testing clean architecture
  * Uses only confirmed existing components
  */
-
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import ProtectedRoute from '../common/ProtectedRoute';
+import EnhancedProtectedRoute, { AdminRoute, ManagementRoute, StudentRoute } from '../common/EnhancedProtectedRoute';
 import RoleBasedRedirect from '../common/RoleBasedRedirect';
 import DashboardLayout from '../layout/DashboardLayout';
 import LoadingSpinner from '../ui/LoadingSpinner';
-
+import { ROUTE_ACCESS } from '../../config/roles';
 // Auth pages (not lazy-loaded for faster auth flow)
 import LoginPage from '../../pages/auth/LoginPage';
 import RegisterPage from '../../pages/auth/RegisterPage';
 import ForgotPasswordPage from '../../pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from '../../pages/auth/ResetPasswordPage';
 import SimpleLoginPage from '../../pages/auth/SimpleLoginPage';
-
-// Test pages
-import TestLogin from '../../TestLogin';
-import TestAuth from '../../TestAuth';
-
+// Test pages - removed for production build
 // Lazy load confirmed components
 const DashboardPageEnhanced = lazy(() => import('../../pages/dashboard/DashboardPageEnhanced'));
 const SettingsPage = lazy(() => import('../../pages/settings/SettingsPage'));
 const ProfilePage = lazy(() => import('../../pages/profile/ProfilePage'));
 const UsersPage = lazy(() => import('../../pages/users/UsersPage'));
+const UserFormPage = lazy(() => import('../../pages/users/UserFormPage'));
+const UserDetailPage = lazy(() => import('../../pages/users/UserDetailPage'));
 const PortalDashboardV3 = lazy(() => import('../../pages/portal/PortalDashboardV3'));
 const BeneficiariesPage = lazy(() => import('../../pages/beneficiaries/BeneficiariesPage'));
 const BeneficiaryDetailPage = lazy(() => import('../../pages/beneficiaries/BeneficiaryDetailPage'));
 const BeneficiaryFormPage = lazy(() => import('../../pages/beneficiaries/BeneficiaryFormPage'));
-
 // Additional key pages
 const EvaluationsPage = lazy(() => import('../../pages/evaluation/EvaluationsPage'));
 const MyEvaluationsPage = lazy(() => import('../../pages/evaluation/MyEvaluationsPage'));
+const TestCreationPageSimple = lazy(() => import('../../pages/evaluation/TestCreationPageSimple'));
+const TrainerEvaluationDetailPage = lazy(() => import('../../pages/evaluation/TrainerEvaluationDetailPage'));
 const DocumentsPage = lazy(() => import('../../pages/document/DocumentsPage'));
 const MyDocumentsPage = lazy(() => import('../../pages/document/MyDocumentsPage'));
 const CalendarPage = lazy(() => import('../../pages/calendar/CalendarPage'));
+const AppointmentCreationPage = lazy(() => import('../../pages/appointment/AppointmentCreationPage'));
 const MessagingPage = lazy(() => import('../../pages/messaging/MessagingPage'));
 const NotificationsPage = lazy(() => import('../../pages/notifications/NotificationsPage'));
 const ProgramsListPage = lazy(() => import('../../pages/programs/ProgramsListPage'));
 const AnalyticsDashboardPage = lazy(() => import('../../pages/analytics/AnalyticsDashboardPage'));
 const ReportsDashboardPage = lazy(() => import('../../pages/reports/ReportsDashboardPage'));
 const TenantsPage = lazy(() => import('../../pages/admin/TenantsPage'));
-
+const ProgressTrackingPage = lazy(() => import('../../pages/beneficiaries/ProgressTrackingPage'));
+const ProgramFormPage = lazy(() => import('../../pages/programs/ProgramFormPage'));
+const ProgramDetailPage = lazy(() => import('../../pages/programs/ProgramDetailPage'));
+// Integration Pages
+const WedofIntegrationPage = lazy(() => import('../../pages/integrations/WedofIntegrationPage'));
+const GoogleCalendarIntegrationV2Page = lazy(() => import('../../pages/integrations/GoogleCalendarIntegrationV2Page'));
+const EmailIntegrationPage = lazy(() => import('../../pages/integrations/EmailIntegrationPage'));
+const SMSIntegrationPage = lazy(() => import('../../pages/integrations/SMSIntegrationPage'));
+const PaymentIntegrationPage = lazy(() => import('../../pages/integrations/PaymentIntegrationPage'));
+const WebhooksPage = lazy(() => import('../../pages/integrations/WebhooksPage'));
+const ZapierIntegrationPage = lazy(() => import('../../pages/integrations/ZapierIntegrationPage'));
+const PennylaneIntegrationPage = lazy(() => import('../../pages/integrations/PennylaneIntegrationPage'));
+// AI Pages
+const AIInsightsPage = lazy(() => import('../../pages/ai/AIInsightsPage'));
+const AIContentGenerationPage = lazy(() => import('../../pages/ai/AIContentGenerationPage'));
+const AIChatbotPage = lazy(() => import('../../pages/ai/AIChatbotPage'));
+const AIRecommendationsPage = lazy(() => import('../../pages/ai/AIRecommendationsPage'));
 /**
  * Simple route renderer for testing
  */
 const SimpleRouteRenderer = () => {
   const { isLoading } = useAuth();
-  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -58,20 +73,15 @@ const SimpleRouteRenderer = () => {
       </div>
     );
   }
-  
   return (
     <Routes>
-      {/* Test routes */}
-      <Route path="/test-login" element={<TestLogin />} />
-      <Route path="/test-auth" element={<TestAuth />} />
+      {/* Test routes - removed for production build */}
       <Route path="/simple-login" element={<SimpleLoginPage />} />
-      
       {/* Public auth routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
-      
       {/* Protected routes within dashboard layout */}
       <Route
         path="/"
@@ -86,7 +96,6 @@ const SimpleRouteRenderer = () => {
         {/* Dashboard root with role-based redirection */}
         <Route index element={<RoleBasedRedirect />} />
         <Route path="dashboard" element={<Navigate to="/" replace />} />
-        
         {/* Basic routes for testing */}
         <Route 
           path="profile" 
@@ -96,7 +105,6 @@ const SimpleRouteRenderer = () => {
             </Suspense>
           } 
         />
-        
         <Route 
           path="settings" 
           element={
@@ -105,201 +113,430 @@ const SimpleRouteRenderer = () => {
             </Suspense>
           } 
         />
-        
+        {/* User Management Routes */}
         <Route 
           path="users" 
           element={
-            <ProtectedRoute requiredRole={['super_admin', 'tenant_admin']}>
+            <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <UsersPage />
               </Suspense>
-            </ProtectedRoute>
+            </AdminRoute>
           } 
         />
-        
+        <Route 
+          path="users/create" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <UserFormPage />
+              </Suspense>
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="users/:id" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <UserDetailPage />
+              </Suspense>
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="users/:id/edit" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <UserFormPage />
+              </Suspense>
+            </AdminRoute>
+          } 
+        />
         <Route 
           path="portal" 
           element={
-            <ProtectedRoute requiredRole={['student', 'trainee']}>
+            <StudentRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <PortalDashboardV3 />
               </Suspense>
-            </ProtectedRoute>
+            </StudentRoute>
           } 
         />
-        
         {/* Beneficiaries Management Routes */}
         <Route 
           path="beneficiaries" 
           element={
-            <ProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer']}>
+            <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <BeneficiariesPage />
               </Suspense>
-            </ProtectedRoute>
+            </ManagementRoute>
           } 
         />
-        
         <Route 
           path="beneficiaries/new" 
           element={
-            <ProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer']}>
+            <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <BeneficiaryFormPage />
               </Suspense>
-            </ProtectedRoute>
+            </ManagementRoute>
           } 
         />
-        
         <Route 
           path="beneficiaries/:id" 
           element={
-            <ProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer']}>
+            <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <BeneficiaryDetailPage />
               </Suspense>
-            </ProtectedRoute>
+            </ManagementRoute>
           } 
         />
-        
         <Route 
           path="beneficiaries/:id/edit" 
           element={
-            <ProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer']}>
+            <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <BeneficiaryFormPage />
               </Suspense>
-            </ProtectedRoute>
+            </ManagementRoute>
           } 
         />
-        
+        <Route 
+          path="beneficiaries/:id/progress" 
+          element={
+            <ManagementRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <ProgressTrackingPage />
+              </Suspense>
+            </ManagementRoute>
+          } 
+        />
         {/* Evaluations Routes */}
         <Route 
           path="evaluations" 
           element={
-            <ProtectedRoute>
+            <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <EvaluationsPage />
               </Suspense>
-            </ProtectedRoute>
+            </ManagementRoute>
           } 
         />
-        
+        <Route 
+          path="evaluations/create" 
+          element={
+            <ManagementRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <TestCreationPageSimple />
+              </Suspense>
+            </ManagementRoute>
+          } 
+        />
+        <Route 
+          path="evaluations/:id" 
+          element={
+            <ManagementRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <TrainerEvaluationDetailPage />
+              </Suspense>
+            </ManagementRoute>
+          } 
+        />
         <Route 
           path="my-evaluations" 
           element={
-            <ProtectedRoute requiredRole={['student', 'trainee']}>
+            <StudentRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <MyEvaluationsPage />
               </Suspense>
-            </ProtectedRoute>
+            </StudentRoute>
           } 
         />
-        
+        {/* Test Routes */}
+        <Route path="tests" element={<Navigate to="/evaluations" replace />} />
+        <Route 
+          path="tests/create" 
+          element={
+            <ManagementRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <TestCreationPageSimple />
+              </Suspense>
+            </ManagementRoute>
+          } 
+        />
         {/* Documents Routes */}
         <Route 
           path="documents" 
           element={
-            <ProtectedRoute>
+            <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <DocumentsPage />
               </Suspense>
-            </ProtectedRoute>
+            </ManagementRoute>
           } 
         />
-        
         <Route 
           path="my-documents" 
           element={
-            <ProtectedRoute requiredRole={['student', 'trainee']}>
+            <StudentRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <MyDocumentsPage />
               </Suspense>
-            </ProtectedRoute>
+            </StudentRoute>
           } 
         />
-        
         {/* Calendar & Communication */}
         <Route 
           path="calendar" 
           element={
-            <ProtectedRoute>
+            <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <CalendarPage />
               </Suspense>
-            </ProtectedRoute>
+            </ManagementRoute>
           } 
         />
-        
+        <Route 
+          path="calendar/google-integration" 
+          element={
+            <ManagementRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <GoogleCalendarIntegrationV2Page />
+              </Suspense>
+            </ManagementRoute>
+          } 
+        />
+        {/* Appointment Routes */}
+        <Route path="appointments" element={<Navigate to="/calendar" replace />} />
+        <Route 
+          path="appointments/new" 
+          element={
+            <ManagementRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <AppointmentCreationPage />
+              </Suspense>
+            </ManagementRoute>
+          } 
+        />
         <Route 
           path="messaging" 
           element={
-            <ProtectedRoute>
+            <EnhancedProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer', 'student']}>
               <Suspense fallback={<LoadingSpinner />}>
                 <MessagingPage />
               </Suspense>
-            </ProtectedRoute>
+            </EnhancedProtectedRoute>
           } 
         />
-        
         <Route 
           path="notifications" 
           element={
-            <ProtectedRoute>
+            <EnhancedProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer', 'student']}>
               <Suspense fallback={<LoadingSpinner />}>
                 <NotificationsPage />
               </Suspense>
-            </ProtectedRoute>
+            </EnhancedProtectedRoute>
           } 
         />
-        
         {/* Programs & Analytics */}
         <Route 
           path="programs" 
           element={
-            <ProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer']}>
+            <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <ProgramsListPage />
               </Suspense>
-            </ProtectedRoute>
+            </ManagementRoute>
           } 
         />
-        
+        <Route 
+          path="programs/new" 
+          element={
+            <ManagementRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <ProgramFormPage />
+              </Suspense>
+            </ManagementRoute>
+          } 
+        />
+        <Route 
+          path="programs/:id" 
+          element={
+            <ManagementRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <ProgramDetailPage />
+              </Suspense>
+            </ManagementRoute>
+          } 
+        />
+        <Route 
+          path="programs/:id/edit" 
+          element={
+            <ManagementRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <ProgramFormPage />
+              </Suspense>
+            </ManagementRoute>
+          } 
+        />
         <Route 
           path="analytics" 
           element={
-            <ProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer']}>
+            <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <AnalyticsDashboardPage />
               </Suspense>
-            </ProtectedRoute>
+            </ManagementRoute>
           } 
         />
-        
         <Route 
           path="reports" 
           element={
-            <ProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer']}>
+            <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <ReportsDashboardPage />
               </Suspense>
-            </ProtectedRoute>
+            </ManagementRoute>
           } 
         />
-        
+        {/* AI Routes */}
+        <Route 
+          path="ai/insights" 
+          element={
+            <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
+              <Suspense fallback={<LoadingSpinner />}>
+                <AIInsightsPage />
+              </Suspense>
+            </EnhancedProtectedRoute>
+          } 
+        />
+        <Route 
+          path="ai/content" 
+          element={
+            <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
+              <Suspense fallback={<LoadingSpinner />}>
+                <AIContentGenerationPage />
+              </Suspense>
+            </EnhancedProtectedRoute>
+          } 
+        />
+        <Route 
+          path="ai/chatbot" 
+          element={
+            <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
+              <Suspense fallback={<LoadingSpinner />}>
+                <AIChatbotPage />
+              </Suspense>
+            </EnhancedProtectedRoute>
+          } 
+        />
+        <Route 
+          path="ai/recommendations" 
+          element={
+            <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
+              <Suspense fallback={<LoadingSpinner />}>
+                <AIRecommendationsPage />
+              </Suspense>
+            </EnhancedProtectedRoute>
+          } 
+        />
         {/* Admin Routes */}
         <Route 
           path="admin/tenants" 
           element={
-            <ProtectedRoute requiredRole={['super_admin']}>
+            <EnhancedProtectedRoute requiredRole={['super_admin']}>
               <Suspense fallback={<LoadingSpinner />}>
                 <TenantsPage />
               </Suspense>
-            </ProtectedRoute>
+            </EnhancedProtectedRoute>
+          } 
+        />
+        {/* Integration Routes */}
+        <Route 
+          path="integrations/wedof" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <WedofIntegrationPage />
+              </Suspense>
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="integrations/google-calendar" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <GoogleCalendarIntegrationV2Page />
+              </Suspense>
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="integrations/email" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <EmailIntegrationPage />
+              </Suspense>
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="integrations/sms" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <SMSIntegrationPage />
+              </Suspense>
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="integrations/payment" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <PaymentIntegrationPage />
+              </Suspense>
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="integrations/webhooks" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <WebhooksPage />
+              </Suspense>
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="integrations/zapier" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <ZapierIntegrationPage />
+              </Suspense>
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="integrations/pennylane" 
+          element={
+            <AdminRoute>
+              <Suspense fallback={<LoadingSpinner />}>
+                <PennylaneIntegrationPage />
+              </Suspense>
+            </AdminRoute>
           } 
         />
       </Route>
-      
       {/* Error routes */}
       <Route 
         path="/unauthorized" 
@@ -318,7 +555,6 @@ const SimpleRouteRenderer = () => {
           </div>
         } 
       />
-      
       <Route 
         path="*" 
         element={
@@ -339,5 +575,4 @@ const SimpleRouteRenderer = () => {
     </Routes>
   );
 };
-
 export default SimpleRouteRenderer;

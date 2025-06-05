@@ -429,16 +429,16 @@ if __name__ == "__main__":
     
     # Get missing indexes
     missing = strategy.get_missing_indexes()
-    print("Missing Indexes:")
+    logger.info("Missing Indexes:")
     for rec in missing[:5]:
-        print(f"  - {rec.table_name}.{rec.columns}: {rec.reason}")
+        logger.info(f"  - {rec.table_name}.{rec.columns}: {rec.reason}")
     
     # Get unused indexes
     unused = strategy.get_unused_indexes()
-    print("\nUnused Indexes:")
+    logger.info("\nUnused Indexes:")
     for idx in unused[:5]:
-        print(f"  - {idx['table']}.{idx['index']}")
+        logger.info(f"  - {idx['table']}.{idx['index']}")
     
     # Generate full report
     report = strategy.generate_index_report()
-    print(f"\nSummary: {report['recommendations_summary']}") 
+    logger.info(f"\nSummary: {report['recommendations_summary']}") 

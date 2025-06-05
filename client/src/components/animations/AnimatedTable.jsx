@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Table } from '@/components/ui/table';
 import { listContainer, listItem } from '@/lib/animations';
-
 export const AnimatedTable = ({ children, className, ...props }) => {
   return (
     <motion.div
@@ -15,7 +14,6 @@ export const AnimatedTable = ({ children, className, ...props }) => {
     </motion.div>
   );
 };
-
 export const AnimatedTableRow = ({ children, className, ...props }) => {
   return (
     <motion.tr

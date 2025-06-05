@@ -103,7 +103,7 @@ ENV VITE_API_URL=${VITE_API_URL} \
     NODE_ENV=production
 
 # Build the application
-RUN npm run build
+RUN rm -f postcss.config.js tailwind.config.js && echo 'import path from "path"; export default { resolve: { alias: { "@": path.resolve(__dirname, "./src") } } }' > vite.config.minimal.mjs && npx vite build --config vite.config.minimal.mjs
 
 # Verify build output
 RUN ls -la dist/ && \

@@ -4,12 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-
 const ApiDebugPanel = () => {
   const [tests, setTests] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [config, setConfig] = useState({});
-
   useEffect(() => {
     // Get API configuration
     setConfig({
@@ -21,11 +19,9 @@ const ApiDebugPanel = () => {
       headers: api.defaults.headers.common
     });
   }, []);
-
   const runTests = async () => {
     setIsRunning(true);
     setTests([]);
-
     const testCases = [
       {
         name: 'Basic Connectivity',
@@ -63,9 +59,7 @@ const ApiDebugPanel = () => {
         auth: true
       }
     ];
-
     let token = null;
-
     for (const test of testCases) {
       const startTime = Date.now();
       let result = {
@@ -77,22 +71,18 @@ const ApiDebugPanel = () => {
         response: null,
         error: null
       };
-
       try {
         let response;
         const headers = test.auth && token ? { Authorization: `Bearer ${token}` } : {};
-
         if (test.method === 'GET') {
           response = await api.get(test.endpoint, { headers });
         } else if (test.method === 'POST') {
           response = await api.post(test.endpoint, test.data, { headers });
         }
-
         result.status = 'success';
         result.response = response.data;
         result.statusCode = response.status;
         result.time = Date.now() - startTime;
-
         // Store token from login
         if (test.name === 'Login Test' && response.data.access_token) {
           token = response.data.access_token;
@@ -105,14 +95,11 @@ const ApiDebugPanel = () => {
         result.time = Date.now() - startTime;
         result.response = error.response?.data;
       }
-
       setTests(prev => [...prev, result]);
       await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between tests
     }
-
     setIsRunning(false);
   };
-
   const getStatusIcon = (status) => {
     switch (status) {
       case 'success':
@@ -123,13 +110,11 @@ const ApiDebugPanel = () => {
         return <AlertCircle className="h-4 w-4 text-yellow-500" />;
     }
   };
-
   const getStatusBadge = (statusCode) => {
     if (!statusCode) return null;
     const variant = statusCode < 400 ? 'success' : 'destructive';
     return <Badge variant={variant}>{statusCode}</Badge>;
   };
-
   return (
     <div className="p-4 space-y-4">
       <Card>
@@ -150,7 +135,6 @@ const ApiDebugPanel = () => {
               <div>With Credentials:</div>
               <div className="font-mono">{String(config.withCredentials)}</div>
             </div>
-
             <Button 
               onClick={runTests} 
               disabled={isRunning}
@@ -159,7 +143,6 @@ const ApiDebugPanel = () => {
               {isRunning && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isRunning ? 'Running Tests...' : 'Run Connection Tests'}
             </Button>
-
             {tests.length > 0 && (
               <div className="space-y-2">
                 {tests.map((test, index) => (
@@ -202,5 +185,4 @@ const ApiDebugPanel = () => {
     </div>
   );
 };
-
 export default ApiDebugPanel;

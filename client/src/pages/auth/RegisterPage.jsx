@@ -4,14 +4,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, Mail, Lock, User, UserPlus, Building } from 'lucide-react';
-
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormGroup, FormLabel, FormControl, FormHelper, Select } from '@/components/ui/form';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-
 // Registration form validation schema
 const registerSchema = z.object({
   first_name: z.string().min(2, 'First name must be at least 2 characters'),
@@ -26,7 +24,6 @@ const registerSchema = z.object({
   message: "Passwords don't match",
   path: ['confirm_password'],
 });
-
 /**
  * Register page component
  */
@@ -34,11 +31,9 @@ const RegisterPage = () => {
   const { register: registerUser, error: authError } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
-  
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
   // React Hook Form with Zod validation
   const { 
     register, 
@@ -58,35 +53,27 @@ const RegisterPage = () => {
       organization: '',
     }
   });
-  
   // Get current role from form
   const currentRole = watch('role');
-  
   // Handle form submission
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
-      
       // Prepare user data - omit confirm_password
       const { confirm_password, ...userData } = data;
-      
       // Register user
       const user = await registerUser(userData);
-      
       addToast({
         type: 'success',
         title: 'Registration successful',
         message: `Welcome, ${user.first_name}!`,
       });
-      
       // Reset form
       reset();
-      
       // Redirect to dashboard
       navigate('/', { replace: true });
     } catch (err) {
       console.error('Registration error:', err);
-      
       addToast({
         type: 'error',
         title: 'Registration failed',
@@ -96,7 +83,6 @@ const RegisterPage = () => {
       setIsLoading(false);
     }
   };
-  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-lg">
@@ -114,7 +100,6 @@ const RegisterPage = () => {
             </Link>
           </p>
         </div>
-        
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Join BDC</CardTitle>
@@ -122,7 +107,6 @@ const RegisterPage = () => {
               Enter your information to create an account
             </CardDescription>
           </CardHeader>
-          
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent className="space-y-4">
               {/* Name fields */}
@@ -138,7 +122,6 @@ const RegisterPage = () => {
                     {...register('first_name')}
                   />
                 </FormGroup>
-                
                 <FormGroup>
                   <FormLabel htmlFor="last_name">Last Name</FormLabel>
                   <Input
@@ -151,7 +134,6 @@ const RegisterPage = () => {
                   />
                 </FormGroup>
               </div>
-              
               {/* Email */}
               <FormGroup>
                 <FormLabel htmlFor="email">Email Address</FormLabel>
@@ -165,7 +147,6 @@ const RegisterPage = () => {
                   {...register('email')}
                 />
               </FormGroup>
-              
               {/* Password */}
               <FormGroup>
                 <FormLabel htmlFor="password">Password</FormLabel>
@@ -195,7 +176,6 @@ const RegisterPage = () => {
                   Password must be at least 8 characters
                 </FormHelper>
               </FormGroup>
-              
               {/* Confirm Password */}
               <FormGroup>
                 <FormLabel htmlFor="confirm_password">Confirm Password</FormLabel>
@@ -222,7 +202,6 @@ const RegisterPage = () => {
                   {...register('confirm_password')}
                 />
               </FormGroup>
-              
               {/* Role Selection */}
               <FormGroup>
                 <FormLabel htmlFor="role">I am a</FormLabel>
@@ -236,7 +215,6 @@ const RegisterPage = () => {
                   <option value="trainer">Trainer / Instructor</option>
                 </Select>
               </FormGroup>
-              
               {/* Organization field (only for trainers) */}
               {currentRole === 'trainer' && (
                 <FormGroup>
@@ -251,7 +229,6 @@ const RegisterPage = () => {
                   />
                 </FormGroup>
               )}
-              
               <div className="flex items-center pt-2">
                 <input
                   id="terms"
@@ -272,7 +249,6 @@ const RegisterPage = () => {
                 </label>
               </div>
             </CardContent>
-            
             <CardFooter>
               <Button
                 type="submit"
@@ -286,7 +262,6 @@ const RegisterPage = () => {
             </CardFooter>
           </form>
         </Card>
-        
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{' '}
@@ -299,5 +274,4 @@ const RegisterPage = () => {
     </div>
   );
 };
-
 export default RegisterPage;

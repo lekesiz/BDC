@@ -6,10 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BDC - Beneficiary Development Center</title>
     
+    <!-- Progressive Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="BDC" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    
+    <!-- Windows PWA Meta Tags -->
+    <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+    <meta name="msapplication-TileColor" content="#3b82f6" />
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="msapplication-navbutton-color" content="#3b82f6" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="#3b82f6" />
+    
     <!-- Resource Hints for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/src/main.jsx" as="script" />
+    <link rel="preload" href="/src/index.css" as="style" />
     
     <!-- Critical CSS (will be injected during build) -->
     <style id="critical-css"></style>
@@ -18,10 +40,51 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => console.log('SW registered:', registration))
-            .catch(error => console.log('SW registration failed:', error));
+          navigator.serviceWorker.register('/sw.js', {
+            scope: '/'
+          })
+          .then(registration => {
+            console.log('SW registered:', registration);
+            
+            // Check for updates immediately and then every 10 minutes
+            registration.update();
+            setInterval(() => {
+              registration.update();
+            }, 10 * 60 * 1000);
+          })
+          .catch(error => {
+            console.log('SW registration failed:', error);
+          });
         });
+      }
+      
+      // Handle iOS install prompt
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Trigger custom install UI
+        window.dispatchEvent(new CustomEvent('pwa-install-available'));
+      });
+      
+      // Track installation
+      window.addEventListener('appinstalled', () => {
+        console.log('PWA was installed');
+        deferredPrompt = null;
+        
+        // Analytics or user feedback
+        window.dispatchEvent(new CustomEvent('pwa-installed'));
+      });
+      
+      // Handle iOS standalone mode
+      if (window.navigator.standalone === true) {
+        console.log('Running in iOS standalone mode');
+      }
+      
+      // Handle Android standalone mode
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('Running in standalone mode');
       }
     </script>
   </head>

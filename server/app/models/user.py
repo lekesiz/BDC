@@ -64,10 +64,10 @@ class User(db.Model):
     
     # Relationships
     tenants = relationship('Tenant', secondary=user_tenant, back_populates='users', lazy='select')
-    folders = relationship('Folder', back_populates='owner', lazy='dynamic')
-    reports = relationship('Report', back_populates='created_by', lazy='dynamic')
-    programs_created = relationship('Program', back_populates='created_by', lazy='dynamic')
-    training_sessions = relationship('TrainingSession', back_populates='trainer', lazy='dynamic')
+    folders = relationship('Folder', back_populates='owner', lazy='select')
+    reports = relationship('Report', back_populates='created_by', lazy='select')
+    programs_created = relationship('Program', back_populates='created_by', lazy='select')
+    training_sessions = relationship('TrainingSession', back_populates='trainer', lazy='select')
     
     @property
     def full_name(self):

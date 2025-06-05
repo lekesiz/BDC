@@ -1,0 +1,558 @@
+{
+  "info": {
+    "name": "BDC API Collection 2025",
+    "description": "Complete API collection for Beneficiary Development Center",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login as Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', response.access_token);",
+                  "    pm.collectionVariables.set('refresh_token', response.refresh_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@bdc.com\",\n    \"password\": \"Admin123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login as super admin user"
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', response.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{refresh_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Beneficiaries",
+      "item": [
+        {
+          "name": "List Beneficiaries",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/beneficiaries?page=1&per_page=10",
+              "host": ["{{base_url}}"],
+              "path": ["beneficiaries"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                },
+                {
+                  "key": "query",
+                  "value": "john",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Beneficiary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePass123!\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"tenant_id\": 1,\n    \"phone\": \"+1234567890\",\n    \"gender\": \"male\",\n    \"birth_date\": \"1990-01-01\",\n    \"address\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"country\": \"USA\",\n    \"profession\": \"Software Developer\",\n    \"company\": \"Tech Corp\",\n    \"emergency_contact_name\": \"Jane Doe\",\n    \"emergency_contact_relationship\": \"Spouse\",\n    \"emergency_contact_phone\": \"+1234567891\",\n    \"emergency_contact_email\": \"jane.doe@example.com\",\n    \"emergency_contact_address\": \"123 Main St, New York\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/beneficiaries",
+              "host": ["{{base_url}}"],
+              "path": ["beneficiaries"]
+            }
+          }
+        },
+        {
+          "name": "Get Beneficiary",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/beneficiaries/1",
+              "host": ["{{base_url}}"],
+              "path": ["beneficiaries", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Beneficiary",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"phone\": \"+9876543210\",\n    \"address\": \"456 Oak Avenue\",\n    \"emergency_contact_name\": \"Updated Contact\",\n    \"emergency_contact_phone\": \"+1112223333\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/beneficiaries/1",
+              "host": ["{{base_url}}"],
+              "path": ["beneficiaries", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Programs",
+      "item": [
+        {
+          "name": "List Programs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/programs",
+              "host": ["{{base_url}}"],
+              "path": ["programs"]
+            }
+          }
+        },
+        {
+          "name": "Create Program",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Web Development Bootcamp\",\n    \"description\": \"Learn full-stack web development\",\n    \"duration_weeks\": 12,\n    \"start_date\": \"2025-07-01\",\n    \"end_date\": \"2025-09-30\",\n    \"max_participants\": 25,\n    \"category\": \"technology\",\n    \"level\": \"beginner\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/programs",
+              "host": ["{{base_url}}"],
+              "path": ["programs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Evaluations",
+      "item": [
+        {
+          "name": "Submit Evaluation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"responses\": [\n        {\n            \"question_id\": 1,\n            \"answer\": \"Option A\"\n        },\n        {\n            \"question_id\": 2,\n            \"answer\": \"True\"\n        },\n        {\n            \"question_id\": 3,\n            \"answer\": \"This is my detailed essay response explaining the concept...\"\n        }\n    ],\n    \"time_spent\": 1800\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/evaluations/1/submit",
+              "host": ["{{base_url}}"],
+              "path": ["evaluations", "1", "submit"]
+            }
+          }
+        },
+        {
+          "name": "Get Evaluation Results",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/evaluations/1/results",
+              "host": ["{{base_url}}"],
+              "path": ["evaluations", "1", "results"]
+            }
+          }
+        },
+        {
+          "name": "Analyze with AI",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/evaluations/1/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["evaluations", "1", "analyze"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "Upload Document",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/document.pdf"
+                },
+                {
+                  "key": "title",
+                  "value": "Certificate of Completion",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Web Development Bootcamp Certificate",
+                  "type": "text"
+                },
+                {
+                  "key": "beneficiary_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "certificates",
+                  "type": "text"
+                },
+                {
+                  "key": "version_control_enabled",
+                  "value": "true",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/documents",
+              "host": ["{{base_url}}"],
+              "path": ["documents"]
+            }
+          }
+        },
+        {
+          "name": "Get Document",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/documents/1",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Document",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Updated Certificate Title\",\n    \"category\": \"achievements\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/documents/1",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "1"]
+            }
+          }
+        },
+        {
+          "name": "Download Document",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/documents/1/download",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "1", "download"]
+            }
+          }
+        },
+        {
+          "name": "Delete Document",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/documents/1",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Document Versioning",
+      "item": [
+        {
+          "name": "List Versions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/documents/1/versions",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "1", "versions"]
+            }
+          }
+        },
+        {
+          "name": "Create New Version",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/updated_document.pdf"
+                },
+                {
+                  "key": "change_notes",
+                  "value": "Updated section 3 with new requirements",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/documents/1/versions",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "1", "versions"]
+            }
+          }
+        },
+        {
+          "name": "Restore Version",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/documents/1/versions/2/restore",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "1", "versions", "2", "restore"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messaging",
+      "item": [
+        {
+          "name": "List Message Threads",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/messages/threads",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "threads"]
+            }
+          }
+        },
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content\": \"Hello, I have a question about the assignment\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/messages/threads/1/messages",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "threads", "1", "messages"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Generate Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"report_type\": \"beneficiary_progress\",\n    \"date_range\": {\n        \"start\": \"2025-01-01\",\n        \"end\": \"2025-06-30\"\n    },\n    \"filters\": {\n        \"tenant_id\": 1\n    },\n    \"format\": \"pdf\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/generate",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "generate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Features",
+      "item": [
+        {
+          "name": "Get AI Insights",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/ai/insights?beneficiary_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "insights"],
+              "query": [
+                {
+                  "key": "beneficiary_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Generate AI Content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content_type\": \"quiz\",\n    \"topic\": \"JavaScript Fundamentals\",\n    \"difficulty\": \"intermediate\",\n    \"num_questions\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ai/content/generate",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "content", "generate"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

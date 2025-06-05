@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-
 export const AnimatedInput = ({ 
   error, 
   className, 
@@ -10,17 +9,14 @@ export const AnimatedInput = ({
   ...props 
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-
   const handleFocus = (e) => {
     setIsFocused(true);
     onFocus?.(e);
   };
-
   const handleBlur = (e) => {
     setIsFocused(false);
     onBlur?.(e);
   };
-
   return (
     <div className="relative">
       <motion.div
@@ -36,7 +32,6 @@ export const AnimatedInput = ({
           {...props}
         />
       </motion.div>
-      
       <AnimatePresence>
         {error && (
           <motion.div

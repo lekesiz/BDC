@@ -5,7 +5,6 @@ import {
   FileText, User, Calendar, BarChart2, MessageSquare
 } from 'lucide-react';
 import { format } from 'date-fns';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +14,6 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { Table } from '@/components/ui/table';
-
 /**
  * TrainerSubmissionDetailPage displays detailed information about a student's 
  * assessment submission and allows trainers to review, grade, and provide feedback
@@ -27,69 +25,52 @@ const TrainerSubmissionDetailPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   // State for submission data
   const [submission, setSubmission] = useState(null);
   const [assessment, setAssessment] = useState(null);
   const [template, setTemplate] = useState(null);
-  
   // State for grading
   const [feedback, setFeedback] = useState('');
   const [manualScore, setManualScore] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
-  
   // Fetch data
   useEffect(() => {
     let isMounted = true;
-    
     const fetchData = async () => {
       try {
         if (!isMounted) return;
-        
         setIsLoading(true);
         setError(null);
-        
         // Fetch submission details
         const submissionResponse = await fetch(`/api/assessment/submissions/${id}`);
         if (!isMounted) return;
-        
         if (!submissionResponse.ok) throw new Error('Failed to fetch submission details');
         const submissionData = await submissionResponse.json();
-        
         if (!isMounted) return;
         setSubmission(submissionData);
-        
         // Initialize feedback from existing data if available
         if (submissionData.feedback?.general) {
           setFeedback(submissionData.feedback.general);
         }
-        
         if (submissionData.score) {
           setManualScore(submissionData.score);
         }
-        
         // Fetch assessment details
         const assessmentResponse = await fetch(`/api/assessment/assigned/${submissionData.assessment_id}`);
         if (!isMounted) return;
-        
         if (!assessmentResponse.ok) throw new Error('Failed to fetch assessment details');
         const assessmentData = await assessmentResponse.json();
-        
         if (!isMounted) return;
         setAssessment(assessmentData);
-        
         // Fetch template details
         const templateResponse = await fetch(`/api/assessment/templates/${submissionData.template_id}`);
         if (!isMounted) return;
-        
         if (!templateResponse.ok) throw new Error('Failed to fetch template details');
         const templateData = await templateResponse.json();
-        
         if (!isMounted) return;
         setTemplate(templateData);
       } catch (err) {
         if (!isMounted) return;
-        
         console.error('Error fetching submission data:', err);
         setError(err.message);
         toast({
@@ -103,28 +84,22 @@ const TrainerSubmissionDetailPage = () => {
         }
       }
     };
-    
     fetchData();
-    
     // Cleanup function to prevent state updates after unmount
     return () => {
       isMounted = false;
     };
   }, [id, toast, setFeedback, setManualScore]);
-  
   // Handle saving feedback without grading
   const handleSaveFeedback = async () => {
     if (!submission) return;
-    
     try {
       setIsSaving(true);
-      
       // Format feedback data
       const feedbackData = {
         ...submission.feedback,
         general: feedback
       };
-      
       // Send feedback update request
       const response = await fetch(`/api/assessment/submissions/${id}/feedback`, {
         method: 'PUT',
@@ -133,15 +108,12 @@ const TrainerSubmissionDetailPage = () => {
         },
         body: JSON.stringify({ feedback: feedbackData }),
       });
-      
       if (!response.ok) throw new Error('Failed to save feedback');
-      
       toast({
         title: 'Success',
         description: 'Feedback saved successfully',
         type: 'success',
       });
-      
       // Update local state
       setSubmission(prev => ({
         ...prev,
@@ -158,14 +130,11 @@ const TrainerSubmissionDetailPage = () => {
       setIsSaving(false);
     }
   };
-  
   // Handle grading submission
   const handleGradeSubmission = async () => {
     if (!submission) return;
-    
     try {
       setIsSaving(true);
-      
       // Format grading data
       const totalPoints = template?.totalPoints || 100;
       const gradingData = {
@@ -179,7 +148,6 @@ const TrainerSubmissionDetailPage = () => {
         graded_at: new Date().toISOString(),
         status: 'graded'
       };
-      
       // Send grading request
       const response = await fetch(`/api/assessment/submissions/${id}/grade`, {
         method: 'POST',
@@ -188,17 +156,13 @@ const TrainerSubmissionDetailPage = () => {
         },
         body: JSON.stringify(gradingData),
       });
-      
       if (!response.ok) throw new Error('Failed to grade submission');
-      
       const updatedSubmission = await response.json();
-      
       toast({
         title: 'Success',
         description: 'Submission graded successfully',
         type: 'success',
       });
-      
       // Update local state
       setSubmission(updatedSubmission);
     } catch (err) {
@@ -212,7 +176,6 @@ const TrainerSubmissionDetailPage = () => {
       setIsSaving(false);
     }
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -221,7 +184,6 @@ const TrainerSubmissionDetailPage = () => {
       </div>
     );
   }
-  
   // Render error state
   if (error || !submission || !assessment || !template) {
     return (
@@ -236,7 +198,6 @@ const TrainerSubmissionDetailPage = () => {
             Back to Assessments
           </Button>
         </div>
-        
         <Card className="p-6 text-center">
           <div className="text-red-500 mb-4">
             <XCircle className="w-12 h-12 mx-auto" />
@@ -250,11 +211,9 @@ const TrainerSubmissionDetailPage = () => {
       </div>
     );
   }
-  
   // Calculate score percentage
   const scorePercentage = submission.percentage || 0;
   const isQuiz = template.type === 'quiz';
-  
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -273,7 +232,6 @@ const TrainerSubmissionDetailPage = () => {
             <p className="text-gray-600">Student Submission Review</p>
           </div>
         </div>
-        
         <div>
           {submission.status !== 'graded' && (
             <Button
@@ -291,7 +249,6 @@ const TrainerSubmissionDetailPage = () => {
           )}
         </div>
       </div>
-      
       {/* Student Info Card */}
       <Card className="p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -303,7 +260,6 @@ const TrainerSubmissionDetailPage = () => {
               <p className="text-xs text-gray-500">{submission.student_id}</p>
             </div>
           </div>
-          
           <div className="flex items-center">
             <Calendar className="w-8 h-8 text-primary mr-4" />
             <div>
@@ -313,7 +269,6 @@ const TrainerSubmissionDetailPage = () => {
               </p>
             </div>
           </div>
-          
           <div className="flex items-center">
             <Clock className="w-8 h-8 text-primary mr-4" />
             <div>
@@ -323,7 +278,6 @@ const TrainerSubmissionDetailPage = () => {
               </p>
             </div>
           </div>
-          
           <div className="flex items-center">
             <Award className="w-8 h-8 text-primary mr-4" />
             <div>
@@ -342,7 +296,6 @@ const TrainerSubmissionDetailPage = () => {
           </div>
         </div>
       </Card>
-      
       {/* Tabs */}
       <Tabs
         value={activeTab}
@@ -363,7 +316,6 @@ const TrainerSubmissionDetailPage = () => {
             Feedback
           </Tabs.TabTrigger>
         </Tabs.TabsList>
-        
         {/* Overview Tab */}
         <Tabs.TabContent value="overview">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -374,7 +326,6 @@ const TrainerSubmissionDetailPage = () => {
                   <Award className="w-5 h-5 mr-2 text-primary" />
                   Score Summary
                 </h3>
-                
                 <div className="space-y-6">
                   <div>
                     <div className="flex justify-between mb-2">
@@ -394,12 +345,10 @@ const TrainerSubmissionDetailPage = () => {
                       }`} 
                     />
                   </div>
-                  
                   <div className="p-4 bg-gray-50 rounded-lg flex items-center justify-between">
                     <span className="font-medium">Passing Score</span>
                     <span>{assessment.settings.passingScore}%</span>
                   </div>
-                  
                   {/* Score classification */}
                   <div className={`p-4 rounded-lg ${
                     scorePercentage >= 90 ? 'bg-green-50 text-green-800' :
@@ -419,14 +368,12 @@ const TrainerSubmissionDetailPage = () => {
                 </div>
               </Card>
             )}
-            
             {/* Assessment Details */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <FileText className="w-5 h-5 mr-2 text-primary" />
                 Assessment Details
               </h3>
-              
               <Table>
                 <Table.Body>
                   <Table.Row>
@@ -464,14 +411,12 @@ const TrainerSubmissionDetailPage = () => {
                 </Table.Body>
               </Table>
             </Card>
-            
             {/* Submission Overview */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <FileText className="w-5 h-5 mr-2 text-primary" />
                 Submission Overview
               </h3>
-              
               <div className="space-y-4">
                 {isQuiz ? (
                   <>
@@ -481,7 +426,6 @@ const TrainerSubmissionDetailPage = () => {
                         {submission.correctCount || 0} / {template.questions?.length || 0}
                       </p>
                     </div>
-                    
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <p className="font-medium">Question Types</p>
                       <div>
@@ -500,7 +444,6 @@ const TrainerSubmissionDetailPage = () => {
                         )}
                       </div>
                     </div>
-                    
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <p className="font-medium">Attempted Questions</p>
                       <p className="font-bold">
@@ -515,7 +458,6 @@ const TrainerSubmissionDetailPage = () => {
                       <p className="font-medium">Submission Type</p>
                       <p>{submission.submission_url ? 'URL' : submission.repository_url ? 'Repository' : 'File Upload'}</p>
                     </div>
-                    
                     {submission.submission_url && (
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <p className="font-medium">Project URL</p>
@@ -529,7 +471,6 @@ const TrainerSubmissionDetailPage = () => {
                         </a>
                       </div>
                     )}
-                    
                     {submission.repository_url && (
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <p className="font-medium">Repository URL</p>
@@ -543,7 +484,6 @@ const TrainerSubmissionDetailPage = () => {
                         </a>
                       </div>
                     )}
-                    
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <p className="font-medium">Requirements Met</p>
                       <p className="font-bold">
@@ -554,7 +494,6 @@ const TrainerSubmissionDetailPage = () => {
                 )}
               </div>
             </Card>
-            
             {/* Feedback Summary */}
             {submission.feedback && (
               <Card className="p-6">
@@ -562,7 +501,6 @@ const TrainerSubmissionDetailPage = () => {
                   <MessageSquare className="w-5 h-5 mr-2 text-primary" />
                   Feedback Summary
                 </h3>
-                
                 <div className="space-y-4">
                   {submission.feedback.general && (
                     <div className="p-4 bg-blue-50 rounded-lg">
@@ -570,7 +508,6 @@ const TrainerSubmissionDetailPage = () => {
                       <p className="text-gray-800">{submission.feedback.general}</p>
                     </div>
                   )}
-                  
                   {submission.feedback.strengths && submission.feedback.strengths.length > 0 && (
                     <div className="p-4 bg-green-50 rounded-lg">
                       <h4 className="text-sm font-medium text-gray-700 mb-2">Strengths</h4>
@@ -581,7 +518,6 @@ const TrainerSubmissionDetailPage = () => {
                       </ul>
                     </div>
                   )}
-                  
                   {submission.feedback.areas_for_improvement && submission.feedback.areas_for_improvement.length > 0 && (
                     <div className="p-4 bg-amber-50 rounded-lg">
                       <h4 className="text-sm font-medium text-gray-700 mb-2">Areas for Improvement</h4>
@@ -597,7 +533,6 @@ const TrainerSubmissionDetailPage = () => {
             )}
           </div>
         </Tabs.TabContent>
-        
         {/* Answers Tab */}
         <Tabs.TabContent value="answers">
           {isQuiz ? (
@@ -607,7 +542,6 @@ const TrainerSubmissionDetailPage = () => {
                 const answer = submission.answers?.[index];
                 const isCorrect = submission.answers && index in submission.answers ? 
                   submission.answers[index].correct : false;
-                
                 return (
                   <Card key={index} className="p-6">
                     <div className="flex justify-between items-start mb-4">
@@ -642,14 +576,12 @@ const TrainerSubmissionDetailPage = () => {
                         )}
                       </div>
                     </div>
-                    
                     {/* Display answer based on question type */}
                     {question.type === 'multipleChoice' && (
                       <div className="space-y-2 mt-4">
                         {question.options.map((option, optionIndex) => {
                           const isSelected = answer === optionIndex;
                           const isOptionCorrect = optionIndex === question.correctAnswer;
-                          
                           let optionClassName = "flex items-start p-3 rounded-lg border ";
                           if (isSelected && isOptionCorrect) {
                             optionClassName += "border-green-300 bg-green-50";
@@ -660,7 +592,6 @@ const TrainerSubmissionDetailPage = () => {
                           } else {
                             optionClassName += "border-gray-200";
                           }
-                          
                           return (
                             <div key={optionIndex} className={optionClassName}>
                               <div className="flex items-center h-5">
@@ -682,13 +613,11 @@ const TrainerSubmissionDetailPage = () => {
                         })}
                       </div>
                     )}
-                    
                     {question.type === 'multipleAnswer' && (
                       <div className="space-y-2 mt-4">
                         {question.options.map((option, optionIndex) => {
                           const isSelected = answer && Array.isArray(answer) && answer.includes(optionIndex);
                           const isOptionCorrect = question.correctAnswers.includes(optionIndex);
-                          
                           let optionClassName = "flex items-start p-3 rounded-lg border ";
                           if (isSelected && isOptionCorrect) {
                             optionClassName += "border-green-300 bg-green-50";
@@ -699,7 +628,6 @@ const TrainerSubmissionDetailPage = () => {
                           } else {
                             optionClassName += "border-gray-200";
                           }
-                          
                           return (
                             <div key={optionIndex} className={optionClassName}>
                               <div className="flex items-center h-5">
@@ -721,7 +649,6 @@ const TrainerSubmissionDetailPage = () => {
                         })}
                       </div>
                     )}
-                    
                     {question.type === 'trueFalse' && (
                       <div className="flex items-center space-x-4 mt-4">
                         <div className={`flex items-center p-2 rounded-lg ${
@@ -736,7 +663,6 @@ const TrainerSubmissionDetailPage = () => {
                               : <XCircle className="w-4 h-4 ml-2" />
                           )}
                         </div>
-                        
                         <div className={`flex items-center p-2 rounded-lg ${
                           answer === false
                             ? (question.correctAnswer === false ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")
@@ -751,7 +677,6 @@ const TrainerSubmissionDetailPage = () => {
                         </div>
                       </div>
                     )}
-                    
                     {question.type === 'shortAnswer' && (
                       <div className="space-y-4 mt-4">
                         <div>
@@ -760,7 +685,6 @@ const TrainerSubmissionDetailPage = () => {
                             {answer || <span className="text-gray-400">No answer provided</span>}
                           </div>
                         </div>
-                        
                         <div>
                           <h4 className="text-sm font-medium text-gray-700 mb-1">Correct Answer:</h4>
                           <div className="p-3 rounded-lg border border-green-200 bg-green-50">
@@ -771,7 +695,6 @@ const TrainerSubmissionDetailPage = () => {
                         </div>
                       </div>
                     )}
-                    
                     {question.type === 'matching' && (
                       <div className="mt-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -779,7 +702,6 @@ const TrainerSubmissionDetailPage = () => {
                             const matchedIndex = answer && typeof answer === 'object' ? answer[item.id] : null;
                             const correctMatchIndex = question.correctMatches[item.id];
                             const isMatchCorrect = matchedIndex === correctMatchIndex;
-                            
                             return (
                               <div key={itemIndex} className="flex items-center space-x-2">
                                 <div className="flex-1 p-3 rounded-lg border border-gray-200">
@@ -807,7 +729,6 @@ const TrainerSubmissionDetailPage = () => {
                             );
                           })}
                         </div>
-                        
                         <div>
                           <h4 className="text-sm font-medium text-gray-700 mb-2">Correct Matches:</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -826,7 +747,6 @@ const TrainerSubmissionDetailPage = () => {
                         </div>
                       </div>
                     )}
-                    
                     {/* Explanation if available */}
                     {question.explanation && (
                       <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
@@ -834,7 +754,6 @@ const TrainerSubmissionDetailPage = () => {
                         <p className="text-sm text-blue-800">{question.explanation}</p>
                       </div>
                     )}
-                    
                     {/* Individual feedback if available */}
                     {submission.answers && 
                      submission.answers[index] && 
@@ -854,7 +773,6 @@ const TrainerSubmissionDetailPage = () => {
               {/* Project Submission Details */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Submission Details</h3>
-                
                 {submission.submission_url && (
                   <div className="mb-4">
                     <h4 className="text-sm font-medium text-gray-700 mb-2">Project URL</h4>
@@ -870,7 +788,6 @@ const TrainerSubmissionDetailPage = () => {
                     </div>
                   </div>
                 )}
-                
                 {submission.repository_url && (
                   <div className="mb-4">
                     <h4 className="text-sm font-medium text-gray-700 mb-2">Repository URL</h4>
@@ -886,7 +803,6 @@ const TrainerSubmissionDetailPage = () => {
                     </div>
                   </div>
                 )}
-                
                 {submission.notes && (
                   <div className="mb-4">
                     <h4 className="text-sm font-medium text-gray-700 mb-2">Student Notes</h4>
@@ -896,16 +812,13 @@ const TrainerSubmissionDetailPage = () => {
                   </div>
                 )}
               </Card>
-              
               {/* Project Requirements */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Project Requirements</h3>
-                
                 <div className="space-y-4">
                   {template.requirements?.map((requirement, index) => {
                     const reqResult = submission.requirements_met?.find(r => r.requirement_id === requirement.id);
                     const isMet = reqResult?.met || false;
-                    
                     return (
                       <div key={index} className={`p-4 rounded-lg border ${
                         isMet 
@@ -943,19 +856,15 @@ const TrainerSubmissionDetailPage = () => {
                   })}
                 </div>
               </Card>
-              
               {/* Rubric Scores */}
               {template.rubric && submission.rubric_scores && (
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Rubric Evaluation</h3>
-                  
                   <div className="space-y-6">
                     {Object.entries(template.rubric).map(([category, rubricData]) => {
                       const score = submission.rubric_scores[category];
                       if (!score) return null;
-                      
                       const percentage = Math.round((score.points_earned / score.points_possible) * 100);
-                      
                       return (
                         <div key={category}>
                           <div className="flex justify-between items-start mb-2">
@@ -975,7 +884,6 @@ const TrainerSubmissionDetailPage = () => {
                               {percentage}%
                             </Badge>
                           </div>
-                          
                           <Progress 
                             value={percentage} 
                             className={`h-2 bg-gray-200 mb-2 ${
@@ -986,7 +894,6 @@ const TrainerSubmissionDetailPage = () => {
                               '[&>div]:bg-red-500'
                             }`} 
                           />
-                          
                           {score.feedback && (
                             <div className="p-3 rounded-lg bg-gray-50 text-sm mt-2">
                               {score.feedback}
@@ -1001,7 +908,6 @@ const TrainerSubmissionDetailPage = () => {
             </div>
           )}
         </Tabs.TabContent>
-        
         {/* Feedback Tab */}
         <Tabs.TabContent value="feedback">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1012,7 +918,6 @@ const TrainerSubmissionDetailPage = () => {
                   <Award className="w-5 h-5 mr-2 text-primary" />
                   Grade Submission
                 </h3>
-                
                 {isQuiz ? (
                   <div className="text-gray-600 mb-4">
                     <p>This quiz has been auto-graded based on the provided answers.</p>
@@ -1034,7 +939,6 @@ const TrainerSubmissionDetailPage = () => {
                         className="w-full"
                       />
                     </div>
-                    
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <p className="font-medium">Score: {manualScore} / 100</p>
                       <p className="text-sm text-gray-600">
@@ -1046,7 +950,6 @@ const TrainerSubmissionDetailPage = () => {
                     </div>
                   </div>
                 )}
-                
                 <div className="mt-6">
                   <Button 
                     onClick={handleGradeSubmission}
@@ -1065,14 +968,12 @@ const TrainerSubmissionDetailPage = () => {
                 </div>
               </Card>
             )}
-            
             {/* Feedback Section */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <MessageSquare className="w-5 h-5 mr-2 text-primary" />
                 Feedback
               </h3>
-              
               <div className="space-y-4">
                 <div>
                   <label htmlFor="feedback" className="block text-sm font-medium text-gray-700 mb-1">
@@ -1087,7 +988,6 @@ const TrainerSubmissionDetailPage = () => {
                     className="w-full"
                   />
                 </div>
-                
                 <div className="flex justify-end">
                   <Button 
                     variant="outline" 
@@ -1106,12 +1006,10 @@ const TrainerSubmissionDetailPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Previous Feedback */}
             {submission.feedback && (
               <Card className="p-6 lg:col-span-2">
                 <h3 className="text-lg font-semibold mb-4">Previous Feedback</h3>
-                
                 <div className="space-y-4">
                   {submission.feedback.general && (
                     <div className="p-4 bg-blue-50 rounded-lg">
@@ -1119,7 +1017,6 @@ const TrainerSubmissionDetailPage = () => {
                       <p className="text-gray-800">{submission.feedback.general}</p>
                     </div>
                   )}
-                  
                   {submission.feedback.strengths && submission.feedback.strengths.length > 0 && (
                     <div className="p-4 bg-green-50 rounded-lg">
                       <h4 className="text-sm font-medium text-gray-700 mb-2">Strengths</h4>
@@ -1130,7 +1027,6 @@ const TrainerSubmissionDetailPage = () => {
                       </ul>
                     </div>
                   )}
-                  
                   {submission.feedback.areas_for_improvement && submission.feedback.areas_for_improvement.length > 0 && (
                     <div className="p-4 bg-amber-50 rounded-lg">
                       <h4 className="text-sm font-medium text-gray-700 mb-2">Areas for Improvement</h4>
@@ -1150,5 +1046,4 @@ const TrainerSubmissionDetailPage = () => {
     </div>
   );
 };
-
 export default TrainerSubmissionDetailPage;

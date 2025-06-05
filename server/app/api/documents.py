@@ -15,8 +15,11 @@ from app.models.evaluation import Evaluation
 from app.models.document import Document
 from app.models.document_permission import DocumentPermission
 from app.services.document_service import DocumentService
+from app.services.document_version_service import DocumentVersionService
 from app.services.notification_service import NotificationService
 from app.utils import generate_evaluation_report, generate_beneficiary_report, analyze_evaluation_responses, generate_report_content
+
+from app.utils.logging import logger
 
 documents_bp = Blueprint('documents', __name__)
 
@@ -77,6 +80,214 @@ def get_documents():
         'pages': pagination.pages,
         'current_page': page
     }), 200
+
+
+@documents_bp.route('/documents/<int:id>', methods=['GET'])
+@jwt_required()
+def get_document(id):
+    """Get a specific document by ID."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_access_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to access this document'}), 403
+    
+    return jsonify(document.to_dict()), 200
+
+
+@documents_bp.route('/documents/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_document(id):
+    """Update a document."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_modify_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to modify this document'}), 403
+    
+    # Get update data
+    data = request.get_json()
+    
+    # Update allowed fields
+    if 'title' in data:
+        document.title = data['title']
+    if 'description' in data:
+        document.description = data['description']
+    if 'tags' in data:
+        document.tags = data['tags']
+    if 'category' in data:
+        document.category = data['category']
+    
+    document.updated_at = datetime.utcnow()
+    
+    try:
+        db.session.commit()
+        return jsonify({
+            'message': 'Document updated successfully',
+            'document': document.to_dict()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error updating document: {str(e)}")
+        return jsonify({'error': 'server_error', 'message': 'Failed to update document'}), 500
+
+
+@documents_bp.route('/documents/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_document(id):
+    """Delete a document."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_delete_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to delete this document'}), 403
+    
+    # Soft delete
+    document.is_active = False
+    document.updated_at = datetime.utcnow()
+    
+    try:
+        db.session.commit()
+        
+        # Delete physical file if exists
+        if document.file_path and os.path.exists(document.file_path):
+            try:
+                os.remove(document.file_path)
+            except Exception as e:
+                current_app.logger.error(f"Error deleting file: {str(e)}")
+        
+        return jsonify({'message': 'Document deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error deleting document: {str(e)}")
+        return jsonify({'error': 'server_error', 'message': 'Failed to delete document'}), 500
+
+
+@documents_bp.route('/documents/<int:id>/download', methods=['GET'])
+@jwt_required()
+def download_document(id):
+    """Download a document."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_access_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to download this document'}), 403
+    
+    # Check if file exists
+    if not document.file_path or not os.path.exists(document.file_path):
+        return jsonify({'error': 'not_found', 'message': 'Document file not found'}), 404
+    
+    # Record download
+    document.download_count = (document.download_count or 0) + 1
+    document.last_accessed_at = datetime.utcnow()
+    db.session.commit()
+    
+    # Send file
+    return send_file(
+        document.file_path,
+        mimetype=document.mime_type or 'application/octet-stream',
+        as_attachment=True,
+        download_name=document.filename or f"document_{id}"
+    )
+
+
+@documents_bp.route('/documents/<int:id>/share', methods=['POST'])
+@jwt_required()
+def share_document(id):
+    """Share a document with other users."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_share_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to share this document'}), 403
+    
+    # Get share data
+    data = request.get_json()
+    user_ids = data.get('user_ids', [])
+    permission_type = data.get('permission_type', 'view')  # view, edit, delete
+    
+    if not user_ids:
+        return jsonify({'error': 'validation_error', 'message': 'No users specified to share with'}), 400
+    
+    if permission_type not in ['view', 'edit', 'delete']:
+        return jsonify({'error': 'validation_error', 'message': 'Invalid permission type'}), 400
+    
+    # Create permissions
+    shared_with = []
+    for uid in user_ids:
+        # Check if user exists
+        target_user = User.query.get(uid)
+        if not target_user:
+            continue
+        
+        # Check if permission already exists
+        existing = DocumentPermission.query.filter_by(
+            document_id=document.id,
+            user_id=uid
+        ).first()
+        
+        if existing:
+            # Update existing permission
+            existing.permission_type = permission_type
+            existing.updated_at = datetime.utcnow()
+        else:
+            # Create new permission
+            permission = DocumentPermission(
+                document_id=document.id,
+                user_id=uid,
+                permission_type=permission_type,
+                granted_by_id=user_id
+            )
+            db.session.add(permission)
+        
+        shared_with.append({
+            'user_id': uid,
+            'name': f"{target_user.first_name} {target_user.last_name}",
+            'email': target_user.email,
+            'permission': permission_type
+        })
+        
+        # Send notification
+        NotificationService.create_notification(
+            user_id=uid,
+            title='Document Shared',
+            message=f'{user.first_name} {user.last_name} has shared "{document.title}" with you',
+            type='document',
+            related_id=document.id,
+            related_type='document',
+            sender_id=user_id
+        )
+    
+    try:
+        db.session.commit()
+        return jsonify({
+            'message': 'Document shared successfully',
+            'shared_with': shared_with
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error sharing document: {str(e)}")
+        return jsonify({'error': 'server_error', 'message': 'Failed to share document'}), 500
 
 
 @documents_bp.route('/documents/evaluation-report/<int:evaluation_id>', methods=['GET'])
@@ -462,3 +673,249 @@ def check_document_permission(document_id):
         "has_permission": has_permission,
         "permission_type": permission_type
     }), 200
+
+
+# Document Versioning Endpoints
+@documents_bp.route('/documents/<int:id>/versions', methods=['GET'])
+@jwt_required()
+def get_document_versions(id):
+    """Get all versions of a document."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_access_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to view this document'}), 403
+    
+    # Get include_archived parameter
+    include_archived = request.args.get('include_archived', 'false').lower() == 'true'
+    
+    # Get versions
+    versions = DocumentVersionService.get_versions(id, include_archived=include_archived)
+    
+    return jsonify({
+        'document_id': id,
+        'current_version': document.current_version,
+        'version_control_enabled': document.version_control_enabled,
+        'versions': [v.to_dict() for v in versions],
+        'total': len(versions)
+    }), 200
+
+
+@documents_bp.route('/documents/<int:id>/versions', methods=['POST'])
+@jwt_required()
+def create_document_version(id):
+    """Create a new version of a document."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_modify_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to modify this document'}), 403
+    
+    # Check if file is provided
+    if 'file' not in request.files:
+        return jsonify({'error': 'validation_error', 'message': 'No file provided'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'validation_error', 'message': 'No file selected'}), 400
+    
+    # Get change notes
+    change_notes = request.form.get('change_notes', '')
+    
+    try:
+        # Create new version
+        version = DocumentVersionService.create_version(
+            document_id=id,
+            file=file,
+            user_id=user_id,
+            change_notes=change_notes
+        )
+        
+        return jsonify({
+            'message': 'New version created successfully',
+            'version': version.to_dict()
+        }), 201
+        
+    except ValueError as e:
+        return jsonify({'error': 'validation_error', 'message': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f"Error creating document version: {str(e)}")
+        return jsonify({'error': 'server_error', 'message': 'Failed to create document version'}), 500
+
+
+@documents_bp.route('/documents/<int:id>/versions/<int:version_id>', methods=['GET'])
+@jwt_required()
+def get_document_version(id, version_id):
+    """Get a specific version of a document."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_access_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to view this document'}), 403
+    
+    # Get version
+    version = DocumentVersionService.get_version(version_id)
+    
+    if not version or version.document_id != id:
+        return jsonify({'error': 'not_found', 'message': 'Version not found'}), 404
+    
+    return jsonify(version.to_dict()), 200
+
+
+@documents_bp.route('/documents/<int:id>/versions/<int:version_id>/download', methods=['GET'])
+@jwt_required()
+def download_document_version(id, version_id):
+    """Download a specific version of a document."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_access_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to download this document'}), 403
+    
+    # Get version
+    version = DocumentVersionService.get_version(version_id)
+    
+    if not version or version.document_id != id:
+        return jsonify({'error': 'not_found', 'message': 'Version not found'}), 404
+    
+    # Check if file exists
+    if not os.path.exists(version.file_path):
+        return jsonify({'error': 'not_found', 'message': 'Version file not found'}), 404
+    
+    # Send file
+    return send_file(
+        version.file_path,
+        mimetype=version.mime_type or 'application/octet-stream',
+        as_attachment=True,
+        download_name=f"{version.filename}_v{version.version_number}"
+    )
+
+
+@documents_bp.route('/documents/<int:id>/versions/<int:version_id>/restore', methods=['POST'])
+@jwt_required()
+def restore_document_version(id, version_id):
+    """Restore a previous version of a document."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_modify_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to modify this document'}), 403
+    
+    try:
+        # Restore version
+        new_version = DocumentVersionService.restore_version(
+            document_id=id,
+            version_id=version_id,
+            user_id=user_id
+        )
+        
+        return jsonify({
+            'message': 'Version restored successfully',
+            'version': new_version.to_dict()
+        }), 200
+        
+    except ValueError as e:
+        return jsonify({'error': 'validation_error', 'message': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f"Error restoring document version: {str(e)}")
+        return jsonify({'error': 'server_error', 'message': 'Failed to restore document version'}), 500
+
+
+@documents_bp.route('/documents/<int:id>/versions/compare', methods=['POST'])
+@jwt_required()
+def compare_document_versions(id):
+    """Compare two versions of a document."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions
+    if not DocumentService.can_access_document(user, document):
+        return jsonify({'error': 'forbidden', 'message': 'You do not have permission to view this document'}), 403
+    
+    # Get version IDs from request
+    data = request.get_json()
+    version1_id = data.get('version1_id')
+    version2_id = data.get('version2_id')
+    
+    if not version1_id or not version2_id:
+        return jsonify({'error': 'validation_error', 'message': 'Both version IDs are required'}), 400
+    
+    try:
+        # Compare versions
+        comparison = DocumentVersionService.compare_versions(
+            document_id=id,
+            version1_id=version1_id,
+            version2_id=version2_id,
+            user_id=user_id
+        )
+        
+        return jsonify({
+            'message': 'Versions compared successfully',
+            'comparison': comparison.to_dict()
+        }), 200
+        
+    except ValueError as e:
+        return jsonify({'error': 'validation_error', 'message': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f"Error comparing document versions: {str(e)}")
+        return jsonify({'error': 'server_error', 'message': 'Failed to compare document versions'}), 500
+
+
+@documents_bp.route('/documents/<int:id>/enable-versioning', methods=['POST'])
+@jwt_required()
+def enable_document_versioning(id):
+    """Enable version control for a document."""
+    user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id)
+    
+    # Get the document
+    document = Document.query.get_or_404(id)
+    
+    # Check permissions (only owner or admin can enable versioning)
+    if document.upload_by != user_id and user.role != 'super_admin':
+        return jsonify({'error': 'forbidden', 'message': 'Only document owner or admin can enable versioning'}), 403
+    
+    # Get max versions from request
+    data = request.get_json() or {}
+    max_versions = data.get('max_versions', 10)
+    
+    try:
+        # Enable versioning
+        version = DocumentVersionService.enable_versioning(
+            document_id=id,
+            max_versions=max_versions
+        )
+        
+        return jsonify({
+            'message': 'Versioning enabled successfully',
+            'version': version.to_dict()
+        }), 200
+        
+    except ValueError as e:
+        return jsonify({'error': 'validation_error', 'message': str(e)}), 400
+    except Exception as e:
+        current_app.logger.error(f"Error enabling document versioning: {str(e)}")
+        return jsonify({'error': 'server_error', 'message': 'Failed to enable document versioning'}), 500

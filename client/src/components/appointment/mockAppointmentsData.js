@@ -1,19 +1,15 @@
 import { addDays, setHours, setMinutes, subDays } from 'date-fns';
-
 // Generate today's date
 const today = new Date();
-
 // Generate dates for different appointments
 const yesterday = subDays(today, 1);
 const tomorrow = addDays(today, 1);
 const nextWeek = addDays(today, 7);
 const twoWeeksFromNow = addDays(today, 14);
-
 // Helper function to create ISO string for a specific date, hour, minute
 const dateTime = (date, hour, minute = 0) => {
   return setMinutes(setHours(date, hour), minute).toISOString();
 };
-
 // Mock appointments data for testing the calendar
 export const mockAppointments = [
   {
@@ -263,7 +259,6 @@ export const mockAppointments = [
     google_event_id: 'pqr678'
   }
 ];
-
 // Mock API responses
 export const fetchMockAppointments = (startDate, endDate) => {
   // In a real app, you would filter by date range
@@ -273,23 +268,19 @@ export const fetchMockAppointments = (startDate, endDate) => {
     data: mockAppointments
   };
 };
-
 export const fetchMockAppointment = (id) => {
   const appointment = mockAppointments.find(appt => appt.id.toString() === id.toString());
-  
   if (appointment) {
     return {
       status: 200,
       data: appointment
     };
   }
-  
   return {
     status: 404,
     data: { message: 'Appointment not found' }
   };
 };
-
 export const createMockAppointment = (data) => {
   // In a real app, this would create a new appointment in the database
   return {
@@ -301,7 +292,6 @@ export const createMockAppointment = (data) => {
     }
   };
 };
-
 export const updateMockAppointment = (id, data) => {
   // In a real app, this would update an appointment in the database
   return {
@@ -313,7 +303,6 @@ export const updateMockAppointment = (id, data) => {
     }
   };
 };
-
 export const deleteMockAppointment = (id) => {
   // In a real app, this would delete an appointment from the database
   return {
@@ -321,7 +310,6 @@ export const deleteMockAppointment = (id) => {
     data: null
   };
 };
-
 export const notifyMockParticipants = (id) => {
   // In a real app, this would send notifications to participants
   return {
@@ -329,7 +317,6 @@ export const notifyMockParticipants = (id) => {
     data: { message: 'Notifications sent successfully' }
   };
 };
-
 // Mock availability data
 export const mockAvailabilitySettings = {
   regular_schedule: [
@@ -369,7 +356,6 @@ export const mockAvailabilitySettings = {
   },
   sync_with_google: true,
 };
-
 // Mock Google Calendar sync settings
 export const mockGoogleCalendarSyncSettings = {
   is_connected: true,
@@ -398,14 +384,12 @@ export const mockGoogleCalendarSyncSettings = {
     last_sync_success: true,
   }
 };
-
 export const fetchMockAvailability = () => {
   return {
     status: 200,
     data: mockAvailabilitySettings
   };
 };
-
 export const updateMockAvailability = (data) => {
   return {
     status: 200,
@@ -415,14 +399,12 @@ export const updateMockAvailability = (data) => {
     }
   };
 };
-
 export const fetchMockGoogleCalendarSync = () => {
   return {
     status: 200,
     data: mockGoogleCalendarSyncSettings
   };
 };
-
 export const updateMockGoogleCalendarSync = (data) => {
   return {
     status: 200,

@@ -1,5 +1,4 @@
 import { generateDashboardData, generateDashboardNotifications, generateQuickActions } from './mockDashboardData';
-
 export const setupDashboardMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -7,25 +6,21 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     put: originalPut || api.put.bind(api),
     delete: originalDelete || api.delete.bind(api)
   };
-
   // Dashboard overview endpoint
   api.get = function(url, ...args) {
     if (url === '/api/dashboard' || url === '/api/dashboard/overview') {
       // Get user role from context or default to student
       const userRole = localStorage.getItem('userRole') || 'student';
       const dashboardData = generateDashboardData(userRole);
-      
       return Promise.resolve({
         status: 200,
         data: dashboardData
       });
     }
-    
     // Dashboard metrics endpoint
     if (url === '/api/dashboard/metrics') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const data = generateDashboardData(userRole);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -35,12 +30,10 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         }
       });
     }
-    
     // Dashboard activity endpoint
     if (url === '/api/dashboard/activity') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const data = generateDashboardData(userRole);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -48,12 +41,10 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         }
       });
     }
-    
     // Dashboard notifications endpoint
     if (url === '/api/dashboard/notifications') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateDashboardNotifications(userRole);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -62,12 +53,10 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         }
       });
     }
-    
     // Dashboard quick actions endpoint
     if (url === '/api/dashboard/quick-actions') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const actions = generateQuickActions(userRole);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -75,12 +64,10 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         }
       });
     }
-    
     // Tenant dashboard endpoint (for admin/tenant_admin)
     if (url === '/api/dashboard/tenant') {
       const userRole = localStorage.getItem('userRole') || 'admin';
       const data = generateDashboardData(userRole);
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -90,11 +77,9 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         }
       });
     }
-    
     // Trainer dashboard endpoint
     if (url === '/api/dashboard/trainer') {
       const data = generateDashboardData('trainer');
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -104,11 +89,9 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         }
       });
     }
-    
     // Student dashboard endpoint
     if (url === '/api/dashboard/student') {
       const data = generateDashboardData('student');
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -118,10 +101,8 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         }
       });
     }
-    
     // Dashboard widgets configuration
     if (url === '/api/dashboard/widgets') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -135,11 +116,9 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         }
       });
     }
-    
     // Call original get for other endpoints
     return originalFunctions.get.call(api, url, ...args);
   };
-  
   // Widget configuration update
   api.put = function(url, data, ...args) {
     if (url === '/api/dashboard/widgets') {
@@ -151,7 +130,6 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         }
       });
     }
-    
     return originalFunctions.put.call(api, url, data, ...args);
   };
 };

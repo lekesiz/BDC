@@ -4,7 +4,6 @@ export const generateCalendarData = (userRole) => {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const day = currentDate.getDate();
-
   const baseEvents = [
     {
       id: 1,
@@ -103,7 +102,6 @@ export const generateCalendarData = (userRole) => {
       instructor: "Prof. Robert Lee"
     }
   ];
-
   // Customize events based on role
   if (userRole === 'trainer') {
     return {
@@ -178,22 +176,17 @@ export const generateCalendarData = (userRole) => {
       facilityBookings: generateFacilityBookings()
     };
   }
-
   return { events: baseEvents };
 };
-
 // Generate available time slots for trainers
 export const generateAvailableSlots = () => {
   const slots = [];
   const currentDate = new Date();
-  
   for (let i = 0; i < 14; i++) {
     const date = new Date(currentDate);
     date.setDate(currentDate.getDate() + i);
-    
     // Skip weekends
     if (date.getDay() === 0 || date.getDay() === 6) continue;
-    
     // Morning slots
     slots.push({
       id: `slot-${i}-1`,
@@ -203,7 +196,6 @@ export const generateAvailableSlots = () => {
       available: Math.random() > 0.3,
       type: "consultation"
     });
-    
     // Afternoon slots
     slots.push({
       id: `slot-${i}-2`,
@@ -213,7 +205,6 @@ export const generateAvailableSlots = () => {
       available: Math.random() > 0.4,
       type: "consultation"
     });
-    
     // Evening slots
     slots.push({
       id: `slot-${i}-3`,
@@ -224,10 +215,8 @@ export const generateAvailableSlots = () => {
       type: "consultation"
     });
   }
-  
   return slots;
 };
-
 // Generate teaching schedule
 export const generateTeachingSchedule = () => {
   return {
@@ -253,11 +242,9 @@ export const generateTeachingSchedule = () => {
     ]
   };
 };
-
 // Generate upcoming deadlines for students
 export const generateUpcomingDeadlines = () => {
   const currentDate = new Date();
-  
   return [
     {
       id: 1,
@@ -293,7 +280,6 @@ export const generateUpcomingDeadlines = () => {
     }
   ];
 };
-
 // Generate study groups
 export const generateStudyGroups = () => {
   return [
@@ -323,7 +309,6 @@ export const generateStudyGroups = () => {
     }
   ];
 };
-
 // Generate resource utilization data
 export const generateResourceUtilization = () => {
   return {
@@ -341,11 +326,9 @@ export const generateResourceUtilization = () => {
     ]
   };
 };
-
 // Generate facility bookings
 export const generateFacilityBookings = () => {
   const currentDate = new Date();
-  
   return [
     {
       id: 1,
@@ -373,7 +356,6 @@ export const generateFacilityBookings = () => {
     }
   ];
 };
-
 // Generate appointment types
 export const generateAppointmentTypes = () => {
   return [

@@ -1,6 +1,7 @@
 """
 AI-powered personalized recommendations service
 """
+import os
 import json
 import logging
 from typing import Dict, List, Any, Optional
@@ -53,8 +54,8 @@ class OpenAI:
 
 # Yapılandırma için geçici sınıf
 class Config:
-    OPENAI_API_KEY = "placeholder-key"
-    AI_MODEL = "gpt-4"
+    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+    AI_MODEL = os.getenv('AI_MODEL', 'gpt-4')
 
 config = Config()
 

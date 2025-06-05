@@ -24,7 +24,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
-
 /**
  * PortalModuleDetailPage displays a specific module with its lessons and resources
  */
@@ -39,7 +38,6 @@ const PortalModuleDetailPage = () => {
   const [isCompleting, setIsCompleting] = useState(false);
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  
   // Fetch module data
   useEffect(() => {
     const fetchModuleData = async () => {
@@ -47,7 +45,6 @@ const PortalModuleDetailPage = () => {
         setIsLoading(true);
         const response = await api.get(`/api/portal/modules/${id}`);
         setModuleData(response.data);
-        
         // Set current lesson to the first incomplete lesson or the first lesson
         const incompleteIndex = response.data.lessons.findIndex(lesson => lesson.status !== 'completed');
         setCurrentLessonIndex(incompleteIndex !== -1 ? incompleteIndex : 0);
@@ -62,26 +59,20 @@ const PortalModuleDetailPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchModuleData();
   }, [id, toast]);
-  
   // Format duration
   const formatDuration = (minutes) => {
     if (minutes < 60) {
       return `${minutes} min`;
     }
-    
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
-    
     if (remainingMinutes === 0) {
       return `${hours} hr`;
     }
-    
     return `${hours} hr ${remainingMinutes} min`;
   };
-  
   // Toggle video playback
   const togglePlayback = () => {
     if (videoRef.current) {
@@ -93,13 +84,11 @@ const PortalModuleDetailPage = () => {
       setIsPlaying(!isPlaying);
     }
   };
-  
   // Mark lesson as completed
   const completeLesson = async (lessonId) => {
     try {
       setIsCompleting(true);
       await api.post(`/api/portal/lessons/${lessonId}/complete`);
-      
       // Update the lesson's status locally
       setModuleData(prevData => ({
         ...prevData,
@@ -107,13 +96,11 @@ const PortalModuleDetailPage = () => {
           lesson.id === lessonId ? { ...lesson, status: 'completed' } : lesson
         )
       }));
-      
       toast({
         title: 'Success',
         description: 'Lesson marked as completed',
         type: 'success',
       });
-      
       // Move to the next lesson if available
       if (currentLessonIndex < moduleData.lessons.length - 1) {
         setCurrentLessonIndex(currentLessonIndex + 1);
@@ -129,14 +116,12 @@ const PortalModuleDetailPage = () => {
       setIsCompleting(false);
     }
   };
-  
   // Download resource
   const downloadResource = async (resourceId, resourceName) => {
     try {
       const response = await api.get(`/api/portal/resources/${resourceId}/download`, {
         responseType: 'blob'
       });
-      
       // Create a URL for the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -145,7 +130,6 @@ const PortalModuleDetailPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      
       toast({
         title: 'Success',
         description: 'Resource downloaded successfully',
@@ -160,29 +144,24 @@ const PortalModuleDetailPage = () => {
       });
     }
   };
-  
   // Navigate to previous lesson
   const goToPreviousLesson = () => {
     if (currentLessonIndex > 0) {
       setCurrentLessonIndex(currentLessonIndex - 1);
     }
   };
-  
   // Navigate to next lesson
   const goToNextLesson = () => {
     if (currentLessonIndex < moduleData.lessons.length - 1) {
       setCurrentLessonIndex(currentLessonIndex + 1);
     }
   };
-  
   // Calculate module completion percentage
   const calculateCompletion = () => {
     if (!moduleData || !moduleData.lessons.length) return 0;
-    
     const completedLessons = moduleData.lessons.filter(lesson => lesson.status === 'completed').length;
     return Math.round((completedLessons / moduleData.lessons.length) * 100);
   };
-  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -190,7 +169,6 @@ const PortalModuleDetailPage = () => {
       </div>
     );
   }
-  
   if (!moduleData) {
     return (
       <div className="container mx-auto py-6">
@@ -205,9 +183,7 @@ const PortalModuleDetailPage = () => {
       </div>
     );
   }
-  
   const currentLesson = moduleData.lessons[currentLessonIndex];
-  
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center mb-6">
@@ -217,7 +193,6 @@ const PortalModuleDetailPage = () => {
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        
         <div>
           <div className="flex items-center">
             <h1 className="text-2xl font-bold">{moduleData.title}</h1>
@@ -233,7 +208,6 @@ const PortalModuleDetailPage = () => {
           </p>
         </div>
       </div>
-      
       {/* Module content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main content area */}
@@ -251,7 +225,6 @@ const PortalModuleDetailPage = () => {
                     onPlay={() => setIsPlaying(true)}
                     onPause={() => setIsPlaying(false)}
                   />
-                  
                   {!isPlaying && (
                     <button
                       className="absolute inset-0 flex items-center justify-center bg-black/30"
@@ -279,7 +252,6 @@ const PortalModuleDetailPage = () => {
                 </div>
               )}
             </div>
-            
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -288,7 +260,6 @@ const PortalModuleDetailPage = () => {
                     {currentLesson.type.charAt(0).toUpperCase() + currentLesson.type.slice(1)} • {formatDuration(currentLesson.duration)}
                   </p>
                 </div>
-                
                 {currentLesson.status === 'completed' ? (
                   <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center">
                     <CheckCircle className="w-3 h-3 mr-1" />
@@ -314,22 +285,18 @@ const PortalModuleDetailPage = () => {
                   </Button>
                 )}
               </div>
-              
               <div className="prose max-w-none">
                 <p>{currentLesson.description}</p>
-                
                 {currentLesson.content && (
                   <div className="mt-4"
                     dangerouslySetInnerHTML={{ __html: currentLesson.content }}
                   />
                 )}
               </div>
-              
               {/* Lesson resources */}
               {currentLesson.resources && currentLesson.resources.length > 0 && (
                 <div className="mt-8">
                   <h3 className="text-lg font-medium mb-4">Lesson Resources</h3>
-                  
                   <div className="space-y-3">
                     {currentLesson.resources.map(resource => (
                       <div key={resource.id} className="flex items-center justify-between p-3 border rounded-lg">
@@ -342,7 +309,6 @@ const PortalModuleDetailPage = () => {
                             <p className="text-xs text-gray-500">{resource.type} • {resource.size}</p>
                           </div>
                         </div>
-                        
                         <Button
                           variant="outline"
                           size="sm"
@@ -357,7 +323,6 @@ const PortalModuleDetailPage = () => {
                   </div>
                 </div>
               )}
-              
               {/* Navigation buttons */}
               <div className="flex justify-between mt-8 pt-4 border-t">
                 <Button
@@ -369,7 +334,6 @@ const PortalModuleDetailPage = () => {
                   <ChevronLeft className="w-4 h-4 mr-1" />
                   Previous Lesson
                 </Button>
-                
                 <Button
                   variant={currentLessonIndex === moduleData.lessons.length - 1 ? "outline" : "default"}
                   onClick={goToNextLesson}
@@ -382,40 +346,34 @@ const PortalModuleDetailPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Discussion area */}
           <Card className="overflow-hidden">
             <div className="p-6 border-b">
               <h2 className="text-lg font-medium">Discussion</h2>
             </div>
-            
             <div className="p-6">
               <div className="flex items-start space-x-4 mb-6">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-primary font-medium">{user?.name?.charAt(0) || 'U'}</span>
                 </div>
-                
                 <div className="flex-1">
                   <textarea
                     placeholder="Ask a question or share your thoughts..."
                     className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     rows={3}
                   />
-                  
                   <div className="flex justify-between mt-2">
                     <div className="flex items-center">
                       <button className="text-gray-500 hover:text-gray-700">
                         <Paperclip className="w-4 h-4" />
                       </button>
                     </div>
-                    
                     <Button>
                       Post Comment
                     </Button>
                   </div>
                 </div>
               </div>
-              
               {moduleData.discussions && moduleData.discussions.length > 0 ? (
                 <div className="space-y-6">
                   {moduleData.discussions.map(discussion => (
@@ -424,7 +382,6 @@ const PortalModuleDetailPage = () => {
                         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
                           <span className="text-gray-600 font-medium">{discussion.author.charAt(0)}</span>
                         </div>
-                        
                         <div>
                           <div className="flex items-center">
                             <h4 className="font-medium">{discussion.author}</h4>
@@ -433,11 +390,9 @@ const PortalModuleDetailPage = () => {
                               {new Date(discussion.timestamp).toLocaleDateString()}
                             </span>
                           </div>
-                          
                           <div className="mt-1">
                             <p>{discussion.message}</p>
                           </div>
-                          
                           <div className="mt-2 flex space-x-3">
                             <button className="text-sm text-gray-500 hover:text-primary">
                               Reply
@@ -446,7 +401,6 @@ const PortalModuleDetailPage = () => {
                               Like
                             </button>
                           </div>
-                          
                           {/* Replies */}
                           {discussion.replies && discussion.replies.length > 0 && (
                             <div className="mt-4 space-y-4 pl-6 border-l">
@@ -455,7 +409,6 @@ const PortalModuleDetailPage = () => {
                                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
                                     <span className="text-gray-600 font-medium text-xs">{reply.author.charAt(0)}</span>
                                   </div>
-                                  
                                   <div>
                                     <div className="flex items-center">
                                       <h5 className="font-medium text-sm">{reply.author}</h5>
@@ -464,7 +417,6 @@ const PortalModuleDetailPage = () => {
                                         {new Date(reply.timestamp).toLocaleDateString()}
                                       </span>
                                     </div>
-                                    
                                     <div className="mt-1">
                                       <p className="text-sm">{reply.message}</p>
                                     </div>
@@ -488,7 +440,6 @@ const PortalModuleDetailPage = () => {
             </div>
           </Card>
         </div>
-        
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Module progress */}
@@ -496,20 +447,17 @@ const PortalModuleDetailPage = () => {
             <div className="p-6 border-b">
               <h2 className="text-lg font-medium">Module Progress</h2>
             </div>
-            
             <div className="p-6">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-gray-500">Your Progress</span>
                 <span className="font-medium">{calculateCompletion()}%</span>
               </div>
-              
               <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
                 <div 
                   className="bg-primary h-2.5 rounded-full" 
                   style={{ width: `${calculateCompletion()}%` }}
                 ></div>
               </div>
-              
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">
                   {moduleData.lessons.filter(lesson => lesson.status === 'completed').length} of {moduleData.lessons.length} lessons completed
@@ -517,13 +465,11 @@ const PortalModuleDetailPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Module content */}
           <Card className="overflow-hidden">
             <div className="p-6 border-b">
               <h2 className="text-lg font-medium">Module Content</h2>
             </div>
-            
             <div className="divide-y max-h-[500px] overflow-y-auto">
               {moduleData.lessons.map((lesson, index) => (
                 <div 
@@ -545,7 +491,6 @@ const PortalModuleDetailPage = () => {
                         <span>{index + 1}</span>
                       )}
                     </div>
-                    
                     <div>
                       <h3 className={`font-medium text-sm ${index === currentLessonIndex ? 'text-primary' : ''}`}>
                         {lesson.title}
@@ -561,13 +506,11 @@ const PortalModuleDetailPage = () => {
               ))}
             </div>
           </Card>
-          
           {/* Module Info */}
           <Card className="overflow-hidden">
             <div className="p-6 border-b">
               <h2 className="text-lg font-medium">Module Information</h2>
             </div>
-            
             <div className="p-6 space-y-4">
               <div>
                 <h3 className="text-sm font-medium mb-2">Description</h3>
@@ -575,7 +518,6 @@ const PortalModuleDetailPage = () => {
                   {moduleData.description}
                 </p>
               </div>
-              
               {moduleData.objectives && moduleData.objectives.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium mb-2">Learning Objectives</h3>
@@ -588,7 +530,6 @@ const PortalModuleDetailPage = () => {
                   </ul>
                 </div>
               )}
-              
               <div>
                 <h3 className="text-sm font-medium mb-2">About the Instructor</h3>
                 <div className="flex items-center">
@@ -607,7 +548,6 @@ const PortalModuleDetailPage = () => {
                   </div>
                 </div>
               </div>
-              
               {moduleData.prerequisites && moduleData.prerequisites.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium mb-2">Prerequisites</h3>
@@ -627,5 +567,4 @@ const PortalModuleDetailPage = () => {
     </div>
   );
 };
-
 export default PortalModuleDetailPage;

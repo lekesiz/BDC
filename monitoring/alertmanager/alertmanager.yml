@@ -1,98 +1,94 @@
-# AlertManager configuration for BDC application
-
 global:
-  smtp_smarthost: '${SMTP_SMARTHOST:-localhost:587}'
-  smtp_from: '${SMTP_FROM:-alerts@bdc.com}'
-  smtp_auth_username: '${SMTP_USERNAME}'
-  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_smarthost: '${MAIL_SERVER}:${MAIL_PORT}'
+  smtp_from: '${MAIL_DEFAULT_SENDER}'
+  smtp_auth_username: '${MAIL_USERNAME}'
+  smtp_auth_password: '${MAIL_PASSWORD}'
   smtp_require_tls: true
 
-# Grouping and routing configuration
+# The directory from which notification templates are read.
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# The root route on which each incoming alert enters.
 route:
+  # The labels by which incoming alerts are grouped together.
   group_by: ['alertname', 'cluster', 'service']
+  
+  # When a new group of alerts is created by an incoming alert, wait at
+  # least 'group_wait' to send the initial notification.
   group_wait: 10s
+  
+  # When the first notification was sent, wait 'group_interval' to send a batch
+  # of new alerts that started firing for that group.
   group_interval: 10s
+  
+  # If an alert has successfully been sent, wait 'repeat_interval' to
+  # resend them.
   repeat_interval: 1h
-  receiver: 'default-receiver'
+  
+  # A default receiver
+  receiver: 'default'
+  
+  # All the above attributes are inherited by all child routes and can
+  # overwritten on each.
   routes:
-    # Critical alerts - immediate notification
+    # Critical alerts go to multiple channels
     - match:
         severity: critical
       receiver: 'critical-alerts'
-      group_wait: 0s
-      repeat_interval: 5m
-      
-    # Warning alerts - grouped notifications
-    - match:
-        severity: warning
-      receiver: 'warning-alerts'
-      group_wait: 30s
+      group_wait: 5s
+      group_interval: 5s
       repeat_interval: 30m
-      
-    # Info alerts - daily digest
+    
+    # Security alerts
     - match:
-        severity: info
-      receiver: 'info-alerts'
-      group_wait: 5m
-      repeat_interval: 24h
-
-    # Database specific alerts
+        service: security
+      receiver: 'security-alerts'
+      group_wait: 5s
+      group_interval: 5s
+      repeat_interval: 1h
+    
+    # Database alerts
     - match:
-        service: postgres
+        service: database
       receiver: 'database-alerts'
-      
-    # Application specific alerts
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 2h
+    
+    # Application alerts
     - match:
-        service: bdc-backend
+        service: application
       receiver: 'application-alerts'
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 2h
 
-# Inhibition rules to suppress redundant alerts
+# Inhibition rules allow to mute a set of alerts given that another alert is firing.
 inhibit_rules:
-  # Suppress warning alerts when critical alerts are firing
   - source_match:
       severity: 'critical'
     target_match:
       severity: 'warning'
     equal: ['alertname', 'cluster', 'service']
-    
-  # Suppress individual service alerts when the whole service is down
-  - source_match:
-      alertname: 'ServiceDown'
-    target_match_re:
-      service: '.*'
-    equal: ['instance']
 
-# Notification receivers
 receivers:
-  # Default receiver
-  - name: 'default-receiver'
+  - name: 'default'
     email_configs:
-      - to: '${ALERT_EMAIL_DEFAULT:-admin@bdc.com}'
-        subject: '[BDC] Alert: {{ .GroupLabels.alertname }}'
+      - to: '${ADMIN_EMAILS}'
+        subject: '[BDC Alert] {{ .GroupLabels.alertname }}'
         body: |
           {{ range .Alerts }}
           Alert: {{ .Annotations.summary }}
           Description: {{ .Annotations.description }}
-          Labels: {{ range .Labels.SortedPairs }}{{ .Name }}: {{ .Value }} {{ end }}
+          Labels: {{ range .Labels.SortedPairs }}{{ .Name }}={{ .Value }} {{ end }}
           {{ end }}
-        html: |
-          <h2>BDC Alert Notification</h2>
-          {{ range .Alerts }}
-          <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
-            <h3 style="color: {{ if eq .Labels.severity "critical" }}red{{ else if eq .Labels.severity "warning" }}orange{{ else }}blue{{ end }};">
-              {{ .Annotations.summary }}
-            </h3>
-            <p><strong>Description:</strong> {{ .Annotations.description }}</p>
-            <p><strong>Service:</strong> {{ .Labels.service }}</p>
-            <p><strong>Time:</strong> {{ .StartsAt }}</p>
-            <p><strong>Labels:</strong> {{ range .Labels.SortedPairs }}{{ .Name }}: {{ .Value }} {{ end }}</p>
-          </div>
-          {{ end }}
+        headers:
+          Subject: '[BDC Alert] {{ .GroupLabels.alertname }}'
 
-  # Critical alerts - immediate notification via multiple channels
   - name: 'critical-alerts'
     email_configs:
-      - to: '${ALERT_EMAIL_CRITICAL:-admin@bdc.com,ops@bdc.com}'
+      - to: '${ADMIN_EMAILS}'
         subject: '[BDC CRITICAL] {{ .GroupLabels.alertname }}'
         body: |
           🚨 CRITICAL ALERT 🚨
@@ -100,79 +96,124 @@ receivers:
           {{ range .Alerts }}
           Alert: {{ .Annotations.summary }}
           Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
           Service: {{ .Labels.service }}
-          Time: {{ .StartsAt }}
+          Labels: {{ range .Labels.SortedPairs }}{{ .Name }}={{ .Value }} {{ end }}
+          Started: {{ .StartsAt }}
           {{ end }}
-          
-          Please investigate immediately!
-    # Add Slack webhook for critical alerts
+        headers:
+          Subject: '[BDC CRITICAL] {{ .GroupLabels.alertname }}'
+          Priority: 'high'
+    
     slack_configs:
       - api_url: '${SLACK_WEBHOOK_URL}'
-        channel: '#bdc-alerts-critical'
+        channel: '#alerts'
         title: '🚨 BDC Critical Alert'
         text: |
           {{ range .Alerts }}
           *Alert:* {{ .Annotations.summary }}
           *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
           *Service:* {{ .Labels.service }}
           {{ end }}
         color: 'danger'
+        send_resolved: true
+    
+    webhook_configs:
+      - url: '${ALERT_WEBHOOK_URL}'
+        send_resolved: true
+        http_config:
+          bearer_token: '${ALERT_API_KEY}'
+        title: 'BDC Critical Alert'
+        text: |
+          {{ range .Alerts }}
+          {{ .Annotations.summary }}
+          {{ end }}
 
-  # Warning alerts
-  - name: 'warning-alerts'
+  - name: 'security-alerts'
     email_configs:
-      - to: '${ALERT_EMAIL_WARNING:-ops@bdc.com}'
-        subject: '[BDC WARNING] {{ .GroupLabels.alertname }}'
+      - to: '${ADMIN_EMAILS}'
+        subject: '[BDC SECURITY] {{ .GroupLabels.alertname }}'
         body: |
-          ⚠️ WARNING ALERT ⚠️
+          🔒 SECURITY ALERT 🔒
           
           {{ range .Alerts }}
           Alert: {{ .Annotations.summary }}
           Description: {{ .Annotations.description }}
-          Service: {{ .Labels.service }}
-          Time: {{ .StartsAt }}
+          Severity: {{ .Labels.severity }}
+          Started: {{ .StartsAt }}
           {{ end }}
-
-  # Info alerts - daily digest
-  - name: 'info-alerts'
-    email_configs:
-      - to: '${ALERT_EMAIL_INFO:-monitoring@bdc.com}'
-        subject: '[BDC INFO] Daily Alert Digest'
-        body: |
-          📊 Daily Alert Digest
-          
+        headers:
+          Subject: '[BDC SECURITY] {{ .GroupLabels.alertname }}'
+          Priority: 'high'
+    
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#security'
+        title: '🔒 BDC Security Alert'
+        text: |
           {{ range .Alerts }}
-          - {{ .Annotations.summary }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
           {{ end }}
+        color: 'warning'
+        send_resolved: true
 
-  # Database specific alerts
   - name: 'database-alerts'
     email_configs:
-      - to: '${ALERT_EMAIL_DATABASE:-dba@bdc.com,ops@bdc.com}'
+      - to: '${ADMIN_EMAILS}'
         subject: '[BDC DATABASE] {{ .GroupLabels.alertname }}'
         body: |
-          🗄️ DATABASE ALERT
+          💾 DATABASE ALERT 💾
           
           {{ range .Alerts }}
           Alert: {{ .Annotations.summary }}
           Description: {{ .Annotations.description }}
-          Time: {{ .StartsAt }}
+          Severity: {{ .Labels.severity }}
+          Started: {{ .StartsAt }}
           {{ end }}
+        headers:
+          Subject: '[BDC DATABASE] {{ .GroupLabels.alertname }}'
+    
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#database'
+        title: '💾 BDC Database Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          {{ end }}
+        color: 'warning'
+        send_resolved: true
 
-  # Application specific alerts
   - name: 'application-alerts'
     email_configs:
-      - to: '${ALERT_EMAIL_APPLICATION:-dev@bdc.com,ops@bdc.com}'
+      - to: '${ADMIN_EMAILS}'
         subject: '[BDC APPLICATION] {{ .GroupLabels.alertname }}'
         body: |
-          🏗️ APPLICATION ALERT
+          🚀 APPLICATION ALERT 🚀
           
           {{ range .Alerts }}
           Alert: {{ .Annotations.summary }}
           Description: {{ .Annotations.description }}
-          Time: {{ .StartsAt }}
+          Severity: {{ .Labels.severity }}
+          Started: {{ .StartsAt }}
           {{ end }}
-
-# Templates for custom formatting
-templates:
-  - '/etc/alertmanager/templates/*.tmpl'
+        headers:
+          Subject: '[BDC APPLICATION] {{ .GroupLabels.alertname }}'
+    
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#application'
+        title: '🚀 BDC Application Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          {{ end }}
+        color: 'warning'
+        send_resolved: true

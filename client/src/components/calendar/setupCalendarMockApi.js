@@ -4,7 +4,6 @@ import {
   generateAppointmentTypes,
   generateTeachingSchedule 
 } from './mockCalendarData';
-
 export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -12,20 +11,16 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     put: originalPut || api.put.bind(api),
     delete: originalDelete || api.delete.bind(api)
   };
-
   // Calendar events endpoint
   api.get = function(url, ...args) {
     if (url === '/api/calendar/events' || url.startsWith('/api/calendar/events?')) {
-      
       try {
         const userRole = localStorage.getItem('userRole') || 'student';
         const calendarData = generateCalendarData(userRole);
-        
         // Parse query parameters for date range
         const urlObj = new URL(url, 'http://localhost');
         const start = urlObj.searchParams.get('start');
         const end = urlObj.searchParams.get('end');
-        
         // Return empty array with google calendar not connected info
         // This simulates the actual server behavior when Google Calendar is not connected
         return Promise.resolve({
@@ -50,11 +45,9 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
         });
       }
     }
-    
     // Available slots endpoint
     if (url === '/api/calendar/available-slots' || url.startsWith('/api/calendar/available-slots?')) {
       const slots = generateAvailableSlots();
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -63,10 +56,8 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
         }
       });
     }
-    
     // Availability endpoint (enhanced version)
     if (url === '/api/calendar/availability') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -117,11 +108,9 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
         }
       });
     }
-    
     // Appointment types endpoint
     if (url === '/api/calendar/appointment-types') {
       const types = generateAppointmentTypes();
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -129,11 +118,9 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
         }
       });
     }
-    
     // Teaching schedule endpoint
     if (url === '/api/calendar/teaching-schedule') {
       const schedule = generateTeachingSchedule();
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -141,14 +128,12 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
         }
       });
     }
-    
     // Specific event endpoint
     if (url.match(/^\/api\/calendar\/events\/\d+$/)) {
       const eventId = parseInt(url.split('/').pop());
       const userRole = localStorage.getItem('userRole') || 'student';
       const calendarData = generateCalendarData(userRole);
       const event = calendarData.events.find(e => e.id === eventId);
-      
       if (event) {
         return Promise.resolve({
           status: 200,
@@ -166,15 +151,12 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
         });
       }
     }
-    
     // Pass through to original function for other endpoints
     return originalFunctions.get.call(this, url, ...args);
   };
-
   // Create appointment endpoint
   api.post = function(url, data, ...args) {
     if (url === '/api/calendar/appointments') {
-      
       const newAppointment = {
         id: Date.now(),
         ...data,
@@ -182,16 +164,13 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
-      
       return Promise.resolve({
         status: 201,
         data: newAppointment
       });
     }
-    
     // Update availability endpoint
     if (url === '/api/calendar/availability') {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -200,36 +179,29 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
         }
       });
     }
-    
     // Pass through to original function for other endpoints
     return originalFunctions.post.call(this, url, data, ...args);
   };
-
   // Update appointment endpoint
   api.put = function(url, data, ...args) {
     if (url.match(/^\/api\/calendar\/appointments\/\d+$/)) {
-      
       const appointmentId = parseInt(url.split('/').pop());
       const updatedAppointment = {
         id: appointmentId,
         ...data,
         updated_at: new Date().toISOString()
       };
-      
       return Promise.resolve({
         status: 200,
         data: updatedAppointment
       });
     }
-    
     // Pass through to original function for other endpoints
     return originalFunctions.put.call(this, url, data, ...args);
   };
-
   // Delete appointment endpoint
   api.delete = function(url, ...args) {
     if (url.match(/^\/api\/calendar\/appointments\/\d+$/)) {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -237,10 +209,8 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
         }
       });
     }
-    
     // Delete availability slot endpoint
     if (url.match(/^\/api\/calendar\/availability\/slots\/\d+$/)) {
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -248,7 +218,6 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
         }
       });
     }
-    
     // Pass through to original function for other endpoints
     return originalFunctions.delete.call(this, url, ...args);
   };

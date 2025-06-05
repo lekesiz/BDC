@@ -80,7 +80,7 @@ class ProductionSecurityConfig:
     # Rate Limiting
     RATELIMIT_STORAGE_URL = REDIS_URL
     RATELIMIT_DEFAULT = "60/minute"
-    RATELIMIT_STRATEGY = "sliding-window"
+    RATELIMIT_STRATEGY = "sliding-window-counter"
     RATELIMIT_HEADERS_ENABLED = True
     RATELIMIT_EXEMPT_WHEN = lambda: False  # No exemptions in production
     

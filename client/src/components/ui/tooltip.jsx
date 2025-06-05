@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Tooltip component for displaying additional information on hover
  * 
@@ -27,21 +26,18 @@ const Tooltip = ({
   const targetRef = React.useRef(null);
   const tooltipRef = React.useRef(null);
   const timeoutRef = React.useRef(null);
-  
   const positionMap = {
     top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
     right: "left-full top-1/2 -translate-y-1/2 ml-2",
     bottom: "top-full left-1/2 -translate-x-1/2 mt-2",
     left: "right-full top-1/2 -translate-y-1/2 mr-2"
   };
-  
   const arrowPositionMap = {
     top: "bottom-[-4px] left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-b-transparent",
     right: "left-[-4px] top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-r-transparent",
     bottom: "top-[-4px] left-1/2 -translate-x-1/2 border-l-transparent border-r-transparent border-t-transparent",
     left: "right-[-4px] top-1/2 -translate-y-1/2 border-t-transparent border-b-transparent border-l-transparent"
   };
-  
   const handleMouseEnter = React.useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
@@ -52,18 +48,15 @@ const Tooltip = ({
       }
     }, delay);
   }, [delay]);
-  
   const handleMouseLeave = React.useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setIsVisible(false);
   }, []);
-  
   React.useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
-  
   // Handle clicks outside to close tooltip
   React.useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -77,13 +70,11 @@ const Tooltip = ({
         setIsVisible(false);
       }
     };
-    
     document.addEventListener('mousedown', handleOutsideClick);
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [isVisible]);
-  
   return (
     <div className="relative inline-block">
       <div
@@ -95,7 +86,6 @@ const Tooltip = ({
       >
         {children}
       </div>
-      
       {isVisible && content && (
         <div
           ref={tooltipRef}
@@ -120,5 +110,4 @@ const Tooltip = ({
     </div>
   );
 };
-
 export { Tooltip };

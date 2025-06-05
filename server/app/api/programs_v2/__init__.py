@@ -10,3 +10,5 @@ from . import progress_routes  # noqa: E402, F401
 from . import session_routes  # noqa: E402, F401
 from . import enrollment_routes  # noqa: E402, F401
 from . import util_routes  # noqa: E402, F401
+
+from app.utils.logging import logger

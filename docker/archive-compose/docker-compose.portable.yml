@@ -1,0 +1,382 @@
+version: '3.8'
+
+# ===============================
+# BDC Portable Docker Compose
+# ===============================
+# This configuration is designed to run anywhere with minimal setup
+# Copy .env.production.template to .env and configure your values
+
+services:
+  # ===============================
+  # Database Service
+  # ===============================
+  postgres:
+    image: postgres:15-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-bdc}-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-bdc_production}
+      POSTGRES_USER: ${DATABASE_USER:-bdc_user}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+      - ./database/backups:/backups
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+    networks:
+      - bdc_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-bdc_user} -d ${DATABASE_NAME:-bdc_production}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+  # ===============================
+  # Redis Cache Service
+  # ===============================
+  redis:
+    image: redis:7-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-bdc}-redis
+    restart: unless-stopped
+    command: >
+      redis-server 
+      --requirepass ${REDIS_PASSWORD}
+      --appendonly yes 
+      --maxmemory 128mb 
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - bdc_internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    # security_opt:
+    #   - no-new-privileges:true
+    # cap_drop:
+    #   - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+
+  # ===============================
+  # Backend API Service
+  # ===============================
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.optimized
+      target: production
+      args:
+        BUILD_ENV: production
+        PYTHON_VERSION: "3.11"
+    container_name: ${COMPOSE_PROJECT_NAME:-bdc}-backend
+    restart: unless-stopped
+    environment:
+      # Flask Configuration
+      FLASK_ENV: production
+      SECRET_KEY: ${SECRET_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      TRUSTED_HOSTS: ${TRUSTED_HOSTS:-localhost,127.0.0.1}
+      
+      # Database Configuration
+      DATABASE_URL: postgresql://${DATABASE_USER:-bdc_user}:${DATABASE_PASSWORD}@postgres:5432/${DATABASE_NAME:-bdc_production}
+      
+      # Redis Configuration
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      
+      # CORS Configuration
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,https://localhost}
+      
+      # External Services
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_ORGANIZATION: ${OPENAI_ORGANIZATION:-}
+      
+      # Email Configuration
+      MAIL_SERVER: ${MAIL_SERVER:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USE_TLS: ${MAIL_USE_TLS:-true}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_DEFAULT_SENDER: ${MAIL_DEFAULT_SENDER:-noreply@bdc.com}
+      
+      # AWS Configuration
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      S3_BUCKET: ${S3_BUCKET:-}
+      
+      # Monitoring
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY:-}
+      
+      # Performance
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-4}
+    volumes:
+      - backend_uploads:/app/uploads
+      - backend_logs:/app/logs
+    ports:
+      - "${BACKEND_PORT:-5000}:5000"
+    networks:
+      - bdc_internal
+      - bdc_external
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    deploy:
+      resources:
+        limits:
+          memory: ${BACKEND_MEMORY_LIMIT:-1G}
+          cpus: ${BACKEND_CPU_LIMIT:-1.0}
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # ===============================
+  # Frontend Service
+  # ===============================
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.optimized
+      target: production
+      args:
+        BUILD_ENV: production
+        NODE_VERSION: "18"
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5000}
+        VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:5000}
+        VITE_APP_NAME: ${VITE_APP_NAME:-BDC}
+        VITE_ENVIRONMENT: production
+    container_name: ${COMPOSE_PROJECT_NAME:-bdc}-frontend
+    restart: unless-stopped
+    volumes:
+      - nginx_logs:/var/log/nginx
+    ports:
+      - "${FRONTEND_HTTP_PORT:-80}:80"
+      - "${FRONTEND_HTTPS_PORT:-443}:443"
+    networks:
+      - bdc_external
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - CHOWN
+      - SETGID
+      - SETUID
+    deploy:
+      resources:
+        limits:
+          memory: ${FRONTEND_MEMORY_LIMIT:-512M}
+          cpus: ${FRONTEND_CPU_LIMIT:-0.5}
+        reservations:
+          memory: 128M
+          cpus: '0.25'
+
+  # ===============================
+  # Optional Monitoring Services
+  # ===============================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ${COMPOSE_PROJECT_NAME:-bdc}-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    networks:
+      - bdc_internal
+    depends_on:
+      - backend
+    profiles:
+      - monitoring
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ${COMPOSE_PROJECT_NAME:-bdc}-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin123}
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:3000}
+      GF_SECURITY_SECRET_KEY: ${GRAFANA_SECRET_KEY}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    networks:
+      - bdc_internal
+    depends_on:
+      - prometheus
+    profiles:
+      - monitoring
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+
+# ===============================
+# Volume Definitions
+# ===============================
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR:-./data}/postgres
+  
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR:-./data}/redis
+  
+  backend_uploads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR:-./data}/uploads
+  
+  backend_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR:-./data}/logs
+  
+  nginx_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR:-./data}/nginx-logs
+  
+  prometheus_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR:-./data}/prometheus
+  
+  grafana_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_DIR:-./data}/grafana
+
+# ===============================
+# Network Definitions
+# ===============================
+networks:
+  bdc_internal:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+  
+  bdc_external:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+
+# ===============================
+# Configuration Notes
+# ===============================
+# 1. Copy .env.production.template to .env and configure your values
+# 2. Create data directories: mkdir -p ./data/{postgres,redis,uploads,logs,nginx-logs,prometheus,grafana}
+# 3. Run with: docker-compose -f docker-compose.portable.yml up -d
+# 4. Enable monitoring: docker-compose -f docker-compose.portable.yml --profile monitoring up -d
+# 5. Access the application at http://localhost
+# 6. Access Grafana at http://localhost:3000 (if monitoring is enabled)
+# 7. For production, ensure SSL certificates are configured
+# 8. Update CORS_ORIGINS for your domain

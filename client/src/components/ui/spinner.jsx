@@ -1,7 +1,6 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
 /**
  * Reusable spinner component with different sizes and variants
  */
@@ -18,14 +17,12 @@ export const Spinner = ({
     lg: 'h-8 w-8',
     xl: 'h-12 w-12'
   };
-
   const variants = {
     default: 'text-primary',
     secondary: 'text-secondary',
     white: 'text-white',
     muted: 'text-muted-foreground'
   };
-
   return (
     <Loader2 
       className={cn(
@@ -38,7 +35,6 @@ export const Spinner = ({
     />
   );
 };
-
 /**
  * Full page spinner for page transitions
  */
@@ -54,7 +50,6 @@ export const PageSpinner = ({ message = 'Loading...', className = '' }) => {
     </div>
   );
 };
-
 /**
  * Inline spinner for buttons and small sections
  */
@@ -70,7 +65,6 @@ export const InlineSpinner = ({
     </span>
   );
 };
-
 /**
  * Overlay spinner for covering content while loading
  */
@@ -80,7 +74,6 @@ export const OverlaySpinner = ({
   className = '' 
 }) => {
   if (!show) return null;
-
   return (
     <div className={cn(
       'absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50',
@@ -95,5 +88,4 @@ export const OverlaySpinner = ({
     </div>
   );
 };
-
 export default Spinner;

@@ -27,10 +27,16 @@ def _import_models():
     # Test and assessment models
     from app.models.test import Test, TestSet, Question, TestSession, Response, AIFeedback
     from app.models.evaluation import Evaluation
+    from app.models.adaptive_test import (
+        AdaptiveTestPool, AdaptiveQuestion, AdaptiveTestSession,
+        AdaptiveResponse, AdaptiveTestReport
+    )
     
     # Document and appointment models
     from app.models.document import Document
+    from app.models.document_version import DocumentVersion, DocumentComparison
     from app.models.appointment import Appointment
+    from app.models.recurring_appointment import RecurringPattern, AppointmentSeries
     
     # Program and training models
     from app.models.program import Program, ProgramModule, ProgramEnrollment, TrainingSession, SessionAttendance
@@ -51,6 +57,43 @@ def _import_models():
     from app.models.settings import Settings
     from app.models.integration import UserIntegration
     from app.models.document_permission import DocumentPermission
+    from app.models.two_factor_auth import TwoFactorAuth, TwoFactorSession
+    
+    # Chat conversation models
+    from app.models.chat_conversation import (
+        ChatConversation, ChatMessage, ChatRateLimit, 
+        ConversationTemplate, ConversationStatus, MessageRole
+    )
+    
+    # Performance prediction models
+    from app.models.performance_prediction import (
+        PredictionModel, PerformancePrediction, PredictionRecommendation,
+        ModelTrainingHistory
+    )
+    
+    # AI Question Generation models
+    from app.models.ai_question_generation import (
+        ContentType, QuestionType, BloomsTaxonomy,
+        LearningObjective, QuestionGenerationRequest, GeneratedQuestion,
+        QuestionDuplicate, QuestionBank, QuestionBankQuestion,
+        GenerationAnalytics
+    )
+    
+    # Internationalization models
+    from app.models.i18n import (
+        Language, MultilingualContent, TranslationProject,
+        TranslationWorkflow, UserLanguagePreference
+    )
+    
+    # Gamification models
+    from app.models.gamification import (
+        Badge, UserBadge, UserXP, PointTransaction,
+        Leaderboard, LeaderboardEntry, Challenge, ChallengeParticipant,
+        GamificationTeam, Reward, RewardRedemption, UserGoal,
+        GamificationEvent, UserProgress,
+        AchievementCategory, AchievementType, PointActivityType,
+        LeaderboardType, ChallengeType, RewardType
+    )
     
     # Return all models as a dictionary for easier access
     return {
@@ -86,6 +129,13 @@ def _import_models():
         'Evaluation': Evaluation,
         'Assessment': Assessment,
         
+        # Adaptive test models
+        'AdaptiveTestPool': AdaptiveTestPool,
+        'AdaptiveQuestion': AdaptiveQuestion,
+        'AdaptiveTestSession': AdaptiveTestSession,
+        'AdaptiveResponse': AdaptiveResponse,
+        'AdaptiveTestReport': AdaptiveTestReport,
+        
         # Document models
         'Document': Document,
         'DocumentPermission': DocumentPermission,
@@ -93,6 +143,8 @@ def _import_models():
         
         # Appointment and scheduling models
         'Appointment': Appointment,
+        'RecurringPattern': RecurringPattern,
+        'AppointmentSeries': AppointmentSeries,
         'AvailabilitySchedule': AvailabilitySchedule,
         'AvailabilitySlot': AvailabilitySlot,
         'AvailabilityException': AvailabilityException,
@@ -120,6 +172,65 @@ def _import_models():
         'Monitoring': Monitoring,
         'Settings': Settings,
         'Integration': UserIntegration,
+        
+        # Two-Factor Authentication
+        'TwoFactorAuth': TwoFactorAuth,
+        'TwoFactorSession': TwoFactorSession,
+        
+        # Chat conversation models
+        'ChatConversation': ChatConversation,
+        'ChatMessage': ChatMessage,
+        'ChatRateLimit': ChatRateLimit,
+        'ConversationTemplate': ConversationTemplate,
+        'ConversationStatus': ConversationStatus,
+        'MessageRole': MessageRole,
+        
+        # Performance prediction models
+        'PredictionModel': PredictionModel,
+        'PerformancePrediction': PerformancePrediction,
+        'PredictionRecommendation': PredictionRecommendation,
+        'ModelTrainingHistory': ModelTrainingHistory,
+        
+        # AI Question Generation models
+        'ContentType': ContentType,
+        'QuestionType': QuestionType,
+        'BloomsTaxonomy': BloomsTaxonomy,
+        'LearningObjective': LearningObjective,
+        'QuestionGenerationRequest': QuestionGenerationRequest,
+        'GeneratedQuestion': GeneratedQuestion,
+        'QuestionDuplicate': QuestionDuplicate,
+        'QuestionBank': QuestionBank,
+        'QuestionBankQuestion': QuestionBankQuestion,
+        'GenerationAnalytics': GenerationAnalytics,
+        
+        # Internationalization models
+        'Language': Language,
+        'MultilingualContent': MultilingualContent,
+        'TranslationProject': TranslationProject,
+        'TranslationWorkflow': TranslationWorkflow,
+        'UserLanguagePreference': UserLanguagePreference,
+        
+        # Gamification models
+        'Badge': Badge,
+        'UserBadge': UserBadge,
+        'UserXP': UserXP,
+        'PointTransaction': PointTransaction,
+        'Leaderboard': Leaderboard,
+        'LeaderboardEntry': LeaderboardEntry,
+        'Challenge': Challenge,
+        'ChallengeParticipant': ChallengeParticipant,
+        'GamificationTeam': GamificationTeam,
+        'Reward': Reward,
+        'RewardRedemption': RewardRedemption,
+        'UserGoal': UserGoal,
+        'GamificationEvent': GamificationEvent,
+        'UserProgress': UserProgress,
+        'AchievementCategory': AchievementCategory,
+        'AchievementType': AchievementType,
+        'PointActivityType': PointActivityType,
+        'LeaderboardType': LeaderboardType,
+        'ChallengeType': ChallengeType,
+        'RewardType': RewardType,
     }
 
 
@@ -184,12 +295,20 @@ __all__ = [
     'AIFeedback',
     'Evaluation',
     'Assessment',
+    # Adaptive test models
+    'AdaptiveTestPool',
+    'AdaptiveQuestion',
+    'AdaptiveTestSession',
+    'AdaptiveResponse',
+    'AdaptiveTestReport',
     # Document models
     'Document',
     'DocumentPermission',
     'Folder',
     # Appointment and scheduling models
     'Appointment',
+    'RecurringPattern',
+    'AppointmentSeries',
     'AvailabilitySchedule',
     'AvailabilitySlot',
     'AvailabilityException',
@@ -213,4 +332,58 @@ __all__ = [
     'Monitoring',
     'Settings',
     'Integration',
+    # Two-Factor Authentication
+    'TwoFactorAuth',
+    'TwoFactorSession',
+    # Chat conversation models
+    'ChatConversation',
+    'ChatMessage',
+    'ChatRateLimit',
+    'ConversationTemplate',
+    'ConversationStatus',
+    'MessageRole',
+    # Performance prediction models
+    'PredictionModel',
+    'PerformancePrediction',
+    'PredictionRecommendation',
+    'ModelTrainingHistory',
+    # AI Question Generation models
+    'ContentType',
+    'SourceContent',
+    'QuestionType',
+    'BloomsTaxonomy',
+    'LearningObjective',
+    'QuestionGenerationRequest',
+    'GeneratedQuestion',
+    'QuestionDuplicate',
+    'QuestionBank',
+    'QuestionBankQuestion',
+    'GenerationAnalytics',
+    # Internationalization models
+    'Language',
+    'MultilingualContent',
+    'TranslationProject',
+    'TranslationWorkflow',
+    'UserLanguagePreference',
+    # Gamification models
+    'Badge',
+    'UserBadge',
+    'UserXP',
+    'PointTransaction',
+    'Leaderboard',
+    'LeaderboardEntry',
+    'Challenge',
+    'ChallengeParticipant',
+    'GamificationTeam',
+    'Reward',
+    'RewardRedemption',
+    'UserGoal',
+    'GamificationEvent',
+    'UserProgress',
+    'AchievementCategory',
+    'AchievementType',
+    'PointActivityType',
+    'LeaderboardType',
+    'ChallengeType',
+    'RewardType',
 ]

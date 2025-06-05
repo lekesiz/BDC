@@ -5,7 +5,6 @@ import {
   FileText, Award, BarChart2, Settings, Share2, Eye
 } from 'lucide-react';
 import { format } from 'date-fns';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +21,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-
 /**
  * TrainerAssessmentTemplateDetailPage displays detailed information about an assessment template
  * and provides options to edit, duplicate, assign, or delete the template
@@ -34,61 +32,46 @@ const TrainerAssessmentTemplateDetailPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   // State for template data
   const [template, setTemplate] = useState(null);
   const [assignments, setAssignments] = useState([]);
   const [analytics, setAnalytics] = useState(null);
-  
   // State for dialogs
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
-  
   // Fetch data
   useEffect(() => {
     let isMounted = true;
-    
     const fetchData = async () => {
       try {
         if (!isMounted) return;
-        
         setIsLoading(true);
         setError(null);
-        
         // Fetch template details
         const templateResponse = await fetch(`/api/assessment/templates/${id}`);
         if (!isMounted) return;
-        
         if (!templateResponse.ok) throw new Error('Failed to fetch template details');
         const templateData = await templateResponse.json();
-        
         if (!isMounted) return;
         setTemplate(templateData);
-        
         // Fetch assignments using this template
         const assignmentsResponse = await fetch(`/api/assessment/templates/${id}/assignments`);
         if (!isMounted) return;
-        
         if (!assignmentsResponse.ok) throw new Error('Failed to fetch assignments');
         const assignmentsData = await assignmentsResponse.json();
-        
         if (!isMounted) return;
         setAssignments(assignmentsData);
-        
         // Fetch analytics for this template
         const analyticsResponse = await fetch(`/api/assessment/templates/${id}/analytics`);
         if (!isMounted) return;
-        
         if (!analyticsResponse.ok) throw new Error('Failed to fetch analytics');
         const analyticsData = await analyticsResponse.json();
-        
         if (!isMounted) return;
         setAnalytics(analyticsData);
       } catch (err) {
         if (!isMounted) return;
-        
         console.error('Error fetching template data:', err);
         setError(err.message);
         toast({
@@ -102,32 +85,25 @@ const TrainerAssessmentTemplateDetailPage = () => {
         }
       }
     };
-    
     fetchData();
-    
     // Cleanup function to prevent state updates after unmount
     return () => {
       isMounted = false;
     };
   }, [id, toast]);
-  
   // Handle template deletion
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      
       const response = await fetch(`/api/assessment/templates/${id}`, {
         method: 'DELETE',
       });
-      
       if (!response.ok) throw new Error('Failed to delete template');
-      
       toast({
         title: 'Success',
         description: 'Template deleted successfully',
         type: 'success',
       });
-      
       navigate('/assessment');
     } catch (err) {
       console.error('Error deleting template:', err);
@@ -141,26 +117,20 @@ const TrainerAssessmentTemplateDetailPage = () => {
       setShowDeleteDialog(false);
     }
   };
-  
   // Handle template duplication
   const handleDuplicate = async () => {
     try {
       setIsDuplicating(true);
-      
       const response = await fetch(`/api/assessment/templates/${id}/duplicate`, {
         method: 'POST',
       });
-      
       if (!response.ok) throw new Error('Failed to duplicate template');
-      
       const duplicatedTemplate = await response.json();
-      
       toast({
         title: 'Success',
         description: 'Template duplicated successfully',
         type: 'success',
       });
-      
       navigate(`/assessment/templates/${duplicatedTemplate.id}`);
     } catch (err) {
       console.error('Error duplicating template:', err);
@@ -174,11 +144,9 @@ const TrainerAssessmentTemplateDetailPage = () => {
       setShowDuplicateDialog(false);
     }
   };
-  
   // Handle template publish/unpublish
   const handleTogglePublish = async () => {
     if (!template) return;
-    
     try {
       const response = await fetch(`/api/assessment/templates/${id}/publish`, {
         method: 'PUT',
@@ -187,12 +155,9 @@ const TrainerAssessmentTemplateDetailPage = () => {
         },
         body: JSON.stringify({ is_published: !template.is_published }),
       });
-      
       if (!response.ok) throw new Error('Failed to update template');
-      
       const updatedTemplate = await response.json();
       setTemplate(updatedTemplate);
-      
       toast({
         title: 'Success',
         description: `Template ${updatedTemplate.is_published ? 'published' : 'unpublished'} successfully`,
@@ -207,7 +172,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
       });
     }
   };
-  
   // Render loading state
   if (isLoading) {
     return (
@@ -216,7 +180,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
       </div>
     );
   }
-  
   // Render error state
   if (error || !template) {
     return (
@@ -231,7 +194,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
             Back to Assessments
           </Button>
         </div>
-        
         <Card className="p-6 text-center">
           <div className="text-red-500 mb-4">
             <FileText className="w-12 h-12 mx-auto" />
@@ -245,9 +207,7 @@ const TrainerAssessmentTemplateDetailPage = () => {
       </div>
     );
   }
-  
   const isQuiz = template.type === 'quiz';
-  
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
@@ -274,7 +234,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
             <p className="text-gray-600">{template.description}</p>
           </div>
         </div>
-        
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
@@ -317,7 +276,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Tabs */}
       <Tabs
         value={activeTab}
@@ -342,7 +300,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
             Settings
           </Tabs.TabTrigger>
         </Tabs.TabsList>
-        
         {/* Overview Tab */}
         <Tabs.TabContent value="overview">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -352,7 +309,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                 <FileText className="w-5 h-5 mr-2 text-primary" />
                 Template Details
               </h3>
-              
               <Table>
                 <Table.Body>
                   <Table.Row>
@@ -396,40 +352,34 @@ const TrainerAssessmentTemplateDetailPage = () => {
                 </Table.Body>
               </Table>
             </Card>
-            
             {/* Analytics Card */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <BarChart2 className="w-5 h-5 mr-2 text-primary" />
                 Usage Analytics
               </h3>
-              
               {analytics ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <p className="font-medium">Total Assignments</p>
                     <p className="font-bold text-primary">{analytics.total_assignments}</p>
                   </div>
-                  
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <p className="font-medium">Completed Submissions</p>
                     <p className="font-bold text-green-600">{analytics.completed_submissions}</p>
                   </div>
-                  
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <p className="font-medium">Average Score</p>
                     <p className="font-bold text-blue-600">
                       {analytics.average_score ? `${analytics.average_score}%` : 'N/A'}
                     </p>
                   </div>
-                  
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <p className="font-medium">Pass Rate</p>
                     <p className="font-bold text-purple-600">
                       {analytics.pass_rate ? `${analytics.pass_rate}%` : 'N/A'}
                     </p>
                   </div>
-                  
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <p className="font-medium">Average Time</p>
                     <p className="font-bold">
@@ -441,14 +391,12 @@ const TrainerAssessmentTemplateDetailPage = () => {
                 <p className="text-gray-500 text-center py-4">No analytics data available</p>
               )}
             </Card>
-            
             {/* Settings Overview Card */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Settings className="w-5 h-5 mr-2 text-primary" />
                 Settings Overview
               </h3>
-              
               <div className="space-y-4">
                 {isQuiz && (
                   <>
@@ -456,43 +404,36 @@ const TrainerAssessmentTemplateDetailPage = () => {
                       <p className="font-medium">Time Limit</p>
                       <p>{template.settings?.timeLimit ? `${template.settings.timeLimit} minutes` : 'No limit'}</p>
                     </div>
-                    
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <p className="font-medium">Shuffle Questions</p>
                       <p>{template.settings?.shuffleQuestions ? 'Yes' : 'No'}</p>
                     </div>
-                    
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <p className="font-medium">Show Correct Answers</p>
                       <p>{template.settings?.showCorrectAnswers ? 'Yes' : 'No'}</p>
                     </div>
                   </>
                 )}
-                
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <p className="font-medium">Allow Late Submission</p>
                   <p>{template.settings?.allowLateSubmission ? 'Yes' : 'No'}</p>
                 </div>
-                
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <p className="font-medium">Auto-grading</p>
                   <p>{template.settings?.autoGrade ? 'Enabled' : 'Disabled'}</p>
                 </div>
-                
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <p className="font-medium">Passing Score</p>
                   <p>{template.settings?.passingScore || 70}%</p>
                 </div>
               </div>
             </Card>
-            
             {/* Recent Activity Card */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Clock className="w-5 h-5 mr-2 text-primary" />
                 Recent Activity
               </h3>
-              
               <div className="space-y-3">
                 {/* Mock recent activity - would be real data in production */}
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -502,7 +443,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                   </div>
                   <p className="text-sm text-gray-500">2 hours ago</p>
                 </div>
-                
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
                     <p className="font-medium">Template edited</p>
@@ -510,7 +450,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                   </div>
                   <p className="text-sm text-gray-500">1 day ago</p>
                 </div>
-                
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
                     <p className="font-medium">Template published</p>
@@ -522,7 +461,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
             </Card>
           </div>
         </Tabs.TabContent>
-        
         {/* Content Tab */}
         <Tabs.TabContent value="content">
           {isQuiz ? (
@@ -530,7 +468,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
             <div className="space-y-6">
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Quiz Questions</h3>
-                
                 {template.questions && template.questions.length > 0 ? (
                   <div className="space-y-4">
                     {template.questions.map((question, index) => (
@@ -549,7 +486,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                           </div>
                           <p className="text-sm text-gray-500">{question.points || 10} points</p>
                         </div>
-                        
                         {/* Display options based on question type */}
                         {question.type === 'multipleChoice' && (
                           <div className="ml-11 space-y-1">
@@ -567,7 +503,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                             ))}
                           </div>
                         )}
-                        
                         {question.type === 'trueFalse' && (
                           <div className="ml-11">
                             <p className="text-sm text-gray-600">
@@ -575,7 +510,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                             </p>
                           </div>
                         )}
-                        
                         {question.type === 'shortAnswer' && (
                           <div className="ml-11">
                             <p className="text-sm text-gray-600">
@@ -602,7 +536,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
               {/* Requirements */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Project Requirements</h3>
-                
                 {template.requirements && template.requirements.length > 0 ? (
                   <div className="space-y-3">
                     {template.requirements.map((requirement, index) => (
@@ -623,18 +556,15 @@ const TrainerAssessmentTemplateDetailPage = () => {
                   <p className="text-gray-500 text-center py-4">No requirements specified</p>
                 )}
               </Card>
-              
               {/* Rubric */}
               {template.rubric && Object.keys(template.rubric).length > 0 && (
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Evaluation Rubric</h3>
-                  
                   <div className="space-y-4">
                     {Object.entries(template.rubric).map(([category, details]) => (
                       <div key={category} className="p-4 border rounded-lg">
                         <h4 className="font-medium mb-2">{category}</h4>
                         <p className="text-gray-600 mb-3">{details.description}</p>
-                        
                         <div className="space-y-2">
                           {Object.entries(details.levels).map(([level, criteria]) => (
                             <div key={level} className="flex items-start">
@@ -655,12 +585,10 @@ const TrainerAssessmentTemplateDetailPage = () => {
                   </div>
                 </Card>
               )}
-              
               {/* Resources */}
               {template.resources && template.resources.length > 0 && (
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Resources</h3>
-                  
                   <div className="space-y-2">
                     {template.resources.map((resource, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -676,7 +604,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
             </div>
           )}
         </Tabs.TabContent>
-        
         {/* Assignments Tab */}
         <Tabs.TabContent value="assignments">
           <Card className="p-6">
@@ -690,7 +617,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                 New Assignment
               </Button>
             </div>
-            
             {assignments.length > 0 ? (
               <Table>
                 <Table.Header>
@@ -749,14 +675,12 @@ const TrainerAssessmentTemplateDetailPage = () => {
             )}
           </Card>
         </Tabs.TabContent>
-        
         {/* Settings Tab */}
         <Tabs.TabContent value="settings">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* General Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">General Settings</h3>
-              
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -769,7 +693,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                     onCheckedChange={handleTogglePublish}
                   />
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="sharable">Sharable</Label>
@@ -781,7 +704,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                     disabled
                   />
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="require-approval">Require Approval</Label>
@@ -795,11 +717,9 @@ const TrainerAssessmentTemplateDetailPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Assessment Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Assessment Settings</h3>
-              
               <div className="space-y-4">
                 {isQuiz && (
                   <>
@@ -809,7 +729,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                         {template.settings?.timeLimit ? `${template.settings.timeLimit} minutes` : 'No time limit'}
                       </p>
                     </div>
-                    
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="font-medium">Attempts Allowed</p>
                       <p className="text-sm text-gray-600">
@@ -818,19 +737,16 @@ const TrainerAssessmentTemplateDetailPage = () => {
                     </div>
                   </>
                 )}
-                
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="font-medium">Passing Score</p>
                   <p className="text-sm text-gray-600">{template.settings?.passingScore || 70}%</p>
                 </div>
-                
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="font-medium">Allow Late Submission</p>
                   <p className="text-sm text-gray-600">
                     {template.settings?.allowLateSubmission ? 'Yes' : 'No'}
                   </p>
                 </div>
-                
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="font-medium">Late Penalty</p>
                   <p className="text-sm text-gray-600">
@@ -839,11 +755,9 @@ const TrainerAssessmentTemplateDetailPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Notification Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Notification Settings</h3>
-              
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -856,7 +770,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                     disabled
                   />
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="notify-due">Notify Before Due Date</Label>
@@ -868,7 +781,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                     disabled
                   />
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="notify-grade">Notify on Grading</Label>
@@ -882,11 +794,9 @@ const TrainerAssessmentTemplateDetailPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Sharing Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Sharing Settings</h3>
-              
               <div className="space-y-4">
                 <Button
                   variant="outline"
@@ -896,7 +806,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
                   <Share2 className="w-4 h-4 mr-2" />
                   Generate Share Link
                 </Button>
-                
                 <p className="text-sm text-gray-600">
                   Share this template with other trainers in your organization
                 </p>
@@ -905,7 +814,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
           </div>
         </Tabs.TabContent>
       </Tabs>
-      
       {/* Delete Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
@@ -937,7 +845,6 @@ const TrainerAssessmentTemplateDetailPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
       {/* Duplicate Dialog */}
       <Dialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
         <DialogContent>
@@ -971,5 +878,4 @@ const TrainerAssessmentTemplateDetailPage = () => {
     </div>
   );
 };
-
 export default TrainerAssessmentTemplateDetailPage;

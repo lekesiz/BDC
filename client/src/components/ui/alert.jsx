@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Alert component with different variants
  * 
@@ -29,7 +28,6 @@ export const Alert = ({
     warning: 'bg-yellow-50 text-yellow-800 border-yellow-200',
     error: 'bg-red-50 text-red-800 border-red-200',
   };
-
   const icons = {
     info: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -52,7 +50,6 @@ export const Alert = ({
       </svg>
     ),
   };
-
   return (
     <div
       className={cn(

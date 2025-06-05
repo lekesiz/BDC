@@ -19,7 +19,6 @@ import {
   MatchingQuestion,
   MultipleAnswerQuestion
 } from './QuestionTypes';
-
 /**
  * Quiz Component
  * Handles quiz flow, timer, scoring, and results
@@ -37,11 +36,9 @@ const Quiz = ({
   const [showResults, setShowResults] = useState(false);
   const [remainingTime, setRemainingTime] = useState(quizData.timeLimit || 0);
   const [reviewMode, setReviewMode] = useState(false);
-  
   // Timer functionality
   useEffect(() => {
     if (!timedMode || quizCompleted || !quizData.timeLimit) return;
-    
     // Start the timer
     const timer = setInterval(() => {
       setRemainingTime(prevTime => {
@@ -54,18 +51,15 @@ const Quiz = ({
         return prevTime - 1;
       });
     }, 1000);
-    
     // Cleanup on unmount
     return () => clearInterval(timer);
   }, [timedMode, quizCompleted]);
-  
   // Format time remaining
   const formatTimeRemaining = () => {
     const minutes = Math.floor(remainingTime / 60);
     const seconds = remainingTime % 60;
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
-  
   // Handle answering a question
   const handleAnswer = (answer) => {
     setUserAnswers(prev => ({
@@ -73,7 +67,6 @@ const Quiz = ({
       [activeQuestion]: answer
     }));
   };
-  
   // Navigate to the next question
   const handleNextQuestion = () => {
     if (activeQuestion < quizData.questions.length - 1) {
@@ -91,21 +84,17 @@ const Quiz = ({
       }
     }
   };
-  
   // Navigate to the previous question
   const handlePreviousQuestion = () => {
     if (activeQuestion > 0) {
       setActiveQuestion(activeQuestion - 1);
     }
   };
-  
   // Complete the quiz
   const handleCompleteQuiz = () => {
     setQuizCompleted(true);
-    
     // Calculate the score
     const score = calculateScore();
-    
     // Provide results to parent component
     onComplete({
       answers: userAnswers,
@@ -115,40 +104,32 @@ const Quiz = ({
       completedAt: new Date(),
       timeSpent: quizData.timeLimit ? quizData.timeLimit - remainingTime : null
     });
-    
     // Show the results screen
     setShowResults(true);
   };
-  
   // Calculate the quiz score
   const calculateScore = () => {
     let correct = 0;
     let total = quizData.questions.length;
-    
     quizData.questions.forEach((question, index) => {
       if (isAnswerCorrect(question, userAnswers[index])) {
         correct++;
       }
     });
-    
     return {
       correct,
       total,
       percentage: Math.round((correct / total) * 100)
     };
   };
-  
   // Check if an answer is correct
   const isAnswerCorrect = (question, answer) => {
     if (answer === undefined) return false;
-    
     switch (question.type) {
       case 'multipleChoice':
         return answer === question.correctAnswer;
-        
       case 'trueFalse':
         return answer === question.correctAnswer;
-        
       case 'shortAnswer':
         if (Array.isArray(question.correctAnswer)) {
           return question.correctAnswer.some(ans => 
@@ -156,23 +137,19 @@ const Quiz = ({
           );
         }
         return answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim();
-        
       case 'matching':
         return Object.keys(question.correctMatches).every(
           itemId => answer[itemId] === question.correctMatches[itemId]
         );
-        
       case 'multipleAnswer':
         if (!answer || answer.length === 0) return false;
         if (answer.length !== question.correctAnswers.length) return false;
         return question.correctAnswers.every(ans => answer.includes(ans)) &&
                answer.every(ans => question.correctAnswers.includes(ans));
-               
       default:
         return false;
     }
   };
-  
   // Restart the quiz
   const handleRestartQuiz = () => {
     setUserAnswers({});
@@ -182,23 +159,19 @@ const Quiz = ({
     setRemainingTime(quizData.timeLimit || 0);
     setReviewMode(false);
   };
-  
   // Enter review mode
   const handleReviewQuiz = () => {
     setReviewMode(true);
     setShowResults(false);
     setActiveQuestion(0);
   };
-  
   // Get the current question
   const currentQuestion = quizData.questions[activeQuestion];
-  
   // Render the results screen
   if (showResults) {
     const score = calculateScore();
     const passingScore = quizData.passingScore || 70;
     const passed = score.percentage >= passingScore;
-    
     return (
       <Card className="p-6">
         <div className="text-center mb-8">
@@ -226,7 +199,6 @@ const Quiz = ({
             </p>
           )}
         </div>
-        
         <div className="flex flex-col sm:flex-row gap-2 justify-center">
           <Button variant="outline" onClick={handleRestartQuiz}>
             <RotateCcw className="h-4 w-4 mr-2" />
@@ -243,7 +215,6 @@ const Quiz = ({
       </Card>
     );
   }
-  
   // Render the current question
   return (
     <Card className="p-6">
@@ -257,7 +228,6 @@ const Quiz = ({
           </div>
         )}
       </div>
-      
       {/* Progress indicator */}
       <div className="mb-6">
         <div className="flex justify-between text-sm text-gray-500 mb-2">
@@ -273,7 +243,6 @@ const Quiz = ({
           ></div>
         </div>
       </div>
-      
       {/* Question */}
       <div className="mb-8">
         {currentQuestion.type === 'multipleChoice' && (
@@ -287,7 +256,6 @@ const Quiz = ({
             questionIndex={activeQuestion}
           />
         )}
-        
         {currentQuestion.type === 'trueFalse' && (
           <TrueFalseQuestion
             question={currentQuestion.question}
@@ -299,7 +267,6 @@ const Quiz = ({
             questionIndex={activeQuestion}
           />
         )}
-        
         {currentQuestion.type === 'shortAnswer' && (
           <ShortAnswerQuestion
             question={currentQuestion.question}
@@ -311,7 +278,6 @@ const Quiz = ({
             questionIndex={activeQuestion}
           />
         )}
-        
         {currentQuestion.type === 'matching' && (
           <MatchingQuestion
             question={currentQuestion.question}
@@ -323,7 +289,6 @@ const Quiz = ({
             questionIndex={activeQuestion}
           />
         )}
-        
         {currentQuestion.type === 'multipleAnswer' && (
           <MultipleAnswerQuestion
             question={currentQuestion.question}
@@ -337,7 +302,6 @@ const Quiz = ({
           />
         )}
       </div>
-      
       {/* Navigation buttons */}
       <div className="flex justify-between">
         <Button 
@@ -348,14 +312,12 @@ const Quiz = ({
           <ChevronLeft className="h-4 w-4 mr-2" />
           Previous
         </Button>
-        
         <div className="flex gap-2">
           {reviewMode && (
             <Button variant="outline" onClick={() => setShowResults(true)}>
               Back to Results
             </Button>
           )}
-          
           {activeQuestion === quizData.questions.length - 1 && !reviewMode ? (
             <Button onClick={handleCompleteQuiz}>
               Submit Quiz
@@ -371,5 +333,4 @@ const Quiz = ({
     </Card>
   );
 };
-
 export default Quiz;

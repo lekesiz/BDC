@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Select } from '@/components/ui/select';
 import { useState } from 'react';
-
 export const AnimatedSelect = ({ 
   error, 
   className, 
@@ -11,17 +10,14 @@ export const AnimatedSelect = ({
   ...props 
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-
   const handleFocus = (e) => {
     setIsFocused(true);
     onFocus?.(e);
   };
-
   const handleBlur = (e) => {
     setIsFocused(false);
     onBlur?.(e);
   };
-
   return (
     <motion.div
       animate={{
@@ -37,7 +33,6 @@ export const AnimatedSelect = ({
       >
         {children}
       </Select>
-      
       {error && (
         <motion.div
           initial={{ opacity: 0, y: -5 }}

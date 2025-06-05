@@ -1,6 +1,7 @@
 """
 AI-powered report synthesis service
 """
+import os
 import json
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
@@ -51,8 +52,8 @@ class ReportSynthesisService:
     """AI-powered report synthesis service"""
     
     def __init__(self):
-        self.api_key = "placeholder-key"
-        self.openai_client = OpenAI(api_key=self.api_key)
+        self.api_key = os.getenv('OPENAI_API_KEY')
+        self.openai_client = OpenAI(api_key=self.api_key) if self.api_key else None
         
     def generate_comprehensive_report(self, beneficiary_id: int, db: Session,
                                     report_type: str = 'comprehensive',

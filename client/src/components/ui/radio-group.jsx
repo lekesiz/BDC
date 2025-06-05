@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * RadioGroup component for grouping radio buttons
  * 
@@ -36,9 +35,7 @@ export const RadioGroup = React.forwardRef(({
     </div>
   );
 });
-
 RadioGroup.displayName = "RadioGroup";
-
 /**
  * RadioGroupItem component for individual radio items
  * 
@@ -58,7 +55,6 @@ export const RadioGroupItem = React.forwardRef(({
   ...props 
 }, ref) => {
   const id = props.id || `radio-${value}`;
-  
   return (
     <div className="flex items-center space-x-2">
       <input
@@ -82,5 +78,4 @@ export const RadioGroupItem = React.forwardRef(({
     </div>
   );
 });
-
 RadioGroupItem.displayName = "RadioGroupItem";

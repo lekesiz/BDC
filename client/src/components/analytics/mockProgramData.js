@@ -1,7 +1,6 @@
 /**
  * Mock data for program analytics
  */
-
 // Sample programs for analytics
 export const programs = [
   {
@@ -101,7 +100,6 @@ export const programs = [
     status: "Upcoming"
   }
 ];
-
 // Detailed program analytics data
 export const programAnalytics = {
   1: { // Web Development Bootcamp
@@ -431,31 +429,24 @@ export const programAnalytics = {
   },
   // You could add more detailed analytics for other programs as needed
 };
-
 // Mock API function to get all programs
 export const getProgramsList = () => {
   return Promise.resolve(programs);
 };
-
 // Mock API function to get program analytics by ID
 export const getProgramAnalytics = (id, dateRange = 'last30days') => {
   const analytics = programAnalytics[id];
-  
   if (!analytics) {
     return Promise.reject(new Error('Program analytics not found'));
   }
-  
   // In a real scenario, you might filter data based on dateRange
   // For mock data, we'll just return the full analytics
-  
   return Promise.resolve(analytics);
 };
-
 // Mock API function to export program analytics
 export const exportProgramAnalytics = (id, format, dateRange = 'last30days') => {
   // In a real scenario, this would generate a file for download
   // For mock data, we'll just return a successful response
-  
   return Promise.resolve({
     success: true,
     message: `Program analytics for program ${id} exported as ${format}`

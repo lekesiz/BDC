@@ -1,8 +1,6 @@
 // Mock data for assessment statistics
-
 export const generateMockStatistics = (startDate, endDate) => {
   const days = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
-  
   return {
     overview: {
       totalAssessments: 127,
@@ -13,7 +11,6 @@ export const generateMockStatistics = (startDate, endDate) => {
       pendingSubmissions: 89,
       averageTimeToComplete: 45 // minutes
     },
-    
     performance: {
       scoreDistribution: [
         { range: '0-20%', count: 12 },
@@ -22,13 +19,11 @@ export const generateMockStatistics = (startDate, endDate) => {
         { range: '61-80%', count: 142 },
         { range: '81-100%', count: 95 }
       ],
-      
       timeToComplete: [
         { type: 'Quick Quiz', minutes: 15 },
         { type: 'Standard Quiz', minutes: 35 },
         { type: 'Project', minutes: 120 }
       ],
-      
       byCourse: [
         { id: 1, name: 'Python Programming', assessmentCount: 24, averageScore: 82, passRate: 85 },
         { id: 2, name: 'Web Development', assessmentCount: 18, averageScore: 75, passRate: 78 },
@@ -36,27 +31,22 @@ export const generateMockStatistics = (startDate, endDate) => {
         { id: 4, name: 'Mobile Development', assessmentCount: 15, averageScore: 71, passRate: 72 },
         { id: 5, name: 'Cloud Computing', assessmentCount: 22, averageScore: 84, passRate: 88 }
       ],
-      
       byTrainer: [
         { id: 1, name: 'John Smith', studentCount: 45, averageScore: 79, completionRate: 88 },
         { id: 2, name: 'Sarah Johnson', studentCount: 52, averageScore: 82, completionRate: 91 },
         { id: 3, name: 'Mike Chen', studentCount: 38, averageScore: 77, completionRate: 85 },
         { id: 4, name: 'Emily Davis', studentCount: 41, averageScore: 80, completionRate: 87 }
       ],
-      
       passRateTrends: generateTrendData(days, ['quiz', 'project', 'overall'])
     },
-    
     completion: {
       trends: generateCompletionTrends(days)
     },
-    
     assessmentStats: {
       typeDistribution: [
         { name: 'Quiz', value: 78 },
         { name: 'Project', value: 49 }
       ],
-      
       topAssessments: [
         {
           id: 1,
@@ -100,7 +90,6 @@ export const generateMockStatistics = (startDate, endDate) => {
         }
       ]
     },
-    
     studentStats: {
       topStudents: [
         {
@@ -136,7 +125,6 @@ export const generateMockStatistics = (startDate, endDate) => {
           badges: ['⭐']
         }
       ],
-      
       needingSupport: [
         {
           id: 5,
@@ -160,10 +148,8 @@ export const generateMockStatistics = (startDate, endDate) => {
           averageScore: 38
         }
       ],
-      
       engagementTrends: generateEngagementTrends(days)
     },
-    
     questionStats: {
       mostChallenging: [
         {
@@ -202,39 +188,30 @@ export const generateMockStatistics = (startDate, endDate) => {
     }
   };
 };
-
 // Helper function to generate trend data
 function generateTrendData(days, metrics) {
   const data = [];
   const today = new Date();
-  
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
-    
     const dataPoint = {
       date: date.toISOString().split('T')[0]
     };
-    
     metrics.forEach(metric => {
       dataPoint[metric] = Math.floor(Math.random() * 20) + 70; // Random value between 70-90
     });
-    
     data.push(dataPoint);
   }
-  
   return data;
 }
-
 // Helper function to generate completion trends
 function generateCompletionTrends(days) {
   const data = [];
   const today = new Date();
-  
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
-    
     data.push({
       date: date.toISOString().split('T')[0],
       completed: Math.floor(Math.random() * 50) + 100,
@@ -242,19 +219,15 @@ function generateCompletionTrends(days) {
       overdue: Math.floor(Math.random() * 10) + 5
     });
   }
-  
   return data;
 }
-
 // Helper function to generate engagement trends
 function generateEngagementTrends(days) {
   const data = [];
   const today = new Date();
-  
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
-    
     data.push({
       date: date.toISOString().split('T')[0],
       active: Math.floor(Math.random() * 100) + 200,
@@ -262,76 +235,63 @@ function generateEngagementTrends(days) {
       new: Math.floor(Math.random() * 20) + 10
     });
   }
-  
   return data;
 }
-
 export const statisticsEndpoints = {
   overview: (req) => {
     const url = new URL(req.url);
     const start = url.searchParams.get('start');
     const end = url.searchParams.get('end');
-    
     const stats = generateMockStatistics(start, end);
     return new Response(JSON.stringify(stats.overview), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   },
-  
   performance: (req) => {
     const url = new URL(req.url);
     const start = url.searchParams.get('start');
     const end = url.searchParams.get('end');
-    
     const stats = generateMockStatistics(start, end);
     return new Response(JSON.stringify(stats.performance), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   },
-  
   completion: (req) => {
     const url = new URL(req.url);
     const start = url.searchParams.get('start');
     const end = url.searchParams.get('end');
-    
     const stats = generateMockStatistics(start, end);
     return new Response(JSON.stringify(stats.completion), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   },
-  
   assessments: (req) => {
     const url = new URL(req.url);
     const start = url.searchParams.get('start');
     const end = url.searchParams.get('end');
-    
     const stats = generateMockStatistics(start, end);
     return new Response(JSON.stringify(stats.assessmentStats), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   },
-  
   students: (req) => {
     const url = new URL(req.url);
     const start = url.searchParams.get('start');
     const end = url.searchParams.get('end');
-    
     const stats = generateMockStatistics(start, end);
     return new Response(JSON.stringify(stats.studentStats), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   },
-  
   questions: (req) => {
     const url = new URL(req.url);
     const start = url.searchParams.get('start');
     const end = url.searchParams.get('end');
-    
     const stats = generateMockStatistics(start, end);
     return new Response(JSON.stringify(stats.questionStats), {
       status: 200,

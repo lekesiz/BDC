@@ -4,7 +4,6 @@ import { BrowserRouter } from 'react-router-dom';
 import TestResultsPageV2 from '../../../pages/evaluation/TestResultsPageV2';
 import axios from '../../../lib/api';
 import * as useToastModule from '../../../hooks/useToast';
-
 // Mock modules
 vi.mock('../../../lib/api');
 vi.mock('../../../hooks/useToast', () => ({
@@ -15,7 +14,6 @@ vi.mock('../../../hooks/useToast', () => ({
   __esModule: true,
   default: { toast: vi.fn() }
 }));
-
 // Mock ChartJS
 vi.mock('chart.js', () => ({
   Chart: { register: vi.fn() },
@@ -30,7 +28,6 @@ vi.mock('chart.js', () => ({
   Legend: class {},
   RadialLinearScale: class {},
 }));
-
 // Mock Chart components
 vi.mock('react-chartjs-2', () => ({
   Line: () => <div data-testid="line-chart">Line Chart</div>,
@@ -39,7 +36,6 @@ vi.mock('react-chartjs-2', () => ({
   Doughnut: () => <div data-testid="doughnut-chart">Doughnut Chart</div>,
   Radar: () => <div data-testid="radar-chart">Radar Chart</div>,
 }));
-
 // Mock useNavigate hook
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -50,9 +46,7 @@ vi.mock('react-router-dom', async () => {
     useParams: () => ({ sessionId: '123' }),
   };
 });
-
 // Toast functions are mocked above
-
 // Mock URL utilities
 global.URL.createObjectURL = vi.fn(() => 'mock-url');
 global.Blob = vi.fn(() => ({}));
@@ -68,7 +62,6 @@ document.createElement = vi.fn().mockImplementation((tag) => {
   return {};
 });
 document.body.appendChild = vi.fn();
-
 // Sample test data
 const mockSessionData = {
   session: {
@@ -152,7 +145,6 @@ const mockSessionData = {
     },
   },
 };
-
 const mockHistoryData = [
   {
     id: '123',
@@ -182,7 +174,6 @@ const mockHistoryData = [
     total_questions: 20,
   },
 ];
-
 const mockComparisonsData = {
   dimensions: ['JavaScript', 'HTML', 'CSS', 'React', 'Node.js'],
   your_scores: [90, 85, 75, 80, 70],
@@ -197,7 +188,6 @@ const mockComparisonsData = {
   achievement_description: 'You demonstrated strong web development skills!',
   badges: ['JavaScript Expert', 'HTML Proficient', 'Fast Learner'],
 };
-
 describe('TestResultsPageV2', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -218,17 +208,14 @@ describe('TestResultsPageV2', () => {
     });
     axios.post.mockResolvedValue({ data: { success: true } });
   });
-
   it('renders loading state initially', async () => {
     // Mock API never resolves to keep loading state
     axios.get.mockImplementationOnce(() => new Promise(() => {}));
-    
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Loading state should be shown - check for any loading indicator
     try {
       const loadingElement = screen.getByTestId('loading-skeleton') || 
@@ -241,34 +228,27 @@ describe('TestResultsPageV2', () => {
       expect(screen.queryByText('Web Development Pro')).not.toBeInTheDocument();
     }
   });
-
   it('renders test results page with correct data', async () => {
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText('Web Development Pro')).toBeInTheDocument();
     });
-    
     // Check header information
     expect(screen.getByText('Test Sonuçları')).toBeInTheDocument();
-    
     // Check score display
     expect(screen.getByText('85%')).toBeInTheDocument();
     expect(screen.getByText('Toplam Puan')).toBeInTheDocument();
-    
     // Check correct answers display
     expect(screen.getByText('17/20')).toBeInTheDocument();
     expect(screen.getByText('Doğru Cevap')).toBeInTheDocument();
-    
     // Check time display
     expect(screen.getByText('35 dk')).toBeInTheDocument();
     expect(screen.getByText('Tamamlama Süresi')).toBeInTheDocument();
-    
     // Check tab navigation
     expect(screen.getByText('Genel Bakış')).toBeInTheDocument();
     expect(screen.getByText('Sorular')).toBeInTheDocument();
@@ -276,103 +256,81 @@ describe('TestResultsPageV2', () => {
     expect(screen.getByText('Karşılaştırma')).toBeInTheDocument();
     expect(screen.getByText('Geçmiş')).toBeInTheDocument();
   });
-
   it('displays charts in overview tab', async () => {
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText('Web Development Pro')).toBeInTheDocument();
     });
-    
     // Check charts are displayed
     expect(screen.getByText('Puan Gelişimi')).toBeInTheDocument();
     expect(screen.getByTestId('line-chart')).toBeInTheDocument();
-    
     expect(screen.getByText('Cevap Dağılımı')).toBeInTheDocument();
     expect(screen.getByTestId('doughnut-chart')).toBeInTheDocument();
-    
     expect(screen.getByText('Beceri Performansı')).toBeInTheDocument();
     expect(screen.getAllByTestId('bar-chart')[0]).toBeInTheDocument();
-    
     expect(screen.getByText('Konu Performansı')).toBeInTheDocument();
     expect(screen.getAllByTestId('bar-chart')[1]).toBeInTheDocument();
   });
-
   it('navigates through tabs correctly', async () => {
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText('Web Development Pro')).toBeInTheDocument();
     });
-    
     // Overview tab should be active by default
     expect(screen.getByText('Puan Gelişimi')).toBeInTheDocument();
-    
     // Click on Questions tab
     fireEvent.click(screen.getByText('Sorular'));
-    
     // Questions content should be visible
     expect(screen.getByText('Soru 1')).toBeInTheDocument();
     expect(screen.getByText('What is JavaScript?')).toBeInTheDocument();
-    
     // Click on Analysis tab
     fireEvent.click(screen.getByText('Detaylı Analiz'));
-    
     // Analysis content should be visible
     expect(screen.getByText('Zorluk Analizi')).toBeInTheDocument();
     expect(screen.getByText('Zaman Analizi')).toBeInTheDocument();
     expect(screen.getByText('Beceri Detayları')).toBeInTheDocument();
-    
     // Click on Comparison tab
     fireEvent.click(screen.getByText('Karşılaştırma'));
-    
     // Comparison content should be visible
     expect(screen.getByText('Performans Karşılaştırması')).toBeInTheDocument();
     expect(screen.getByText('Grup İstatistikleri')).toBeInTheDocument();
     expect(screen.getByText('Başarı Rozeti')).toBeInTheDocument();
-    
     // Click on History tab
     fireEvent.click(screen.getByText('Geçmiş'));
-    
     // History content should be visible
     expect(screen.getByText('Test Geçmişi')).toBeInTheDocument();
     expect(screen.getByText('Deneme #1')).toBeInTheDocument();
     expect(screen.getByText('Deneme #2')).toBeInTheDocument();
     expect(screen.getByText('Deneme #3')).toBeInTheDocument();
   });
-
   it('handles export functionality correctly', async () => {
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText('Web Development Pro')).toBeInTheDocument();
     });
-    
     // Click on export button
     fireEvent.click(screen.getByText('İndir'));
-    
     // Check API call
     await waitFor(() => {
       expect(axios.get).toHaveBeenCalledWith('/api/evaluations/sessions/123/export?format=pdf', {
         responseType: 'blob'
       });
     });
-    
     // Check download link was created and clicked
     expect(URL.createObjectURL).toHaveBeenCalled();
     expect(document.createElement).toHaveBeenCalledWith('a');
@@ -380,7 +338,6 @@ describe('TestResultsPageV2', () => {
     expect(mockAnchor.setAttribute).toHaveBeenCalledWith('download', 'test-results-123.pdf');
     expect(mockAnchor.click).toHaveBeenCalled();
     expect(mockAnchor.remove).toHaveBeenCalled();
-    
     // Check success toast
     expect(useToastModule.toast).toHaveBeenCalledWith({
       title: 'Başarılı',
@@ -388,7 +345,6 @@ describe('TestResultsPageV2', () => {
       variant: 'success'
     });
   });
-
   it('handles export errors correctly', async () => {
     // Mock API error for export
     axios.get.mockImplementation((url) => {
@@ -406,21 +362,17 @@ describe('TestResultsPageV2', () => {
       }
       return Promise.reject(new Error('Unknown URL'));
     });
-    
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText('Web Development Pro')).toBeInTheDocument();
     });
-    
     // Click on export button
     fireEvent.click(screen.getByText('İndir'));
-    
     // Check error toast
     await waitFor(() => {
       expect(useToastModule.toast).toHaveBeenCalledWith({
@@ -430,31 +382,25 @@ describe('TestResultsPageV2', () => {
       });
     });
   });
-
   it('opens and handles share modal correctly', async () => {
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText('Web Development Pro')).toBeInTheDocument();
     });
-    
     // Click on share button to open modal
     fireEvent.click(screen.getByText('Paylaş'));
-    
     // Check modal is displayed
     expect(screen.getByText('Sonuçları Paylaş')).toBeInTheDocument();
     expect(screen.getByText('E-posta ile Gönder')).toBeInTheDocument();
     expect(screen.getByText('Link Oluştur')).toBeInTheDocument();
     expect(screen.getByText('Sosyal Medyada Paylaş')).toBeInTheDocument();
-    
     // Click on email share option
     fireEvent.click(screen.getByText('E-posta ile Gönder'));
-    
     // Check API call
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalledWith('/api/evaluations/sessions/123/share', {
@@ -462,41 +408,33 @@ describe('TestResultsPageV2', () => {
         includeAnalysis: true
       });
     });
-    
     // Check success toast and modal closing
     expect(useToastModule.toast).toHaveBeenCalledWith({
       title: 'Başarılı',
       description: 'Sonuçlar paylaşıldı',
       variant: 'success'
     });
-    
     // Modal should be closed
     await waitFor(() => {
       expect(screen.queryByText('Sonuçları Paylaş')).not.toBeInTheDocument();
     });
   });
-
   it('handles share errors correctly', async () => {
     // Mock API error for sharing
     axios.post.mockRejectedValueOnce(new Error('Share failed'));
-    
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText('Web Development Pro')).toBeInTheDocument();
     });
-    
     // Click on share button to open modal
     fireEvent.click(screen.getByText('Paylaş'));
-    
     // Click on link share option
     fireEvent.click(screen.getByText('Link Oluştur'));
-    
     // Check error toast
     await waitFor(() => {
       expect(useToastModule.toast).toHaveBeenCalledWith({
@@ -506,58 +444,46 @@ describe('TestResultsPageV2', () => {
       });
     });
   });
-
   it('navigates to AI Analysis page when button is clicked', async () => {
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText('Web Development Pro')).toBeInTheDocument();
     });
-    
     // Click AI Analysis button
     fireEvent.click(screen.getByText('AI Analizi'));
-    
     // Check navigation
     expect(mockNavigate).toHaveBeenCalledWith('/evaluations/sessions/123/analysis');
   });
-
   it('navigates when clicking on a test history item', async () => {
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Wait for data to load
     await waitFor(() => {
       expect(screen.getByText('Web Development Pro')).toBeInTheDocument();
     });
-    
     // Click on History tab
     fireEvent.click(screen.getByText('Geçmiş'));
-    
     // Click on a history item
     fireEvent.click(screen.getByText('Deneme #2'));
-    
     // Check navigation
     expect(mockNavigate).toHaveBeenCalledWith('/evaluations/sessions/122/results');
   });
-
   it('handles data fetching errors correctly', async () => {
     // Mock API error for data fetching
     axios.get.mockRejectedValueOnce(new Error('Failed to fetch data'));
-    
     render(
       <BrowserRouter>
         <TestResultsPageV2 />
       </BrowserRouter>
     );
-    
     // Check error toast
     await waitFor(() => {
       expect(useToastModule.toast).toHaveBeenCalledWith({

@@ -17,12 +17,31 @@ import {
   Mic,
   Paperclip,
   X,
-  Info
+  Info,
+  Lock
 } from 'lucide-react';
-
 const AIChatbotPage = () => {
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
   const { toast } = useToast();
+  // AI Chatbot is restricted to admin and trainer roles only
+  const canAccessChatbot = hasRole(['super_admin', 'tenant_admin', 'trainer']);
+  // If user doesn't have permission, show access denied
+  if (!canAccessChatbot) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="p-8 text-center max-w-md">
+          <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h2>
+          <p className="text-gray-600 mb-4">
+            AI Learning Assistant is only available to administrators and trainers.
+          </p>
+          <p className="text-sm text-gray-500">
+            Current role: <span className="font-medium">{user?.role}</span>
+          </p>
+        </Card>
+      </div>
+    );
+  }
   const messagesEndRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([
@@ -50,29 +69,23 @@ const AIChatbotPage = () => {
     "Can you suggest resources for improvement?",
     "How can I prepare for my next test?"
   ]);
-
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
-
   const handleSendMessage = async (message = input) => {
     if (!message.trim()) return;
-
     const userMessage = {
       id: Date.now(),
       type: 'user',
       content: message,
       timestamp: new Date().toISOString()
     };
-
     setMessages([...messages, userMessage]);
     setInput('');
     setTyping(true);
-
     try {
       const res = await fetch('/api/ai/chatbot/message', {
         method: 'POST',
@@ -87,11 +100,8 @@ const AIChatbotPage = () => {
           conversation_history: messages.slice(-10) // Send last 10 messages for context
         })
       });
-
       if (!res.ok) throw new Error('Failed to get response');
-
       const data = await res.json();
-      
       const assistantMessage = {
         id: Date.now() + 1,
         type: 'assistant',
@@ -100,7 +110,6 @@ const AIChatbotPage = () => {
         suggestions: data.suggestions || [],
         resources: data.resources || []
       };
-
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -113,7 +122,6 @@ const AIChatbotPage = () => {
       setTyping(false);
     }
   };
-
   const handleClearChat = () => {
     if (confirm('Are you sure you want to clear the chat history?')) {
       setMessages([
@@ -126,12 +134,19 @@ const AIChatbotPage = () => {
       ]);
     }
   };
-
   const handleExportChat = () => {
+    // Additional permission check for export functionality
+    if (!hasRole(['super_admin', 'tenant_admin', 'trainer'])) {
+      toast({
+        title: 'Access Denied',
+        description: 'Chat export is restricted to administrators and trainers only',
+        variant: 'destructive'
+      });
+      return;
+    }
     const chatText = messages.map(msg => 
       `${msg.type === 'user' ? 'You' : 'AI Assistant'}: ${msg.content}\n`
     ).join('\n');
-
     const blob = new Blob([chatText], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -142,7 +157,6 @@ const AIChatbotPage = () => {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   };
-
   const handleSaveSettings = () => {
     toast({
       title: 'Success',
@@ -150,7 +164,6 @@ const AIChatbotPage = () => {
     });
     setShowSettings(false);
   };
-
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString('en-US', { 
@@ -159,7 +172,6 @@ const AIChatbotPage = () => {
       hour12: true 
     });
   };
-
   return (
     <div className="flex flex-col h-[calc(100vh-200px)]">
       <div className="flex items-center justify-between mb-6">
@@ -170,7 +182,6 @@ const AIChatbotPage = () => {
             {context === 'general' ? 'General Help' : context}
           </Badge>
         </div>
-        
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -186,16 +197,17 @@ const AIChatbotPage = () => {
           >
             <RotateCcw className="h-4 w-4" />
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExportChat}
-          >
-            <Download className="h-4 w-4" />
-          </Button>
+          {hasRole(['super_admin', 'tenant_admin', 'trainer']) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportChat}
+            >
+              <Download className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
-
       {/* Settings Panel */}
       {showSettings && (
         <Card className="p-4 mb-4">
@@ -216,7 +228,6 @@ const AIChatbotPage = () => {
                 <option value="de">German</option>
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Personality
@@ -232,7 +243,6 @@ const AIChatbotPage = () => {
                 <option value="coach">Coach</option>
               </select>
             </div>
-
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -245,7 +255,6 @@ const AIChatbotPage = () => {
                 Remember conversation context
               </label>
             </div>
-
             <div className="flex justify-end">
               <Button size="sm" onClick={handleSaveSettings}>
                 Save Settings
@@ -254,7 +263,6 @@ const AIChatbotPage = () => {
           </div>
         </Card>
       )}
-
       {/* Context Selection */}
       <div className="flex gap-2 mb-4">
         <Button
@@ -286,7 +294,6 @@ const AIChatbotPage = () => {
           Career Guidance
         </Button>
       </div>
-
       {/* Chat Area */}
       <Card className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -302,7 +309,6 @@ const AIChatbotPage = () => {
                   }`}>
                     {message.type === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                   </div>
-                  
                   <div className={`order-1 ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
                     <div className={`inline-block p-3 rounded-lg ${
                       message.type === 'user' 
@@ -311,7 +317,6 @@ const AIChatbotPage = () => {
                     }`}>
                       <p className="whitespace-pre-wrap">{message.content}</p>
                     </div>
-                    
                     {message.suggestions && message.suggestions.length > 0 && (
                       <div className="mt-2 space-y-1">
                         <p className="text-xs text-gray-500">Suggested follow-ups:</p>
@@ -326,7 +331,6 @@ const AIChatbotPage = () => {
                         ))}
                       </div>
                     )}
-                    
                     {message.resources && message.resources.length > 0 && (
                       <div className="mt-2 space-y-1">
                         <p className="text-xs text-gray-500">Helpful resources:</p>
@@ -343,7 +347,6 @@ const AIChatbotPage = () => {
                         ))}
                       </div>
                     )}
-                    
                     <p className="text-xs text-gray-400 mt-1">
                       {formatTimestamp(message.timestamp)}
                     </p>
@@ -352,7 +355,6 @@ const AIChatbotPage = () => {
               </div>
             </div>
           ))}
-          
           {typing && (
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
@@ -367,10 +369,8 @@ const AIChatbotPage = () => {
               </div>
             </div>
           )}
-          
           <div ref={messagesEndRef} />
         </div>
-
         {/* Suggested Questions */}
         {messages.length === 1 && (
           <div className="px-4 pb-2">
@@ -388,7 +388,6 @@ const AIChatbotPage = () => {
             </div>
           </div>
         )}
-
         {/* Input Area */}
         <div className="p-4 border-t">
           <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="flex gap-2">
@@ -400,7 +399,6 @@ const AIChatbotPage = () => {
             >
               <Paperclip className="h-4 w-4" />
             </Button>
-            
             <Input
               type="text"
               value={input}
@@ -409,7 +407,6 @@ const AIChatbotPage = () => {
               className="flex-1"
               disabled={typing}
             />
-            
             <Button
               type="button"
               variant="ghost"
@@ -418,7 +415,6 @@ const AIChatbotPage = () => {
             >
               <Mic className="h-4 w-4" />
             </Button>
-            
             <Button
               type="submit"
               disabled={!input.trim() || typing}
@@ -426,7 +422,6 @@ const AIChatbotPage = () => {
               <Send className="h-4 w-4" />
             </Button>
           </form>
-          
           <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
             <Info className="h-3 w-3" />
             <span>AI responses are generated and may not always be accurate</span>
@@ -436,5 +431,4 @@ const AIChatbotPage = () => {
     </div>
   );
 };
-
 export default AIChatbotPage;

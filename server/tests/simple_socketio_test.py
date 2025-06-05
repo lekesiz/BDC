@@ -5,6 +5,8 @@ from flask import Flask
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 
+from app.utils.logging import logger
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -13,12 +15,12 @@ socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=
 
 @socketio.on('connect')
 def handle_connect():
-    print('Client connected')
+    logger.info("Client connected")
     emit('connected', {'data': 'Connected'})
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print('Client disconnected')
+    logger.info("Client disconnected")
 
 @app.route('/')
 def index():

@@ -1,7 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
-
 /**
  * Table component
  * 
@@ -47,7 +46,6 @@ export const Table = ({
     </div>
   );
 };
-
 /**
  * Table Header component
  * 
@@ -63,7 +61,6 @@ export const TableHeader = ({ children, className = '', ...props }) => {
     </thead>
   );
 };
-
 /**
  * Table Body component
  * 
@@ -79,7 +76,6 @@ export const TableBody = ({ children, className = '', ...props }) => {
     </tbody>
   );
 };
-
 /**
  * Table Row component
  * 
@@ -108,7 +104,6 @@ export const TableRow = ({
     </tr>
   );
 };
-
 /**
  * Table Cell component
  * 
@@ -132,14 +127,11 @@ export const TableCell = ({
 }) => {
   const Component = isHeader ? 'th' : 'td';
   const { isMobile } = useBreakpoint();
-  
   // Determine scope for header cells
   const cellScope = scope || (isHeader ? 'col' : undefined);
-  
   if (hideOnMobile && isMobile) {
     return null;
   }
-  
   return (
     <Component
       className={cn(
@@ -165,7 +157,6 @@ export const TableCell = ({
     </Component>
   );
 };
-
 /**
  * Table Pagination component
  * 
@@ -190,42 +181,33 @@ export const TablePagination = ({
 }) => {
   const totalPages = propTotalPages || Math.ceil(totalItems / itemsPerPage) || 0;
   const { isMobile } = useBreakpoint();
-  
   // Generate page numbers to display
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5; // Adjust as needed
-    
     // Always show first page
     pages.push(1);
-    
     // Calculate range around current page
     let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
     const endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 3);
-    
     // Add ellipsis after first page if needed
     if (startPage > 2) {
       pages.push('...');
     }
-    
     // Add pages around current page
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
     }
-    
     // Add ellipsis before last page if needed
     if (endPage < totalPages - 1) {
       pages.push('...');
     }
-    
     // Always show last page if there's more than one page
     if (totalPages > 1) {
       pages.push(totalPages);
     }
-    
     return pages;
   };
-  
   return (
     <div
       className={cn(
@@ -254,7 +236,6 @@ export const TablePagination = ({
           Next
         </button>
       </div>
-      
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-700 dark:text-gray-300">
@@ -269,7 +250,6 @@ export const TablePagination = ({
             of <span className="font-medium">{totalItems || 0}</span> results
           </p>
         </div>
-        
         <div>
           <nav className="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
             {/* Previous button */}
@@ -284,7 +264,6 @@ export const TablePagination = ({
                 <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             </button>
-            
             {/* Page numbers */}
             {getPageNumbers().map((page, index) => (
               page === '...' ? (
@@ -308,7 +287,6 @@ export const TablePagination = ({
                 </button>
               )
             ))}
-            
             {/* Next button */}
             <button
               onClick={() => onPageChange(currentPage + 1)}

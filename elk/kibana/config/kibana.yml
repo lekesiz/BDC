@@ -1,0 +1,124 @@
+# ================================
+# Kibana Configuration
+# ================================
+
+# --------------------------------
+# Server Configuration
+# --------------------------------
+server.name: "bdc-kibana"
+server.host: "0.0.0.0"
+server.port: 5601
+server.basePath: ""
+server.rewriteBasePath: false
+
+# --------------------------------
+# Elasticsearch Configuration
+# --------------------------------
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.requestTimeout: 30000
+elasticsearch.shardTimeout: 30000
+
+# --------------------------------
+# Kibana Index
+# --------------------------------
+kibana.index: ".kibana"
+kibana.defaultAppId: "discover"
+
+# --------------------------------
+# Security Configuration
+# --------------------------------
+xpack.security.enabled: false
+xpack.encryptedSavedObjects.encryptionKey: "bdc-kibana-encryption-key-32chars"
+
+# --------------------------------
+# Monitoring Configuration
+# --------------------------------
+monitoring.enabled: true
+monitoring.ui.enabled: true
+monitoring.kibana.collection.enabled: true
+
+# --------------------------------
+# Logging Configuration
+# --------------------------------
+logging.level: info
+logging.appenders:
+  default:
+    type: console
+    layout:
+      type: json
+logging.loggers:
+  - name: plugins.security
+    level: debug
+  - name: elasticsearch.query
+    level: debug
+
+# --------------------------------
+# UI Configuration
+# --------------------------------
+# Default index patterns
+kibana.autocompleteTimeout: 1000
+kibana.autocompleteTerminateAfter: 100000
+
+# --------------------------------
+# Advanced Settings
+# --------------------------------
+# Time zone
+newsfeed.enabled: false
+telemetry.enabled: false
+telemetry.optIn: false
+
+# Dashboard settings
+dashboard.defaultDarkMode: false
+
+# --------------------------------
+# Data Views Configuration
+# --------------------------------
+# Default data view
+data.search.searchTimeout: 30000
+
+# --------------------------------
+# Saved Objects Configuration
+# --------------------------------
+savedObjects.maxImportPayloadBytes: 26214400
+
+# --------------------------------
+# Maps Configuration
+# --------------------------------
+map.includeElasticMapsService: false
+
+# --------------------------------
+# APM Configuration (if using APM)
+# --------------------------------
+apm_oss.enabled: true
+
+# --------------------------------
+# Canvas Configuration
+# --------------------------------
+canvas.enabled: true
+
+# --------------------------------
+# ML Configuration
+# --------------------------------
+xpack.ml.enabled: false
+
+# --------------------------------
+# Graph Configuration  
+# --------------------------------
+xpack.graph.enabled: false
+
+# --------------------------------
+# Reporting Configuration
+# --------------------------------
+xpack.reporting.enabled: true
+xpack.reporting.kibanaServer.hostname: "localhost"
+xpack.reporting.kibanaServer.port: 5601
+
+# --------------------------------
+# Console Configuration
+# --------------------------------
+console.enabled: true
+
+# --------------------------------
+# Dev Tools Configuration
+# --------------------------------
+console.ui.enabled: true

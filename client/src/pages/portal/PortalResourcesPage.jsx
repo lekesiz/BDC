@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
-
 /**
  * PortalResourcesPage provides access to learning materials and resources
  * for beneficiary students
@@ -30,7 +29,6 @@ const PortalResourcesPage = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  
   // Fetch resources data
   useEffect(() => {
     const fetchResources = async () => {
@@ -38,11 +36,9 @@ const PortalResourcesPage = () => {
         setIsLoading(true);
         const response = await api.get('/api/portal/resources');
         const resourceData = response.data;
-        
         // Handle different response structures
         const resourcesList = resourceData.resources || resourceData.documents || resourceData.data || [];
         const categoriesList = resourceData.categories || [];
-        
         setResources(resourcesList);
         setFilteredResources(resourcesList);
         setCategories(categoriesList);
@@ -57,24 +53,19 @@ const PortalResourcesPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchResources();
   }, []); // Remove toast dependency to prevent infinite loop
-  
   // Filter resources based on category and search term
   useEffect(() => {
     if (!Array.isArray(resources)) {
       setFilteredResources([]);
       return;
     }
-    
     let result = resources;
-    
     // Filter by category
     if (selectedCategory !== 'all') {
       result = result.filter(resource => resource.category === selectedCategory);
     }
-    
     // Filter by search term
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
@@ -83,10 +74,8 @@ const PortalResourcesPage = () => {
         (resource.description && resource.description.toLowerCase().includes(search))
       );
     }
-    
     setFilteredResources(result);
   }, [selectedCategory, searchTerm, resources]);
-  
   // Get icon based on file type
   const getFileIcon = (type) => {
     switch (type.toLowerCase()) {
@@ -124,7 +113,6 @@ const PortalResourcesPage = () => {
         return <FileText className="h-6 w-6 text-gray-500" />;
     }
   };
-  
   // Format file size
   const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B';
@@ -132,13 +120,11 @@ const PortalResourcesPage = () => {
     else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
     else return (bytes / 1073741824).toFixed(1) + ' GB';
   };
-  
   // Handle resource download
   const handleDownload = async (resourceId) => {
     try {
       // In a real implementation, this would trigger a file download
       await api.get(`/api/portal/resources/${resourceId}/download`);
-      
       toast({
         title: 'Success',
         description: 'Resource downloaded successfully',
@@ -153,7 +139,6 @@ const PortalResourcesPage = () => {
       });
     }
   };
-  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -161,7 +146,6 @@ const PortalResourcesPage = () => {
       </div>
     );
   }
-  
   return (
     <div className="container mx-auto py-6">
       {/* Page header */}
@@ -171,7 +155,6 @@ const PortalResourcesPage = () => {
           Access all learning materials, reference guides, and supplementary resources for your program
         </p>
       </div>
-      
       {/* Search and filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="relative flex-1">
@@ -184,7 +167,6 @@ const PortalResourcesPage = () => {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
-        
         <div className="flex space-x-2">
           <Button
             variant={selectedCategory === 'all' ? 'default' : 'outline'}
@@ -192,7 +174,6 @@ const PortalResourcesPage = () => {
           >
             All
           </Button>
-          
           {categories.map(category => (
             <Button
               key={category.id}
@@ -204,7 +185,6 @@ const PortalResourcesPage = () => {
           ))}
         </div>
       </div>
-      
       {/* Categories grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
         {categories.map(category => (
@@ -230,7 +210,6 @@ const PortalResourcesPage = () => {
           </Card>
         ))}
       </div>
-      
       {/* Resources list */}
       {filteredResources.length === 0 ? (
         <div className="text-center py-12">
@@ -300,5 +279,4 @@ const PortalResourcesPage = () => {
     </div>
   );
 };
-
 export default PortalResourcesPage;

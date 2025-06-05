@@ -16,24 +16,40 @@ import {
   ArrowUp,
   ArrowDown,
   RefreshCw,
-  Download
+  Download,
+  Lock
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-
 const AIInsightsPage = () => {
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
   const { toast } = useToast();
-  
+  // AI Insights are restricted to admin and trainer roles only
+  const canAccessAIInsights = hasRole(['super_admin', 'tenant_admin', 'trainer']);
+  // If user doesn't have permission, show access denied
+  if (!canAccessAIInsights) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="p-8 text-center max-w-md">
+          <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h2>
+          <p className="text-gray-600 mb-4">
+            AI Insights are only available to administrators and trainers.
+          </p>
+          <p className="text-sm text-gray-500">
+            Current role: <Badge variant="secondary">{user?.role}</Badge>
+          </p>
+        </Card>
+      </div>
+    );
+  }
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [insights, setInsights] = useState(null);
   const [timeRange, setTimeRange] = useState('last_30_days');
   const [category, setCategory] = useState('all');
-
   useEffect(() => {
     fetchAIInsights();
   }, [timeRange, category]);
-
   const fetchAIInsights = async () => {
     try {
       const res = await fetch(`/api/ai/insights?time_range=${timeRange}&category=${category}`, {
@@ -41,9 +57,7 @@ const AIInsightsPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch insights');
-
       const data = await res.json();
       setInsights(data);
     } catch (error) {
@@ -58,22 +72,27 @@ const AIInsightsPage = () => {
       setRefreshing(false);
     }
   };
-
   const handleRefresh = () => {
     setRefreshing(true);
     fetchAIInsights();
   };
-
   const handleExport = async () => {
+    // Additional permission check for export functionality
+    if (!hasRole(['super_admin', 'tenant_admin'])) {
+      toast({
+        title: 'Access Denied',
+        description: 'Export functionality is restricted to administrators only',
+        variant: 'destructive'
+      });
+      return;
+    }
     try {
       const res = await fetch(`/api/ai/insights/export?time_range=${timeRange}&category=${category}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to export insights');
-
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -83,7 +102,6 @@ const AIInsightsPage = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-
       toast({
         title: 'Success',
         description: 'Insights exported successfully'
@@ -97,9 +115,7 @@ const AIInsightsPage = () => {
       });
     }
   };
-
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -107,7 +123,6 @@ const AIInsightsPage = () => {
       </div>
     );
   }
-
   if (!insights) {
     return (
       <div className="text-center py-12">
@@ -116,7 +131,6 @@ const AIInsightsPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -124,7 +138,6 @@ const AIInsightsPage = () => {
           <Brain className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold text-gray-900">AI Insights</h1>
         </div>
-        
         <div className="flex items-center gap-3">
           <Select
             value={timeRange}
@@ -136,7 +149,6 @@ const AIInsightsPage = () => {
             <option value="last_90_days">Last 90 days</option>
             <option value="all_time">All time</option>
           </Select>
-          
           <Select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -148,7 +160,6 @@ const AIInsightsPage = () => {
             <option value="learning">Learning</option>
             <option value="trends">Trends</option>
           </Select>
-          
           <Button
             variant="outline"
             onClick={handleRefresh}
@@ -157,14 +168,14 @@ const AIInsightsPage = () => {
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
-          
-          <Button onClick={handleExport}>
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
+          {hasRole(['super_admin', 'tenant_admin']) && (
+            <Button onClick={handleExport}>
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          )}
         </div>
       </div>
-
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="p-6">
@@ -178,7 +189,6 @@ const AIInsightsPage = () => {
             {insights.metrics.performance_change}% from last period
           </p>
         </Card>
-
         <Card className="p-6">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-gray-600">Active Learners</p>
@@ -189,7 +199,6 @@ const AIInsightsPage = () => {
             {insights.metrics.total_learners} total
           </p>
         </Card>
-
         <Card className="p-6">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-gray-600">Completion Rate</p>
@@ -201,7 +210,6 @@ const AIInsightsPage = () => {
             {insights.metrics.completion_change}% improvement
           </p>
         </Card>
-
         <Card className="p-6">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-gray-600">Risk Assessment</p>
@@ -213,7 +221,6 @@ const AIInsightsPage = () => {
           </p>
         </Card>
       </div>
-
       {/* AI Predictions */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">AI Predictions</h2>
@@ -235,7 +242,6 @@ const AIInsightsPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Performance Trends */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Performance Trends</h2>
@@ -265,7 +271,6 @@ const AIInsightsPage = () => {
           </ResponsiveContainer>
         </div>
       </Card>
-
       {/* Learning Categories */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6">
@@ -282,7 +287,6 @@ const AIInsightsPage = () => {
             </ResponsiveContainer>
           </div>
         </Card>
-
         <Card className="p-6">
           <h2 className="text-lg font-semibold mb-4">Time Distribution</h2>
           <div className="h-64">
@@ -308,7 +312,6 @@ const AIInsightsPage = () => {
           </div>
         </Card>
       </div>
-
       {/* Recommendations */}
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">AI Recommendations</h2>
@@ -329,7 +332,6 @@ const AIInsightsPage = () => {
           ))}
         </div>
       </Card>
-
       {/* Anomalies Detection */}
       {insights.anomalies && insights.anomalies.length > 0 && (
         <Card className="p-6 border-amber-200 bg-amber-50">
@@ -356,5 +358,4 @@ const AIInsightsPage = () => {
     </div>
   );
 };
-
 export default AIInsightsPage;

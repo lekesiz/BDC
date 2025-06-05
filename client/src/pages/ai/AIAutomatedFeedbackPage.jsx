@@ -21,11 +21,9 @@ import {
   ThumbsDown,
   Edit
 } from 'lucide-react';
-
 const AIAutomatedFeedbackPage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
   const [loading, setLoading] = useState(true);
   const [feedbacks, setFeedbacks] = useState([]);
   const [selectedFeedback, setSelectedFeedback] = useState(null);
@@ -39,12 +37,10 @@ const AIAutomatedFeedbackPage = () => {
   });
   const [showSettings, setShowSettings] = useState(false);
   const [filter, setFilter] = useState('pending');
-
   useEffect(() => {
     fetchFeedbacks();
     fetchSettings();
   }, [filter]);
-
   const fetchFeedbacks = async () => {
     try {
       const res = await fetch(`/api/ai/automated-feedback?status=${filter}`, {
@@ -52,9 +48,7 @@ const AIAutomatedFeedbackPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch feedbacks');
-
       const data = await res.json();
       setFeedbacks(data);
     } catch (error) {
@@ -68,7 +62,6 @@ const AIAutomatedFeedbackPage = () => {
       setLoading(false);
     }
   };
-
   const fetchSettings = async () => {
     try {
       const res = await fetch('/api/ai/feedback-settings', {
@@ -76,16 +69,13 @@ const AIAutomatedFeedbackPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch settings');
-
       const data = await res.json();
       setFeedbackSettings(data);
     } catch (error) {
       console.error('Error fetching settings:', error);
     }
   };
-
   const handleSaveSettings = async () => {
     try {
       const res = await fetch('/api/ai/feedback-settings', {
@@ -96,9 +86,7 @@ const AIAutomatedFeedbackPage = () => {
         },
         body: JSON.stringify(feedbackSettings)
       });
-
       if (!res.ok) throw new Error('Failed to save settings');
-
       toast({
         title: 'Success',
         description: 'Feedback settings saved successfully'
@@ -113,11 +101,9 @@ const AIAutomatedFeedbackPage = () => {
       });
     }
   };
-
   const handleApproveFeedback = async (feedbackId) => {
     try {
       const feedbackToApprove = editingFeedback || feedbacks.find(f => f.id === feedbackId);
-      
       const res = await fetch(`/api/ai/automated-feedback/${feedbackId}/approve`, {
         method: 'POST',
         headers: {
@@ -128,14 +114,11 @@ const AIAutomatedFeedbackPage = () => {
           content: feedbackToApprove.content
         })
       });
-
       if (!res.ok) throw new Error('Failed to approve feedback');
-
       toast({
         title: 'Success',
         description: 'Feedback approved and sent'
       });
-
       setEditingFeedback(null);
       fetchFeedbacks();
     } catch (error) {
@@ -147,10 +130,8 @@ const AIAutomatedFeedbackPage = () => {
       });
     }
   };
-
   const handleRejectFeedback = async (feedbackId) => {
     if (!confirm('Are you sure you want to reject this feedback?')) return;
-
     try {
       const res = await fetch(`/api/ai/automated-feedback/${feedbackId}/reject`, {
         method: 'POST',
@@ -158,14 +139,11 @@ const AIAutomatedFeedbackPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to reject feedback');
-
       toast({
         title: 'Success',
         description: 'Feedback rejected'
       });
-
       fetchFeedbacks();
     } catch (error) {
       console.error('Error rejecting feedback:', error);
@@ -176,7 +154,6 @@ const AIAutomatedFeedbackPage = () => {
       });
     }
   };
-
   const handleRegenerateFeedback = async (feedbackId) => {
     try {
       const res = await fetch(`/api/ai/automated-feedback/${feedbackId}/regenerate`, {
@@ -185,15 +162,11 @@ const AIAutomatedFeedbackPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to regenerate feedback');
-
       const data = await res.json();
-      
       // Update the feedback in the list
       setFeedbacks(feedbacks.map(f => f.id === feedbackId ? data : f));
       setSelectedFeedback(data);
-
       toast({
         title: 'Success',
         description: 'Feedback regenerated successfully'
@@ -207,7 +180,6 @@ const AIAutomatedFeedbackPage = () => {
       });
     }
   };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'approved':
@@ -222,13 +194,11 @@ const AIAutomatedFeedbackPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
   const getConfidenceColor = (confidence) => {
     if (confidence >= 0.8) return 'text-green-600';
     if (confidence >= 0.6) return 'text-yellow-600';
     return 'text-red-600';
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -236,7 +206,6 @@ const AIAutomatedFeedbackPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -244,7 +213,6 @@ const AIAutomatedFeedbackPage = () => {
           <Bot className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold text-gray-900">AI Automated Feedback</h1>
         </div>
-        
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
@@ -255,7 +223,6 @@ const AIAutomatedFeedbackPage = () => {
           </Button>
         </div>
       </div>
-
       {/* Settings Panel */}
       {showSettings && (
         <Card className="p-6">
@@ -275,7 +242,6 @@ const AIAutomatedFeedbackPage = () => {
                 }
               />
             </label>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Auto-approval threshold
@@ -300,7 +266,6 @@ const AIAutomatedFeedbackPage = () => {
                 <span>100%</span>
               </div>
             </div>
-
             <label className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Include improvement suggestions</p>
@@ -315,7 +280,6 @@ const AIAutomatedFeedbackPage = () => {
                 }
               />
             </label>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Feedback tone
@@ -333,7 +297,6 @@ const AIAutomatedFeedbackPage = () => {
                 <option value="friendly">Friendly</option>
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Maximum length (words)
@@ -349,7 +312,6 @@ const AIAutomatedFeedbackPage = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
-
             <div className="flex justify-end">
               <Button onClick={handleSaveSettings}>
                 Save Settings
@@ -358,7 +320,6 @@ const AIAutomatedFeedbackPage = () => {
           </div>
         </Card>
       )}
-
       {/* Filter Tabs */}
       <div className="flex gap-2">
         {['pending', 'approved', 'rejected', 'all'].map((status) => (
@@ -372,12 +333,10 @@ const AIAutomatedFeedbackPage = () => {
           </Button>
         ))}
       </div>
-
       {/* Feedback List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6">
           <h2 className="text-lg font-semibold mb-4">Feedback Queue</h2>
-          
           {feedbacks.length === 0 ? (
             <div className="text-center py-8">
               <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -409,7 +368,6 @@ const AIAutomatedFeedbackPage = () => {
                       {feedback.status}
                     </Badge>
                   </div>
-
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
@@ -422,7 +380,6 @@ const AIAutomatedFeedbackPage = () => {
                       </span>
                     </div>
                   </div>
-
                   {feedback.status === 'pending' && (
                     <div className="flex gap-2 mt-3">
                       <Button
@@ -453,14 +410,13 @@ const AIAutomatedFeedbackPage = () => {
             </div>
           )}
         </Card>
-
         {/* Selected Feedback Details */}
         {selectedFeedback && (
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Feedback Details</h2>
               <div className="flex gap-2">
-                {selectedFeedback.status === 'pending' && (
+                {selectedFeedback.status === 'pending' && hasRole(['super_admin', 'tenant_admin', 'trainer']) && (
                   <>
                     <Button
                       variant="outline"
@@ -480,23 +436,19 @@ const AIAutomatedFeedbackPage = () => {
                 )}
               </div>
             </div>
-
             <div className="space-y-4">
               <div>
                 <p className="text-sm font-medium text-gray-700">Student</p>
                 <p className="text-gray-900">{selectedFeedback.beneficiary_name}</p>
               </div>
-
               <div>
                 <p className="text-sm font-medium text-gray-700">Test</p>
                 <p className="text-gray-900">{selectedFeedback.test_title}</p>
               </div>
-
               <div>
                 <p className="text-sm font-medium text-gray-700">Score</p>
                 <p className="text-gray-900">{selectedFeedback.score}%</p>
               </div>
-
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-2">Generated Feedback</p>
                 {editingFeedback ? (
@@ -514,7 +466,6 @@ const AIAutomatedFeedbackPage = () => {
                   </div>
                 )}
               </div>
-
               {selectedFeedback.suggestions && selectedFeedback.suggestions.length > 0 && (
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">Improvement Suggestions</p>
@@ -527,7 +478,6 @@ const AIAutomatedFeedbackPage = () => {
                   </ul>
                 </div>
               )}
-
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-2">AI Analysis</p>
                 <div className="space-y-2">
@@ -547,7 +497,6 @@ const AIAutomatedFeedbackPage = () => {
                   </div>
                 </div>
               </div>
-
               {editingFeedback && (
                 <div className="flex gap-2 pt-4">
                   <Button
@@ -570,5 +519,4 @@ const AIAutomatedFeedbackPage = () => {
     </div>
   );
 };
-
 export default AIAutomatedFeedbackPage;

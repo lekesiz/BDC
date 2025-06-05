@@ -14,6 +14,8 @@ from app.models import (
 from app.middleware.request_context import auth_required, role_required
 from app.utils import cache_response
 
+from app.utils.logging import logger
+
 
 portal_bp = Blueprint('portal', __name__)
 

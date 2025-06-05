@@ -1,7 +1,6 @@
 import React from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
 import { MessageSquare } from 'lucide-react';
-
 const ExplanationBlockView = () => {
   return (
     <NodeViewWrapper className="explanation-block-wrapper">
@@ -13,5 +12,4 @@ const ExplanationBlockView = () => {
     </NodeViewWrapper>
   );
 };
-
 export default ExplanationBlockView;

@@ -30,9 +30,7 @@ import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   AreaChart, Area
 } from 'recharts';
-
 const COLORS = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-
 /**
  * BeneficiaryAnalyticsPage displays detailed analytics for individual beneficiaries
  */
@@ -48,17 +46,14 @@ const BeneficiaryAnalyticsPage = () => {
   const [dateRange, setDateRange] = useState('last30days');
   const [beneficiaryMetrics, setBeneficiaryMetrics] = useState(null);
   const [filterOpen, setFilterOpen] = useState(false);
-  
   // Fetch beneficiaries and metrics
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
         // Fetch beneficiaries list
         const beneficiariesResponse = await api.get('/api/beneficiaries');
         setBeneficiaries(beneficiariesResponse.data);
-        
         // If an ID is provided, fetch that specific beneficiary
         if (id) {
           const beneficiary = beneficiariesResponse.data?.find(b => b.id.toString() === id);
@@ -73,7 +68,6 @@ const BeneficiaryAnalyticsPage = () => {
             navigate('/analytics/beneficiaries');
           }
         }
-        
         // Fetch beneficiary metrics if a beneficiary is selected
         if (selectedBeneficiary || id) {
           const beneficiaryId = selectedBeneficiary?.id || id;
@@ -82,7 +76,6 @@ const BeneficiaryAnalyticsPage = () => {
               date_range: dateRange
             }
           });
-          
           setBeneficiaryMetrics(metricsResponse.data);
         }
       } catch (error) {
@@ -96,21 +89,17 @@ const BeneficiaryAnalyticsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchData();
   }, [toast, id, selectedBeneficiary, dateRange, navigate]);
-  
   // Handle date range change
   const handleDateRangeChange = (range) => {
     setDateRange(range);
   };
-  
   // Filter beneficiaries based on search term
   const filteredBeneficiaries = beneficiaries.filter(beneficiary => 
     beneficiary.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (beneficiary.email && beneficiary.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-  
   // Format date range for display
   const formatDateRange = () => {
     switch(dateRange) {
@@ -128,11 +117,9 @@ const BeneficiaryAnalyticsPage = () => {
         return 'Last 30 Days';
     }
   };
-  
   // Export beneficiary metrics
   const exportBeneficiaryMetrics = async (format) => {
     if (!selectedBeneficiary && !id) return;
-    
     try {
       const beneficiaryId = selectedBeneficiary?.id || id;
       const response = await api.get(`/api/analytics/beneficiaries/${beneficiaryId}/export`, {
@@ -142,7 +129,6 @@ const BeneficiaryAnalyticsPage = () => {
         },
         responseType: 'blob'
       });
-      
       // Create a URL for the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -151,7 +137,6 @@ const BeneficiaryAnalyticsPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      
       toast({
         title: 'Success',
         description: `Beneficiary metrics exported successfully as ${format.toUpperCase()}`,
@@ -166,7 +151,6 @@ const BeneficiaryAnalyticsPage = () => {
       });
     }
   };
-  
   // Render specific beneficiary analytics view
   const renderBeneficiaryAnalytics = () => {
     if (!beneficiaryMetrics) {
@@ -176,7 +160,6 @@ const BeneficiaryAnalyticsPage = () => {
         </div>
       );
     }
-    
     const { 
       overview, 
       attendance, 
@@ -188,7 +171,6 @@ const BeneficiaryAnalyticsPage = () => {
       milestones,
       actionPlan
     } = beneficiaryMetrics;
-    
     // Prepare session type data
     const sessionTypeData = sessionEngagement?.byType 
       ? Object.entries(sessionEngagement.byType).map(([name, value]) => ({
@@ -196,7 +178,6 @@ const BeneficiaryAnalyticsPage = () => {
           value
         }))
       : [];
-    
     return (
       <div className="space-y-6">
         {/* Beneficiary overview stats */}
@@ -222,7 +203,6 @@ const BeneficiaryAnalyticsPage = () => {
               </div>
             </div>
           </Card>
-          
           <Card className="p-4">
             <div className="flex justify-between items-start">
               <div>
@@ -244,7 +224,6 @@ const BeneficiaryAnalyticsPage = () => {
               </div>
             </div>
           </Card>
-          
           <Card className="p-4">
             <div className="flex justify-between items-start">
               <div>
@@ -266,7 +245,6 @@ const BeneficiaryAnalyticsPage = () => {
               </div>
             </div>
           </Card>
-          
           <Card className="p-4">
             <div className="flex justify-between items-start">
               <div>
@@ -289,7 +267,6 @@ const BeneficiaryAnalyticsPage = () => {
             </div>
           </Card>
         </div>
-        
         {/* Attendance and Progression */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="p-6">
@@ -322,7 +299,6 @@ const BeneficiaryAnalyticsPage = () => {
               )}
             </div>
           </Card>
-          
           <Card className="p-6">
             <h2 className="text-lg font-medium mb-4">Program Progression</h2>
             <div className="h-64">
@@ -354,7 +330,6 @@ const BeneficiaryAnalyticsPage = () => {
             </div>
           </Card>
         </div>
-        
         {/* Skills Assessment */}
         <Card className="p-6">
           <h2 className="text-lg font-medium mb-4">Skills Assessment</h2>
@@ -379,7 +354,6 @@ const BeneficiaryAnalyticsPage = () => {
             )}
           </div>
         </Card>
-        
         {/* Session Engagement and Progress by Module */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="p-6">
@@ -413,7 +387,6 @@ const BeneficiaryAnalyticsPage = () => {
               )}
             </div>
           </Card>
-          
           <Card className="p-6">
             <h2 className="text-lg font-medium mb-4">Module Progress</h2>
             <div className="h-64">
@@ -445,14 +418,12 @@ const BeneficiaryAnalyticsPage = () => {
             </div>
           </Card>
         </div>
-        
         {/* Milestones */}
         {milestones && milestones.length > 0 && (
           <Card className="p-6">
             <h2 className="text-lg font-medium mb-4">Progress Milestones</h2>
             <div className="relative">
               <div className="absolute left-4 inset-y-0 w-0.5 bg-gray-200"></div>
-              
               <div className="space-y-8 relative">
                 {(milestones || []).map((milestone, index) => (
                   <div key={index} className="relative pl-10">
@@ -479,7 +450,6 @@ const BeneficiaryAnalyticsPage = () => {
                         )}
                       </div>
                     </div>
-                    
                     <div className="bg-white rounded-lg border p-4">
                       <div className="flex justify-between items-start">
                         <div>
@@ -505,7 +475,6 @@ const BeneficiaryAnalyticsPage = () => {
                           )}
                         </div>
                       </div>
-                      
                       {milestone.achievements && milestone.achievements.length > 0 && (
                         <div className="mt-3">
                           <p className="text-xs font-medium text-gray-500 mb-1">Achievements:</p>
@@ -523,12 +492,10 @@ const BeneficiaryAnalyticsPage = () => {
             </div>
           </Card>
         )}
-        
         {/* Action Plan */}
         {actionPlan && (
           <Card className="p-6">
             <h2 className="text-lg font-medium mb-4">Action Plan</h2>
-            
             <div className="space-y-4">
               {actionPlan.objectives && (
                 <div>
@@ -540,7 +507,6 @@ const BeneficiaryAnalyticsPage = () => {
                   </ul>
                 </div>
               )}
-              
               {actionPlan.shortTermGoals && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Short-term Goals (1-3 months)</h3>
@@ -551,7 +517,6 @@ const BeneficiaryAnalyticsPage = () => {
                   </ul>
                 </div>
               )}
-              
               {actionPlan.longTermGoals && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Long-term Goals (4+ months)</h3>
@@ -562,7 +527,6 @@ const BeneficiaryAnalyticsPage = () => {
                   </ul>
                 </div>
               )}
-              
               {actionPlan.recommendations && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Trainer Recommendations</h3>
@@ -573,14 +537,12 @@ const BeneficiaryAnalyticsPage = () => {
                   </ul>
                 </div>
               )}
-              
               {actionPlan.nextReview && (
                 <div className="mt-6 flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg">
                   <div className="text-sm">
                     <p className="font-medium text-gray-700">Next progress review:</p>
                     <p className="text-gray-500">{actionPlan.nextReview}</p>
                   </div>
-                  
                   <Button
                     variant="outline"
                     size="sm"
@@ -593,13 +555,11 @@ const BeneficiaryAnalyticsPage = () => {
             </div>
           </Card>
         )}
-        
         {/* Assigned Trainers */}
         <Card className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-medium">Assigned Trainers</h2>
           </div>
-          
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
@@ -658,7 +618,6 @@ const BeneficiaryAnalyticsPage = () => {
       </div>
     );
   };
-  
   // Render beneficiaries list
   const renderBeneficiariesList = () => {
     return (
@@ -675,7 +634,6 @@ const BeneficiaryAnalyticsPage = () => {
             />
           </div>
         </div>
-        
         <Card>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -770,7 +728,6 @@ const BeneficiaryAnalyticsPage = () => {
       </div>
     );
   };
-  
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
@@ -786,7 +743,6 @@ const BeneficiaryAnalyticsPage = () => {
               <ArrowLeft className="w-5 h-5" />
             </button>
           )}
-          
           <div>
             <h1 className="text-2xl font-bold">
               {selectedBeneficiary || id 
@@ -800,7 +756,6 @@ const BeneficiaryAnalyticsPage = () => {
             )}
           </div>
         </div>
-        
         {(selectedBeneficiary || id) && (
           <div className="flex space-x-2">
             <div className="relative">
@@ -813,7 +768,6 @@ const BeneficiaryAnalyticsPage = () => {
                 Date Range
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
-              
               {filterOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border p-4">
                   <div className="grid grid-cols-1 gap-2">
@@ -871,7 +825,6 @@ const BeneficiaryAnalyticsPage = () => {
                 </div>
               )}
             </div>
-            
             <div className="relative">
               <Button
                 variant="outline"
@@ -882,7 +835,6 @@ const BeneficiaryAnalyticsPage = () => {
                 Export
                 <ChevronDown className="w-4 h-4 ml-2" />
               </Button>
-              
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border p-2 hidden group-hover:block">
                 <button
                   className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
@@ -907,7 +859,6 @@ const BeneficiaryAnalyticsPage = () => {
           </div>
         )}
       </div>
-      
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <Loader className="w-10 h-10 text-primary animate-spin" />
@@ -920,5 +871,4 @@ const BeneficiaryAnalyticsPage = () => {
     </div>
   );
 };
-
 export default BeneficiaryAnalyticsPage;

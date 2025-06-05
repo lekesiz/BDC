@@ -1,8 +1,6 @@
 import { Mark, mergeAttributes } from '@tiptap/core';
-
 export const CorrectAnswer = Mark.create({
   name: 'correctAnswer',
-
   addOptions() {
     return {
       HTMLAttributes: {
@@ -10,7 +8,6 @@ export const CorrectAnswer = Mark.create({
       },
     };
   },
-
   parseHTML() {
     return [
       {
@@ -21,7 +18,6 @@ export const CorrectAnswer = Mark.create({
       },
     ];
   },
-
   renderHTML({ HTMLAttributes }) {
     return [
       'span',
@@ -31,7 +27,6 @@ export const CorrectAnswer = Mark.create({
       0,
     ];
   },
-
   addCommands() {
     return {
       setCorrectAnswer:
@@ -51,7 +46,6 @@ export const CorrectAnswer = Mark.create({
         },
     };
   },
-
   addKeyboardShortcuts() {
     return {
       'Mod-Shift-c': () => this.editor.commands.toggleCorrectAnswer(),

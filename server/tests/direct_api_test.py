@@ -8,6 +8,8 @@ from config import DevelopmentConfig
 from flask import Flask
 import json
 
+from app.utils.logging import logger
+
 app = create_app(DevelopmentConfig)
 
 with app.app_context():
@@ -18,17 +20,17 @@ with app.app_context():
                           json={'email': 'test.admin@bdc.com', 'password': 'Test123!'},
                           content_type='application/json')
     
-    print(f"Status: {response.status_code}")
-    print(f"Data: {response.data.decode()}")
+    logger.info(f"Status: {response.status_code}")
+    logger.info(f"Data: {response.data.decode()}")
     
     if response.status_code == 200:
         data = json.loads(response.data)
-        print(f"Token: {data.get('access_token', '')[:50]}...")
+        logger.info(f"Token: {data.get('access_token', '')[:50]}...")
     
     # Also check user directly
     user = User.query.filter_by(email='test.admin@bdc.com').first()
-    print(f"\nUser check:")
-    print(f"Found: {user is not None}")
+    logger.info(f"\nUser check:")
+    logger.info(f"Found: {user is not None}")
     if user:
-        print(f"Active: {user.is_active}")
-        print(f"Password OK: {user.verify_password('Test123!')}")
+        logger.info(f"Active: {user.is_active}")
+        logger.info(f"Password OK: {user.verify_password('Test123!')}")

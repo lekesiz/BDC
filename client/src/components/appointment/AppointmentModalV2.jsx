@@ -17,14 +17,12 @@ import { Badge } from '../ui/badge';
 import { Alert } from '../ui/alert';
 import { Tabs } from '../ui/tabs';
 import { useAuth } from '../../hooks/useAuth';
-
 /**
  * Enhanced AppointmentModal with advanced features
  */
 const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
   const { user } = useAuth();
   const isEditMode = !!appointment;
-  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -54,7 +52,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
     },
     custom_fields: {}
   });
-  
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [trainers, setTrainers] = useState([]);
   const [conflicts, setConflicts] = useState([]);
@@ -65,7 +62,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
   const [validateForm, setValidateForm] = useState(false);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [templates, setTemplates] = useState([]);
-
   useEffect(() => {
     if (appointment) {
       setFormData({
@@ -81,16 +77,13 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
         end_time: timeSlot.end
       });
     }
-    
     fetchInitialData();
   }, [appointment, timeSlot]);
-
   useEffect(() => {
     if (formData.start_time && formData.end_time) {
       checkConflicts();
     }
   }, [formData.start_time, formData.end_time, formData.beneficiaries, formData.trainer_id]);
-
   const fetchInitialData = async () => {
     try {
       const [beneficiariesRes, trainersRes, templatesRes] = await Promise.all([
@@ -98,7 +91,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
         axios.get('/api/users?role=trainer'),
         axios.get('/api/appointments/templates')
       ]);
-      
       setBeneficiaries(beneficiariesRes.data);
       setTrainers(trainersRes.data);
       setTemplates(templatesRes.data);
@@ -106,10 +98,8 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
       console.error('Error fetching initial data:', error);
     }
   };
-
   const checkConflicts = async () => {
     if (!formData.start_time || !formData.end_time) return;
-    
     try {
       const response = await axios.post('/api/appointments/check-conflicts', {
         start_time: formData.start_time.toISOString(),
@@ -118,17 +108,14 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
         beneficiary_ids: formData.beneficiaries,
         exclude_id: appointment?.id
       });
-      
       setConflicts(response.data.conflicts);
       setSuggestions(response.data.suggestions);
     } catch (error) {
       console.error('Error checking conflicts:', error);
     }
   };
-
   const fetchAvailableSlots = async () => {
     if (!formData.trainer_id || !formData.beneficiaries.length) return;
-    
     try {
       const response = await axios.post('/api/appointments/available-slots', {
         trainer_id: formData.trainer_id,
@@ -136,13 +123,11 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
         date: format(formData.start_time || new Date(), 'yyyy-MM-dd'),
         duration: differenceInMinutes(formData.end_time, formData.start_time)
       });
-      
       setAvailableSlots(response.data);
     } catch (error) {
       console.error('Error fetching available slots:', error);
     }
   };
-
   const applyTemplate = (template) => {
     setFormData({
       ...formData,
@@ -150,18 +135,15 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
       start_time: formData.start_time,
       end_time: formData.end_time
     });
-    
     toast({
       title: 'Şablon Uygulandı',
       description: template.title,
       variant: 'success'
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setValidateForm(true);
-    
     if (!formData.title || !formData.start_time || !formData.end_time) {
       toast({
         title: 'Hata',
@@ -170,13 +152,10 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
       });
       return;
     }
-    
     if (conflicts.length > 0 && !window.confirm('Çakışmalar var. Devam etmek istiyor musunuz?')) {
       return;
     }
-    
     setLoading(true);
-    
     try {
       const data = {
         ...formData,
@@ -184,7 +163,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
         end_time: formData.end_time.toISOString(),
         beneficiary_ids: formData.beneficiaries
       };
-      
       if (isEditMode) {
         await axios.put(`/api/appointments/${appointment.id}`, data);
         toast({
@@ -200,7 +178,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
           variant: 'success'
         });
       }
-      
       onSave();
     } catch (error) {
       toast({
@@ -212,14 +189,11 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
       setLoading(false);
     }
   };
-
   const handleDelete = async () => {
     if (!window.confirm('Bu randevuyu silmek istediğinizden emin misiniz?')) {
       return;
     }
-    
     setLoading(true);
-    
     try {
       await axios.delete(`/api/appointments/${appointment.id}`);
       toast({
@@ -238,16 +212,13 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
       setLoading(false);
     }
   };
-
   const handleGoogleSync = async () => {
     try {
       const response = await axios.post(`/api/appointments/${appointment.id}/sync-google`);
-      
       setFormData({
         ...formData,
         google_event_id: response.data.google_event_id
       });
-      
       toast({
         title: 'Başarılı',
         description: 'Google Takvim ile senkronize edildi',
@@ -261,7 +232,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
       });
     }
   };
-
   const handleDurationChange = (duration) => {
     if (formData.start_time) {
       setFormData({
@@ -270,28 +240,23 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
       });
     }
   };
-
   const getStatusBadge = (status) => {
     const statusMap = {
       confirmed: { label: 'Onaylandı', variant: 'success' },
       pending: { label: 'Beklemede', variant: 'warning' },
       cancelled: { label: 'İptal', variant: 'error' }
     };
-    
     const { label, variant } = statusMap[status] || statusMap.pending;
     return <Badge variant={variant}>{label}</Badge>;
   };
-
   const getTypeIcon = (type) => {
     const icons = {
       session: <Users className="h-4 w-4" />,
       evaluation: <FileText className="h-4 w-4" />,
       meeting: <Calendar className="h-4 w-4" />
     };
-    
     return icons[type] || <Calendar className="h-4 w-4" />;
   };
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -304,7 +269,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
             </h2>
             {isEditMode && getStatusBadge(formData.status)}
           </div>
-          
           <div className="flex items-center gap-2">
             {isEditMode && formData.google_event_id && (
               <Badge variant="secondary">
@@ -317,7 +281,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
             </Button>
           </div>
         </div>
-
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
           <form onSubmit={handleSubmit}>
@@ -337,7 +300,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                 </div>
               </Alert>
             )}
-
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="p-6">
               <Tabs.TabsList>
@@ -346,7 +308,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                 <Tabs.TabTrigger value="schedule">Zamanlama</Tabs.TabTrigger>
                 {isEditMode && <Tabs.TabTrigger value="history">Geçmiş</Tabs.TabTrigger>}
               </Tabs.TabsList>
-
               {/* Details Tab */}
               <Tabs.TabContent value="details" className="space-y-4">
                 {/* Templates */}
@@ -370,7 +331,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     </div>
                   </div>
                 )}
-
                 {/* Basic Fields */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -384,7 +344,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                       className={validateForm && !formData.title ? 'border-red-500' : ''}
                     />
                   </div>
-                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Tür
@@ -399,7 +358,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     </Select>
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Açıklama
@@ -411,7 +369,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     rows={3}
                   />
                 </div>
-
                 {/* Location */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -440,7 +397,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                       <span>Online</span>
                     </label>
                   </div>
-                  
                   {formData.is_online && (
                     <Input
                       value={formData.meeting_url}
@@ -450,7 +406,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     />
                   )}
                 </div>
-
                 {/* Tags */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -478,7 +433,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     ))}
                   </div>
                 </div>
-
                 {/* Advanced Options */}
                 <div className="pt-4">
                   <button
@@ -489,7 +443,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     {showAdvanced ? <ChevronUp /> : <ChevronDown />}
                     Gelişmiş Seçenekler
                   </button>
-                  
                   {showAdvanced && (
                     <div className="mt-4 space-y-4 p-4 border rounded-lg">
                       {/* Color */}
@@ -511,7 +464,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                           ))}
                         </div>
                       </div>
-
                       {/* Notifications */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -562,7 +514,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                           </label>
                         </div>
                       </div>
-
                       {/* Notes */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -579,7 +530,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                   )}
                 </div>
               </Tabs.TabContent>
-
               {/* Participants Tab */}
               <Tabs.TabContent value="participants" className="space-y-4">
                 <div>
@@ -598,7 +548,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     ))}
                   </Select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Katılımcılar
@@ -631,7 +580,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     ))}
                   </div>
                 </div>
-
                 {/* Participant Conflicts */}
                 {conflicts.length > 0 && (
                   <Alert variant="warning">
@@ -645,7 +593,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                   </Alert>
                 )}
               </Tabs.TabContent>
-
               {/* Schedule Tab */}
               <Tabs.TabContent value="schedule" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -663,7 +610,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                       className={validateForm && !formData.start_time ? 'border-red-500' : ''}
                     />
                   </div>
-                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Bitiş *
@@ -679,7 +625,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     />
                   </div>
                 </div>
-
                 {/* Quick Duration Buttons */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -700,7 +645,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     ))}
                   </div>
                 </div>
-
                 {/* Reminder */}
                 <div>
                   <label className="flex items-center gap-2">
@@ -715,7 +659,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     <Bell className="h-4 w-4" />
                     <span>Hatırlatıcı</span>
                   </label>
-                  
                   {formData.reminder_enabled && (
                     <Select
                       value={formData.reminder_time}
@@ -733,14 +676,12 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     </Select>
                   )}
                 </div>
-
                 {/* Recurrence */}
                 <div>
                   <label className="flex items-center gap-2">
                     <Repeat className="h-4 w-4" />
                     <span>Tekrarlayan Randevu</span>
                   </label>
-                  
                   <Select
                     value={formData.recurrence_type}
                     onValueChange={(value) => setFormData({ 
@@ -755,7 +696,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     <Select.Option value="monthly">Aylık</Select.Option>
                     <Select.Option value="custom">Özel</Select.Option>
                   </Select>
-                  
                   {formData.recurrence_type !== 'none' && (
                     <div className="mt-2 space-y-2">
                       <Input
@@ -767,7 +707,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                         })}
                         placeholder="Bitiş tarihi"
                       />
-                      
                       {formData.recurrence_type === 'weekly' && (
                         <div className="flex gap-2">
                           {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((day, index) => (
@@ -797,7 +736,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                     </div>
                   )}
                 </div>
-
                 {/* Available Slots */}
                 {availableSlots.length > 0 && (
                   <div>
@@ -826,7 +764,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                   </div>
                 )}
               </Tabs.TabContent>
-
               {/* History Tab */}
               {isEditMode && (
                 <Tabs.TabContent value="history" className="space-y-4">
@@ -846,7 +783,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
                       ))}
                     </div>
                   </div>
-                  
                   {appointment.google_event_id && (
                     <div>
                       <h4 className="font-medium mb-3">Google Takvim</h4>
@@ -877,7 +813,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
             </Tabs>
           </form>
         </div>
-
         {/* Footer */}
         <div className="p-6 border-t flex items-center justify-between">
           <div>
@@ -893,7 +828,6 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
               </Button>
             )}
           </div>
-          
           <div className="flex items-center gap-2">
             <Button
               type="button"
@@ -916,5 +850,4 @@ const AppointmentModalV2 = ({ appointment, timeSlot, onClose, onSave }) => {
     </div>
   );
 };
-
 export default AppointmentModalV2;

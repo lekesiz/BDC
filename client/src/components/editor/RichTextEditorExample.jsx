@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { RichTextEditor, exportContent } from './index';
-
 const RichTextEditorExample = () => {
   const [content, setContent] = useState('');
   const [darkMode, setDarkMode] = useState(false);
-
   const handleImageUpload = async (file) => {
     // In a real application, you would upload the file to your server
     // and return the URL. For this example, we'll use a local URL.
@@ -14,15 +12,12 @@ const RichTextEditorExample = () => {
       reader.readAsDataURL(file);
     });
   };
-
   const handleExport = (format, content) => {
     exportContent(format, content, 'my-document');
   };
-
   const sampleContent = `
     <h1>Welcome to the Rich Text Editor</h1>
     <p>This is a comprehensive rich text editor built with TipTap for the BDC client application.</p>
-    
     <h2>Features</h2>
     <ul>
       <li><strong>Bold</strong>, <em>italic</em>, <u>underline</u>, and <strike>strikethrough</strike> text</li>
@@ -34,27 +29,20 @@ const RichTextEditorExample = () => {
       <li>Tables and images</li>
       <li>Custom educational features</li>
     </ul>
-    
     <h3>Code Example</h3>
     <pre><code class="language-javascript">function calculateSum(a, b) {
   return a + b;
 }
-
-console.log(calculateSum(5, 3)); // Output: 8</code></pre>
-    
+); // Output: 8</code></pre>
     <h3>Math Example</h3>
     <p>The quadratic formula is: <span class="math-inline" data-latex="x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"></span></p>
-    
     <div class="math-block" data-latex="\\int_{a}^{b} f(x) dx = F(b) - F(a)"></div>
-    
     <h3>Educational Features</h3>
     <p><span class="question-hint">This is a hint for students</span></p>
     <p><span class="correct-answer">This is the correct answer</span></p>
-    
     <div class="explanation-block">
       <p>This is an explanation block that provides additional context and information about the topic.</p>
     </div>
-    
     <h3>Table Example</h3>
     <table>
       <tr>
@@ -79,7 +67,6 @@ console.log(calculateSum(5, 3)); // Output: 8</code></pre>
       </tr>
     </table>
   `;
-
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="mb-8">
@@ -107,14 +94,12 @@ console.log(calculateSum(5, 3)); // Output: 8</code></pre>
           </label>
         </div>
       </div>
-
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Editor</h2>
         <RichTextEditor
           content={content}
           onChange={({ html, text, json }) => {
             setContent(html);
-            console.log('Content changed:', { html, text, json });
           }}
           onImageUpload={handleImageUpload}
           placeholder="Start typing your content here..."
@@ -127,7 +112,6 @@ console.log(calculateSum(5, 3)); // Output: 8</code></pre>
           exportFormats={['html', 'markdown', 'json']}
         />
       </div>
-
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Read-Only Preview</h2>
         <RichTextEditor
@@ -139,7 +123,6 @@ console.log(calculateSum(5, 3)); // Output: 8</code></pre>
           className="border-2 border-gray-300"
         />
       </div>
-
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">HTML Output</h2>
         <pre className="bg-gray-100 p-4 rounded overflow-x-auto">
@@ -149,5 +132,4 @@ console.log(calculateSum(5, 3)); // Output: 8</code></pre>
     </div>
   );
 };
-
 export default RichTextEditorExample;

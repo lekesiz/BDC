@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-
 const ResourceHints = ({ 
   preconnectUrls = [],
   prefetchUrls = [],
@@ -8,7 +7,6 @@ const ResourceHints = ({
 }) => {
   useEffect(() => {
     const head = document.head;
-
     // Add preconnect hints
     preconnectUrls.forEach(url => {
       if (!document.querySelector(`link[rel="preconnect"][href="${url}"]`)) {
@@ -19,7 +17,6 @@ const ResourceHints = ({
         head.appendChild(link);
       }
     });
-
     // Add DNS prefetch hints
     dnsPrefetchUrls.forEach(url => {
       if (!document.querySelector(`link[rel="dns-prefetch"][href="${url}"]`)) {
@@ -29,7 +26,6 @@ const ResourceHints = ({
         head.appendChild(link);
       }
     });
-
     // Add prefetch hints
     prefetchUrls.forEach(url => {
       if (!document.querySelector(`link[rel="prefetch"][href="${url}"]`)) {
@@ -42,7 +38,6 @@ const ResourceHints = ({
         head.appendChild(link);
       }
     });
-
     // Add preload hints
     preloadResources.forEach(({ href, as, type, crossOrigin }) => {
       if (!document.querySelector(`link[rel="preload"][href="${href}"]`)) {
@@ -55,7 +50,6 @@ const ResourceHints = ({
         head.appendChild(link);
       }
     });
-
     // Cleanup function
     return () => {
       // Only remove hints added by this component
@@ -65,7 +59,6 @@ const ResourceHints = ({
         ...prefetchUrls.map(url => `link[rel="prefetch"][href="${url}"]`),
         ...preloadResources.map(({ href }) => `link[rel="preload"][href="${href}"]`)
       ];
-
       selectors.forEach(selector => {
         const element = document.querySelector(selector);
         if (element) {
@@ -74,8 +67,6 @@ const ResourceHints = ({
       });
     };
   }, [preconnectUrls, prefetchUrls, preloadResources, dnsPrefetchUrls]);
-
   return null;
 };
-
 export default ResourceHints;

@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Form component
  * 
@@ -15,7 +14,6 @@ export const Form = ({ onSubmit, children, className = '', ...props }) => {
     e.preventDefault();
     onSubmit && onSubmit(e);
   };
-
   return (
     <form
       className={cn('space-y-4 sm:space-y-6', className)}
@@ -26,7 +24,6 @@ export const Form = ({ onSubmit, children, className = '', ...props }) => {
     </form>
   );
 };
-
 /**
  * FormGroup component
  * 
@@ -42,7 +39,6 @@ export const FormGroup = ({ children, className = '', ...props }) => {
     </div>
   );
 };
-
 /**
  * FormLabel component
  * 
@@ -71,7 +67,6 @@ export const FormLabel = ({
     </label>
   );
 };
-
 /**
  * FormControl component
  * 
@@ -102,7 +97,6 @@ export const FormControl = ({
     ...props
   });
 };
-
 /**
  * FormHelper component for help text or error messages
  * 
@@ -134,7 +128,6 @@ export const FormHelper = ({
     </p>
   );
 };
-
 /**
  * Checkbox component
  * 
@@ -181,7 +174,6 @@ export const Checkbox = ({
     </div>
   );
 };
-
 /**
  * Radio component
  * 
@@ -228,7 +220,6 @@ export const Radio = ({
     </div>
   );
 };
-
 /**
  * Select component
  * 

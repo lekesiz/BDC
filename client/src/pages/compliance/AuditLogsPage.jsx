@@ -20,7 +20,6 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { useToast } from '../../components/ui/use-toast';
-
 const eventTypes = [
   { value: 'all', label: 'All Events' },
   { value: 'auth', label: 'Authentication' },
@@ -30,7 +29,6 @@ const eventTypes = [
   { value: 'system', label: 'System Events' },
   { value: 'security', label: 'Security Events' }
 ];
-
 const severityLevels = [
   { value: 'all', label: 'All Levels', color: 'gray' },
   { value: 'info', label: 'Info', color: 'blue' },
@@ -38,7 +36,6 @@ const severityLevels = [
   { value: 'error', label: 'Error', color: 'red' },
   { value: 'critical', label: 'Critical', color: 'purple' }
 ];
-
 const AuditLogsPage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -63,19 +60,16 @@ const AuditLogsPage = () => {
   const [selectedLog, setSelectedLog] = useState(null);
   const [exportFormat, setExportFormat] = useState('csv');
   const [autoRefresh, setAutoRefresh] = useState(false);
-
   useEffect(() => {
     fetchLogs();
     fetchStats();
   }, [filters]);
-
   useEffect(() => {
     if (autoRefresh) {
       const interval = setInterval(fetchLogs, 30000); // Refresh every 30 seconds
       return () => clearInterval(interval);
     }
   }, [autoRefresh]);
-
   const fetchLogs = async () => {
     setLoading(true);
     try {
@@ -85,13 +79,11 @@ const AuditLogsPage = () => {
           params.append(key, value);
         }
       });
-
       const response = await fetch(`/api/admin/audit-logs?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setLogs(data.logs || []);
@@ -102,7 +94,6 @@ const AuditLogsPage = () => {
       setLoading(false);
     }
   };
-
   const fetchStats = async () => {
     try {
       const response = await fetch('/api/admin/audit-logs/stats', {
@@ -110,7 +101,6 @@ const AuditLogsPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setStats(data);
@@ -119,7 +109,6 @@ const AuditLogsPage = () => {
       console.error('Error fetching stats:', error);
     }
   };
-
   const exportLogs = async () => {
     try {
       const params = new URLSearchParams();
@@ -129,13 +118,11 @@ const AuditLogsPage = () => {
         }
       });
       params.append('format', exportFormat);
-
       const response = await fetch(`/api/admin/audit-logs/export?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -152,14 +139,12 @@ const AuditLogsPage = () => {
       showToast('Error exporting logs', 'error');
     }
   };
-
   // Spinner component definition
   const Spinner = () => (
     <div className="flex justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
   );
-
   const getSeverityIcon = (severity) => {
     switch (severity) {
       case 'info':
@@ -174,7 +159,6 @@ const AuditLogsPage = () => {
         return <Activity className="w-4 h-4 text-gray-500" />;
     }
   };
-
   const getEventTypeIcon = (type) => {
     switch (type) {
       case 'auth':
@@ -189,7 +173,6 @@ const AuditLogsPage = () => {
         return <FileText className="w-4 h-4" />;
     }
   };
-
   const renderFilters = () => (
     <Card className="mb-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -207,7 +190,6 @@ const AuditLogsPage = () => {
             />
           </div>
         </div>
-
         {/* Event Type */}
         <div>
           <label className="block text-sm font-medium mb-1">Event Type</label>
@@ -221,7 +203,6 @@ const AuditLogsPage = () => {
             ))}
           </select>
         </div>
-
         {/* Severity */}
         <div>
           <label className="block text-sm font-medium mb-1">Severity</label>
@@ -235,7 +216,6 @@ const AuditLogsPage = () => {
             ))}
           </select>
         </div>
-
         {/* User ID */}
         <div>
           <label className="block text-sm font-medium mb-1">User ID</label>
@@ -247,7 +227,6 @@ const AuditLogsPage = () => {
             onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
           />
         </div>
-
         {/* Date From */}
         <div>
           <label className="block text-sm font-medium mb-1">From Date</label>
@@ -258,7 +237,6 @@ const AuditLogsPage = () => {
             onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
           />
         </div>
-
         {/* Date To */}
         <div>
           <label className="block text-sm font-medium mb-1">To Date</label>
@@ -269,7 +247,6 @@ const AuditLogsPage = () => {
             onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
           />
         </div>
-
         {/* Export Format */}
         <div>
           <label className="block text-sm font-medium mb-1">Export Format</label>
@@ -283,7 +260,6 @@ const AuditLogsPage = () => {
             <option value="pdf">PDF</option>
           </select>
         </div>
-
         {/* Actions */}
         <div className="flex items-end space-x-2">
           <Button onClick={fetchLogs} disabled={loading}>
@@ -298,7 +274,6 @@ const AuditLogsPage = () => {
       </div>
     </Card>
   );
-
   const renderStats = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
       <Card>
@@ -306,7 +281,6 @@ const AuditLogsPage = () => {
         <p className="text-2xl font-bold">{stats.total.toLocaleString()}</p>
         <p className="text-sm text-gray-600">Last 30 days</p>
       </Card>
-
       <Card>
         <h3 className="font-medium mb-2">Security Events</h3>
         <p className="text-2xl font-bold text-red-600">
@@ -314,13 +288,11 @@ const AuditLogsPage = () => {
         </p>
         <p className="text-sm text-gray-600">Critical severity</p>
       </Card>
-
       <Card>
         <h3 className="font-medium mb-2">Most Active</h3>
         <p className="text-2xl font-bold">{Object.keys(stats.byType)[0] || 'N/A'}</p>
         <p className="text-sm text-gray-600">Event type</p>
       </Card>
-
       <Card>
         <h3 className="font-medium mb-2">Auto-Refresh</h3>
         <label className="relative inline-flex items-center cursor-pointer mt-2">
@@ -336,7 +308,6 @@ const AuditLogsPage = () => {
       </Card>
     </div>
   );
-
   const renderLogs = () => (
     <Card>
       <div className="overflow-x-auto">
@@ -400,7 +371,6 @@ const AuditLogsPage = () => {
           </tbody>
         </table>
       </div>
-
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
         <p className="text-sm text-gray-600">
@@ -427,7 +397,6 @@ const AuditLogsPage = () => {
       </div>
     </Card>
   );
-
   const renderLogDetail = () => (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <Card className="max-w-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -441,7 +410,6 @@ const AuditLogsPage = () => {
             <XCircle className="w-4 h-4" />
           </Button>
         </div>
-
         {selectedLog && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -470,17 +438,14 @@ const AuditLogsPage = () => {
                 <p className="text-sm">{selectedLog.severity}</p>
               </div>
             </div>
-
             <div>
               <p className="text-sm font-medium text-gray-500 mb-1">Event</p>
               <p className="text-sm">{selectedLog.event}</p>
             </div>
-
             <div>
               <p className="text-sm font-medium text-gray-500 mb-1">Description</p>
               <p className="text-sm">{selectedLog.description}</p>
             </div>
-
             {selectedLog.metadata && (
               <div>
                 <p className="text-sm font-medium text-gray-500 mb-1">Metadata</p>
@@ -489,7 +454,6 @@ const AuditLogsPage = () => {
                 </pre>
               </div>
             )}
-
             {selectedLog.error && (
               <div>
                 <p className="text-sm font-medium text-gray-500 mb-1">Error Details</p>
@@ -503,7 +467,6 @@ const AuditLogsPage = () => {
       </Card>
     </div>
   );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -515,10 +478,8 @@ const AuditLogsPage = () => {
           Back to Settings
         </Button>
       </div>
-
       {renderStats()}
       {renderFilters()}
-      
       {loading ? (
         <div className="flex justify-center py-12">
           <Spinner />
@@ -526,10 +487,8 @@ const AuditLogsPage = () => {
       ) : (
         renderLogs()
       )}
-
       {selectedLog && renderLogDetail()}
     </div>
   );
 };
-
 export default AuditLogsPage;

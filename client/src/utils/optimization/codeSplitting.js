@@ -1,10 +1,8 @@
 /**
  * Code splitting utilities for React applications
  */
-
 import React, { lazy, Suspense } from 'react';
 import { LinearProgress, CircularProgress } from '@mui/material';
-
 /**
  * Loading fallback components
  */
@@ -20,19 +18,16 @@ export const LoadingFallbacks = {
       <CircularProgress />
     </div>
   ),
-
   // Inline loader
   Inline: () => (
     <div style={{ padding: '20px', textAlign: 'center' }}>
       <CircularProgress size={24} />
     </div>
   ),
-
   // Linear progress bar
   Linear: () => (
     <LinearProgress />
   ),
-
   // Custom skeleton loader
   Skeleton: ({ height = 200 }) => (
     <div style={{
@@ -43,7 +38,6 @@ export const LoadingFallbacks = {
     }} />
   )
 };
-
 /**
  * Route-based code splitting
  */
@@ -54,44 +48,36 @@ export const routeBasedSplitting = {
     Login: lazy(() => import('../../pages/auth/LoginPage')),
     Register: lazy(() => import('../../pages/auth/RegisterPage')),
     ForgotPassword: lazy(() => import('../../pages/auth/ForgotPasswordPage')),
-
     // Dashboard routes
     Dashboard: lazy(() => import('../../pages/dashboard/DashboardPage')),
     AdminDashboard: lazy(() => import('../../pages/dashboard/AdminDashboard')),
     TrainerDashboard: lazy(() => import('../../pages/dashboard/TrainerDashboard')),
     StudentDashboard: lazy(() => import('../../pages/dashboard/StudentDashboard')),
-
     // User management
     UserList: lazy(() => import('../../pages/users/UserListPage')),
     UserProfile: lazy(() => import('../../pages/users/UserProfilePage')),
     UserEdit: lazy(() => import('../../pages/users/UserEditPage')),
-
     // Beneficiary management
     BeneficiaryList: lazy(() => import('../../pages/beneficiaries/BeneficiaryListPage')),
     BeneficiaryDetail: lazy(() => import('../../pages/beneficiaries/BeneficiaryDetailPage')),
     BeneficiaryForm: lazy(() => import('../../pages/beneficiaries/BeneficiaryFormPage')),
-
     // Assessment system
     AssessmentList: lazy(() => import('../../pages/assessments/AssessmentListPage')),
     AssessmentCreate: lazy(() => import('../../pages/assessments/AssessmentCreatePage')),
     AssessmentTake: lazy(() => import('../../pages/assessments/AssessmentTakePage')),
     AssessmentResults: lazy(() => import('../../pages/assessments/AssessmentResultsPage')),
-
     // Documents
     DocumentList: lazy(() => import('../../pages/documents/DocumentListPage')),
     DocumentUpload: lazy(() => import('../../pages/documents/DocumentUploadPage')),
     DocumentViewer: lazy(() => import('../../pages/documents/DocumentViewerPage')),
-
     // Reports
     Reports: lazy(() => import('../../pages/reports/ReportsPage')),
     ReportViewer: lazy(() => import('../../pages/reports/ReportViewerPage')),
-
     // Settings
     Settings: lazy(() => import('../../pages/settings/SettingsPage')),
     ProfileSettings: lazy(() => import('../../pages/settings/ProfileSettingsPage')),
     SystemSettings: lazy(() => import('../../pages/settings/SystemSettingsPage'))
   },
-
   /**
    * Create route with code splitting
    */
@@ -105,7 +91,6 @@ export const routeBasedSplitting = {
     ...options
   })
 };
-
 /**
  * Component-based code splitting
  */
@@ -120,21 +105,18 @@ export const componentBasedSplitting = {
       RadarChart: lazy(() => import('../../components/charts/RadarChart')),
       Dashboard: lazy(() => import('../../components/analytics/AnalyticsDashboard'))
     },
-
     // Rich text editors
     Editors: {
       RichTextEditor: lazy(() => import('../../components/editors/RichTextEditor')),
       MarkdownEditor: lazy(() => import('../../components/editors/MarkdownEditor')),
       CodeEditor: lazy(() => import('../../components/editors/CodeEditor'))
     },
-
     // File handling
     FileHandlers: {
       FileUploader: lazy(() => import('../../components/upload/FileUploader')),
       ImageCropper: lazy(() => import('../../components/upload/ImageCropper')),
       PDFViewer: lazy(() => import('../../components/viewers/PDFViewer'))
     },
-
     // Complex forms
     Forms: {
       AssessmentBuilder: lazy(() => import('../../components/forms/AssessmentBuilder')),
@@ -142,13 +124,11 @@ export const componentBasedSplitting = {
       FormBuilder: lazy(() => import('../../components/forms/FormBuilder'))
     }
   },
-
   /**
    * Wrap component with lazy loading
    */
   withLazyLoading: (importFunc, fallback = <LoadingFallbacks.Inline />) => {
     const LazyComponent = lazy(importFunc);
-    
     return (props) => (
       <Suspense fallback={fallback}>
         <LazyComponent {...props} />
@@ -156,7 +136,6 @@ export const componentBasedSplitting = {
     );
   }
 };
-
 /**
  * Library-based code splitting
  */
@@ -169,21 +148,18 @@ export const libraryBasedSplitting = {
       chartjs: () => import('chart.js'),
       d3: () => import('d3')
     }),
-
     // Date/time libraries
     dateLibraries: () => ({
       moment: () => import('moment'),
       dateFns: () => import('date-fns'),
       dayjs: () => import('dayjs')
     }),
-
     // Rich content libraries
     contentLibraries: () => ({
       quill: () => import('quill'),
       draftJs: () => import('draft-js'),
       slate: () => import('slate')
     }),
-
     // Utility libraries
     utilityLibraries: () => ({
       lodash: () => import('lodash'),
@@ -191,32 +167,27 @@ export const libraryBasedSplitting = {
       axios: () => import('axios')
     })
   },
-
   /**
    * Dynamic import with error handling
    */
   dynamicImport: async (library, retries = 3) => {
     let attempt = 0;
-    
     while (attempt < retries) {
       try {
         const module = await library();
         return module;
       } catch (error) {
         attempt++;
-        
         if (attempt === retries) {
           console.error(`Failed to load library after ${retries} attempts:`, error);
           throw error;
         }
-        
         // Wait before retry
         await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
       }
     }
   }
 };
-
 /**
  * Advanced code splitting strategies
  */
@@ -226,11 +197,9 @@ export const advancedStrategies = {
    */
   intersectionObserverLoading: (componentImport, options = {}) => {
     const LazyComponent = lazy(componentImport);
-    
     return React.forwardRef((props, ref) => {
       const [isIntersecting, setIsIntersecting] = React.useState(false);
       const observerRef = React.useRef(null);
-      
       React.useEffect(() => {
         const observer = new IntersectionObserver(
           ([entry]) => {
@@ -244,14 +213,11 @@ export const advancedStrategies = {
             threshold: options.threshold || 0.01
           }
         );
-        
         if (observerRef.current) {
           observer.observe(observerRef.current);
         }
-        
         return () => observer.disconnect();
       }, []);
-      
       return (
         <div ref={observerRef}>
           {isIntersecting ? (
@@ -265,7 +231,6 @@ export const advancedStrategies = {
       );
     });
   },
-
   /**
    * Prefetch components
    */
@@ -280,7 +245,6 @@ export const advancedStrategies = {
       }, 1);
     }
   },
-
   /**
    * Progressive loading
    */
@@ -291,14 +255,12 @@ export const advancedStrategies = {
       () => import('../../components/layout/Navigation'),
       () => import('../../components/auth/AuthProvider')
     ],
-
     // Load enhanced features later
     enhanced: [
       () => import('../../components/analytics/AnalyticsDashboard'),
       () => import('../../components/charts/AdvancedCharts'),
       () => import('../../components/ai/AIAssistant')
     ],
-
     // Load optional features on demand
     optional: [
       () => import('../../components/themes/ThemeCustomizer'),
@@ -307,7 +269,6 @@ export const advancedStrategies = {
     ]
   }
 };
-
 /**
  * Performance optimization helpers
  */
@@ -318,11 +279,9 @@ export const performanceHelpers = {
   measureLoadTime: (componentName, startTime) => {
     const endTime = performance.now();
     const loadTime = endTime - startTime;
-    
     if (process.env.NODE_ENV === 'development') {
       // Component loaded
     }
-    
     // Report to analytics
     if (window.analytics) {
       window.analytics.track('Component Load Time', {
@@ -331,7 +290,6 @@ export const performanceHelpers = {
       });
     }
   },
-
   /**
    * Resource hints for preloading
    */
@@ -340,19 +298,15 @@ export const performanceHelpers = {
       const link = document.createElement('link');
       link.rel = resource.rel || 'prefetch';
       link.href = resource.href;
-      
       if (resource.as) {
         link.as = resource.as;
       }
-      
       if (resource.crossOrigin) {
         link.crossOrigin = resource.crossOrigin;
       }
-      
       document.head.appendChild(link);
     });
   },
-
   /**
    * Bundle size monitor
    */
@@ -361,7 +315,6 @@ export const performanceHelpers = {
       // Get all script tags
       const scripts = document.getElementsByTagName('script');
       let totalSize = 0;
-      
       Array.from(scripts).forEach(script => {
         if (script.src) {
           fetch(script.src)
@@ -372,13 +325,10 @@ export const performanceHelpers = {
             });
         }
       });
-      
-      setTimeout(() => {
-      }, 2000);
+      setTimeout(() => {}, 2000);
     }
   }
 };
-
 /**
  * Error boundaries for code splitting
  */
@@ -387,20 +337,16 @@ export class CodeSplitErrorBoundary extends React.Component {
     super(props);
     this.state = { hasError: false, error: null };
   }
-
   static getDerivedStateFromError(error) {
     return { hasError: true, error };
   }
-
   componentDidCatch(error, errorInfo) {
     console.error('Code splitting error:', error, errorInfo);
-    
     // Report to error tracking service
     if (window.Sentry) {
       window.Sentry.captureException(error);
     }
   }
-
   render() {
     if (this.state.hasError) {
       return (
@@ -413,11 +359,9 @@ export class CodeSplitErrorBoundary extends React.Component {
         </div>
       );
     }
-
     return this.props.children;
   }
 }
-
 export default {
   LoadingFallbacks,
   routeBasedSplitting,

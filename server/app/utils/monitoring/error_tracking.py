@@ -553,6 +553,6 @@ def init_error_tracking(app: Flask, db: SQLAlchemy, redis_client: redis.Redis):
     def cleanup_errors():
         """Clean up old error records"""
         count = error_tracker.cleanup_old_errors()
-        print(f"Cleaned up {count} old error records")
+        logger.info(f"Cleaned up {count} old error records")
     
     return error_tracker 

@@ -1,8 +1,6 @@
 import { Mark, mergeAttributes } from '@tiptap/core';
-
 export const QuestionHint = Mark.create({
   name: 'questionHint',
-
   addOptions() {
     return {
       HTMLAttributes: {
@@ -10,7 +8,6 @@ export const QuestionHint = Mark.create({
       },
     };
   },
-
   parseHTML() {
     return [
       {
@@ -21,7 +18,6 @@ export const QuestionHint = Mark.create({
       },
     ];
   },
-
   renderHTML({ HTMLAttributes }) {
     return [
       'span',
@@ -31,7 +27,6 @@ export const QuestionHint = Mark.create({
       0,
     ];
   },
-
   addCommands() {
     return {
       setQuestionHint:
@@ -51,7 +46,6 @@ export const QuestionHint = Mark.create({
         },
     };
   },
-
   addKeyboardShortcuts() {
     return {
       'Mod-Shift-h': () => this.editor.commands.toggleQuestionHint(),

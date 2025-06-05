@@ -37,7 +37,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Dropdown, DropdownItem } from '@/components/ui/dropdown';
 import { Tooltip } from '@/components/ui/tooltip';
-
 const EditorToolbar = ({
   editor,
   onImageUpload,
@@ -49,22 +48,18 @@ const EditorToolbar = ({
   const fileInputRef = useRef(null);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
-
   if (!editor) {
     return null;
   }
-
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
-
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (file && onImageUpload) {
       onImageUpload(file);
     }
   };
-
   const setLink = () => {
     if (linkUrl) {
       editor.chain().focus().setLink({ href: linkUrl }).run();
@@ -72,11 +67,9 @@ const EditorToolbar = ({
       setShowLinkDialog(false);
     }
   };
-
   const addTable = () => {
     editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
   };
-
   const ToolbarButton = ({ onClick, isActive, disabled, children, tooltip }) => (
     <Tooltip content={tooltip} position="top">
       <Button
@@ -90,9 +83,7 @@ const EditorToolbar = ({
       </Button>
     </Tooltip>
   );
-
   const ToolbarSeparator = () => <div className="toolbar-separator" />;
-
   return (
     <div className={`editor-toolbar ${darkMode ? 'dark' : ''}`}>
       <div className="toolbar-section">
@@ -104,7 +95,6 @@ const EditorToolbar = ({
         >
           <Bold className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleItalic().run()}
           isActive={editor.isActive('italic')}
@@ -112,7 +102,6 @@ const EditorToolbar = ({
         >
           <Italic className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           isActive={editor.isActive('underline')}
@@ -120,7 +109,6 @@ const EditorToolbar = ({
         >
           <Underline className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleStrike().run()}
           isActive={editor.isActive('strike')}
@@ -128,9 +116,7 @@ const EditorToolbar = ({
         >
           <Strikethrough className="w-4 h-4" />
         </ToolbarButton>
-
         <ToolbarSeparator />
-
         {/* Headings */}
         <Dropdown
           trigger={
@@ -171,9 +157,7 @@ const EditorToolbar = ({
             </div>
           </DropdownItem>
         </Dropdown>
-
         <ToolbarSeparator />
-
         {/* Lists */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -182,7 +166,6 @@ const EditorToolbar = ({
         >
           <List className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           isActive={editor.isActive('orderedList')}
@@ -190,7 +173,6 @@ const EditorToolbar = ({
         >
           <ListOrdered className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleTaskList().run()}
           isActive={editor.isActive('taskList')}
@@ -198,9 +180,7 @@ const EditorToolbar = ({
         >
           <ListTodo className="w-4 h-4" />
         </ToolbarButton>
-
         <ToolbarSeparator />
-
         {/* Code */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleCode().run()}
@@ -209,7 +189,6 @@ const EditorToolbar = ({
         >
           <Code className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           isActive={editor.isActive('codeBlock')}
@@ -217,9 +196,7 @@ const EditorToolbar = ({
         >
           <FileCode className="w-4 h-4" />
         </ToolbarButton>
-
         <ToolbarSeparator />
-
         {/* Alignment */}
         <ToolbarButton
           onClick={() => editor.chain().focus().setTextAlign('left').run()}
@@ -228,7 +205,6 @@ const EditorToolbar = ({
         >
           <AlignLeft className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().setTextAlign('center').run()}
           isActive={editor.isActive({ textAlign: 'center' })}
@@ -236,7 +212,6 @@ const EditorToolbar = ({
         >
           <AlignCenter className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().setTextAlign('right').run()}
           isActive={editor.isActive({ textAlign: 'right' })}
@@ -244,7 +219,6 @@ const EditorToolbar = ({
         >
           <AlignRight className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().setTextAlign('justify').run()}
           isActive={editor.isActive({ textAlign: 'justify' })}
@@ -252,9 +226,7 @@ const EditorToolbar = ({
         >
           <AlignJustify className="w-4 h-4" />
         </ToolbarButton>
-
         <ToolbarSeparator />
-
         {/* Insert items */}
         <ToolbarButton
           onClick={handleImageClick}
@@ -262,14 +234,12 @@ const EditorToolbar = ({
         >
           <ImageIcon className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={addTable}
           tooltip="Insert Table"
         >
           <Table className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => setShowLinkDialog(true)}
           isActive={editor.isActive('link')}
@@ -277,9 +247,7 @@ const EditorToolbar = ({
         >
           <Link className="w-4 h-4" />
         </ToolbarButton>
-
         <ToolbarSeparator />
-
         {/* Custom extensions */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleQuestionHint().run()}
@@ -288,7 +256,6 @@ const EditorToolbar = ({
         >
           <HelpCircle className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleCorrectAnswer().run()}
           isActive={editor.isActive('correctAnswer')}
@@ -296,7 +263,6 @@ const EditorToolbar = ({
         >
           <CheckSquare className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleExplanationBlock().run()}
           isActive={editor.isActive('explanationBlock')}
@@ -304,16 +270,13 @@ const EditorToolbar = ({
         >
           <MessageSquare className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().insertMath().run()}
           tooltip="Insert Math Formula"
         >
           <Calculator className="w-4 h-4" />
         </ToolbarButton>
-
         <ToolbarSeparator />
-
         {/* Colors */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleHighlight().run()}
@@ -322,9 +285,7 @@ const EditorToolbar = ({
         >
           <Highlighter className="w-4 h-4" />
         </ToolbarButton>
-
         <ToolbarSeparator />
-
         {/* History */}
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}
@@ -333,7 +294,6 @@ const EditorToolbar = ({
         >
           <Undo className="w-4 h-4" />
         </ToolbarButton>
-        
         <ToolbarButton
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().redo()}
@@ -342,7 +302,6 @@ const EditorToolbar = ({
           <Redo className="w-4 h-4" />
         </ToolbarButton>
       </div>
-
       <div className="toolbar-section">
         {/* Preview and Export */}
         {onTogglePreview && (
@@ -353,7 +312,6 @@ const EditorToolbar = ({
             <Eye className="w-4 h-4" />
           </ToolbarButton>
         )}
-
         {onExport && exportFormats.length > 0 && (
           <Dropdown
             trigger={
@@ -382,7 +340,6 @@ const EditorToolbar = ({
           </Dropdown>
         )}
       </div>
-
       {/* Hidden file input for image upload */}
       <input
         ref={fileInputRef}
@@ -391,7 +348,6 @@ const EditorToolbar = ({
         onChange={handleImageChange}
         style={{ display: 'none' }}
       />
-
       {/* Link dialog */}
       {showLinkDialog && (
         <div className="link-dialog">
@@ -427,5 +383,4 @@ const EditorToolbar = ({
     </div>
   );
 };
-
 export default EditorToolbar;

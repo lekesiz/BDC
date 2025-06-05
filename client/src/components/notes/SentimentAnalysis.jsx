@@ -34,26 +34,22 @@ import {
 import { Line, Bar, Doughnut, Radar } from 'react-chartjs-2';
 import { useSnackbar } from 'notistack';
 import api from '../../services/api';
-
 const sentimentColors = {
   positive: '#4CAF50',
   neutral: '#FFC107',
   negative: '#F44336',
   mixed: '#9C27B0'
 };
-
 const sentimentIcons = {
   positive: <EmotionHappy />,
   neutral: <EmotionNeutral />,
   negative: <EmotionSad />
 };
-
 const getScoreColor = (score) => {
   if (score > 0.3) return sentimentColors.positive;
   if (score < -0.3) return sentimentColors.negative;
   return sentimentColors.neutral;
 };
-
 const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
   const [sentimentData, setSentimentData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +58,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
   const [timeRange, setTimeRange] = useState('month');
   const [comparison, setComparison] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
-
   const fetchSentimentData = async () => {
     try {
       setLoading(true);
@@ -78,7 +73,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
       setLoading(false);
     }
   };
-
   const fetchHistoricalData = async () => {
     try {
       const response = await api.get(`/api/beneficiaries/${beneficiaryId}/sentiment-history`, {
@@ -89,25 +83,20 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
       enqueueSnackbar('Geçmiş veri yüklenemedi', { variant: 'error' });
     }
   };
-
   useEffect(() => {
     if (noteId) {
       fetchSentimentData();
     }
   }, [noteId]);
-
   useEffect(() => {
     if (beneficiaryId && viewMode === 'timeline') {
       fetchHistoricalData();
     }
   }, [beneficiaryId, viewMode, timeRange]);
-
   if (loading) return <CircularProgress />;
   if (error) return <Alert severity="error">{error}</Alert>;
   if (!sentimentData) return null;
-
   const { sentiment } = sentimentData;
-
   const overallSentimentChart = {
     labels: ['Pozitif', 'Nötr', 'Negatif'],
     datasets: [{
@@ -124,7 +113,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
       borderWidth: 0
     }]
   };
-
   const emotionRadarChart = sentiment.emotions && {
     labels: Object.keys(sentiment.emotions),
     datasets: [{
@@ -138,7 +126,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
       pointHoverBorderColor: '#3F51B5'
     }]
   };
-
   const sentenceSentimentChart = sentiment.sentence_sentiments && {
     labels: sentiment.sentence_sentiments.map((_, idx) => `Cümle ${idx + 1}`),
     datasets: [{
@@ -148,7 +135,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
       borderWidth: 0
     }]
   };
-
   const renderOverview = () => (
     <Grid container spacing={3}>
       <Grid item xs={12} md={4}>
@@ -169,7 +155,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
           </Typography>
         </Paper>
       </Grid>
-
       <Grid item xs={12} md={4}>
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
@@ -191,7 +176,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
           </Box>
         </Paper>
       </Grid>
-
       <Grid item xs={12} md={4}>
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
@@ -214,7 +198,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
               %{Math.round(sentiment.confidence * 100)}
             </Typography>
           </Box>
-          
           {sentiment.subjectivity !== undefined && (
             <Box>
               <Typography variant="body2" color="text.secondary">
@@ -236,7 +219,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
           )}
         </Paper>
       </Grid>
-
       {sentiment.key_phrases && sentiment.key_phrases.length > 0 && (
         <Grid item xs={12}>
           <Paper sx={{ p: 3 }}>
@@ -266,7 +248,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
           </Paper>
         </Grid>
       )}
-
       {sentiment.ai_insights && (
         <Grid item xs={12}>
           <Paper sx={{ p: 3, backgroundColor: '#f5f5f5' }}>
@@ -298,7 +279,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
       )}
     </Grid>
   );
-
   const renderDetailed = () => (
     <Grid container spacing={3}>
       {sentiment.emotions && (
@@ -325,7 +305,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
           </Paper>
         </Grid>
       )}
-
       {sentiment.sentence_sentiments && (
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
@@ -356,7 +335,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
           </Paper>
         </Grid>
       )}
-
       {sentiment.sentence_sentiments && (
         <Grid item xs={12}>
           <Paper sx={{ p: 3 }}>
@@ -385,7 +363,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
       )}
     </Grid>
   );
-
   const renderTimeline = () => (
     <Grid container spacing={3}>
       <Grid item xs={12}>
@@ -407,7 +384,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
               </Select>
             </FormControl>
           </Box>
-
           {comparison && comparison.timeline && (
             <Box sx={{ height: 400 }}>
               <Line
@@ -443,7 +419,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
               />
             </Box>
           )}
-
           {comparison && comparison.summary && (
             <Grid container spacing={2} sx={{ mt: 3 }}>
               <Grid item xs={12} md={3}>
@@ -495,7 +470,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
       </Grid>
     </Grid>
   );
-
   const renderView = () => {
     switch (viewMode) {
       case 'overview':
@@ -508,7 +482,6 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
         return renderOverview();
     }
   };
-
   return (
     <Card sx={{ mb: 3 }}>
       <CardContent>
@@ -548,11 +521,9 @@ const SentimentAnalysis = ({ noteId, beneficiaryId, noteContent }) => {
             </Tooltip>
           </Box>
         </Box>
-
         {renderView()}
       </CardContent>
     </Card>
   );
 };
-
 export default SentimentAnalysis;

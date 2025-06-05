@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-
 /**
  * Progress component - Shows a progress bar
  * 
@@ -17,7 +16,6 @@ export const Progress = React.forwardRef(({
   ...props 
 }, ref) => {
   const percentage = Math.min(Math.max(0, (value / max) * 100), 100);
-  
   return (
     <div
       ref={ref}
@@ -38,5 +36,4 @@ export const Progress = React.forwardRef(({
     </div>
   );
 });
-
 Progress.displayName = "Progress";

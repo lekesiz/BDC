@@ -115,7 +115,7 @@ RUN --mount=type=cache,target=/var/lib/apt/lists \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python dependencies from builder
-COPY --from=dependencies /usr/local/lib/python${PYTHON_VERSION}/site-packages /usr/local/lib/python${PYTHON_VERSION}/site-packages
+COPY --from=dependencies /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=dependencies /usr/local/bin /usr/local/bin
 
 # Copy application from builder
@@ -146,21 +146,7 @@ flask db upgrade || {
 
 # Start the application
 echo "Starting Gunicorn..."
-exec gunicorn \
-    --bind 0.0.0.0:5000 \
-    --workers \${GUNICORN_WORKERS:-4} \
-    --worker-class gevent \
-    --worker-connections 1000 \
-    --max-requests 10000 \
-    --max-requests-jitter 1000 \
-    --preload \
-    --timeout 30 \
-    --keep-alive 5 \
-    --log-level info \
-    --access-logfile - \
-    --error-logfile - \
-    --capture-output \
-    wsgi:app
+exec gunicorn --bind 0.0.0.0:5000 --workers \${GUNICORN_WORKERS:-4} --worker-class gevent --worker-connections 1000 --max-requests 10000 --max-requests-jitter 1000 --preload --timeout 30 --keep-alive 5 --log-level info --access-logfile - --error-logfile - --capture-output wsgi:application
 EOF
 
 RUN chmod +x /usr/local/bin/start.sh

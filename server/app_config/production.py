@@ -47,7 +47,7 @@ class ProductionConfig(Config):
     # Rate Limiting
     RATELIMIT_STORAGE_URL = os.environ.get('RATELIMIT_STORAGE_URL', REDIS_URL)
     RATELIMIT_DEFAULT = os.environ.get('RATELIMIT_DEFAULT', '60 per minute')
-    RATELIMIT_STRATEGY = os.environ.get('RATELIMIT_STRATEGY', 'sliding-window')
+    RATELIMIT_STRATEGY = os.environ.get('RATELIMIT_STRATEGY', 'sliding-window-counter')
     
     # JWT Configuration
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)  # Shorter for production

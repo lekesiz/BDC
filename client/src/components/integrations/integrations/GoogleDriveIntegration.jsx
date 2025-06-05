@@ -19,14 +19,12 @@ import {
   Shield,
   RefreshCw
 } from 'lucide-react';
-
 const GoogleDriveIntegration = ({ integration, onBack }) => {
   const [storageInfo, setStorageInfo] = useState({
     used: 45.2,
     total: 100,
     percentage: 45.2
   });
-
   const [folders, setFolders] = useState([
     { id: '1', name: 'Training Materials', files: 234, size: '12.5 GB', shared: true, lastModified: '2024-11-15' },
     { id: '2', name: 'Beneficiary Documents', files: 567, size: '8.3 GB', shared: true, lastModified: '2024-11-17' },
@@ -34,7 +32,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
     { id: '4', name: 'Course Videos', files: 45, size: '15.8 GB', shared: true, lastModified: '2024-11-14' },
     { id: '5', name: 'Administrative', files: 89, size: '2.1 GB', shared: false, lastModified: '2024-11-17' }
   ]);
-
   const [syncSettings, setSyncSettings] = useState({
     autoSync: true,
     syncInterval: 30,
@@ -43,7 +40,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
     maxFileSize: 100,
     preserveFolderStructure: true
   });
-
   const configFields = [
     {
       name: 'clientId',
@@ -88,7 +84,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
       description: 'Automatically backup important documents'
     }
   ];
-
   const oauthConfig = {
     authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
     tokenUrl: 'https://oauth2.googleapis.com/token',
@@ -100,7 +95,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
       'https://www.googleapis.com/auth/drive.readonly'
     ]
   };
-
   const webhookEvents = [
     'file.created',
     'file.updated',
@@ -109,7 +103,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
     'permission.changed',
     'storage.limit.warning'
   ];
-
   const apiEndpoints = [
     {
       method: 'GET',
@@ -132,7 +125,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
       description: 'Share files or folders'
     }
   ];
-
   const fileTypeStats = [
     { type: 'Documents', icon: FileText, count: 456, size: '5.2 GB', color: 'text-blue-600' },
     { type: 'Spreadsheets', icon: FileText, count: 234, size: '2.8 GB', color: 'text-green-600' },
@@ -140,7 +132,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
     { type: 'Videos', icon: Video, count: 67, size: '18.3 GB', color: 'text-red-600' },
     { type: 'Archives', icon: Archive, count: 45, size: '6.5 GB', color: 'text-orange-600' }
   ];
-
   const customOverview = (
     <>
       {/* Storage Overview */}
@@ -184,7 +175,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Folders */}
       <Card>
         <div className="p-6">
@@ -223,7 +213,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Sync Settings */}
       <Card>
         <div className="p-6">
@@ -247,7 +236,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 File Types to Sync
@@ -271,7 +259,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
                 ))}
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Maximum File Size (MB)
@@ -289,7 +276,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Quick Actions */}
       <Card>
         <div className="p-6">
@@ -326,7 +312,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
           </div>
         </div>
       </Card>
-
       {/* Recent Activity */}
       <Card>
         <div className="p-6">
@@ -369,7 +354,6 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
       </Card>
     </>
   );
-
   return (
     <BaseIntegration
       integration={integration}
@@ -383,5 +367,4 @@ const GoogleDriveIntegration = ({ integration, onBack }) => {
     </BaseIntegration>
   );
 };
-
 export default GoogleDriveIntegration;

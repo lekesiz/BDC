@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { FaDownload, FaExpand, FaCompress, FaPrint, FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-
 /**
  * DocumentViewer - Reusable component for viewing different types of documents
  * 
@@ -30,14 +29,12 @@ const DocumentViewer = ({
   const [searchText, setSearchText] = useState('');
   const [isTextFile, setIsTextFile] = useState(false);
   const [textContent, setTextContent] = useState('');
-
   useEffect(() => {
     // Reset state when document changes
     setCurrentPage(1);
     setZoom(initialZoom);
     setIsLoading(true);
     setTotalPages(document?.page_count || 1);
-    
     // Check if it's a text file
     if (document?.type === 'txt' || document?.mime_type === 'text/plain') {
       setIsTextFile(true);
@@ -45,17 +42,14 @@ const DocumentViewer = ({
     } else {
       setIsTextFile(false);
     }
-    
     // Set up PDF.js if it's a PDF document
     if (document?.type === 'pdf') {
       initPdfViewer();
     }
   }, [document?.id]);
-  
   // Function to fetch text content for text files
   const fetchTextContent = async () => {
     if (!document?.url) return;
-    
     try {
       const response = await fetch(document.url);
       const text = await response.text();
@@ -67,7 +61,6 @@ const DocumentViewer = ({
       setIsLoading(false);
     }
   };
-  
   // Initialize PDF.js viewer if needed
   const initPdfViewer = () => {
     // In a real implementation, this would initialize PDF.js
@@ -76,7 +69,6 @@ const DocumentViewer = ({
       setIsLoading(false);
     }, 1000);
   };
-
   const handleZoom = (direction) => {
     if (direction === 'in' && zoom < 200) {
       setZoom(prev => prev + 25);
@@ -86,7 +78,6 @@ const DocumentViewer = ({
       setZoom(100);
     }
   };
-
   const handleDownload = () => {
     if (onDownload) {
       onDownload();
@@ -100,7 +91,6 @@ const DocumentViewer = ({
       link.remove();
     }
   };
-
   const toggleFullscreen = () => {
     if (!fullscreen) {
       viewerRef.current?.requestFullscreen();
@@ -109,11 +99,9 @@ const DocumentViewer = ({
     }
     setFullscreen(!fullscreen);
   };
-
   const handlePrint = () => {
     window.print();
   };
-
   const navigatePage = (direction) => {
     if (direction === 'next' && currentPage < totalPages) {
       setCurrentPage(prev => prev + 1);
@@ -121,20 +109,17 @@ const DocumentViewer = ({
       setCurrentPage(prev => prev - 1);
     }
   };
-
   const handleSearch = (e) => {
     e.preventDefault();
     // In a real implementation, this would use PDF.js search functionality
     // or highlight text in the document
     toast.info(`Aranan: ${searchText}`);
   };
-
   // Handle document loading error
   const handleError = () => {
     setIsLoading(false);
     toast.error('Doküman yüklenemedi');
   };
-
   // Render the appropriate viewer based on file type
   const renderContent = () => {
     if (!document || !document.url) {
@@ -144,7 +129,6 @@ const DocumentViewer = ({
         </div>
       );
     }
-
     if (isLoading) {
       return (
         <div className="flex flex-col items-center justify-center h-full">
@@ -153,7 +137,6 @@ const DocumentViewer = ({
         </div>
       );
     }
-
     switch (document.type) {
       case 'pdf':
         return (
@@ -197,7 +180,6 @@ const DocumentViewer = ({
             )}
           </div>
         );
-      
       case 'image':
       case 'jpg':
       case 'jpeg':
@@ -216,7 +198,6 @@ const DocumentViewer = ({
             />
           </div>
         );
-      
       case 'txt':
         return (
           <div 
@@ -231,7 +212,6 @@ const DocumentViewer = ({
             ))}
           </div>
         );
-      
       case 'doc':
       case 'docx':
       case 'xls':
@@ -248,7 +228,6 @@ const DocumentViewer = ({
             data-cy="document-office-viewer"
           />
         );
-      
       case 'html':
         return (
           <iframe
@@ -261,7 +240,6 @@ const DocumentViewer = ({
             data-cy="document-html-viewer"
           />
         );
-      
       default:
         // Fallback for unsupported file types
         return (
@@ -287,7 +265,6 @@ const DocumentViewer = ({
         );
     }
   };
-
   return (
     <div 
       ref={viewerRef}
@@ -332,7 +309,6 @@ const DocumentViewer = ({
                 100%
               </button>
             </div>
-            
             {document?.type === 'pdf' && (
               <div className="flex items-center ml-4">
                 <button
@@ -360,7 +336,6 @@ const DocumentViewer = ({
                 </button>
               </div>
             )}
-            
             {(document?.type === 'pdf' || isTextFile) && (
               <form onSubmit={handleSearch} className="ml-4 flex items-center">
                 <input
@@ -383,7 +358,6 @@ const DocumentViewer = ({
               </form>
             )}
           </div>
-          
           <div className="flex items-center space-x-2">
             <button
               onClick={handleDownload}
@@ -415,7 +389,6 @@ const DocumentViewer = ({
           </div>
         </div>
       )}
-      
       {/* Document Content */}
       <div className="document-content">
         {renderContent()}
@@ -423,7 +396,6 @@ const DocumentViewer = ({
     </div>
   );
 };
-
 DocumentViewer.propTypes = {
   /** Document object with url, type, name, page_count properties */
   document: PropTypes.shape({
@@ -445,5 +417,4 @@ DocumentViewer.propTypes = {
   /** Additional CSS classes */
   className: PropTypes.string
 };
-
 export default DocumentViewer;

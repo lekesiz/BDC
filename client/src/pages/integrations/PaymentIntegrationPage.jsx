@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 import { 
   CreditCard, 
   Link, 
@@ -23,7 +23,6 @@ import {
   Globe
 } from 'lucide-react';
 import { LineChart, Line, BarChart as RechartsBarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 const PaymentIntegrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -34,7 +33,6 @@ const PaymentIntegrationPage = () => {
     secretKey: '',
     webhookSecret: ''
   });
-
   const paymentStats = {
     totalRevenue: 125450,
     monthlyRevenue: 12560,
@@ -45,7 +43,6 @@ const PaymentIntegrationPage = () => {
     refunds: 234,
     disputes: 3
   };
-
   const revenueData = [
     { month: 'Jan', revenue: 18500, transactions: 456 },
     { month: 'Feb', revenue: 19800, transactions: 489 },
@@ -54,7 +51,6 @@ const PaymentIntegrationPage = () => {
     { month: 'May', revenue: 22800, transactions: 567 },
     { month: 'Jun', revenue: 24600, transactions: 589 }
   ];
-
   const paymentMethods = [
     { method: 'Credit Card', count: 2345, percentage: 68 },
     { method: 'Debit Card', count: 678, percentage: 20 },
@@ -62,7 +58,6 @@ const PaymentIntegrationPage = () => {
     { method: 'Digital Wallet', count: 156, percentage: 4 },
     { method: 'Other', count: 43, percentage: 1 }
   ];
-
   const recentTransactions = [
     { id: 'TXN-001', date: '2024-11-17 15:30', amount: 89.99, status: 'completed', method: 'Visa ****1234' },
     { id: 'TXN-002', date: '2024-11-17 14:45', amount: 129.00, status: 'completed', method: 'Mastercard ****5678' },
@@ -70,21 +65,18 @@ const PaymentIntegrationPage = () => {
     { id: 'TXN-004', date: '2024-11-17 12:15', amount: 200.00, status: 'failed', method: 'Visa ****9012' },
     { id: 'TXN-005', date: '2024-11-17 11:30', amount: 75.25, status: 'refunded', method: 'PayPal' }
   ];
-
   const subscriptions = [
     { id: 1, plan: 'Basic Training', price: 49.99, frequency: 'monthly', active: 234 },
     { id: 2, plan: 'Pro Development', price: 99.99, frequency: 'monthly', active: 156 },
     { id: 3, plan: 'Enterprise', price: 299.99, frequency: 'monthly', active: 45 },
     { id: 4, plan: 'Annual Basic', price: 499.99, frequency: 'yearly', active: 89 }
   ];
-
   const paymentProviders = [
     { value: 'stripe', label: 'Stripe', icon: CreditCard },
     { value: 'paypal', label: 'PayPal', icon: CreditCard },
     { value: 'square', label: 'Square', icon: CreditCard },
     { value: 'razorpay', label: 'Razorpay', icon: CreditCard }
   ];
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: DollarSign },
     { id: 'transactions', label: 'Transactions', icon: FileText },
@@ -93,7 +85,6 @@ const PaymentIntegrationPage = () => {
     { id: 'analytics', label: 'Analytics', icon: BarChart },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
-
   const handleConnect = () => {
     if (paymentConfig.apiKey && paymentConfig.secretKey) {
       setLoading(true);
@@ -103,9 +94,7 @@ const PaymentIntegrationPage = () => {
       }, 2000);
     }
   };
-
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -128,7 +117,6 @@ const PaymentIntegrationPage = () => {
           </Button>
         )}
       </div>
-
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -152,7 +140,6 @@ const PaymentIntegrationPage = () => {
           })}
         </nav>
       </div>
-
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <Card>
@@ -182,7 +169,6 @@ const PaymentIntegrationPage = () => {
                   </div>
                 )}
               </div>
-
               {!isConnected && (
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-3">
@@ -228,7 +214,6 @@ const PaymentIntegrationPage = () => {
                   </div>
                 </div>
               )}
-
               {isConnected && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -255,7 +240,6 @@ const PaymentIntegrationPage = () => {
               )}
             </div>
           </Card>
-
           {isConnected && (
             <>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -277,7 +261,6 @@ const PaymentIntegrationPage = () => {
                     </div>
                   </div>
                 </Card>
-
                 <Card>
                   <div className="p-6">
                     <h3 className="text-lg font-semibold mb-4">Payment Methods</h3>
@@ -305,7 +288,6 @@ const PaymentIntegrationPage = () => {
                   </div>
                 </Card>
               </div>
-
               <Card>
                 <div className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
@@ -345,7 +327,6 @@ const PaymentIntegrationPage = () => {
           )}
         </div>
       )}
-
       {activeTab === 'transactions' && isConnected && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -360,7 +341,6 @@ const PaymentIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -372,7 +352,6 @@ const PaymentIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -384,7 +363,6 @@ const PaymentIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <div className="flex items-center justify-between">
@@ -397,7 +375,6 @@ const PaymentIntegrationPage = () => {
               </div>
             </Card>
           </div>
-
           <Card>
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -457,7 +434,6 @@ const PaymentIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'subscriptions' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -482,7 +458,6 @@ const PaymentIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -535,7 +510,6 @@ const PaymentIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'methods' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -555,7 +529,6 @@ const PaymentIntegrationPage = () => {
                   </div>
                   <p className="text-sm text-gray-600">Accept Visa, Mastercard, Amex, Discover</p>
                 </div>
-
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center">
@@ -569,7 +542,6 @@ const PaymentIntegrationPage = () => {
                   </div>
                   <p className="text-sm text-gray-600">ACH transfers and wire transfers</p>
                 </div>
-
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center">
@@ -583,7 +555,6 @@ const PaymentIntegrationPage = () => {
                   </div>
                   <p className="text-sm text-gray-600">PayPal, Apple Pay, Google Pay</p>
                 </div>
-
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center">
@@ -600,7 +571,6 @@ const PaymentIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Currency Settings</h3>
@@ -616,7 +586,6 @@ const PaymentIntegrationPage = () => {
                     <option value="CAD">CAD - Canadian Dollar</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" />
@@ -626,7 +595,6 @@ const PaymentIntegrationPage = () => {
                     Accept payments in multiple currencies
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -641,7 +609,6 @@ const PaymentIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'analytics' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -661,7 +628,6 @@ const PaymentIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <div className="p-6">
@@ -697,7 +663,6 @@ const PaymentIntegrationPage = () => {
                 </div>
               </div>
             </Card>
-
             <Card>
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Top Revenue Sources</h3>
@@ -729,7 +694,6 @@ const PaymentIntegrationPage = () => {
           </div>
         </div>
       )}
-
       {activeTab === 'settings' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -752,7 +716,6 @@ const PaymentIntegrationPage = () => {
                     ))}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     API Key
@@ -767,7 +730,6 @@ const PaymentIntegrationPage = () => {
                     <Button variant="secondary">Update</Button>
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Secret Key
@@ -778,7 +740,6 @@ const PaymentIntegrationPage = () => {
                     onChange={(e) => setPaymentConfig({...paymentConfig, secretKey: e.target.value})}
                   />
                 </div>
-
                 {paymentConfig.provider === 'stripe' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -798,7 +759,6 @@ const PaymentIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Security Settings</h3>
@@ -812,7 +772,6 @@ const PaymentIntegrationPage = () => {
                     Require additional authentication for card payments
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -822,7 +781,6 @@ const PaymentIntegrationPage = () => {
                     Ensure all payment data is handled securely
                   </p>
                 </div>
-
                 <div>
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" defaultChecked />
@@ -832,7 +790,6 @@ const PaymentIntegrationPage = () => {
                     Enable automatic fraud detection and prevention
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Risk threshold
@@ -843,14 +800,12 @@ const PaymentIntegrationPage = () => {
                     <option>High (Allow most payments)</option>
                   </select>
                 </div>
-
                 <div className="pt-4">
                   <Button variant="primary">Save Settings</Button>
                 </div>
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Webhook Configuration</h3>
@@ -866,7 +821,6 @@ const PaymentIntegrationPage = () => {
                     </div>
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Webhook Events
@@ -902,5 +856,4 @@ const PaymentIntegrationPage = () => {
     </div>
   );
 };
-
 export default PaymentIntegrationPage;

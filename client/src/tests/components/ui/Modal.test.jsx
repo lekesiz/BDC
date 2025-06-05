@@ -11,7 +11,6 @@ import {
   DialogClose,
   DialogFooter
 } from '../../../components/ui/dialog';
-
 describe('Modal/Dialog Component', () => {
   it('renders a simple dialog when open', () => {
     render(
@@ -24,11 +23,9 @@ describe('Modal/Dialog Component', () => {
         </DialogContent>
       </Dialog>
     );
-    
     expect(screen.getByText('Test Dialog')).toBeInTheDocument();
     expect(screen.getByText('This is a test dialog')).toBeInTheDocument();
   });
-
   it('does not render when closed', () => {
     render(
       <Dialog open={false}>
@@ -39,10 +36,8 @@ describe('Modal/Dialog Component', () => {
         </DialogContent>
       </Dialog>
     );
-    
     expect(screen.queryByText('Hidden Dialog')).not.toBeInTheDocument();
   });
-
   it('renders with footer', () => {
     render(
       <Dialog open={true}>
@@ -57,14 +52,11 @@ describe('Modal/Dialog Component', () => {
         </DialogContent>
       </Dialog>
     );
-    
     expect(screen.getByText('Cancel')).toBeInTheDocument();
     expect(screen.getByText('Save')).toBeInTheDocument();
   });
-
   it('triggers onOpenChange when close button clicked', () => {
     const onOpenChange = vi.fn();
-    
     render(
       <Dialog open={true} onOpenChange={onOpenChange}>
         <DialogContent>
@@ -75,18 +67,14 @@ describe('Modal/Dialog Component', () => {
         </DialogContent>
       </Dialog>
     );
-    
     // Find and click the close button
     const closeButton = screen.getByRole('button', { name: /close/i });
     fireEvent.click(closeButton);
-    
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
-
   it('can be controlled externally', () => {
     const ControlledDialog = () => {
       const [open, setOpen] = useState(false);
-      
       return (
         <>
           <button onClick={() => setOpen(true)}>Open Dialog</button>
@@ -100,15 +88,11 @@ describe('Modal/Dialog Component', () => {
         </>
       );
     };
-    
     render(<ControlledDialog />);
-    
     // Initially closed
     expect(screen.queryByText('Controlled Dialog')).not.toBeInTheDocument();
-    
     // Open dialog
     fireEvent.click(screen.getByText('Open Dialog'));
-    
     // Should now be visible
     expect(screen.getByText('Controlled Dialog')).toBeInTheDocument();
   });

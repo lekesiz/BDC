@@ -1,5 +1,4 @@
 import { vi } from 'vitest'
-
 const api = {
   get: vi.fn(),
   post: vi.fn(),
@@ -16,5 +15,4 @@ const api = {
     }
   }
 }
-
 export default api

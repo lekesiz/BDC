@@ -81,7 +81,6 @@ export const generateComplianceData = () => {
         risk: "high"
       }
     ],
-    
     gdprCompliance: {
       status: "compliant",
       lastAudit: "2024-01-15",
@@ -105,7 +104,6 @@ export const generateComplianceData = () => {
         { category: "Usage Analytics", sensitivity: "low", encrypted: false, retention: "1 year" }
       ]
     },
-    
     securityHeaders: {
       status: "configured",
       headers: [
@@ -120,7 +118,6 @@ export const generateComplianceData = () => {
       score: 100,
       lastCheck: new Date(Date.now() - 86400000).toISOString()
     },
-    
     dataBackup: {
       backups: [
         {
@@ -181,7 +178,6 @@ export const generateComplianceData = () => {
         unit: "GB"
       }
     },
-    
     inputValidation: {
       rules: [
         {
@@ -232,7 +228,6 @@ export const generateComplianceData = () => {
         mostViolatedField: "password"
       }
     },
-    
     regulatoryCompliance: {
       frameworks: [
         {
@@ -285,7 +280,6 @@ export const generateComplianceData = () => {
         }
       ]
     },
-    
     riskAssessment: {
       overallRisk: "medium",
       riskScore: 6.2,
@@ -305,7 +299,6 @@ export const generateComplianceData = () => {
     }
   };
 };
-
 // Generate compliance metrics
 export const generateComplianceMetrics = () => {
   return {
@@ -333,7 +326,6 @@ export const generateComplianceMetrics = () => {
     }
   };
 };
-
 // Generate compliance reports
 export const generateComplianceReports = () => {
   return [

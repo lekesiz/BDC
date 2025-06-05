@@ -1,9 +1,7 @@
 /**
  * Mock data for reports system
  */
-
 import { format, subDays, addDays } from 'date-fns';
-
 // Sample reports
 export const reports = [
   {
@@ -132,7 +130,6 @@ export const reports = [
     generated_at: subDays(new Date(), 15).toISOString()
   }
 ];
-
 // Scheduled reports
 export const scheduledReports = [
   {
@@ -202,7 +199,6 @@ export const scheduledReports = [
     last_run: subDays(new Date(), 1).toISOString()
   }
 ];
-
 // Available fields for report types
 export const reportFields = {
   beneficiary: [
@@ -267,7 +263,6 @@ export const reportFields = {
     { id: "change_percentage", name: "Change Percentage", description: "Percentage change from previous period" }
   ]
 };
-
 // Available filters for report types
 export const reportFilters = {
   beneficiary: [
@@ -362,7 +357,6 @@ export const reportFilters = {
     { id: "date_range", name: "Date Range", type: "date" }
   ]
 };
-
 // Sample report preview data
 export const sampleReportPreview = {
   sections: [
@@ -407,7 +401,6 @@ export const sampleReportPreview = {
     }
   ]
 };
-
 // List of users for recipients
 export const users = [
   { id: 1, name: "Admin User", email: "admin@example.com", role: "admin" },
@@ -416,37 +409,30 @@ export const users = [
   { id: 4, name: "Director User", email: "director@example.com", role: "director" },
   { id: 5, name: "Coordinator User", email: "coordinator@example.com", role: "coordinator" }
 ];
-
 // Mock API function to get recent reports
 export const getRecentReports = () => {
   return Promise.resolve(reports.slice(0, 3));
 };
-
 // Mock API function to get saved reports
 export const getSavedReports = () => {
   return Promise.resolve(reports);
 };
-
 // Mock API function to get scheduled reports
 export const getScheduledReports = () => {
   return Promise.resolve(scheduledReports);
 };
-
 // Mock API function to get report fields
 export const getReportFields = (type) => {
   return Promise.resolve(reportFields[type] || []);
 };
-
 // Mock API function to get report filters
 export const getReportFilters = (type) => {
   return Promise.resolve(reportFilters[type] || []);
 };
-
 // Mock API function to get report preview
 export const getReportPreview = (reportData) => {
   return Promise.resolve(sampleReportPreview);
 };
-
 // Mock API function to save report
 export const saveReport = (reportData) => {
   const newReport = {
@@ -460,23 +446,17 @@ export const saveReport = (reportData) => {
     runCount: 0,
     generated_at: new Date().toISOString()
   };
-  
   reports.push(newReport);
-  
   return Promise.resolve(newReport);
 };
-
 // Mock API function to get scheduled report
 export const getScheduledReport = (id) => {
   const schedule = scheduledReports.find(s => s.id.toString() === id);
-  
   if (!schedule) {
     return Promise.reject(new Error('Schedule not found'));
   }
-  
   return Promise.resolve(schedule);
 };
-
 // Mock API function to save scheduled report
 export const saveScheduledReport = (scheduleData) => {
   const newSchedule = {
@@ -486,21 +466,16 @@ export const saveScheduledReport = (scheduleData) => {
     next_run: calculateNextRun(scheduleData),
     last_run: null
   };
-  
   scheduledReports.push(newSchedule);
-  
   return Promise.resolve(newSchedule);
 };
-
 // Helper function to calculate next run date
 const calculateNextRun = (schedule) => {
   const now = new Date();
   let nextRun = new Date();
-  
   if (!schedule.active) {
     return null;
   }
-  
   if (schedule.frequency === 'daily') {
     nextRun.setDate(now.getDate() + 1);
   } else if (schedule.frequency === 'weekly') {
@@ -515,12 +490,10 @@ const calculateNextRun = (schedule) => {
     const dayOfMonth = parseInt(schedule.dayOfMonth);
     nextRun = new Date(now.getFullYear(), now.getMonth() + 3, dayOfMonth);
   }
-  
   // Set the time
   if (schedule.time) {
     const [hours, minutes] = schedule.time.split(':').map(Number);
     nextRun.setHours(hours, minutes, 0, 0);
   }
-  
   return nextRun.toISOString();
 };

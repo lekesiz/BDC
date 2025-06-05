@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Card } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 import { 
   Users, 
   Link, 
@@ -22,7 +22,6 @@ import {
   Briefcase
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 const WedofIntegrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -34,14 +33,12 @@ const WedofIntegrationPage = () => {
     syncedToday: 45,
     failedRecords: 2
   });
-
   const syncHistory = [
     { id: 1, date: '2024-11-17 15:30', type: 'Beneficiaries', records: 23, status: 'success' },
     { id: 2, date: '2024-11-17 14:00', type: 'Programs', records: 5, status: 'success' },
     { id: 3, date: '2024-11-17 12:30', type: 'Financials', records: 87, status: 'failed', error: 'Invalid data format' },
     { id: 4, date: '2024-11-17 11:00', type: 'Activities', records: 34, status: 'success' }
   ];
-
   const dataMapping = [
     { bdc: 'beneficiary_id', wedof: 'person_id', status: 'mapped' },
     { bdc: 'first_name', wedof: 'prenom', status: 'mapped' },
@@ -52,14 +49,12 @@ const WedofIntegrationPage = () => {
     { bdc: 'trainer_name', wedof: 'formateur', status: 'pending' },
     { bdc: 'completion_date', wedof: 'date_fin', status: 'error' }
   ];
-
   const financialSummary = {
     totalAllocated: 250000,
     totalSpent: 187500,
     pendingPayments: 12500,
     remainingBudget: 62500
   };
-
   const activityMetrics = [
     { month: 'Jan', beneficiaries: 120, programs: 8, spending: 22000 },
     { month: 'Feb', beneficiaries: 135, programs: 9, spending: 24500 },
@@ -68,7 +63,6 @@ const WedofIntegrationPage = () => {
     { month: 'May', beneficiaries: 165, programs: 11, spending: 31000 },
     { month: 'Jun', beneficiaries: 178, programs: 12, spending: 33500 }
   ];
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Briefcase },
     { id: 'configuration', label: 'Configuration', icon: Settings },
@@ -77,7 +71,6 @@ const WedofIntegrationPage = () => {
     { id: 'financial', label: 'Financial', icon: Euro },
     { id: 'reports', label: 'Reports', icon: FileText }
   ];
-
   const handleConnect = () => {
     if (apiKey) {
       setLoading(true);
@@ -87,16 +80,13 @@ const WedofIntegrationPage = () => {
       }, 2000);
     }
   };
-
   const handleSync = (type) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 3000);
   };
-
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -119,7 +109,6 @@ const WedofIntegrationPage = () => {
           </Button>
         )}
       </div>
-
       <div className="bg-white border-b">
         <nav className="flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -143,7 +132,6 @@ const WedofIntegrationPage = () => {
           })}
         </nav>
       </div>
-
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <Card>
@@ -173,7 +161,6 @@ const WedofIntegrationPage = () => {
                   </div>
                 )}
               </div>
-
               {!isConnected && (
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600 mb-3">
@@ -192,7 +179,6 @@ const WedofIntegrationPage = () => {
                   </div>
                 </div>
               )}
-
               {isConnected && (
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
@@ -219,7 +205,6 @@ const WedofIntegrationPage = () => {
               )}
             </div>
           </Card>
-
           {isConnected && (
             <>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -241,7 +226,6 @@ const WedofIntegrationPage = () => {
                     </div>
                   </div>
                 </Card>
-
                 <Card>
                   <div className="p-6">
                     <h3 className="text-lg font-semibold mb-4">Financial Overview</h3>
@@ -274,7 +258,6 @@ const WedofIntegrationPage = () => {
                   </div>
                 </Card>
               </div>
-
               <Card>
                 <div className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Recent Sync History</h3>
@@ -332,7 +315,6 @@ const WedofIntegrationPage = () => {
           )}
         </div>
       )}
-
       {activeTab === 'configuration' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -353,7 +335,6 @@ const WedofIntegrationPage = () => {
                     <Button variant="secondary">Update</Button>
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     API Endpoint
@@ -365,7 +346,6 @@ const WedofIntegrationPage = () => {
                     className="bg-gray-50"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Organization ID
@@ -378,7 +358,6 @@ const WedofIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Sync Settings</h3>
@@ -392,7 +371,6 @@ const WedofIntegrationPage = () => {
                     Automatically sync data every hour
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Sync Frequency
@@ -405,7 +383,6 @@ const WedofIntegrationPage = () => {
                     <option>Daily</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Data to Sync
@@ -429,7 +406,6 @@ const WedofIntegrationPage = () => {
                     </label>
                   </div>
                 </div>
-
                 <div className="pt-4">
                   <Button variant="primary">Save Settings</Button>
                 </div>
@@ -438,7 +414,6 @@ const WedofIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'data-mapping' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -496,7 +471,6 @@ const WedofIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Custom Field Rules</h3>
@@ -528,7 +502,6 @@ const WedofIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'sync' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -578,7 +551,6 @@ const WedofIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Sync Progress</h3>
@@ -605,7 +577,6 @@ const WedofIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'financial' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -631,7 +602,6 @@ const WedofIntegrationPage = () => {
               </div>
             </div>
           </Card>
-
           <Card>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Spending Trend</h3>
@@ -651,7 +621,6 @@ const WedofIntegrationPage = () => {
           </Card>
         </div>
       )}
-
       {activeTab === 'reports' && isConnected && (
         <div className="space-y-6">
           <Card>
@@ -717,5 +686,4 @@ const WedofIntegrationPage = () => {
     </div>
   );
 };
-
 export default WedofIntegrationPage;

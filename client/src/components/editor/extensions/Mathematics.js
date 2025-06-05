@@ -1,16 +1,11 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import MathematicsView from './MathematicsView';
-
 export const Mathematics = Node.create({
   name: 'mathematics',
-
   group: 'inline',
-
   inline: true,
-
   atom: true,
-
   addAttributes() {
     return {
       latex: {
@@ -21,7 +16,6 @@ export const Mathematics = Node.create({
       },
     };
   },
-
   parseHTML() {
     return [
       {
@@ -47,10 +41,8 @@ export const Mathematics = Node.create({
       },
     ];
   },
-
   renderHTML({ node, HTMLAttributes }) {
     const { latex, display } = node.attrs;
-    
     return [
       display ? 'div' : 'span',
       mergeAttributes(
@@ -65,7 +57,6 @@ export const Mathematics = Node.create({
       ),
     ];
   },
-
   addCommands() {
     return {
       insertMath:
@@ -86,13 +77,11 @@ export const Mathematics = Node.create({
         },
     };
   },
-
   addKeyboardShortcuts() {
     return {
       'Mod-Shift-m': () => this.editor.commands.insertMath(),
     };
   },
-
   addNodeView() {
     return ReactNodeViewRenderer(MathematicsView);
   },

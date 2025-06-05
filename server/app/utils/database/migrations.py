@@ -296,8 +296,8 @@ if __name__ == "__main__":
     manager.run_migrations()
     
     # Get status
-    print(f"Current revision: {manager.get_current_revision()}")
+    logger.info(f"Current revision: {manager.get_current_revision()}")
     
     # Generate report
     report = manager.generate_migration_report()
-    print(f"Migration report: {report}") 
+    logger.info(f"Migration report: {report}") 

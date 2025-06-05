@@ -5,7 +5,6 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
     put: originalPut || api.put.bind(api),
     delete: originalDelete || api.delete.bind(api)
   };
-
   // Mock AI settings data
   const mockAISettings = {
     providers: {
@@ -45,7 +44,6 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
       chatbot: false
     }
   };
-
   // Intercept GET requests
   api.get = function(url, ...args) {
     // Get AI settings
@@ -55,16 +53,13 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
         data: mockAISettings
       });
     }
-
     // Pass through to original function for other routes
     return originalFunctions.get.call(this, url, ...args);
   };
-
   // Intercept PUT requests
   api.put = function(url, data, ...args) {
     // Update AI settings
     if (url === '/api/settings/ai') {
-      
       // Update mock data
       if (data.providers) {
         Object.assign(mockAISettings.providers, data.providers);
@@ -75,7 +70,6 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
       if (data.features) {
         Object.assign(mockAISettings.features, data.features);
       }
-      
       return Promise.resolve({
         status: 200,
         data: {
@@ -84,18 +78,14 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-
     // Pass through to original function for other routes
     return originalFunctions.put.call(this, url, data, ...args);
   };
-
   // Intercept POST requests
   api.post = function(url, data, ...args) {
     // Test AI provider connection
     if (url === '/api/settings/ai/test') {
-      
       const { provider, config } = data;
-      
       // Simulate API key validation
       if (!config.apiKey) {
         return Promise.reject({
@@ -108,7 +98,6 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
           }
         });
       }
-      
       // Simulate successful connection for valid keys
       if (config.apiKey.startsWith('sk-') || config.apiKey.startsWith('AIza')) {
         return Promise.resolve({
@@ -127,7 +116,6 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
           }
         });
       }
-      
       // Simulate invalid API key
       return Promise.reject({
         response: {
@@ -139,7 +127,6 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
         }
       });
     }
-
     // Pass through to original function for other routes
     return originalFunctions.post.call(this, url, data, ...args);
   };

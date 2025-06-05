@@ -1,85 +1,59 @@
+# BDC Docker Compose - Production Override
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+
 version: '3.8'
 
 services:
-  redis:
-    image: redis:alpine
-    container_name: bdc_redis
-    restart: unless-stopped
-    volumes:
-      - redis_data:/data
-    networks:
-      - bdc_network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  postgres:
-    image: postgres:14-alpine
-    container_name: bdc_postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-bdc}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB:-bdc}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - bdc_network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  server:
-    image: ${REPO:-ghcr.io/organization/bdc}/bdc-server:${TAG:-latest}
-    container_name: bdc_server
-    restart: unless-stopped
-    depends_on:
-      - postgres
-      - redis
+  backend:
+    build:
+      target: production
     environment:
       - FLASK_ENV=production
-      - FLASK_APP=wsgi.py
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-bdc}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-bdc}
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=${SECRET_KEY}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - CORS_ORIGINS=${CORS_ORIGINS}
-      - MAIL_SERVER=${MAIL_SERVER}
-      - MAIL_PORT=${MAIL_PORT}
-      - MAIL_USERNAME=${MAIL_USERNAME}
-      - MAIL_PASSWORD=${MAIL_PASSWORD}
-      - MAIL_DEFAULT_SENDER=${MAIL_DEFAULT_SENDER}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - UPLOAD_FOLDER=/app/uploads
-    volumes:
-      - uploads_data:/app/uploads
-      - logs_data:/app/logs
-    networks:
-      - bdc_network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-  client:
-    image: ${REPO:-ghcr.io/organization/bdc}/bdc-client:${TAG:-latest}
-    container_name: bdc_client
+    command: gunicorn -c /app/gunicorn.conf.py wsgi:app
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - VITE_API_URL=${API_URL}
-    networks:
-      - bdc_network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  frontend:
+    build:
+      target: production
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  postgres:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+
+  redis:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   nginx:
     image: nginx:alpine
@@ -90,25 +64,17 @@ services:
       - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./nginx/www:/var/www/html
+      - ./ssl:/etc/nginx/ssl
     depends_on:
-      - server
-      - client
+      - backend
+      - frontend
     networks:
-      - bdc_network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-networks:
-  bdc_network:
-    driver: bridge
-
-volumes:
-  postgres_data:
-  redis_data:
-  uploads_data:
-  logs_data:
+      - bdc_external
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M

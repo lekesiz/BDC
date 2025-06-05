@@ -1,73 +1,102 @@
+# BDC Docker Compose - Main Configuration
+# For development use: docker-compose up
+# For production use: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+
 version: '3.8'
 
 services:
-  server:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile.server
+  postgres:
+    image: postgres:15-alpine
+    container_name: bdc_postgres
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-bdc_development}
+      POSTGRES_USER: ${DATABASE_USER:-bdc_user}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-bdc_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
     ports:
-      - "5000:5000"
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - bdc_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-bdc_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: bdc_redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - bdc_internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      target: development
+    container_name: bdc_backend
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - DATABASE_URL=postgresql://${DATABASE_USER:-bdc_user}:${DATABASE_PASSWORD:-bdc_password}@postgres:5432/${DATABASE_NAME:-bdc_development}
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     volumes:
       - ./server:/app
-      - ./server/uploads:/app/uploads
-    env_file:
-      - .env
-    environment:
-      - FLASK_APP=wsgi.py
-      - FLASK_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/bdc
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      - db
-      - redis
-    networks:
-      - bdc-network
-
-  client:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile.client
+      - backend_uploads:/app/uploads
     ports:
-      - "5173:3000"
+      - "${BACKEND_PORT:-5001}:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - bdc_internal
+      - bdc_external
+    command: flask run --host=0.0.0.0 --port=5000 --reload
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      target: development
+    container_name: bdc_frontend
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:5001}
+      - NODE_ENV=${NODE_ENV:-development}
     volumes:
       - ./client:/app
       - /app/node_modules
-    env_file:
-      - .env
-    environment:
-      - VITE_API_URL=http://localhost:5000/api
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
     depends_on:
-      - server
+      - backend
     networks:
-      - bdc-network
-
-  db:
-    image: postgres:14
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=bdc
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - bdc-network
-
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    networks:
-      - bdc-network
+      - bdc_external
+    command: npm run dev -- --host
 
 networks:
-  bdc-network:
+  bdc_internal:
     driver: bridge
+    name: bdc_internal
+  bdc_external:
+    driver: bridge
+    name: bdc_external
 
 volumes:
-  postgres-data:
-  redis-data:
-  uploads:
+  postgres_data:
+  redis_data:
+  backend_uploads:

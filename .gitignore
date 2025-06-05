@@ -10,6 +10,7 @@ dist/
 downloads/
 eggs/
 .eggs/
+lib/
 lib64/
 parts/
 sdist/
@@ -19,46 +20,72 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.nox/
-.hypothesis/
-.coverage.*
-coverage.xml
-*.cover
-.hypothesis/
-
-# Virtual Environment
+.env
+.venv
 venv/
 ENV/
-env/
-.env
 
-# Flask
-instance/
-.webassets-cache
-
-# React/Node
+# Node
 node_modules/
-coverage/
-build/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+.DS_Store
+coverage/
+.nyc_output/
 
 # IDEs and editors
 .idea/
 .vscode/
 *.swp
 *.swo
-*~
+.project
+.classpath
+.settings/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# System Files
 .DS_Store
+Thumbs.db
+
+# Flask
+instance/
+.webassets-cache
+
+# React/Node
+coverage/
+build/
 .env.local
 .env.development.local
 .env.test.local
@@ -66,7 +93,53 @@ yarn-error.log*
 
 # Project specific
 uploads/
-logs/
 *.db
 *.sqlite3
 .env
+
+# Test and debug files
+test*.html
+debug*.py
+test*.js
+simple*.js
+manual_auth_test.sh
+test_*.py
+debug_*.js
+ui_test_helper.py
+simple_auth_test.py
+test*.json
+
+# Build artifacts
+stats.html
+frontend-test-report.html
+frontend-test-report.json
+coverage.json
+htmlcov/
+
+# Backup files
+*.backup
+*.bak
+*_old
+*_backup
+*.orig
+
+# Data directories
+data/logs/
+data/nginx-logs/
+data/redis/
+data/postgres/
+
+# Instance databases
+instance/*.db
+
+# Cache files
+*.pyc
+__pycache__/
+.pytest_cache/
+.cache/
+
+# Documentation drafts
+DAILY_PROGRESS_*.md
+PHASE*_*.md
+*_SUMMARY_*.md
+TEST_FIX_*.md

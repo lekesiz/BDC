@@ -20,7 +20,6 @@ import {
 import EditProgramModal from '@/components/programs/EditProgramModal'
 import DeleteProgramModal from '@/components/programs/DeleteProgramModal'
 import { useSocket } from '@/contexts/SocketContext'
-
 const ProgramDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -31,13 +30,11 @@ const ProgramDetailPage = () => {
   const [program, setProgram] = useState(null);
   const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [sessions, setSessions] = useState([]);
-
   useEffect(() => {
     fetchProgramDetails();
     fetchEnrolledStudents();
     fetchProgramSessions();
   }, [id]);
-
   // Socket listeners for program updates/deletion
   useEffect(() => {
     const offUpdated = on('program_updated', ({ program: updated }) => {
@@ -45,20 +42,17 @@ const ProgramDetailPage = () => {
         setProgram(updated);
       }
     });
-
     const offDeleted = on('program_deleted', ({ program_id }) => {
       if (program_id === Number(id)) {
         toast({ title: 'Program deleted', description: 'This program was deleted', type: 'info' });
         navigate('/programs');
       }
     });
-
     return () => {
       offUpdated && offUpdated();
       offDeleted && offDeleted();
     };
   }, [id, on]);
-
   const fetchProgramDetails = async () => {
     try {
       const res = await fetch(`/api/programs/${id}`, {
@@ -66,9 +60,7 @@ const ProgramDetailPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch program');
-
       const data = await res.json();
       setProgram(data);
     } catch (error) {
@@ -82,7 +74,6 @@ const ProgramDetailPage = () => {
       setLoading(false);
     }
   };
-
   const fetchEnrolledStudents = async () => {
     try {
       const res = await fetch(`/api/programs/${id}/students`, {
@@ -90,16 +81,13 @@ const ProgramDetailPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch students');
-
       const data = await res.json();
       setEnrolledStudents(data);
     } catch (error) {
       console.error('Error fetching students:', error);
     }
   };
-
   const fetchProgramSessions = async () => {
     try {
       const res = await fetch(`/api/programs/${id}/sessions`, {
@@ -107,16 +95,13 @@ const ProgramDetailPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch sessions');
-
       const data = await res.json();
       setSessions(data);
     } catch (error) {
       console.error('Error fetching sessions:', error);
     }
   };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'active':
@@ -131,7 +116,6 @@ const ProgramDetailPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -139,7 +123,6 @@ const ProgramDetailPage = () => {
       </div>
     );
   }
-
   if (!program) {
     return (
       <div className="text-center py-12">
@@ -155,7 +138,6 @@ const ProgramDetailPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -173,7 +155,6 @@ const ProgramDetailPage = () => {
             {program.status}
           </Badge>
         </div>
-        
         {(user.role === 'super_admin' || user.role === 'tenant_admin') && (
           <div className="flex gap-3">
             <EditProgramModal program={program} onUpdated={fetchProgramDetails} />
@@ -181,13 +162,11 @@ const ProgramDetailPage = () => {
           </div>
         )}
       </div>
-
       {/* Overview Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6 md:col-span-2">
           <h2 className="text-lg font-semibold mb-4">Program Overview</h2>
           <p className="text-gray-600 mb-6">{program.description}</p>
-          
           <div className="space-y-4">
             <div>
               <h3 className="font-medium text-gray-900 mb-2 flex items-center">
@@ -196,7 +175,6 @@ const ProgramDetailPage = () => {
               </h3>
               <p className="text-gray-600">{program.objectives || 'No objectives specified'}</p>
             </div>
-            
             <div>
               <h3 className="font-medium text-gray-900 mb-2 flex items-center">
                 <BookOpen className="h-4 w-4 mr-2" />
@@ -206,7 +184,6 @@ const ProgramDetailPage = () => {
             </div>
           </div>
         </Card>
-
         <Card className="p-6">
           <h2 className="text-lg font-semibold mb-4">Program Details</h2>
           <div className="space-y-3">
@@ -239,7 +216,6 @@ const ProgramDetailPage = () => {
           </div>
         </Card>
       </div>
-
       {/* Modules Section */}
       {program.modules && program.modules.length > 0 && (
         <Card className="p-6">
@@ -266,7 +242,6 @@ const ProgramDetailPage = () => {
           </div>
         </Card>
       )}
-
       {/* Enrolled Students */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
@@ -277,7 +252,6 @@ const ProgramDetailPage = () => {
             </Button>
           )}
         </div>
-        
         {enrolledStudents.length === 0 ? (
           <p className="text-gray-500">No students enrolled yet</p>
         ) : (
@@ -295,14 +269,12 @@ const ProgramDetailPage = () => {
             ))}
           </div>
         )}
-        
         {enrolledStudents.length > 6 && (
           <p className="text-sm text-gray-500 mt-4">
             And {enrolledStudents.length - 6} more students...
           </p>
         )}
       </Card>
-
       {/* Upcoming Sessions */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
@@ -313,7 +285,6 @@ const ProgramDetailPage = () => {
             </Button>
           )}
         </div>
-        
         {sessions.length === 0 ? (
           <p className="text-gray-500">No sessions scheduled</p>
         ) : (
@@ -336,5 +307,4 @@ const ProgramDetailPage = () => {
     </div>
   );
 };
-
 export default ProgramDetailPage;

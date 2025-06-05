@@ -58,7 +58,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Switch } from '../ui/switch';
 import { Textarea } from '../ui/textarea';
-
 // Sample data for widgets
 const generateSampleData = (type) => {
   const chartData = [
@@ -69,14 +68,12 @@ const generateSampleData = (type) => {
     { name: 'May', value: 6000, value2: 2181 },
     { name: 'Jun', value: 5500, value2: 2500 },
   ];
-
   const pieData = [
     { name: 'Group A', value: 400, color: '#3b82f6' },
     { name: 'Group B', value: 300, color: '#10b981' },
     { name: 'Group C', value: 300, color: '#f59e0b' },
     { name: 'Group D', value: 200, color: '#ef4444' },
   ];
-
   const radarData = [
     { subject: 'Math', A: 120, B: 110, fullMark: 150 },
     { subject: 'Chinese', A: 98, B: 130, fullMark: 150 },
@@ -85,7 +82,6 @@ const generateSampleData = (type) => {
     { subject: 'Physics', A: 85, B: 90, fullMark: 150 },
     { subject: 'History', A: 65, B: 85, fullMark: 150 },
   ];
-
   const tableData = [
     { id: 1, name: 'John Doe', role: 'Student', progress: 75, status: 'Active' },
     { id: 2, name: 'Jane Smith', role: 'Student', progress: 92, status: 'Active' },
@@ -93,7 +89,6 @@ const generateSampleData = (type) => {
     { id: 4, name: 'Alice Brown', role: 'Student', progress: 45, status: 'Inactive' },
     { id: 5, name: 'Charlie Wilson', role: 'Student', progress: 88, status: 'Active' },
   ];
-
   switch (type) {
     case 'pie':
     case 'donut':
@@ -106,7 +101,6 @@ const generateSampleData = (type) => {
       return chartData;
   }
 };
-
 const ReportWidget = ({
   widget,
   darkMode,
@@ -118,7 +112,6 @@ const ReportWidget = ({
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [localConfig, setLocalConfig] = useState(widget.config);
   const [isFullscreen, setIsFullscreen] = useState(false);
-
   // Generate sample data based on widget type
   const sampleData = useMemo(() => {
     if (widget.type === 'chart') {
@@ -128,21 +121,17 @@ const ReportWidget = ({
     }
     return null;
   }, [widget.type, widget.config.chartType]);
-
   const handleConfigSave = () => {
     onUpdate({ config: localConfig });
     setIsConfigOpen(false);
   };
-
   const handleConfigCancel = () => {
     setLocalConfig(widget.config);
     setIsConfigOpen(false);
   };
-
   const renderChart = () => {
     const { chartType, colors, showLegend, showGrid } = widget.config;
     const chartColors = colors || ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
-
     switch (chartType) {
       case 'bar':
         return (
@@ -158,7 +147,6 @@ const ReportWidget = ({
             </BarChart>
           </ResponsiveContainer>
         );
-
       case 'line':
         return (
           <ResponsiveContainer width="100%" height={300}>
@@ -173,7 +161,6 @@ const ReportWidget = ({
             </LineChart>
           </ResponsiveContainer>
         );
-
       case 'area':
         return (
           <ResponsiveContainer width="100%" height={300}>
@@ -188,7 +175,6 @@ const ReportWidget = ({
             </AreaChart>
           </ResponsiveContainer>
         );
-
       case 'pie':
         return (
           <ResponsiveContainer width="100%" height={300}>
@@ -211,7 +197,6 @@ const ReportWidget = ({
             </PieChart>
           </ResponsiveContainer>
         );
-
       case 'donut':
         return (
           <ResponsiveContainer width="100%" height={300}>
@@ -235,7 +220,6 @@ const ReportWidget = ({
             </PieChart>
           </ResponsiveContainer>
         );
-
       case 'radar':
         return (
           <ResponsiveContainer width="100%" height={300}>
@@ -250,18 +234,15 @@ const ReportWidget = ({
             </RadarChart>
           </ResponsiveContainer>
         );
-
       default:
         return null;
     }
   };
-
   const renderKPI = () => {
     const { title, value, unit, trend, trendValue, color, showProgress } = widget.config;
     const trendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
     const TrendIcon = trendIcon;
     const trendColor = trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-600';
-
     return (
       <div className="p-6">
         <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
@@ -288,10 +269,8 @@ const ReportWidget = ({
       </div>
     );
   };
-
   const renderTable = () => {
     const { title, pageSize, sortable, filterable } = widget.config;
-
     return (
       <div className="p-4">
         {title && <h3 className="text-lg font-semibold mb-4">{title}</h3>}
@@ -329,23 +308,19 @@ const ReportWidget = ({
       </div>
     );
   };
-
   const renderText = () => {
     const { content, fontSize, alignment } = widget.config;
     const alignmentClass = alignment === 'center' ? 'text-center' : alignment === 'right' ? 'text-right' : 'text-left';
     const sizeClass = fontSize === 'small' ? 'text-sm' : fontSize === 'large' ? 'text-lg' : 'text-base';
-
     return (
       <div className={`p-4 ${alignmentClass} ${sizeClass}`}>
         <div dangerouslySetInnerHTML={{ __html: content || '<p>Enter text here...</p>' }} />
       </div>
     );
   };
-
   const renderImage = () => {
     const { src, alt, width, height, alignment } = widget.config;
     const alignmentClass = alignment === 'center' ? 'mx-auto' : alignment === 'right' ? 'ml-auto' : '';
-
     return (
       <div className="p-4">
         {src ? (
@@ -363,7 +338,6 @@ const ReportWidget = ({
       </div>
     );
   };
-
   const renderWidget = () => {
     switch (widget.type) {
       case 'chart':
@@ -384,7 +358,6 @@ const ReportWidget = ({
         );
     }
   };
-
   const renderConfigDialog = () => {
     switch (widget.type) {
       case 'chart':
@@ -457,7 +430,6 @@ const ReportWidget = ({
             </TabsContent>
           </Tabs>
         );
-
       case 'kpi':
         return (
           <div className="space-y-4">
@@ -531,7 +503,6 @@ const ReportWidget = ({
             </div>
           </div>
         );
-
       case 'text':
         return (
           <div className="space-y-4">
@@ -578,12 +549,10 @@ const ReportWidget = ({
             </div>
           </div>
         );
-
       default:
         return <p>Configuration not available for this widget type.</p>;
     }
   };
-
   return (
     <>
       <Card
@@ -646,7 +615,6 @@ const ReportWidget = ({
           {renderWidget()}
         </CardContent>
       </Card>
-
       {/* Configuration Dialog */}
       <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>
         <DialogContent className="max-w-2xl">
@@ -669,7 +637,6 @@ const ReportWidget = ({
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Fullscreen Dialog */}
       <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
         <DialogContent className="max-w-6xl h-[90vh]">
@@ -684,5 +651,4 @@ const ReportWidget = ({
     </>
   );
 };
-
 export default ReportWidget;

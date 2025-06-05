@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 /**
  * Base API configuration with default settings
  */
@@ -9,7 +8,6 @@ const api = axios.create({
     'Content-Type': 'application/json'
   }
 });
-
 /**
  * Add authorization header with JWT token
  */
@@ -23,7 +21,6 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
 /**
  * Handle token expiration and other common API errors
  */
@@ -40,19 +37,15 @@ api.interceptors.response.use(
         window.location.reload();
       }
     }
-    
     // Handle 403 Forbidden - insufficient permissions
     if (error.response && error.response.status === 403) {
       console.error('Permission denied:', error.response.data);
     }
-    
     // Handle 500 server errors
     if (error.response && error.response.status >= 500) {
       console.error('Server error:', error.response.data);
     }
-    
     return Promise.reject(error);
   }
 );
-
 export default api;

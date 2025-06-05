@@ -17,7 +17,6 @@ import {
   Clock,
   Zap
 } from 'lucide-react';
-
 const IntegrationStatusDashboard = () => {
   const [stats, setStats] = useState({
     totalIntegrations: 11,
@@ -27,7 +26,6 @@ const IntegrationStatusDashboard = () => {
     averageResponseTime: 245,
     dataTransferred: '2.3 TB'
   });
-
   const [integrationHealth, setIntegrationHealth] = useState([
     { name: 'Google Calendar', status: 'healthy', uptime: 99.9, lastCheck: '2 min ago', issues: 0 },
     { name: 'Slack', status: 'healthy', uptime: 99.5, lastCheck: '5 min ago', issues: 0 },
@@ -37,7 +35,6 @@ const IntegrationStatusDashboard = () => {
     { name: 'Twilio', status: 'error', uptime: 95.5, lastCheck: '1 min ago', issues: 5 },
     { name: 'Mailchimp', status: 'healthy', uptime: 99.7, lastCheck: '6 min ago', issues: 0 }
   ]);
-
   const [activityTimeline, setActivityTimeline] = useState([
     { time: '09:00', calls: 234, errors: 2 },
     { time: '10:00', calls: 456, errors: 5 },
@@ -48,7 +45,6 @@ const IntegrationStatusDashboard = () => {
     { time: '15:00', calls: 765, errors: 3 },
     { time: '16:00', calls: 654, errors: 2 }
   ]);
-
   const [topEndpoints, setTopEndpoints] = useState([
     { endpoint: 'Google Calendar Sync', calls: 12456, avgTime: 156, trend: 'up' },
     { endpoint: 'Slack Notifications', calls: 9876, avgTime: 89, trend: 'up' },
@@ -56,7 +52,6 @@ const IntegrationStatusDashboard = () => {
     { endpoint: 'Twilio SMS', calls: 8765, avgTime: 178, trend: 'down' },
     { endpoint: 'Zoom Meetings', calls: 3456, avgTime: 345, trend: 'up' }
   ]);
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'healthy': return 'text-green-500';
@@ -65,7 +60,6 @@ const IntegrationStatusDashboard = () => {
       default: return 'text-gray-500';
     }
   };
-
   const getStatusIcon = (status) => {
     switch (status) {
       case 'healthy': return <CheckCircle className="w-5 h-5" />;
@@ -74,7 +68,6 @@ const IntegrationStatusDashboard = () => {
       default: return <AlertCircle className="w-5 h-5" />;
     }
   };
-
   return (
     <div className="space-y-6">
       {/* Header Stats */}
@@ -90,7 +83,6 @@ const IntegrationStatusDashboard = () => {
             </div>
           </div>
         </Card>
-        
         <Card>
           <div className="p-4">
             <div className="flex items-center justify-between">
@@ -102,7 +94,6 @@ const IntegrationStatusDashboard = () => {
             </div>
           </div>
         </Card>
-        
         <Card>
           <div className="p-4">
             <div className="flex items-center justify-between">
@@ -114,7 +105,6 @@ const IntegrationStatusDashboard = () => {
             </div>
           </div>
         </Card>
-        
         <Card>
           <div className="p-4">
             <div className="flex items-center justify-between">
@@ -126,7 +116,6 @@ const IntegrationStatusDashboard = () => {
             </div>
           </div>
         </Card>
-        
         <Card>
           <div className="p-4">
             <div className="flex items-center justify-between">
@@ -138,7 +127,6 @@ const IntegrationStatusDashboard = () => {
             </div>
           </div>
         </Card>
-        
         <Card>
           <div className="p-4">
             <div className="flex items-center justify-between">
@@ -151,7 +139,6 @@ const IntegrationStatusDashboard = () => {
           </div>
         </Card>
       </div>
-
       {/* System Health Overview */}
       <Card>
         <div className="p-6">
@@ -162,7 +149,6 @@ const IntegrationStatusDashboard = () => {
               Refresh
             </button>
           </div>
-          
           <div className="space-y-3">
             {integrationHealth.map((integration) => (
               <div key={integration.name} className="flex items-center justify-between p-3 border rounded-lg">
@@ -175,7 +161,6 @@ const IntegrationStatusDashboard = () => {
                     <p className="text-sm text-gray-500">Last check: {integration.lastCheck}</p>
                   </div>
                 </div>
-                
                 <div className="flex items-center space-x-6">
                   <div className="text-right">
                     <p className="text-sm text-gray-600">Uptime</p>
@@ -197,7 +182,6 @@ const IntegrationStatusDashboard = () => {
           </div>
         </div>
       </Card>
-
       {/* Activity Timeline */}
       <Card>
         <div className="p-6">
@@ -207,7 +191,6 @@ const IntegrationStatusDashboard = () => {
               const maxCalls = Math.max(...activityTimeline.map(h => h.calls));
               const heightPercentage = (hour.calls / maxCalls) * 100;
               const errorPercentage = (hour.errors / hour.calls) * 100;
-              
               return (
                 <div key={hour.time} className="flex-1 flex flex-col items-center">
                   <div className="w-full bg-gray-200 rounded-t relative" style={{ height: `${heightPercentage}%` }}>
@@ -237,7 +220,6 @@ const IntegrationStatusDashboard = () => {
           </div>
         </div>
       </Card>
-
       {/* Top Endpoints */}
       <Card>
         <div className="p-6">
@@ -262,7 +244,6 @@ const IntegrationStatusDashboard = () => {
           </div>
         </div>
       </Card>
-
       {/* Alerts */}
       <div className="space-y-3">
         <Alert variant="warning">
@@ -272,7 +253,6 @@ const IntegrationStatusDashboard = () => {
             <p className="text-sm">Average response time has increased to 345ms. Consider optimizing API calls.</p>
           </div>
         </Alert>
-        
         <Alert variant="danger">
           <XCircle className="w-4 h-4" />
           <div>
@@ -284,5 +264,4 @@ const IntegrationStatusDashboard = () => {
     </div>
   );
 };
-
 export default IntegrationStatusDashboard;

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { CheckCircle, XCircle, AlertCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-
 /**
  * Multiple Choice Question Component
  */
@@ -16,7 +15,6 @@ export const MultipleChoiceQuestion = ({
   questionIndex
 }) => {
   const isCorrect = userAnswer === correctAnswer;
-  
   return (
     <div className="mb-8">
       <div className="flex items-start mb-4">
@@ -42,7 +40,6 @@ export const MultipleChoiceQuestion = ({
           )}
         </div>
       </div>
-      
       <div className="space-y-3 pl-11">
         {options.map((option, index) => (
           <div key={index}>
@@ -81,7 +78,6 @@ export const MultipleChoiceQuestion = ({
           </div>
         ))}
       </div>
-      
       {showFeedback && !isCorrect && (
         <div className="mt-4 pl-11">
           <Card className="p-4 bg-blue-50 border-blue-200">
@@ -100,7 +96,6 @@ export const MultipleChoiceQuestion = ({
     </div>
   );
 };
-
 /**
  * True/False Question Component
  */
@@ -114,7 +109,6 @@ export const TrueFalseQuestion = ({
   questionIndex
 }) => {
   const isCorrect = userAnswer === correctAnswer;
-  
   return (
     <div className="mb-8">
       <div className="flex items-start mb-4">
@@ -140,7 +134,6 @@ export const TrueFalseQuestion = ({
           )}
         </div>
       </div>
-      
       <div className="flex space-x-4 pl-11">
         <button
           className={`flex-1 p-3 border rounded-md transition-colors ${
@@ -176,7 +169,6 @@ export const TrueFalseQuestion = ({
             <span>True</span>
           </div>
         </button>
-        
         <button
           className={`flex-1 p-3 border rounded-md transition-colors ${
             userAnswer === false 
@@ -212,7 +204,6 @@ export const TrueFalseQuestion = ({
           </div>
         </button>
       </div>
-      
       {showFeedback && !isCorrect && explanation && (
         <div className="mt-4 pl-11">
           <Card className="p-4 bg-blue-50 border-blue-200">
@@ -229,7 +220,6 @@ export const TrueFalseQuestion = ({
     </div>
   );
 };
-
 /**
  * Short Answer Question Component
  */
@@ -243,7 +233,6 @@ export const ShortAnswerQuestion = ({
   questionIndex
 }) => {
   const [inputValue, setInputValue] = useState(userAnswer);
-  
   // Check if the answer is correct
   // This is a simple exact match, but could be extended to handle partial matches
   const isCorrect = () => {
@@ -255,24 +244,20 @@ export const ShortAnswerQuestion = ({
     }
     return userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
   };
-  
   // Handle input change
   const handleChange = (e) => {
     setInputValue(e.target.value);
   };
-  
   // Handle submit
   const handleSubmit = () => {
     onAnswer(inputValue);
   };
-  
   // Handle key press (submit on Enter)
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSubmit();
     }
   };
-  
   return (
     <div className="mb-8">
       <div className="flex items-start mb-4">
@@ -298,7 +283,6 @@ export const ShortAnswerQuestion = ({
           )}
         </div>
       </div>
-      
       <div className="pl-11">
         <div className="mb-3">
           <input
@@ -317,13 +301,11 @@ export const ShortAnswerQuestion = ({
             disabled={showFeedback}
           />
         </div>
-        
         {!showFeedback && (
           <Button onClick={handleSubmit}>
             Submit Answer
           </Button>
         )}
-        
         {showFeedback && (
           <div className="mt-2">
             <Card className="p-4 bg-blue-50 border-blue-200">
@@ -353,7 +335,6 @@ export const ShortAnswerQuestion = ({
     </div>
   );
 };
-
 /**
  * Matching Question Component
  */
@@ -372,23 +353,18 @@ export const MatchingQuestion = ({
     if (!userMatches[itemId]) return 'unmatched';
     return userMatches[itemId] === correctMatches[itemId] ? 'correct' : 'incorrect';
   };
-  
   // Calculate overall correctness
   const isAllCorrect = () => {
     if (!userMatches) return false;
-    
     return Object.keys(correctMatches).every(
       itemId => userMatches[itemId] === correctMatches[itemId]
     );
   };
-  
   // Handle selection of an option
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
-  
   const handleSelectItem = (itemId) => {
     if (showFeedback) return;
-    
     if (selectedItem === itemId) {
       setSelectedItem(null);
     } else if (selectedOption) {
@@ -402,10 +378,8 @@ export const MatchingQuestion = ({
       setSelectedOption(null);
     }
   };
-  
   const handleSelectOption = (optionId) => {
     if (showFeedback) return;
-    
     if (selectedOption === optionId) {
       setSelectedOption(null);
     } else if (selectedItem) {
@@ -419,10 +393,8 @@ export const MatchingQuestion = ({
       setSelectedItem(null);
     }
   };
-  
   // Get all options (right column)
   const options = items.map(item => item.match);
-  
   return (
     <div className="mb-8">
       <div className="flex items-start mb-4">
@@ -448,7 +420,6 @@ export const MatchingQuestion = ({
           )}
         </div>
       </div>
-      
       <div className="pl-11">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Left column: Items */}
@@ -493,7 +464,6 @@ export const MatchingQuestion = ({
               </button>
             ))}
           </div>
-          
           {/* Right column: Options */}
           <div className="space-y-3">
             <h4 className="font-medium mb-3">Matches</h4>
@@ -513,7 +483,6 @@ export const MatchingQuestion = ({
             ))}
           </div>
         </div>
-        
         {showFeedback && !isAllCorrect() && (
           <div className="mt-4">
             <Card className="p-4 bg-blue-50 border-blue-200">
@@ -537,7 +506,6 @@ export const MatchingQuestion = ({
     </div>
   );
 };
-
 /**
  * Multiple Answer Question Component (Checkboxes)
  */
@@ -557,23 +525,18 @@ export const MultipleAnswerQuestion = ({
     return correctAnswers.every(ans => userAnswers.includes(ans)) &&
            userAnswers.every(ans => correctAnswers.includes(ans));
   };
-  
   // Handle toggle of option
   const toggleOption = (index) => {
     if (showFeedback) return;
-    
     const newAnswers = [...userAnswers];
     const answerIndex = newAnswers.indexOf(index);
-    
     if (answerIndex === -1) {
       newAnswers.push(index);
     } else {
       newAnswers.splice(answerIndex, 1);
     }
-    
     onAnswer(newAnswers);
   };
-  
   return (
     <div className="mb-8">
       <div className="flex items-start mb-4">
@@ -600,7 +563,6 @@ export const MultipleAnswerQuestion = ({
           )}
         </div>
       </div>
-      
       <div className="space-y-3 pl-11">
         {options.map((option, index) => (
           <div key={index}>
@@ -642,7 +604,6 @@ export const MultipleAnswerQuestion = ({
           </div>
         ))}
       </div>
-      
       {showFeedback && !isCorrect() && (
         <div className="mt-4 pl-11">
           <Card className="p-4 bg-blue-50 border-blue-200">

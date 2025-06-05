@@ -1,5 +1,4 @@
 import api from '@/lib/api';
-
 /**
  * Get a list of beneficiaries with pagination and filters
  * 
@@ -26,7 +25,6 @@ export const getBeneficiaries = async (params = {}) => {
     throw error;
   }
 };
-
 /**
  * Get a single beneficiary by ID
  * 
@@ -42,7 +40,6 @@ export const getBeneficiary = async (id) => {
     throw error;
   }
 };
-
 /**
  * Create a new beneficiary
  * 
@@ -58,7 +55,6 @@ export const createBeneficiary = async (data) => {
     throw error;
   }
 };
-
 /**
  * Update an existing beneficiary
  * 
@@ -75,7 +71,6 @@ export const updateBeneficiary = async (id, data) => {
     throw error;
   }
 };
-
 /**
  * Delete a beneficiary
  * 
@@ -91,7 +86,6 @@ export const deleteBeneficiary = async (id) => {
     throw error;
   }
 };
-
 /**
  * Export beneficiaries to a file format
  * 
@@ -105,7 +99,6 @@ export const exportBeneficiaries = async (format = 'csv', filters = {}) => {
       params: { format, ...filters },
       responseType: 'blob'
     });
-    
     // Create a download link and trigger it
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
@@ -114,7 +107,6 @@ export const exportBeneficiaries = async (format = 'csv', filters = {}) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
     return response.data;
   } catch (error) {
     console.error('Error exporting beneficiaries:', error);

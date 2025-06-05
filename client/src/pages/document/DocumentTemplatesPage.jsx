@@ -19,12 +19,10 @@ import {
   Copy,
   Files
 } from 'lucide-react';
-
 const DocumentTemplatesPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
   const [loading, setLoading] = useState(true);
   const [templates, setTemplates] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,7 +35,6 @@ const DocumentTemplatesPage = () => {
     description: '',
     category: 'general'
   });
-
   const templateCategories = [
     'all',
     'contracts', 
@@ -46,11 +43,9 @@ const DocumentTemplatesPage = () => {
     'evaluations',
     'general'
   ];
-
   useEffect(() => {
     fetchTemplates();
   }, []);
-
   const fetchTemplates = async () => {
     try {
       const res = await fetch('/api/documents/templates', {
@@ -58,9 +53,7 @@ const DocumentTemplatesPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to fetch templates');
-
       const data = await res.json();
       setTemplates(data);
     } catch (error) {
@@ -74,7 +67,6 @@ const DocumentTemplatesPage = () => {
       setLoading(false);
     }
   };
-
   const handleUploadTemplate = async () => {
     if (!uploadFile || !templateForm.name) {
       toast({
@@ -84,14 +76,12 @@ const DocumentTemplatesPage = () => {
       });
       return;
     }
-
     setUploading(true);
     const formData = new FormData();
     formData.append('file', uploadFile);
     formData.append('name', templateForm.name);
     formData.append('description', templateForm.description);
     formData.append('category', templateForm.category);
-
     try {
       const res = await fetch('/api/documents/templates', {
         method: 'POST',
@@ -100,14 +90,11 @@ const DocumentTemplatesPage = () => {
         },
         body: formData
       });
-
       if (!res.ok) throw new Error('Failed to upload template');
-
       toast({
         title: 'Success',
         description: 'Template uploaded successfully'
       });
-
       fetchTemplates();
       setShowUploadModal(false);
       resetUploadForm();
@@ -122,10 +109,8 @@ const DocumentTemplatesPage = () => {
       setUploading(false);
     }
   };
-
   const handleDeleteTemplate = async (templateId) => {
     if (!confirm('Are you sure you want to delete this template?')) return;
-
     try {
       const res = await fetch(`/api/documents/templates/${templateId}`, {
         method: 'DELETE',
@@ -133,14 +118,11 @@ const DocumentTemplatesPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to delete template');
-
       toast({
         title: 'Success',
         description: 'Template deleted successfully'
       });
-
       fetchTemplates();
     } catch (error) {
       console.error('Error deleting template:', error);
@@ -151,7 +133,6 @@ const DocumentTemplatesPage = () => {
       });
     }
   };
-
   const handleDuplicateTemplate = async (templateId) => {
     try {
       const res = await fetch(`/api/documents/templates/${templateId}/duplicate`, {
@@ -160,14 +141,11 @@ const DocumentTemplatesPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       if (!res.ok) throw new Error('Failed to duplicate template');
-
       toast({
         title: 'Success',
         description: 'Template duplicated successfully'
       });
-
       fetchTemplates();
     } catch (error) {
       console.error('Error duplicating template:', error);
@@ -178,7 +156,6 @@ const DocumentTemplatesPage = () => {
       });
     }
   };
-
   const resetUploadForm = () => {
     setTemplateForm({
       name: '',
@@ -187,14 +164,12 @@ const DocumentTemplatesPage = () => {
     });
     setUploadFile(null);
   };
-
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          template.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
   const getCategoryIcon = (category) => {
     switch (category) {
       case 'contracts':
@@ -209,7 +184,6 @@ const DocumentTemplatesPage = () => {
         return '📄';
     }
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -217,7 +191,6 @@ const DocumentTemplatesPage = () => {
       </div>
     );
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -227,7 +200,6 @@ const DocumentTemplatesPage = () => {
           New Template
         </Button>
       </div>
-
       {/* Search and Filter */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
@@ -240,7 +212,6 @@ const DocumentTemplatesPage = () => {
             className="pl-9"
           />
         </div>
-        
         <div className="flex gap-2">
           {templateCategories.map((category) => (
             <Button
@@ -254,7 +225,6 @@ const DocumentTemplatesPage = () => {
           ))}
         </div>
       </div>
-
       {/* Templates Grid */}
       {filteredTemplates.length === 0 ? (
         <Card className="p-8 text-center">
@@ -283,7 +253,6 @@ const DocumentTemplatesPage = () => {
                     {template.category}
                   </Badge>
                 </div>
-
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <div>
                     <p>Format: {template.file_type?.toUpperCase()}</p>
@@ -294,7 +263,6 @@ const DocumentTemplatesPage = () => {
                     <p>Used: {template.usage_count} times</p>
                   </div>
                 </div>
-
                 <div className="flex gap-2 mt-4">
                   <Button
                     variant="outline"
@@ -342,7 +310,6 @@ const DocumentTemplatesPage = () => {
           ))}
         </div>
       )}
-
       {/* Upload Modal */}
       <Modal
         isOpen={showUploadModal}
@@ -364,7 +331,6 @@ const DocumentTemplatesPage = () => {
               placeholder="Enter template name"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description
@@ -376,7 +342,6 @@ const DocumentTemplatesPage = () => {
               placeholder="Enter template description"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Category
@@ -393,7 +358,6 @@ const DocumentTemplatesPage = () => {
               <option value="evaluations">Evaluations</option>
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Template File *
@@ -408,7 +372,6 @@ const DocumentTemplatesPage = () => {
               Accepted formats: DOC, DOCX, PDF, XLS, XLSX
             </p>
           </div>
-
           <div className="flex justify-end gap-3">
             <Button
               variant="outline"
@@ -441,5 +404,4 @@ const DocumentTemplatesPage = () => {
     </div>
   );
 };
-
 export default DocumentTemplatesPage;

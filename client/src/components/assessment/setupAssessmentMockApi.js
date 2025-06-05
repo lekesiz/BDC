@@ -20,10 +20,8 @@ import {
   getAssessmentAnalyticsByCohort
 } from './mockData';
 import { statisticsEndpoints } from './assessmentStatsMockData';
-
 export const setupAssessmentMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Templates
-  
   // Get all assessment templates
   api.get = async function(url, config) {
     if (url === '/api/assessment/templates' || url.startsWith('/api/assessment/templates?')) {
@@ -33,7 +31,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         if (url.includes('?status=')) {
           status = url.split('?status=')[1];
         }
-        
         const templates = await getAssessmentTemplates(status);
         return {
           data: templates,
@@ -56,7 +53,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Get assessment template by ID
     if (url.match(/\/api\/assessment\/templates\/[^/?]+$/)) {
       try {
@@ -83,9 +79,7 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Assigned Assessments
-    
     // Get all assigned assessments
     if (url === '/api/assessment/assigned' || url.startsWith('/api/assessment/assigned?')) {
       try {
@@ -94,7 +88,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         if (url.includes('?status=')) {
           status = url.split('?status=')[1];
         }
-        
         const assessments = await getAssignedAssessments(status);
         return {
           data: assessments,
@@ -117,7 +110,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Get assigned assessment by ID
     if (url.match(/\/api\/assessment\/assigned\/[^/?]+$/)) {
       try {
@@ -144,7 +136,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Get submissions for an assessment
     if (url.match(/\/api\/assessment\/assigned\/[^/?]+\/submissions$/)) {
       try {
@@ -171,7 +162,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Get submission by ID
     if (url.match(/\/api\/assessment\/submissions\/[^/?]+$/)) {
       try {
@@ -198,9 +188,7 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Analytics
-    
     // Get overall assessment analytics
     if (url === '/api/assessment/analytics') {
       try {
@@ -226,7 +214,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Get assessment-specific analytics
     if (url.match(/\/api\/assessment\/analytics\/assignments\/[^/?]+$/)) {
       try {
@@ -253,7 +240,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Get cohort-specific analytics
     if (url.match(/\/api\/assessment\/analytics\/cohorts\/[^/?]+$/)) {
       try {
@@ -280,7 +266,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Statistics endpoints
     if (url === '/api/assessment/statistics/overview' || url.startsWith('/api/assessment/statistics/overview?')) {
       try {
@@ -307,7 +292,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     if (url === '/api/assessment/statistics/performance' || url.startsWith('/api/assessment/statistics/performance?')) {
       try {
         const response = statisticsEndpoints.performance({ url });
@@ -333,7 +317,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     if (url === '/api/assessment/statistics/completion' || url.startsWith('/api/assessment/statistics/completion?')) {
       try {
         const response = statisticsEndpoints.completion({ url });
@@ -359,7 +342,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     if (url === '/api/assessment/statistics/assessments' || url.startsWith('/api/assessment/statistics/assessments?')) {
       try {
         const response = statisticsEndpoints.assessments({ url });
@@ -385,7 +367,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     if (url === '/api/assessment/statistics/students' || url.startsWith('/api/assessment/statistics/students?')) {
       try {
         const response = statisticsEndpoints.students({ url });
@@ -411,7 +392,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     if (url === '/api/assessment/statistics/questions' || url.startsWith('/api/assessment/statistics/questions?')) {
       try {
         const response = statisticsEndpoints.questions({ url });
@@ -437,11 +417,9 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Pass through to original GET method if not handled
     return originalGet.apply(this, [url, config]);
   };
-  
   // POST Requests
   api.post = async function(url, data, config) {
     // Create assessment template
@@ -469,7 +447,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Assign assessment
     if (url === '/api/assessment/assign') {
       try {
@@ -495,7 +472,6 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Grade submission
     if (url.match(/\/api\/assessment\/submissions\/[^/?]+\/grade$/)) {
       try {
@@ -522,11 +498,9 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Pass through to original POST method if not handled
     return originalPost.apply(this, [url, data, config]);
   };
-  
   // PUT Requests
   api.put = async function(url, data, config) {
     // Update assessment template
@@ -555,12 +529,9 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
         });
       }
     }
-    
     // Pass through to original PUT method if not handled
     return originalPut.apply(this, [url, data, config]);
   };
-  
   // Leave DELETE as is, we're not handling it for now
 };
-
 export default setupAssessmentMockApi;

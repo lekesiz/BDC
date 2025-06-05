@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
-
 /**
  * Modal component using React Portal
  * 
@@ -31,16 +30,13 @@ export const Modal = ({
   const modalRef = useRef(null);
   const previousActiveElement = useRef(null);
   const { isMobile } = useBreakpoint();
-
   // Handle ESC key and focus management
   useEffect(() => {
     if (isOpen) {
       // Save current focus
       previousActiveElement.current = document.activeElement;
-      
       // Prevent body scrolling
       document.body.style.overflow = 'hidden';
-      
       // Focus management
       setTimeout(() => {
         if (initialFocus && modalRef.current) {
@@ -53,24 +49,20 @@ export const Modal = ({
           modalRef.current.focus();
         }
       }, 0);
-      
       // Handle escape key
       const handleEsc = (event) => {
         if (closeOnEscape && event.key === 'Escape') {
           onClose();
         }
       };
-      
       // Trap focus within modal
       const handleTab = (event) => {
         if (event.key === 'Tab' && modalRef.current) {
           const focusableElements = modalRef.current.querySelectorAll(
             'a[href], button:not([disabled]), textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select, [tabindex]:not([tabindex="-1"])'
           );
-          
           const firstElement = focusableElements[0];
           const lastElement = focusableElements[focusableElements.length - 1];
-          
           if (event.shiftKey && document.activeElement === firstElement) {
             event.preventDefault();
             lastElement.focus();
@@ -80,10 +72,8 @@ export const Modal = ({
           }
         }
       };
-      
       document.addEventListener('keydown', handleEsc);
       document.addEventListener('keydown', handleTab);
-      
       return () => {
         document.removeEventListener('keydown', handleEsc);
         document.removeEventListener('keydown', handleTab);
@@ -91,22 +81,18 @@ export const Modal = ({
     } else {
       // Restore body scrolling and focus
       document.body.style.overflow = 'auto';
-      
       if (returnFocus && previousActiveElement.current && previousActiveElement.current.focus) {
         previousActiveElement.current.focus();
       }
     }
   }, [isOpen, onClose, closeOnEscape, initialFocus, returnFocus]);
-
   // Handle clicking outside modal
   const handleBackdropClick = (e) => {
     if (closeOnOutsideClick && modalRef.current && !modalRef.current.contains(e.target)) {
       onClose();
     }
   };
-
   if (!isOpen) return null;
-
   const sizeClasses = {
     sm: 'sm:max-w-sm',
     md: 'sm:max-w-md',
@@ -118,7 +104,6 @@ export const Modal = ({
     '5xl': 'sm:max-w-5xl',
     full: 'max-w-full'
   };
-
   return createPortal(
     <div 
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black bg-opacity-50 transition-opacity"
@@ -168,7 +153,6 @@ export const Modal = ({
     document.body
   );
 };
-
 /**
  * Modal Header component
  * 
@@ -198,7 +182,6 @@ export const ModalHeader = ({ children, className = '', onClose, ...props }) => 
     </div>
   );
 };
-
 /**
  * Modal Body component
  * 
@@ -214,7 +197,6 @@ export const ModalBody = ({ children, className = '', ...props }) => {
     </div>
   );
 };
-
 /**
  * Modal Footer component
  * 
@@ -225,7 +207,6 @@ export const ModalBody = ({ children, className = '', ...props }) => {
  */
 export const ModalFooter = ({ children, className = '', ...props }) => {
   const { isMobile } = useBreakpoint();
-  
   return (
     <div 
       className={cn(

@@ -1,16 +1,13 @@
 /**
  * Users Mock API Setup
  */
-
 import { mockUsers, userStats } from './usersMockData.js';
-
 export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Store original methods if not provided
   const get = originalGet || api.get;
   const post = originalPost || api.post;
   const put = originalPut || api.put;
   const del = originalDelete || api.delete;
-
   // GET /api/users - List users with filtering, pagination, search
   api.get = function(url, config) {
     if (url.includes('/api/users') && !url.includes('/api/users/')) {
@@ -18,7 +15,6 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
         // Parse query parameters
         const urlObj = new URL(url, 'http://localhost');
         const params = new URLSearchParams(urlObj.search);
-        
         const page = parseInt(params.get('page')) || 1;
         const limit = parseInt(params.get('limit')) || 10;
         const search = params.get('search') || '';
@@ -26,9 +22,7 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
         const status = params.get('status') || '';
         const sortBy = params.get('sortBy') || 'firstName';
         const sortOrder = params.get('sortOrder') || 'asc';
-        
         let filteredUsers = [...mockUsers];
-        
         // Apply search filter
         if (search) {
           filteredUsers = filteredUsers.filter(u => 
@@ -38,39 +32,32 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
             u.username.toLowerCase().includes(search.toLowerCase())
           );
         }
-        
         // Apply role filter
         if (role) {
           filteredUsers = filteredUsers.filter(u => u.role === role);
         }
-        
         // Apply status filter  
         if (status) {
           filteredUsers = filteredUsers.filter(u => u.status === status);
         }
-        
         // Apply sorting
         filteredUsers.sort((a, b) => {
           const aVal = a[sortBy];
           const bVal = b[sortBy];
-          
           if (sortOrder === 'desc') {
             return bVal > aVal ? 1 : -1;
           }
           return aVal > bVal ? 1 : -1;
         });
-        
         // Calculate pagination
         const startIndex = (page - 1) * limit;
         const endIndex = startIndex + limit;
         const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-        
         // Remove sensitive data
         const sanitizedUsers = paginatedUsers.map(user => {
           const { ...sanitized } = user;
           return sanitized;
         });
-        
         // Simulate API response delay
         setTimeout(() => {
           resolve({
@@ -97,7 +84,6 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
         }, 300);
       });
     }
-    
     // GET /api/users/:id - Get single user
     if (url.match(/\/api\/users\/\d+$/) && !url.includes('?')) {
       const id = parseInt(url.split('/').pop());
@@ -154,12 +140,10 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
         }, 200);
       });
     }
-    
     // GET /api/users/me - Get current user profile (use real backend)
     if (url.includes('/api/users/me')) {
       return get.call(this, url, config);
     }
-    
     // GET /api/users/stats - Get user statistics
     if (url.includes('/api/users/stats')) {
       return new Promise((resolve) => {
@@ -187,11 +171,9 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
         }, 200);
       });
     }
-    
     // Default: call original get method
     return get.call(this, url, config);
   };
-
   // POST /api/users - Create new user
   api.post = function(url, data, config) {
     if (url === '/api/users') {
@@ -207,9 +189,7 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
               lastLogin: null,
               status: 'active'
             };
-            
             mockUsers.push(newUser);
-            
             resolve({
               data: {
                 user: newUser,
@@ -227,11 +207,9 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
         }, 500);
       });
     }
-    
     // Default: call original post method
     return post.call(this, url, data, config);
   };
-
   // PUT /api/users/:id - Update user
   api.put = function(url, data, config) {
     if (url.match(/\/api\/users\/\d+$/)) {
@@ -245,7 +223,6 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
               ...data,
               updatedAt: new Date().toISOString()
             };
-            
             resolve({
               data: {
                 user: mockUsers[index],
@@ -263,11 +240,9 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
         }, 400);
       });
     }
-    
     // Default: call original put method
     return put.call(this, url, data, config);
   };
-
   // DELETE /api/users/:id - Delete user
   api.delete = function(url, config) {
     if (url.match(/\/api\/users\/\d+$/)) {
@@ -294,10 +269,7 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
         }, 300);
       });
     }
-    
     // Default: call original delete method
     return del.call(this, url, config);
   };
-  
-  console.log('👥 Users Mock API setup completed');
 };

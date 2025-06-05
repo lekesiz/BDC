@@ -23,7 +23,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
-
 /**
  * PortalSkillsPage displays the student's skills, development areas,
  * and progress in various competencies
@@ -41,7 +40,6 @@ const PortalSkillsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
   const [selectedSkill, setSelectedSkill] = useState(null);
-  
   // Fetch skills data
   useEffect(() => {
     const fetchSkillsData = async () => {
@@ -60,10 +58,8 @@ const PortalSkillsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchSkillsData();
   }, []); // Remove toast dependency to prevent infinite loop
-  
   // Filter skills based on search term and filter
   const getFilteredSkills = () => {
     // First apply category filter
@@ -82,7 +78,6 @@ const PortalSkillsPage = () => {
         return skill ? { ...skill, focusReason: focus.reason } : null;
       }).filter(Boolean);
     }
-    
     // Then apply search filter if there's a search term
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
@@ -92,10 +87,8 @@ const PortalSkillsPage = () => {
         skill.category.toLowerCase().includes(term)
       );
     }
-    
     return filtered;
   };
-  
   // Get skill level label
   const getSkillLevelLabel = (level) => {
     switch (level) {
@@ -107,7 +100,6 @@ const PortalSkillsPage = () => {
       default: return 'Not Started';
     }
   };
-  
   // Get skill level color
   const getSkillLevelColor = (level, maxLevel) => {
     const ratio = level / maxLevel;
@@ -117,18 +109,15 @@ const PortalSkillsPage = () => {
     if (ratio < 0.8) return 'bg-blue-500';
     return 'bg-green-500';
   };
-  
   // Format date
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-  
   // Handle skill selection
   const handleSkillSelect = (skill) => {
     setSelectedSkill(selectedSkill?.id === skill.id ? null : skill);
   };
-  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -136,9 +125,7 @@ const PortalSkillsPage = () => {
       </div>
     );
   }
-  
   const filteredSkills = getFilteredSkills();
-  
   return (
     <div className="container mx-auto py-6">
       {/* Page header */}
@@ -148,7 +135,6 @@ const PortalSkillsPage = () => {
           Track your progress in technical and soft skills across your learning journey
         </p>
       </div>
-      
       {/* Skills metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {skillsData.highlightMetrics.map(metric => (
@@ -175,7 +161,6 @@ const PortalSkillsPage = () => {
           </Card>
         ))}
       </div>
-      
       {/* Search and filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
@@ -188,7 +173,6 @@ const PortalSkillsPage = () => {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
-        
         <div className="flex space-x-2">
           <Button
             variant={filter === 'all' ? 'default' : 'outline'}
@@ -216,7 +200,6 @@ const PortalSkillsPage = () => {
           </Button>
         </div>
       </div>
-      
       {/* Recent skill growth chart */}
       {filter === 'all' && !searchTerm && (
         <Card className="p-6 mb-8">
@@ -252,7 +235,6 @@ const PortalSkillsPage = () => {
           </div>
         </Card>
       )}
-      
       {/* Skills list */}
       {filteredSkills.length === 0 ? (
         <Card className="p-8 text-center">
@@ -328,7 +310,6 @@ const PortalSkillsPage = () => {
                   </div>
                 </div>
               </div>
-              
               {/* Expanded skill details */}
               {selectedSkill?.id === skill.id && (
                 <div className="p-6 pt-0 border-t mt-4">
@@ -352,7 +333,6 @@ const PortalSkillsPage = () => {
                         ))}
                       </div>
                     </div>
-                    
                     <div>
                       <h4 className="font-medium mb-3">Learning Path</h4>
                       {skill.learningPath && (
@@ -393,7 +373,6 @@ const PortalSkillsPage = () => {
                           ))}
                         </div>
                       )}
-                      
                       {skill.focusReason && (
                         <div className="mt-4 p-3 bg-yellow-50 rounded-md border border-yellow-200">
                           <div className="flex">
@@ -416,7 +395,6 @@ const PortalSkillsPage = () => {
     </div>
   );
 };
-
 // Fix missing component error
 const Circle = (props) => (
   <div 
@@ -424,7 +402,6 @@ const Circle = (props) => (
     style={{width: '1.25em', height: '1.25em'}}
   />
 );
-
 const Users = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -444,5 +421,4 @@ const Users = (props) => (
     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
   </svg>
 );
-
 export default PortalSkillsPage;

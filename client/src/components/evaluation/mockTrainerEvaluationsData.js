@@ -135,7 +135,6 @@ export const mockTrainerEvaluations = [
     overall_feedback: "The beneficiary has demonstrated excellent programming fundamentals and is progressing well through our technical curriculum. Their code is consistently well-structured and they show a natural aptitude for algorithmic thinking.\n\nParticularly impressive is their ability to quickly master new syntax and programming concepts, applying them appropriately in their projects. Their code is clean and readable, showing good adherence to best practices.\n\nTo progress to the advanced level, focus should be placed on developing more robust code through careful consideration of edge cases, comprehensive testing, and clearer documentation. With these improvements, they have the potential to become an exceptional developer capable of handling complex systems and mentoring others."
   }
 ];
-
 // Mock API responses for trainer evaluations
 export const fetchMockTrainerEvaluations = (beneficiaryId) => {
   return {
@@ -145,23 +144,19 @@ export const fetchMockTrainerEvaluations = (beneficiaryId) => {
     )
   };
 };
-
 export const fetchMockTrainerEvaluation = (id) => {
   const evaluation = mockTrainerEvaluations.find(evaluation => evaluation.id.toString() === id.toString());
-  
   if (evaluation) {
     return {
       status: 200,
       data: evaluation
     };
   }
-  
   return {
     status: 404,
     data: { message: 'Evaluation not found' }
   };
 };
-
 export const createMockTrainerEvaluation = (data) => {
   return {
     status: 201,
@@ -172,14 +167,12 @@ export const createMockTrainerEvaluation = (data) => {
     }
   };
 };
-
 export const shareMockTrainerEvaluation = (id) => {
   return {
     status: 200,
     data: { message: 'Evaluation shared successfully' }
   };
 };
-
 export const downloadMockTrainerEvaluationPDF = () => {
   return {
     status: 200,

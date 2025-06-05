@@ -27,7 +27,6 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import ReportWidget from './ReportWidget';
-
 const ReportSection = ({
   section,
   darkMode,
@@ -44,17 +43,14 @@ const ReportSection = ({
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(section.title);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
   const handleTitleSave = () => {
     onUpdate({ title: editedTitle });
     setIsEditingTitle(false);
   };
-
   const handleTitleCancel = () => {
     setEditedTitle(section.title);
     setIsEditingTitle(false);
   };
-
   const getLayoutClass = () => {
     switch (section.layout) {
       case 'two-column':
@@ -65,7 +61,6 @@ const ReportSection = ({
         return 'space-y-4';
     }
   };
-
   const getLayoutIcon = () => {
     switch (section.layout) {
       case 'two-column':
@@ -76,7 +71,6 @@ const ReportSection = ({
         return <Square className="w-4 h-4" />;
     }
   };
-
   return (
     <Card
       className={`
@@ -97,7 +91,6 @@ const ReportSection = ({
             >
               <GripVertical className="w-5 h-5 text-gray-400" />
             </div>
-
             {/* Section Title */}
             {isEditingTitle ? (
               <div className="flex items-center space-x-2 flex-1">
@@ -135,7 +128,6 @@ const ReportSection = ({
               </div>
             )}
           </div>
-
           {/* Section Actions */}
           <div className="flex items-center space-x-2">
             {/* Layout Selector */}
@@ -170,7 +162,6 @@ const ReportSection = ({
                 </SelectItem>
               </SelectContent>
             </Select>
-
             {/* Collapse/Expand Button */}
             <Button
               size="sm"
@@ -186,7 +177,6 @@ const ReportSection = ({
                 <ChevronUp className="w-4 h-4" />
               )}
             </Button>
-
             {/* More Options */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -212,7 +202,6 @@ const ReportSection = ({
           </div>
         </div>
       </CardHeader>
-
       {!isCollapsed && (
         <CardContent>
           <Droppable droppableId={`section-${section.id}`} type="WIDGET">
@@ -270,7 +259,6 @@ const ReportSection = ({
               </div>
             )}
           </Droppable>
-
           {/* Add Widget Button */}
           {section.widgets.length > 0 && (
             <div className="mt-4 flex justify-center">
@@ -292,5 +280,4 @@ const ReportSection = ({
     </Card>
   );
 };
-
 export default ReportSection;

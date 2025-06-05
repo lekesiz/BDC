@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
-
 /**
  * NotificationSettingsPage allows users to configure their notification preferences
  */
@@ -67,7 +66,6 @@ const NotificationSettingsPage = () => {
       },
     },
   });
-
   // Fetch notification settings
   useEffect(() => {
     const fetchNotificationSettings = async () => {
@@ -86,10 +84,8 @@ const NotificationSettingsPage = () => {
         setIsLoading(false);
       }
     };
-    
     fetchNotificationSettings();
   }, [toast]);
-
   // Toggle channel setting
   const toggleChannel = (channel) => {
     setSettings(prev => ({
@@ -100,7 +96,6 @@ const NotificationSettingsPage = () => {
       },
     }));
   };
-
   // Toggle category setting
   const toggleCategorySetting = (category, setting) => {
     setSettings(prev => ({
@@ -114,18 +109,15 @@ const NotificationSettingsPage = () => {
       },
     }));
   };
-
   // Toggle all settings in a category
   const toggleAllInCategory = (category, value) => {
     setSettings(prev => {
       const categorySettings = prev.categories[category];
       const updatedCategorySettings = {};
-      
       // Set all settings in the category to the specified value
       Object.keys(categorySettings).forEach(setting => {
         updatedCategorySettings[setting] = value;
       });
-      
       return {
         ...prev,
         categories: {
@@ -135,7 +127,6 @@ const NotificationSettingsPage = () => {
       };
     });
   };
-
   // Toggle preference setting
   const togglePreference = (preference) => {
     setSettings(prev => ({
@@ -151,7 +142,6 @@ const NotificationSettingsPage = () => {
       },
     }));
   };
-
   // Update quiet hours settings
   const updateQuietHours = (field, value) => {
     setSettings(prev => ({
@@ -165,13 +155,11 @@ const NotificationSettingsPage = () => {
       },
     }));
   };
-
   // Save notification settings
   const saveSettings = async () => {
     try {
       setIsSaving(true);
       await api.put('/api/settings/notifications', settings);
-      
       toast({
         title: 'Success',
         description: 'Notification settings saved successfully',
@@ -188,7 +176,6 @@ const NotificationSettingsPage = () => {
       setIsSaving(false);
     }
   };
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -196,7 +183,6 @@ const NotificationSettingsPage = () => {
       </div>
     );
   }
-
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center mb-6">
@@ -206,13 +192,11 @@ const NotificationSettingsPage = () => {
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        
         <div>
           <h1 className="text-2xl font-bold">Notification Settings</h1>
           <p className="text-gray-500">Configure how and when you receive notifications</p>
         </div>
       </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           {/* Notification Channels */}
@@ -221,7 +205,6 @@ const NotificationSettingsPage = () => {
             <p className="text-gray-500 mb-4">
               Choose how you want to receive notifications
             </p>
-            
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
@@ -235,7 +218,6 @@ const NotificationSettingsPage = () => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="relative inline-block w-12 align-middle select-none">
                   <input
                     type="checkbox"
@@ -258,7 +240,6 @@ const NotificationSettingsPage = () => {
                   </label>
                 </div>
               </div>
-              
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
@@ -271,7 +252,6 @@ const NotificationSettingsPage = () => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="relative inline-block w-12 align-middle select-none">
                   <input
                     type="checkbox"
@@ -294,7 +274,6 @@ const NotificationSettingsPage = () => {
                   </label>
                 </div>
               </div>
-              
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
@@ -307,7 +286,6 @@ const NotificationSettingsPage = () => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="relative inline-block w-12 align-middle select-none">
                   <input
                     type="checkbox"
@@ -332,7 +310,6 @@ const NotificationSettingsPage = () => {
               </div>
             </div>
           </Card>
-          
           {/* Category Settings */}
           <div className="space-y-6">
             {/* Appointments */}
@@ -344,7 +321,6 @@ const NotificationSettingsPage = () => {
                   </div>
                   <h2 className="text-lg font-medium">Appointment Notifications</h2>
                 </div>
-                
                 <div className="flex items-center space-x-2">
                   <button
                     className="text-sm text-primary hover:underline"
@@ -361,7 +337,6 @@ const NotificationSettingsPage = () => {
                   </button>
                 </div>
               </div>
-              
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -370,7 +345,6 @@ const NotificationSettingsPage = () => {
                       When a new appointment is scheduled
                     </div>
                   </div>
-                  
                   <div className="relative inline-block w-12 align-middle select-none">
                     <input
                       type="checkbox"
@@ -393,7 +367,6 @@ const NotificationSettingsPage = () => {
                     </label>
                   </div>
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">Appointment Reminder</div>
@@ -401,7 +374,6 @@ const NotificationSettingsPage = () => {
                       Reminders before scheduled appointments
                     </div>
                   </div>
-                  
                   <div className="relative inline-block w-12 align-middle select-none">
                     <input
                       type="checkbox"
@@ -424,7 +396,6 @@ const NotificationSettingsPage = () => {
                     </label>
                   </div>
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">Appointment Update</div>
@@ -432,7 +403,6 @@ const NotificationSettingsPage = () => {
                       When an appointment is updated or rescheduled
                     </div>
                   </div>
-                  
                   <div className="relative inline-block w-12 align-middle select-none">
                     <input
                       type="checkbox"
@@ -455,7 +425,6 @@ const NotificationSettingsPage = () => {
                     </label>
                   </div>
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">Appointment Cancellation</div>
@@ -463,7 +432,6 @@ const NotificationSettingsPage = () => {
                       When an appointment is cancelled
                     </div>
                   </div>
-                  
                   <div className="relative inline-block w-12 align-middle select-none">
                     <input
                       type="checkbox"
@@ -488,7 +456,6 @@ const NotificationSettingsPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Documents */}
             <Card className="p-6">
               <div className="flex justify-between items-center mb-4">
@@ -498,7 +465,6 @@ const NotificationSettingsPage = () => {
                   </div>
                   <h2 className="text-lg font-medium">Document Notifications</h2>
                 </div>
-                
                 <div className="flex items-center space-x-2">
                   <button
                     className="text-sm text-primary hover:underline"
@@ -515,7 +481,6 @@ const NotificationSettingsPage = () => {
                   </button>
                 </div>
               </div>
-              
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -524,7 +489,6 @@ const NotificationSettingsPage = () => {
                       When a document is shared with you
                     </div>
                   </div>
-                  
                   <div className="relative inline-block w-12 align-middle select-none">
                     <input
                       type="checkbox"
@@ -547,7 +511,6 @@ const NotificationSettingsPage = () => {
                     </label>
                   </div>
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">Document Updated</div>
@@ -555,7 +518,6 @@ const NotificationSettingsPage = () => {
                       When a shared document is updated
                     </div>
                   </div>
-                  
                   <div className="relative inline-block w-12 align-middle select-none">
                     <input
                       type="checkbox"
@@ -578,7 +540,6 @@ const NotificationSettingsPage = () => {
                     </label>
                   </div>
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">Document Commented</div>
@@ -586,7 +547,6 @@ const NotificationSettingsPage = () => {
                       When someone comments on a document
                     </div>
                   </div>
-                  
                   <div className="relative inline-block w-12 align-middle select-none">
                     <input
                       type="checkbox"
@@ -611,7 +571,6 @@ const NotificationSettingsPage = () => {
                 </div>
               </div>
             </Card>
-            
             {/* Messages */}
             <Card className="p-6">
               <div className="flex justify-between items-center mb-4">
@@ -621,7 +580,6 @@ const NotificationSettingsPage = () => {
                   </div>
                   <h2 className="text-lg font-medium">Message Notifications</h2>
                 </div>
-                
                 <div className="flex items-center space-x-2">
                   <button
                     className="text-sm text-primary hover:underline"
@@ -638,7 +596,6 @@ const NotificationSettingsPage = () => {
                   </button>
                 </div>
               </div>
-              
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -647,7 +604,6 @@ const NotificationSettingsPage = () => {
                       When you receive a new message
                     </div>
                   </div>
-                  
                   <div className="relative inline-block w-12 align-middle select-none">
                     <input
                       type="checkbox"
@@ -670,7 +626,6 @@ const NotificationSettingsPage = () => {
                     </label>
                   </div>
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">Message Reply</div>
@@ -678,7 +633,6 @@ const NotificationSettingsPage = () => {
                       When someone replies to your message
                     </div>
                   </div>
-                  
                   <div className="relative inline-block w-12 align-middle select-none">
                     <input
                       type="checkbox"
@@ -705,12 +659,10 @@ const NotificationSettingsPage = () => {
             </Card>
           </div>
         </div>
-        
         {/* Preferences Sidebar */}
         <div>
           <Card className="p-6 mb-6">
             <h2 className="text-lg font-medium mb-4">Additional Preferences</h2>
-            
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -719,7 +671,6 @@ const NotificationSettingsPage = () => {
                     Receive a daily summary of all notifications
                   </div>
                 </div>
-                
                 <div className="relative inline-block w-12 align-middle select-none">
                   <input
                     type="checkbox"
@@ -742,11 +693,9 @@ const NotificationSettingsPage = () => {
                   </label>
                 </div>
               </div>
-              
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="font-medium">Quiet Hours</div>
-                  
                   <div className="relative inline-block w-12 align-middle select-none">
                     <input
                       type="checkbox"
@@ -769,11 +718,9 @@ const NotificationSettingsPage = () => {
                     </label>
                   </div>
                 </div>
-                
                 <div className="text-gray-500 text-sm mb-3">
                   Don't send notifications during these hours
                 </div>
-                
                 {settings.preferences.quiet_hours.enabled && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -795,7 +742,6 @@ const NotificationSettingsPage = () => {
                         })}
                       </select>
                     </div>
-                    
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         To
@@ -820,7 +766,6 @@ const NotificationSettingsPage = () => {
               </div>
             </div>
           </Card>
-          
           <div className="mt-4">
             <Button
               onClick={saveSettings}
@@ -845,5 +790,4 @@ const NotificationSettingsPage = () => {
     </div>
   );
 };
-
 export default NotificationSettingsPage;

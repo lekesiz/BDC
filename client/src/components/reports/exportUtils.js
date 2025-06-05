@@ -1,6 +1,5 @@
 import jsPDF from 'jspdf';
 import { format } from 'date-fns';
-
 // Helper function to extract widget data
 const extractWidgetData = (widget) => {
   switch (widget.type) {
@@ -12,13 +11,11 @@ const extractWidgetData = (widget) => {
         trend: widget.config.trend,
         trendValue: widget.config.trendValue
       };
-    
     case 'text':
       return {
         type: 'text',
         content: widget.config.content || ''
       };
-    
     case 'table':
       // In a real implementation, this would fetch actual data
       return {
@@ -31,7 +28,6 @@ const extractWidgetData = (widget) => {
           ['Sample Row 3', '300', 'Inactive']
         ]
       };
-    
     case 'chart':
       // In a real implementation, this would fetch actual chart data
       return {
@@ -45,38 +41,32 @@ const extractWidgetData = (widget) => {
           { label: 'Apr', value: 180 }
         ]
       };
-    
     default:
       return null;
   }
 };
-
 // Export to PDF
 export const exportToPDF = async (reportData) => {
   const pdf = new jsPDF();
   let yPosition = 20;
   const pageHeight = pdf.internal.pageSize.height;
   const margin = 20;
-  
   // Add title
   pdf.setFontSize(20);
   pdf.text(reportData.name || 'Report', margin, yPosition);
   yPosition += 10;
-  
   // Add description
   if (reportData.description) {
     pdf.setFontSize(12);
     pdf.text(reportData.description, margin, yPosition);
     yPosition += 10;
   }
-  
   // Add metadata
   pdf.setFontSize(10);
   pdf.setTextColor(100);
   pdf.text(`Generated on: ${format(new Date(reportData.generatedAt), 'PPP')}`, margin, yPosition);
   yPosition += 15;
   pdf.setTextColor(0);
-  
   // Add sections
   reportData.sections.forEach((section) => {
     // Check if we need a new page
@@ -84,25 +74,21 @@ export const exportToPDF = async (reportData) => {
       pdf.addPage();
       yPosition = 20;
     }
-    
     // Section title
     pdf.setFontSize(16);
     pdf.setFont(undefined, 'bold');
     pdf.text(section.title, margin, yPosition);
     pdf.setFont(undefined, 'normal');
     yPosition += 10;
-    
     // Process widgets
     section.widgets.forEach((widget) => {
       const widgetData = extractWidgetData(widget);
       if (!widgetData) return;
-      
       // Check if we need a new page
       if (yPosition > pageHeight - 60) {
         pdf.addPage();
         yPosition = 20;
       }
-      
       switch (widgetData.type) {
         case 'kpi':
           pdf.setFontSize(12);
@@ -119,7 +105,6 @@ export const exportToPDF = async (reportData) => {
           }
           yPosition += 15;
           break;
-        
         case 'text':
           pdf.setFontSize(11);
           // Simple HTML stripping
@@ -135,12 +120,10 @@ export const exportToPDF = async (reportData) => {
           });
           yPosition += 10;
           break;
-        
         case 'table':
           pdf.setFontSize(12);
           pdf.text(widgetData.title, margin, yPosition);
           yPosition += 10;
-          
           // Simple table rendering
           pdf.setFontSize(10);
           // Headers
@@ -150,7 +133,6 @@ export const exportToPDF = async (reportData) => {
           });
           pdf.setFont(undefined, 'normal');
           yPosition += 5;
-          
           // Rows
           widgetData.rows.forEach((row) => {
             if (yPosition > pageHeight - 20) {
@@ -164,7 +146,6 @@ export const exportToPDF = async (reportData) => {
           });
           yPosition += 10;
           break;
-        
         case 'chart':
           pdf.setFontSize(12);
           pdf.text(`${widgetData.title} (${widgetData.chartType} chart)`, margin, yPosition);
@@ -175,14 +156,11 @@ export const exportToPDF = async (reportData) => {
           break;
       }
     });
-    
     yPosition += 10;
   });
-  
   // Save the PDF
   pdf.save(`${reportData.name || 'report'}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
 };
-
 // Export to Excel (simplified CSV format that Excel can open)
 export const exportToExcel = async (reportData) => {
   let csvContent = 'Report Summary\n';
@@ -192,11 +170,9 @@ export const exportToExcel = async (reportData) => {
   csvContent += `Date Range,${reportData.dateRange ? `${reportData.dateRange.start} to ${reportData.dateRange.end}` : 'All time'}\n`;
   csvContent += `\nSections,${reportData.sections.length}\n`;
   csvContent += `Total Widgets,${reportData.sections.reduce((acc, section) => acc + section.widgets.length, 0)}\n\n`;
-  
   // Add data from each section
   reportData.sections.forEach((section) => {
     csvContent += `\n${section.title}\n`;
-    
     // Extract KPIs
     const kpiWidgets = section.widgets.filter(w => w.type === 'kpi');
     if (kpiWidgets.length > 0) {
@@ -209,7 +185,6 @@ export const exportToExcel = async (reportData) => {
       });
       csvContent += '\n';
     }
-    
     // Extract tables
     const tableWidgets = section.widgets.filter(w => w.type === 'table');
     tableWidgets.forEach((widget) => {
@@ -224,28 +199,22 @@ export const exportToExcel = async (reportData) => {
       }
     });
   });
-  
   // Create blob and download with .csv extension (Excel will open it)
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
   link.setAttribute('href', url);
   link.setAttribute('download', `${reportData.name || 'report'}_${format(new Date(), 'yyyy-MM-dd')}.csv`);
   link.style.visibility = 'hidden';
-  
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 };
-
 // Export to CSV (simplified - exports first table found)
 export const exportToCSV = async (reportData) => {
   let csvContent = '';
-  
   // Find first table widget
   let tableFound = false;
-  
   for (const section of reportData.sections) {
     for (const widget of section.widgets) {
       if (widget.type === 'table' && !tableFound) {
@@ -253,12 +222,10 @@ export const exportToCSV = async (reportData) => {
         if (widgetData && widgetData.type === 'table') {
           // Add headers
           csvContent += widgetData.headers.join(',') + '\n';
-          
           // Add rows
           widgetData.rows.forEach(row => {
             csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
           });
-          
           tableFound = true;
           break;
         }
@@ -266,11 +233,9 @@ export const exportToCSV = async (reportData) => {
     }
     if (tableFound) break;
   }
-  
   if (!tableFound) {
     // If no table found, export KPIs
     csvContent = 'KPI,Value,Trend,Change\n';
-    
     reportData.sections.forEach(section => {
       section.widgets.forEach(widget => {
         if (widget.type === 'kpi') {
@@ -282,33 +247,26 @@ export const exportToCSV = async (reportData) => {
       });
     });
   }
-  
   // Create blob and download
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
   link.setAttribute('href', url);
   link.setAttribute('download', `${reportData.name || 'report'}_${format(new Date(), 'yyyy-MM-dd')}.csv`);
   link.style.visibility = 'hidden';
-  
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 };
-
 // Helper function to export widget as image (for future use)
 export const exportWidgetAsImage = async (widgetElement, filename) => {
   // This would require a library like html2canvas
   // Implementation would go here
-  console.log('Export widget as image:', filename);
 };
-
 // Helper function to print report
 export const printReport = (reportData) => {
   // Create a new window with print-friendly styling
   const printWindow = window.open('', '_blank');
-  
   const printContent = `
     <!DOCTYPE html>
     <html>
@@ -343,7 +301,6 @@ export const printReport = (reportData) => {
           ${section.widgets.map(widget => {
             const data = extractWidgetData(widget);
             if (!data) return '';
-            
             switch (data.type) {
               case 'kpi':
                 return `
@@ -378,7 +335,6 @@ export const printReport = (reportData) => {
     </body>
     </html>
   `;
-  
   printWindow.document.write(printContent);
   printWindow.document.close();
 };

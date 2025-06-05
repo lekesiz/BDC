@@ -1,7 +1,6 @@
 /**
  * Centralized animation configurations for consistent animations throughout the app
  */
-
 // Framer Motion animation variants with GPU acceleration
 export const fadeIn = {
   initial: { opacity: 0 },
@@ -9,66 +8,56 @@ export const fadeIn = {
   exit: { opacity: 0 },
   transition: { duration: 0.3 }
 };
-
 export const fadeInUp = {
   initial: { opacity: 0, y: 20, transform: 'translateZ(0)' },
   animate: { opacity: 1, y: 0, transform: 'translateZ(0)' },
   exit: { opacity: 0, y: 20 },
   transition: { duration: 0.3, ease: 'easeOut' }
 };
-
 export const fadeInDown = {
   initial: { opacity: 0, y: -20, transform: 'translateZ(0)' },
   animate: { opacity: 1, y: 0, transform: 'translateZ(0)' },
   exit: { opacity: 0, y: -20 },
   transition: { duration: 0.3, ease: 'easeOut' }
 };
-
 export const fadeInLeft = {
   initial: { opacity: 0, x: -20, transform: 'translateZ(0)' },
   animate: { opacity: 1, x: 0, transform: 'translateZ(0)' },
   exit: { opacity: 0, x: -20 },
   transition: { duration: 0.3, ease: 'easeOut' }
 };
-
 export const fadeInRight = {
   initial: { opacity: 0, x: 20, transform: 'translateZ(0)' },
   animate: { opacity: 1, x: 0, transform: 'translateZ(0)' },
   exit: { opacity: 0, x: 20 },
   transition: { duration: 0.3, ease: 'easeOut' }
 };
-
 export const scaleIn = {
   initial: { opacity: 0, scale: 0.9, transform: 'translateZ(0)' },
   animate: { opacity: 1, scale: 1, transform: 'translateZ(0)' },
   exit: { opacity: 0, scale: 0.9 },
   transition: { duration: 0.3, ease: 'easeOut' }
 };
-
 export const slideLeft = {
   initial: { x: '100%' },
   animate: { x: 0 },
   exit: { x: '100%' }
 };
-
 export const slideRight = {
   initial: { x: '-100%' },
   animate: { x: 0 },
   exit: { x: '-100%' }
 };
-
 export const slideUp = {
   initial: { y: '100%' },
   animate: { y: 0 },
   exit: { y: '100%' }
 };
-
 export const slideDown = {
   initial: { y: '-100%' },
   animate: { y: 0 },
   exit: { y: '-100%' }
 };
-
 // Stagger children animations
 export const staggerContainer = {
   animate: {
@@ -77,12 +66,10 @@ export const staggerContainer = {
     }
   }
 };
-
 export const staggerItem = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 }
 };
-
 // Page transition variants
 export const pageTransition = {
   initial: { opacity: 0, y: 20 },
@@ -103,14 +90,12 @@ export const pageTransition = {
     }
   }
 };
-
 // Modal animations
 export const modalOverlay = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 }
 };
-
 export const modalContent = {
   initial: { opacity: 0, scale: 0.95, y: 20 },
   animate: { 
@@ -132,7 +117,6 @@ export const modalContent = {
     }
   }
 };
-
 // List animations
 export const listContainer = {
   hidden: { opacity: 1 },
@@ -144,7 +128,6 @@ export const listContainer = {
     }
   }
 };
-
 export const listItem = {
   hidden: { y: 20, opacity: 0 },
   visible: {
@@ -157,7 +140,6 @@ export const listItem = {
     }
   }
 };
-
 // Skeleton loading animation
 export const shimmer = {
   initial: { x: '-100%' },
@@ -170,7 +152,6 @@ export const shimmer = {
     }
   }
 };
-
 // Button hover animations
 export const buttonHover = {
   whileHover: { scale: 1.02 },
@@ -181,7 +162,6 @@ export const buttonHover = {
     damping: 17
   }
 };
-
 // Card hover animations
 export const cardHover = {
   whileHover: { 
@@ -194,7 +174,6 @@ export const cardHover = {
     damping: 25
   }
 };
-
 // Navigation menu animations
 export const menuItemVariants = {
   initial: { opacity: 0, x: -20 },
@@ -209,7 +188,6 @@ export const menuItemVariants = {
     }
   })
 };
-
 // Toast notification animations
 export const toastAnimation = {
   initial: { opacity: 0, y: 50, scale: 0.9 },
@@ -232,7 +210,6 @@ export const toastAnimation = {
     }
   }
 };
-
 // Floating action animations
 export const floatingAnimation = {
   animate: {
@@ -244,7 +221,6 @@ export const floatingAnimation = {
     }
   }
 };
-
 // Pulse animation for notifications
 export const pulseAnimation = {
   animate: {
@@ -257,7 +233,6 @@ export const pulseAnimation = {
     }
   }
 };
-
 // Rotation animation
 export const rotateAnimation = {
   animate: {
@@ -269,7 +244,6 @@ export const rotateAnimation = {
     }
   }
 };
-
 // Custom easing functions
 export const easings = {
   easeInQuad: [0.55, 0.085, 0.68, 0.53],
@@ -291,7 +265,6 @@ export const easings = {
   easeOutCirc: [0.075, 0.82, 0.165, 1],
   easeInOutCirc: [0.785, 0.135, 0.15, 0.86]
 };
-
 // CSS transition classes for non-Framer Motion components
 export const transitionClasses = {
   ease: 'transition-all duration-300 ease-in-out',
@@ -304,7 +277,6 @@ export const transitionClasses = {
   transform: 'transition-transform duration-300',
   opacity: 'transition-opacity duration-300'
 };
-
 export default {
   fadeIn,
   fadeInUp,

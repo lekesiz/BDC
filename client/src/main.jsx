@@ -7,7 +7,6 @@ import { AuthProvider } from './contexts/AuthContext.jsx';
 import { reportWebVitals, startPerformanceMonitoring } from './utils/performance.js';
 import './i18n/config'; // Initialize i18n
 import './index.css';
-
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,7 +16,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter
@@ -34,11 +32,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>,
 );
-
 // Initialize performance monitoring
 if (process.env.NODE_ENV === 'production') {
   startPerformanceMonitoring();
-  
   // Report web vitals to analytics
   reportWebVitals((metric) => {
     if (window.gtag) {

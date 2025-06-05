@@ -123,7 +123,6 @@ export const generateSettingsData = (userRole) => {
       }
     }
   };
-
   // Role-specific settings
   if (userRole === "admin" || userRole === "tenant_admin") {
     return {
@@ -234,7 +233,6 @@ export const generateSettingsData = (userRole) => {
       }
     };
   }
-
   if (userRole === "trainer") {
     return {
       ...baseSettings,
@@ -285,7 +283,6 @@ export const generateSettingsData = (userRole) => {
       }
     };
   }
-
   if (userRole === "student") {
     return {
       ...baseSettings,
@@ -346,10 +343,8 @@ export const generateSettingsData = (userRole) => {
       }
     };
   }
-
   return baseSettings;
 };
-
 // Generate available settings options
 export const generateSettingsOptions = () => {
   return {
@@ -399,7 +394,6 @@ export const generateSettingsOptions = () => {
     ]
   };
 };
-
 // Generate data export options
 export const generateDataExportOptions = () => {
   return {

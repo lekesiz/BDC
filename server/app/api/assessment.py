@@ -6,6 +6,8 @@ from app.extensions import db
 from app.models.user import User
 from app.middleware.request_context import role_required
 
+from app.utils.logging import logger
+
 assessment_bp = Blueprint('assessment', __name__)
 
 

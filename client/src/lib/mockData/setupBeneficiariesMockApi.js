@@ -1,16 +1,13 @@
 /**
  * Beneficiaries Mock API Setup
  */
-
 import { mockBeneficiaries, beneficiaryStats, generateBeneficiary } from './beneficiariesMockData.js';
-
 export const setupBeneficiariesMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Store original methods if not provided
   const get = originalGet || api.get;
   const post = originalPost || api.post;
   const put = originalPut || api.put;
   const del = originalDelete || api.delete;
-
   // GET /api/beneficiaries - List beneficiaries with filtering, pagination, search
   api.get = function(url, config) {
     if (url.includes('/api/beneficiaries') && !url.includes('/api/beneficiaries/')) {
@@ -18,7 +15,6 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
         // Parse query parameters
         const urlObj = new URL(url, 'http://localhost');
         const params = new URLSearchParams(urlObj.search);
-        
         const page = parseInt(params.get('page')) || 1;
         const limit = parseInt(params.get('limit')) || 10;
         const search = params.get('search') || '';
@@ -27,9 +23,7 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
         const city = params.get('city') || '';
         const sortBy = params.get('sortBy') || 'personalInfo.firstName';
         const sortOrder = params.get('sortOrder') || 'asc';
-        
         let filteredBeneficiaries = [...mockBeneficiaries];
-        
         // Apply search filter
         if (search) {
           filteredBeneficiaries = filteredBeneficiaries.filter(b => 
@@ -39,48 +33,40 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
             b.personalInfo.phone.includes(search)
           );
         }
-        
         // Apply status filter
         if (status) {
           filteredBeneficiaries = filteredBeneficiaries.filter(b => 
             b.programInfo.status === status
           );
         }
-        
         // Apply program filter  
         if (program) {
           filteredBeneficiaries = filteredBeneficiaries.filter(b => 
             b.programInfo.currentProgram === program
           );
         }
-        
         // Apply city filter
         if (city) {
           filteredBeneficiaries = filteredBeneficiaries.filter(b => 
             b.contactInfo.city === city
           );
         }
-        
         // Apply sorting
         filteredBeneficiaries.sort((a, b) => {
           const getValue = (obj, path) => {
             return path.split('.').reduce((current, key) => current && current[key], obj);
           };
-          
           const aVal = getValue(a, sortBy);
           const bVal = getValue(b, sortBy);
-          
           if (sortOrder === 'desc') {
             return bVal > aVal ? 1 : -1;
           }
           return aVal > bVal ? 1 : -1;
         });
-        
         // Calculate pagination
         const startIndex = (page - 1) * limit;
         const endIndex = startIndex + limit;
         const paginatedBeneficiaries = filteredBeneficiaries.slice(startIndex, endIndex);
-        
         // Simulate API response delay
         setTimeout(() => {
           resolve({
@@ -108,7 +94,6 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
         }, 300); // 300ms delay to simulate real API
       });
     }
-    
     // GET /api/beneficiaries/:id - Get single beneficiary
     if (url.match(/\/api\/beneficiaries\/\d+$/) && !url.includes('?')) {
       const id = parseInt(url.split('/').pop());
@@ -174,7 +159,6 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
         }, 200);
       });
     }
-    
     // GET /api/beneficiaries/stats - Get beneficiary statistics
     if (url.includes('/api/beneficiaries/stats')) {
       return new Promise((resolve) => {
@@ -201,11 +185,9 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
         }, 200);
       });
     }
-    
     // Default: call original get method
     return get.call(this, url, config);
   };
-
   // POST /api/beneficiaries - Create new beneficiary
   api.post = function(url, data, config) {
     if (url === '/api/beneficiaries') {
@@ -225,9 +207,7 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
                 assignedTrainer: null
               }
             };
-            
             mockBeneficiaries.push(newBeneficiary);
-            
             resolve({
               data: {
                 beneficiary: newBeneficiary,
@@ -245,11 +225,9 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
         }, 500);
       });
     }
-    
     // Default: call original post method
     return post.call(this, url, data, config);
   };
-
   // PUT /api/beneficiaries/:id - Update beneficiary
   api.put = function(url, data, config) {
     if (url.match(/\/api\/beneficiaries\/\d+$/)) {
@@ -266,7 +244,6 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
                 updatedAt: new Date().toISOString()
               }
             };
-            
             resolve({
               data: {
                 beneficiary: mockBeneficiaries[index],
@@ -284,11 +261,9 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
         }, 400);
       });
     }
-    
     // Default: call original put method
     return put.call(this, url, data, config);
   };
-
   // DELETE /api/beneficiaries/:id - Delete beneficiary
   api.delete = function(url, config) {
     if (url.match(/\/api\/beneficiaries\/\d+$/)) {
@@ -315,10 +290,7 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
         }, 300);
       });
     }
-    
     // Default: call original delete method
     return del.call(this, url, config);
   };
-  
-  console.log('🎭 Beneficiaries Mock API setup completed');
 };

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-
 /**
  * Optimized image component with lazy loading and progressive enhancement
  */
@@ -26,22 +25,18 @@ export const OptimizedImage = ({
   const [error, setError] = useState(false);
   const imgRef = useRef(null);
   const observerRef = useRef(null);
-
   // Generate blur placeholder if not provided
   const defaultBlurDataUrl = `data:image/svg+xml;base64,${btoa(
     `<svg width="${width || 100}" height="${height || 100}" xmlns="http://www.w3.org/2000/svg">
       <rect width="100%" height="100%" fill="#f3f4f6"/>
     </svg>`
   )}`;
-
   const placeholderSrc = blurDataUrl || defaultBlurDataUrl;
-
   useEffect(() => {
     if (priority || loading === 'eager') {
       setIsInView(true);
       return;
     }
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -56,36 +51,29 @@ export const OptimizedImage = ({
         rootMargin: '50px'
       }
     );
-
     observerRef.current = observer;
-
     if (imgRef.current) {
       observer.observe(imgRef.current);
     }
-
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
     };
   }, [priority, loading]);
-
   const handleLoad = (e) => {
     setIsLoaded(true);
     if (onLoad) onLoad(e);
   };
-
   const handleError = (e) => {
     setError(true);
     if (onError) onError(e);
   };
-
   const style = {
     objectFit,
     width: width || '100%',
     height: height || 'auto'
   };
-
   return (
     <div 
       ref={imgRef}
@@ -102,12 +90,10 @@ export const OptimizedImage = ({
           aria-hidden="true"
         />
       )}
-
       {/* Skeleton Placeholder */}
       {placeholder === 'skeleton' && !isLoaded && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse" />
       )}
-
       {/* Main Image */}
       {isInView && !error && (
         <motion.img
@@ -127,7 +113,6 @@ export const OptimizedImage = ({
           {...props}
         />
       )}
-
       {/* Error State */}
       {error && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
@@ -152,7 +137,6 @@ export const OptimizedImage = ({
     </div>
   );
 };
-
 /**
  * Picture component for responsive images
  */
@@ -182,7 +166,6 @@ export const ResponsivePicture = ({
     </picture>
   );
 };
-
 /**
  * Background image component with optimization
  */
@@ -196,13 +179,11 @@ export const OptimizedBackgroundImage = ({
   ...props
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-
   useEffect(() => {
     const img = new Image();
     img.src = src;
     img.onload = () => setIsLoaded(true);
   }, [src]);
-
   return (
     <div
       className={`relative ${className}`}
@@ -218,21 +199,18 @@ export const OptimizedBackgroundImage = ({
       {!isLoaded && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse" />
       )}
-      
       {overlay && (
         <div
           className="absolute inset-0"
           style={{ backgroundColor: overlayColor }}
         />
       )}
-      
       <div className="relative z-10">
         {children}
       </div>
     </div>
   );
 };
-
 /**
  * Image gallery with lazy loading
  */
@@ -263,7 +241,6 @@ export const OptimizedImageGallery = ({
     </div>
   );
 };
-
 /**
  * Avatar component with optimization
  */
@@ -282,9 +259,7 @@ export const OptimizedAvatar = ({
     lg: 48,
     xl: 64
   };
-
   const dimension = sizes[size] || sizes.md;
-
   return (
     <OptimizedImage
       src={src}

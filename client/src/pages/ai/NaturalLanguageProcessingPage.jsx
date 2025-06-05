@@ -19,12 +19,13 @@ import {
   Activity,
   Users,
   Globe,
-  Zap
+  Zap,
+  Lock
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
+import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../components/ui/use-toast';
-
 const nlpFeatures = [
   {
     id: 'sentiment_analysis',
@@ -69,10 +70,29 @@ const nlpFeatures = [
     enabled: true
   }
 ];
-
 const NaturalLanguageProcessingPage = () => {
   const navigate = useNavigate();
+  const { user, hasRole } = useAuth();
   const { showToast } = useToast();
+  // NLP features are restricted to admin and trainer roles only
+  const canAccessNLP = hasRole(['super_admin', 'tenant_admin', 'trainer']);
+  // If user doesn't have permission, show access denied
+  if (!canAccessNLP) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="p-8 text-center max-w-md">
+          <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h2>
+          <p className="text-gray-600 mb-4">
+            Natural Language Processing features are only available to administrators and trainers.
+          </p>
+          <p className="text-sm text-gray-500">
+            Current role: <span className="font-medium">{user?.role}</span>
+          </p>
+        </Card>
+      </div>
+    );
+  }
   const [loading, setLoading] = useState(false);
   const [inputText, setInputText] = useState('');
   const [results, setResults] = useState(null);
@@ -85,12 +105,10 @@ const NaturalLanguageProcessingPage = () => {
     topKeywords: [],
     languageDistribution: {}
   });
-
   useEffect(() => {
     fetchSavedAnalyses();
     fetchStats();
   }, []);
-
   const fetchSavedAnalyses = async () => {
     try {
       const response = await fetch('/api/ai/nlp/analyses', {
@@ -98,7 +116,6 @@ const NaturalLanguageProcessingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setSavedAnalyses(data.analyses || []);
@@ -107,7 +124,6 @@ const NaturalLanguageProcessingPage = () => {
       console.error('Error fetching analyses:', error);
     }
   };
-
   const fetchStats = async () => {
     try {
       const response = await fetch('/api/ai/nlp/stats', {
@@ -115,7 +131,6 @@ const NaturalLanguageProcessingPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
         setStats(data.stats || stats);
@@ -124,13 +139,11 @@ const NaturalLanguageProcessingPage = () => {
       console.error('Error fetching stats:', error);
     }
   };
-
   const analyzeText = async () => {
     if (!inputText.trim()) {
       showToast('Please enter some text to analyze', 'error');
       return;
     }
-    
     setLoading(true);
     try {
       const response = await fetch('/api/ai/nlp/analyze', {
@@ -144,7 +157,6 @@ const NaturalLanguageProcessingPage = () => {
           features: selectedFeatures
         })
       });
-      
       if (response.ok) {
         const data = await response.json();
         setResults(data.results);
@@ -160,14 +172,16 @@ const NaturalLanguageProcessingPage = () => {
       setLoading(false);
     }
   };
-
   const exportResults = (format = 'json') => {
+    // Additional permission check for export functionality
+    if (!hasRole(['super_admin', 'tenant_admin', 'trainer'])) {
+      showToast('Export functionality is restricted to administrators and trainers only', 'error');
+      return;
+    }
     if (!results) return;
-    
     const dataStr = format === 'json' 
       ? JSON.stringify(results, null, 2)
       : generateCSV(results);
-    
     const blob = new Blob([dataStr], { type: format === 'json' ? 'application/json' : 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -178,7 +192,6 @@ const NaturalLanguageProcessingPage = () => {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   };
-
   const generateCSV = (data) => {
     // Simple CSV generation for results
     let csv = 'Feature,Result\n';
@@ -187,20 +200,17 @@ const NaturalLanguageProcessingPage = () => {
     });
     return csv;
   };
-
   // Spinner component definition
   const Spinner = () => (
     <div className="flex justify-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
   );
-
   const getSentimentIcon = (sentiment) => {
     if (sentiment > 0.6) return <CheckCircle className="w-5 h-5 text-green-500" />;
     if (sentiment < -0.6) return <XCircle className="w-5 h-5 text-red-500" />;
     return <AlertCircle className="w-5 h-5 text-yellow-500" />;
   };
-
   const getSentimentLabel = (sentiment) => {
     if (sentiment > 0.6) return 'Positive';
     if (sentiment > 0.2) return 'Slightly Positive';
@@ -208,7 +218,6 @@ const NaturalLanguageProcessingPage = () => {
     if (sentiment < -0.2) return 'Slightly Negative';
     return 'Neutral';
   };
-
   const renderAnalyze = () => (
     <div className="space-y-6">
       {/* Input Section */}
@@ -225,7 +234,6 @@ const NaturalLanguageProcessingPage = () => {
               onChange={(e) => setInputText(e.target.value)}
             />
           </div>
-          
           <div>
             <label className="block text-sm font-medium mb-2">Select Features</label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -248,7 +256,6 @@ const NaturalLanguageProcessingPage = () => {
               ))}
             </div>
           </div>
-          
           <div className="flex space-x-2">
             <Button
               onClick={analyzeText}
@@ -269,32 +276,32 @@ const NaturalLanguageProcessingPage = () => {
           </div>
         </div>
       </Card>
-
       {/* Results Section */}
       {results && (
         <Card>
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-semibold text-lg">Analysis Results</h3>
-            <div className="space-x-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => exportResults('json')}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export JSON
-              </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => exportResults('csv')}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export CSV
-              </Button>
-            </div>
+            {hasRole(['super_admin', 'tenant_admin', 'trainer']) && (
+              <div className="space-x-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => exportResults('json')}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export JSON
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => exportResults('csv')}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export CSV
+                </Button>
+              </div>
+            )}
           </div>
-          
           <div className="space-y-4">
             {results.sentiment && (
               <div>
@@ -320,7 +327,6 @@ const NaturalLanguageProcessingPage = () => {
                 </div>
               </div>
             )}
-            
             {results.keywords && (
               <div>
                 <h4 className="font-medium mb-2">Extracted Keywords</h4>
@@ -336,14 +342,12 @@ const NaturalLanguageProcessingPage = () => {
                 </div>
               </div>
             )}
-            
             {results.summary && (
               <div>
                 <h4 className="font-medium mb-2">Summary</h4>
                 <p className="text-sm bg-gray-50 p-3 rounded">{results.summary}</p>
               </div>
             )}
-            
             {results.language && (
               <div>
                 <h4 className="font-medium mb-2">Language Detection</h4>
@@ -356,7 +360,6 @@ const NaturalLanguageProcessingPage = () => {
                 </div>
               </div>
             )}
-            
             {results.entities && (
               <div>
                 <h4 className="font-medium mb-2">Extracted Entities</h4>
@@ -381,7 +384,6 @@ const NaturalLanguageProcessingPage = () => {
                 </div>
               </div>
             )}
-            
             {results.intent && (
               <div>
                 <h4 className="font-medium mb-2">Intent Recognition</h4>
@@ -405,7 +407,6 @@ const NaturalLanguageProcessingPage = () => {
       )}
     </div>
   );
-
   const renderHistory = () => (
     <Card>
       <h3 className="font-semibold text-lg mb-4">Analysis History</h3>
@@ -436,7 +437,6 @@ const NaturalLanguageProcessingPage = () => {
                   View
                 </Button>
               </div>
-              
               <div className="flex items-center space-x-4 text-sm">
                 {analysis.results.sentiment && (
                   <div className="flex items-center space-x-1">
@@ -463,7 +463,6 @@ const NaturalLanguageProcessingPage = () => {
       )}
     </Card>
   );
-
   const renderInsights = () => (
     <div className="space-y-6">
       {/* Stats Overview */}
@@ -477,7 +476,6 @@ const NaturalLanguageProcessingPage = () => {
             <Activity className="w-8 h-8 text-primary" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -489,7 +487,6 @@ const NaturalLanguageProcessingPage = () => {
             <TrendingUp className="w-8 h-8 text-green-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -499,7 +496,6 @@ const NaturalLanguageProcessingPage = () => {
             <Globe className="w-8 h-8 text-blue-600" />
           </div>
         </Card>
-        
         <Card>
           <div className="flex items-center justify-between">
             <div>
@@ -510,7 +506,6 @@ const NaturalLanguageProcessingPage = () => {
           </div>
         </Card>
       </div>
-
       {/* Top Keywords */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Top Keywords</h3>
@@ -532,7 +527,6 @@ const NaturalLanguageProcessingPage = () => {
           </div>
         )}
       </Card>
-
       {/* Language Distribution */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Language Distribution</h3>
@@ -561,7 +555,6 @@ const NaturalLanguageProcessingPage = () => {
           </div>
         )}
       </Card>
-
       {/* Use Cases */}
       <Card>
         <h3 className="font-semibold text-lg mb-4">Common Use Cases</h3>
@@ -582,7 +575,6 @@ const NaturalLanguageProcessingPage = () => {
               Try Example
             </Button>
           </div>
-          
           <div className="p-4 bg-gray-50 rounded-lg">
             <h4 className="font-medium mb-2">Essay Evaluation</h4>
             <p className="text-sm text-gray-600 mb-2">
@@ -599,7 +591,6 @@ const NaturalLanguageProcessingPage = () => {
               Try Example
             </Button>
           </div>
-          
           <div className="p-4 bg-gray-50 rounded-lg">
             <h4 className="font-medium mb-2">Support Ticket Classification</h4>
             <p className="text-sm text-gray-600 mb-2">
@@ -616,7 +607,6 @@ const NaturalLanguageProcessingPage = () => {
               Try Example
             </Button>
           </div>
-          
           <div className="p-4 bg-gray-50 rounded-lg">
             <h4 className="font-medium mb-2">Multi-language Support</h4>
             <p className="text-sm text-gray-600 mb-2">
@@ -637,7 +627,6 @@ const NaturalLanguageProcessingPage = () => {
       </Card>
     </div>
   );
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -649,7 +638,6 @@ const NaturalLanguageProcessingPage = () => {
           Back to AI Tools
         </Button>
       </div>
-
       {/* Feature Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {nlpFeatures.slice(0, 3).map(feature => (
@@ -662,7 +650,6 @@ const NaturalLanguageProcessingPage = () => {
           </Card>
         ))}
       </div>
-
       {/* Tabs */}
       <div className="border-b">
         <nav className="-mb-px flex space-x-8">
@@ -681,7 +668,6 @@ const NaturalLanguageProcessingPage = () => {
           ))}
         </nav>
       </div>
-
       {/* Tab Content */}
       {loading ? (
         <div className="flex justify-center py-12">
@@ -697,5 +683,4 @@ const NaturalLanguageProcessingPage = () => {
     </div>
   );
 };
-
 export default NaturalLanguageProcessingPage;
