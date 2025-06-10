@@ -5,6 +5,7 @@ import api from '@/lib/api';
 import { API_ENDPOINTS } from '@/lib/constants';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { ResponsiveContainer as ResponsiveLayout, ResponsiveGrid, ResponsiveCard } from '@/components/responsive/ResponsiveContainer';
 import {
   Users,
   ClipboardList,
@@ -122,7 +123,8 @@ const DashboardPageV3 = () => {
 const AdminDashboard = ({ stats, chartData, timeRange, setTimeRange }) => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
   return (
-    <div className="space-y-6">
+    <ResponsiveLayout>
+      <div className="space-y-6">
       {/* Page header */}
       <div className="flex justify-between items-center">
         <div>
@@ -191,7 +193,7 @@ const AdminDashboard = ({ stats, chartData, timeRange, setTimeRange }) => {
       {/* Charts */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* User Growth Chart */}
-        <Card className="p-6">
+        <ResponsiveCard className="p-6">
           <h3 className="text-lg font-medium mb-4">User Growth</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData.user_growth || []}>
@@ -203,9 +205,9 @@ const AdminDashboard = ({ stats, chartData, timeRange, setTimeRange }) => {
               <Line type="monotone" dataKey="count" stroke="#8884d8" name="New Users" />
             </LineChart>
           </ResponsiveContainer>
-        </Card>
+        </ResponsiveCard>
         {/* Evaluation Completion Chart */}
-        <Card className="p-6">
+        <ResponsiveCard className="p-6">
           <h3 className="text-lg font-medium mb-4">Evaluation Completions</h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={chartData.evaluation_completion || []}>
@@ -217,11 +219,11 @@ const AdminDashboard = ({ stats, chartData, timeRange, setTimeRange }) => {
               <Area type="monotone" dataKey="count" stroke="#82ca9d" fill="#82ca9d" name="Completed" />
             </AreaChart>
           </ResponsiveContainer>
-        </Card>
+        </ResponsiveCard>
       </div>
       {/* Role Distribution */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="p-6">
+        <ResponsiveCard className="p-6">
           <h3 className="text-lg font-medium mb-4">User Role Distribution</h3>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
@@ -245,9 +247,9 @@ const AdminDashboard = ({ stats, chartData, timeRange, setTimeRange }) => {
               <Legend />
             </PieChart>
           </ResponsiveContainer>
-        </Card>
+        </ResponsiveCard>
         {/* Recent Activity */}
-        <Card className="p-6 col-span-2">
+        <ResponsiveCard className="p-6 col-span-2">
           <h3 className="text-lg font-medium mb-4">Recent Activity</h3>
           <div className="space-y-4">
             <ActivityItem
@@ -272,15 +274,17 @@ const AdminDashboard = ({ stats, chartData, timeRange, setTimeRange }) => {
               trend="up"
             />
           </div>
-        </Card>
+        </ResponsiveCard>
       </div>
-    </div>
+      </div>
+    </ResponsiveLayout>
   );
 };
 // Trainer Dashboard Component
 const TrainerDashboard = ({ stats, chartData, recentTests, upcomingAppointments }) => {
   return (
-    <div className="space-y-6">
+    <ResponsiveLayout>
+      <div className="space-y-6">
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Trainer Dashboard</h1>
@@ -316,7 +320,7 @@ const TrainerDashboard = ({ stats, chartData, recentTests, upcomingAppointments 
         />
       </div>
       {/* Session Activity Chart */}
-      <Card className="p-6">
+      <ResponsiveCard className="p-6">
         <h3 className="text-lg font-medium mb-4">Session Activity</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData.session_completion || []}>
@@ -328,19 +332,21 @@ const TrainerDashboard = ({ stats, chartData, recentTests, upcomingAppointments 
             <Bar dataKey="count" fill="#8884d8" name="Completed Sessions" />
           </BarChart>
         </ResponsiveContainer>
-      </Card>
+      </ResponsiveCard>
       {/* Recent Evaluations and Appointments */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <RecentTestsCard tests={recentTests} />
         <UpcomingAppointmentsCard appointments={upcomingAppointments} />
       </div>
-    </div>
+      </div>
+    </ResponsiveLayout>
   );
 };
 // Student Dashboard Component
 const StudentDashboard = ({ stats, recentTests, upcomingAppointments }) => {
   return (
-    <div className="space-y-6">
+    <ResponsiveLayout>
+      <div className="space-y-6">
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">My Dashboard</h1>
@@ -374,13 +380,14 @@ const StudentDashboard = ({ stats, recentTests, upcomingAppointments }) => {
         <RecentTestsCard tests={recentTests} userRole="student" />
         <UpcomingAppointmentsCard appointments={upcomingAppointments} userRole="student" />
       </div>
-    </div>
+      </div>
+    </ResponsiveLayout>
   );
 };
 // Reusable Components
 const StatsCard = ({ title, value, change, changeText, icon, color }) => {
   return (
-    <Card className="overflow-hidden">
+    <ResponsiveCard className="overflow-hidden">
       <div className="p-6">
         <div className="flex items-center">
           <div className={`p-3 rounded-lg ${color} bg-opacity-10`}>
@@ -397,7 +404,7 @@ const StatsCard = ({ title, value, change, changeText, icon, color }) => {
           </div>
         </div>
       </div>
-    </Card>
+    </ResponsiveCard>
   );
 };
 const ActivityItem = ({ title, count, description, icon, trend }) => {
@@ -423,7 +430,7 @@ const ActivityItem = ({ title, count, description, icon, trend }) => {
 };
 const RecentTestsCard = ({ tests, userRole }) => {
   return (
-    <Card className="p-6">
+    <ResponsiveCard className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium">Recent Evaluations</h3>
         <Link to="/evaluations" className="text-sm text-primary hover:underline">
@@ -457,12 +464,12 @@ const RecentTestsCard = ({ tests, userRole }) => {
           <p className="text-sm text-gray-500 text-center py-4">No recent evaluations</p>
         )}
       </div>
-    </Card>
+    </ResponsiveCard>
   );
 };
 const UpcomingAppointmentsCard = ({ appointments, userRole }) => {
   return (
-    <Card className="p-6">
+    <ResponsiveCard className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium">Upcoming Appointments</h3>
         <Link to="/appointments" className="text-sm text-primary hover:underline">
@@ -496,7 +503,7 @@ const UpcomingAppointmentsCard = ({ appointments, userRole }) => {
           <p className="text-sm text-gray-500 text-center py-4">No upcoming appointments</p>
         )}
       </div>
-    </Card>
+    </ResponsiveCard>
   );
 };
 export default DashboardPageV3;

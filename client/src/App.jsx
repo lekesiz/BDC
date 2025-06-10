@@ -12,6 +12,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import GlobalErrorHandler from './components/common/GlobalErrorHandler';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import NotificationProviderV2 from './providers/NotificationProviderV2';
+import { PWAProvider, PWAInstallBanner, PWAUpdateBanner, PWAOfflineBanner } from './providers/PWAProvider';
 import SimpleRouteRenderer from './components/routing/SimpleRouteRenderer';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 import { useTranslation } from 'react-i18next';
@@ -44,6 +45,11 @@ function AppContent() {
   return (
     <RTLProvider>
       <SimpleRouteRenderer />
+      
+      {/* PWA UI Components */}
+      <PWAInstallBanner />
+      <PWAUpdateBanner />
+      {/* <PWAOfflineBanner /> */}
     </RTLProvider>
   );
 
@@ -58,18 +64,20 @@ function App() {
       <LanguageProvider>
         <ThemeProvider>
           <ToastProvider>
-            <GlobalErrorHandler />
-            <NotificationProviderV2>
-              <SocketProvider>
-                <Suspense fallback={
-                  <div className="flex items-center justify-center min-h-screen">
-                    <LoadingSpinner size="lg" text="Loading..." />
-                  </div>
-                }>
-                  <AppContent />
-                </Suspense>
-              </SocketProvider>
-            </NotificationProviderV2>
+            <PWAProvider>
+              <GlobalErrorHandler />
+              <NotificationProviderV2>
+                <SocketProvider>
+                  <Suspense fallback={
+                    <div className="flex items-center justify-center min-h-screen">
+                      <LoadingSpinner size="lg" text="Loading..." />
+                    </div>
+                  }>
+                    <AppContent />
+                  </Suspense>
+                </SocketProvider>
+              </NotificationProviderV2>
+            </PWAProvider>
           </ToastProvider>
         </ThemeProvider>
       </LanguageProvider>

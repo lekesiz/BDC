@@ -1,5 +1,12 @@
 {
   "\nrealtime_notifications_and_events_using_socketio\n": "\nReal-time notifications and events using Socket.IO.\n\nThis module provides a centralized way to emit real-time events to clients\nusing Socket.IO. It's designed to be imported by services and API endpoints\nthat need to notify clients of changes or events.\n",
+  "api": {
+    "auth": {
+      "email_verified": "Email verified successfully",
+      "verification_email_sent": "Verification email sent successfully",
+      "user_not_found": "User not found"
+    }
+  },
   "backend": {
     "2": "([.!?]){2,}",
     "configure_socketio_with_the_application_context": "Configure Socket.IO with the application context.",

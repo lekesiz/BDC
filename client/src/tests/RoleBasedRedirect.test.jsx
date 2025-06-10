@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import RoleBasedRedirect from '@/components/common/RoleBasedRedirect';
-// Mock the DashboardPageEnhanced component
-vi.mock('@/pages/dashboard/DashboardPageEnhanced', () => ({
+// Mock the DashboardPage component
+vi.mock('@/pages/dashboard/DashboardPage', () => ({
   default: () => <div data-testid="dashboard">Dashboard</div>
 }));
 // Mock the useAuth hook

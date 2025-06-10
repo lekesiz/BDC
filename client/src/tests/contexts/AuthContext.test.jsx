@@ -5,18 +5,6 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { AuthContext, AuthProvider } from '@/contexts/AuthContext';
 import api from '@/lib/api';
 
-// Mock api module
-vi.mock('@/lib/api', () => ({
-  default: {
-    post: vi.fn(),
-    defaults: {
-      headers: {
-        common: {}
-      }
-    }
-  }
-}));
-
 // Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(),
@@ -286,20 +274,15 @@ describe('AuthContext', () => {
     localStorageMock.getItem.mockReturnValue('existing-token');
     
     const mockUser = {
-      id: '1',
+      id: '1', 
       email: 'test@example.com',
       role: 'admin'
     };
 
-    // Mock JWT decode
-    vi.mock('jwt-decode', () => ({
-      jwtDecode: vi.fn(() => ({
-        sub: '1',
-        email: 'test@example.com',
-        role: 'admin',
-        exp: Date.now() / 1000 + 3600
-      }))
-    }));
+    // Mock successful user fetch
+    api.get.mockResolvedValueOnce({
+      data: mockUser
+    });
 
     render(
       <AuthProvider>
@@ -309,6 +292,8 @@ describe('AuthContext', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('is-loading')).toHaveTextContent('false');
+      expect(screen.getByTestId('is-authenticated')).toHaveTextContent('true');
+      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
     });
   });
 });

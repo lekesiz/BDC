@@ -1,3 +1,5 @@
+from flask_babel import _
+
 _('i18n_translation_service.message.translation_service_for_multi')
 import json
 import logging
@@ -5,7 +7,7 @@ import os
 from typing import Dict, Optional, Any, List
 from pathlib import Path
 from dataclasses import dataclass
-from app.utils.cache import cache_manager
+from app.utils.cache import cache, generate_cache_key
 from app.services.i18n.language_detection_service import LanguageDetectionService
 from flask_babel import _, lazy_gettext as _l
 logger = logging.getLogger(__name__)
@@ -415,7 +417,6 @@ class TranslationService:
             return result
         return base_translations
 
-    @cache_manager.memoize(timeout=3600)
     def translate(self, key: str, language: str, **kwargs) ->TranslationResult:
         _('i18n_translation_service.validation.translate_a_key_to_th')
         try:
@@ -497,7 +498,7 @@ class TranslationService:
             if save_to_file:
                 self._save_translation_file(language)
             cache_key = f'translate_{key}_{language}'
-            cache_manager.delete(cache_key)
+            cache.delete(cache_key)
         except Exception as e:
             logger.error(
                 f'Error updating translation {key} for {language}: {e}')

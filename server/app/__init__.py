@@ -17,7 +17,7 @@ from app.core.cdn_config import init_cdn_configuration
 
 # Import API blueprints
 from app.api.auth import auth_bp
-from app.api.beneficiaries_dashboard import beneficiaries_bp
+from app.api.beneficiaries_v2 import beneficiaries_bp
 from app.api.appointments import appointments_bp
 from app.api.evaluations import evaluations_bp
 from app.api.documents import documents_bp
@@ -27,6 +27,13 @@ from app.api.ai_question_generation import ai_question_generation_bp
 from app.api.i18n import i18n_bp
 from app.api.gamification import gamification_bp
 from app.api.security import security_bp
+from app.api.database_optimization import database_optimization_bp
+from app.api.two_factor import two_factor_bp
+from app.api.virus_scan import virus_scan_bp
+from app.api.push_notifications import push_notifications_bp
+from app.api.v2.bulk_operations import bulk_bp
+from app.api.v2.global_search import global_search_bp
+# from app.api.v2.reports import reports_bp as v2_reports_bp
 
 # Import i18n middleware
 from app.middleware.i18n_middleware import (
@@ -50,8 +57,12 @@ def create_app(config_name='default'):
     app = Flask(__name__)
     
     # Load configuration
-    from config import config
-    app.config.from_object(config[config_name])
+    if isinstance(config_name, str):
+        from config import config
+        app.config.from_object(config[config_name])
+    else:
+        # If config_name is already a config class
+        app.config.from_object(config_name)
     
     # Initialize extensions
     db.init_app(app)
@@ -60,6 +71,10 @@ def create_app(config_name='default'):
     migrate.init_app(app, db)
     limiter.init_app(app)
     cache.init_app(app)
+    
+    # Initialize secure exception handler
+    from app.utils.secure_exception_handler import SecureExceptionHandler
+    secure_exception_handler = SecureExceptionHandler(app)
     
     # Configure CORS
     CORS(app, resources={
@@ -104,6 +119,15 @@ def create_app(config_name='default'):
     except Exception as e:
         logger.error(f"❌ Security middleware initialization failed: {e}")
     
+    # Initialize report service
+    try:
+        logger.info("📊 Initializing report service...")
+        from app.services.report_service import report_service
+        report_service.init_app(app)
+        logger.info("✅ Report service initialized successfully!")
+    except Exception as e:
+        logger.error(f"❌ Report service initialization failed: {e}")
+    
     # CRITICAL: Initialize Performance Optimization
     try:
         logger.info("🚀 Initializing comprehensive performance optimization...")
@@ -135,7 +159,14 @@ def create_app(config_name='default'):
         (ai_question_generation_bp, None),  # AI Question Generation API (has its own prefix)
         (i18n_bp, None),  # I18n API (has its own prefix)
         (gamification_bp, None),  # Gamification API (has its own prefix)
-        (security_bp, None)  # Security API (has its own prefix)
+        (security_bp, None),  # Security API (has its own prefix)
+        (database_optimization_bp, None),  # Database Optimization API (has its own prefix)
+        (two_factor_bp, None),  # Two-Factor Authentication API (has its own prefix)
+        (virus_scan_bp, None),  # Virus Scanning API (has its own prefix)
+        (push_notifications_bp, None),  # Push Notifications API (has its own prefix)
+        (bulk_bp, None),  # Bulk Operations API (has its own prefix)
+        (global_search_bp, None),  # Global Search API (has its own prefix)
+        # (v2_reports_bp, None)  # V2 Reports API (has its own prefix)
     ]
     
     for blueprint, url_prefix in api_blueprints:
@@ -145,28 +176,28 @@ def create_app(config_name='default'):
         except Exception as e:
             logger.error(f"❌ Failed to register blueprint {blueprint.name}: {e}")
     
-    # Application hooks for performance monitoring
-    @app.before_first_request
-    def initialize_performance_monitoring():
-        """Initialize performance monitoring on first request"""
-        logger.info("🔍 Starting performance monitoring...")
-        
-        # Set memory baseline
-        try:
-            from app.core.memory_optimizer import memory_optimizer
-            memory_optimizer.monitor.set_memory_baseline()
-            logger.info("✅ Memory baseline established")
-        except Exception as e:
-            logger.error(f"❌ Memory baseline setup failed: {e}")
-        
-        # Run initial database optimizations
-        try:
-            from app.core.database_performance import db_performance_optimizer
-            with app.app_context():
+    # Initialize performance monitoring outside of deprecated before_first_request
+    # This runs during app creation instead of on first request
+    # Skip database-dependent initialization in testing mode
+    if not app.config.get('TESTING', False):
+        with app.app_context():
+            logger.info("🔍 Starting performance monitoring...")
+            
+            # Set memory baseline
+            try:
+                from app.core.memory_optimizer import memory_optimizer
+                memory_optimizer.monitor.set_memory_baseline()
+                logger.info("✅ Memory baseline established")
+            except Exception as e:
+                logger.error(f"❌ Memory baseline setup failed: {e}")
+            
+            # Run initial database optimizations
+            try:
+                from app.core.database_performance import db_performance_optimizer
                 result = db_performance_optimizer.create_performance_indexes()
                 logger.info(f"✅ Database indexes optimized: {result}")
-        except Exception as e:
-            logger.error(f"❌ Database optimization failed: {e}")
+            except Exception as e:
+                logger.error(f"❌ Database optimization failed: {e}")
     
     @app.before_request
     def before_request():

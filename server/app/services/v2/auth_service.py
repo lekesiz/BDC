@@ -5,7 +5,8 @@ from flask import current_app
 from flask_jwt_extended import create_access_token, create_refresh_token
 from sqlalchemy.orm import Session
 
-from app.models.user import User, UserActivity
+from app.models.user import User
+from app.models.user_activity import UserActivity
 from app.models.tenant import Tenant
 from app.repositories.v2.interfaces.user_repository_interface import IUserRepository
 from app.services.v2.interfaces.auth_service_interface import IAuthService

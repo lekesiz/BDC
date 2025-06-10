@@ -4,7 +4,23 @@ import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SocketContext } from '@/contexts/SocketContext';
+// Mock SocketContext and useSocket hook
+const mockSocket = {
+  on: vi.fn(() => vi.fn()), // Returns cleanup function
+  off: vi.fn(),
+  emit: vi.fn(),
+  connected: true
+};
+
+vi.mock('@/contexts/SocketContext', () => ({
+  useSocket: () => ({
+    socket: mockSocket,
+    isConnected: true,
+    on: mockSocket.on,
+    off: mockSocket.off,
+    emit: mockSocket.emit
+  })
+}));
 import ProgramsListPage from '@/pages/programs/ProgramsListPage';
 import api from '@/lib/api';
 
@@ -21,7 +37,7 @@ vi.mock('@/lib/api', () => ({
 // Mock auth hook
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
-    user: { id: '1', role: 'admin' }
+    user: { id: '1', role: 'super_admin' }
   })
 }));
 
@@ -30,22 +46,6 @@ const mockToast = vi.fn();
 vi.mock('@/components/ui/toast', () => ({
   useToast: () => ({ toast: mockToast })
 }));
-
-// Mock socket context
-const mockSocket = {
-  on: vi.fn(),
-  off: vi.fn(),
-  emit: vi.fn(),
-  connected: true
-};
-
-const mockSocketContext = {
-  socket: mockSocket,
-  isConnected: true,
-  on: mockSocket.on,
-  off: mockSocket.off,
-  emit: mockSocket.emit
-};
 
 // Test wrapper component
 const TestWrapper = ({ children }) => {
@@ -59,9 +59,7 @@ const TestWrapper = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <SocketContext.Provider value={mockSocketContext}>
-          {children}
-        </SocketContext.Provider>
+        {children}
       </BrowserRouter>
     </QueryClientProvider>
   );
@@ -104,14 +102,14 @@ describe('Program Lifecycle Integration', () => {
       
       // Mock program creation
       const newProgram = {
-        id: '2',
+        id: 2,
         name: 'Data Science Fundamentals',
         description: 'Introduction to data science',
         code: 'DS-001',
         category: 'data',
         level: 'beginner',
         status: 'draft',
-        duration: '8 weeks',
+        duration: 8,
         participants_count: 0,
         trainers: [],
         modules: []
@@ -130,12 +128,11 @@ describe('Program Lifecycle Integration', () => {
         expect(screen.getByText(/no programs found/i)).toBeInTheDocument();
       });
 
-      // Click create button
+      // Click create button (this would navigate to create form)
       const createButton = screen.getByRole('button', { name: /create program/i });
       await user.click(createButton);
 
-      // Fill program form (mocked as this would be in a modal/separate page)
-      // Simulate program creation via WebSocket event
+      // Simulate program creation via window event (component listens to both methods)
       const programCreatedEvent = new CustomEvent('programCreated', {
         detail: newProgram
       });

@@ -7,15 +7,15 @@ from datetime import datetime
 class VideoConferenceSettingsSchema(Schema):
     """Schema for video conference settings."""
     
-    waiting_room_enabled = fields.Boolean(missing=True)
-    require_authentication = fields.Boolean(missing=False)
-    allow_recording = fields.Boolean(missing=True)
-    auto_record = fields.Boolean(missing=False)
+    waiting_room_enabled = fields.Boolean(load_default=True)
+    require_authentication = fields.Boolean(load_default=False)
+    allow_recording = fields.Boolean(load_default=True)
+    auto_record = fields.Boolean(load_default=False)
     meeting_password = fields.String(allow_none=True, validate=validate.Length(min=4, max=20))
-    max_participants = fields.Integer(validate=validate.Range(min=2, max=100), missing=10)
-    allow_screen_sharing = fields.Boolean(missing=True)
-    allow_chat = fields.Boolean(missing=True)
-    mute_on_entry = fields.Boolean(missing=True)
+    max_participants = fields.Integer(validate=validate.Range(min=2, max=100), load_default=10)
+    allow_screen_sharing = fields.Boolean(load_default=True)
+    allow_chat = fields.Boolean(load_default=True)
+    mute_on_entry = fields.Boolean(load_default=True)
 
 
 class CreateVideoConferenceSchema(Schema):
@@ -24,10 +24,10 @@ class CreateVideoConferenceSchema(Schema):
     appointment_id = fields.Integer(required=True, validate=validate.Range(min=1))
     provider = fields.String(
         required=False,
-        missing='zoom',
+        load_default='zoom',
         validate=validate.OneOf(['zoom', 'google_meet', 'microsoft_teams', 'webrtc'])
     )
-    settings = fields.Nested(VideoConferenceSettingsSchema, missing=dict)
+    settings = fields.Nested(VideoConferenceSettingsSchema, load_default=dict)
 
 
 class UpdateVideoConferenceSchema(Schema):
@@ -62,7 +62,7 @@ class AddParticipantSchema(Schema):
     email = fields.Email(required=True)
     name = fields.String(required=True, validate=validate.Length(min=1, max=200))
     role = fields.String(
-        missing='participant',
+        load_default='participant',
         validate=validate.OneOf(['host', 'co_host', 'participant'])
     )
     user_id = fields.Integer(validate=validate.Range(min=1), allow_none=True)
@@ -74,7 +74,7 @@ class SendInvitationSchema(Schema):
     email = fields.Email(required=True)
     name = fields.String(required=True, validate=validate.Length(min=1, max=200))
     delivery_method = fields.String(
-        missing='email',
+        load_default='email',
         validate=validate.OneOf(['email', 'sms', 'both'])
     )
     phone_number = fields.String(

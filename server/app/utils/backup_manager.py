@@ -4,7 +4,7 @@ import os
 import gzip
 import shutil
 import boto3
-import subprocess
+from app.utils.secure_subprocess import SecureSubprocess, DatabaseBackupSecure
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -129,11 +129,11 @@ class BackupManager:
             backup_filename = f"bdc_files_backup_{timestamp}.tar.gz"
             backup_path = os.path.join('/tmp', backup_filename)
             
-            # Create tar.gz archive
-            subprocess.run([
+            # Create tar.gz archive securely
+            SecureSubprocess.run_secure([
                 'tar', '-czf', backup_path, '-C', os.path.dirname(upload_folder),
                 os.path.basename(upload_folder)
-            ], check=True)
+            ], timeout=1800, check=True)
             
             # Encrypt the backup
             encrypted_path = self._encrypt_file(backup_path)
@@ -279,27 +279,10 @@ class BackupManager:
                 return {'success': False, 'error': str(e)}
     
     def _create_postgres_backup(self, database_url, backup_path):
-        """Create PostgreSQL backup using pg_dump."""
-        env = os.environ.copy()
-        env['PGPASSWORD'] = database_url.split(':')[2].split('@')[0]
-        
-        # Parse database URL
-        parts = database_url.replace('postgresql://', '').split('@')
-        user_pass = parts[0].split(':')
-        host_port_db = parts[1].split('/')
-        host_port = host_port_db[0].split(':')
-        
-        cmd = [
-            'pg_dump',
-            '-h', host_port[0],
-            '-p', host_port[1] if len(host_port) > 1 else '5432',
-            '-U', user_pass[0],
-            '-d', host_port_db[1],
-            '--no-password',
-            '-f', backup_path
-        ]
-        
-        subprocess.run(cmd, env=env, check=True)
+        """Create PostgreSQL backup using secure method."""
+        success = DatabaseBackupSecure.create_postgres_backup(database_url, backup_path)
+        if not success:
+            raise Exception("PostgreSQL backup failed")
     
     def _create_sqlite_backup(self, database_url, backup_path):
         """Create SQLite backup."""
@@ -307,27 +290,10 @@ class BackupManager:
         shutil.copy2(db_path, backup_path)
     
     def _restore_postgres_backup(self, database_url, backup_path):
-        """Restore PostgreSQL backup using psql."""
-        env = os.environ.copy()
-        env['PGPASSWORD'] = database_url.split(':')[2].split('@')[0]
-        
-        # Parse database URL
-        parts = database_url.replace('postgresql://', '').split('@')
-        user_pass = parts[0].split(':')
-        host_port_db = parts[1].split('/')
-        host_port = host_port_db[0].split(':')
-        
-        cmd = [
-            'psql',
-            '-h', host_port[0],
-            '-p', host_port[1] if len(host_port) > 1 else '5432',
-            '-U', user_pass[0],
-            '-d', host_port_db[1],
-            '--no-password',
-            '-f', backup_path
-        ]
-        
-        subprocess.run(cmd, env=env, check=True)
+        """Restore PostgreSQL backup using secure method."""
+        success = DatabaseBackupSecure.restore_postgres_backup(database_url, backup_path)
+        if not success:
+            raise Exception("PostgreSQL restore failed")
     
     def _restore_sqlite_backup(self, database_url, backup_path):
         """Restore SQLite backup."""

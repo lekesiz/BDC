@@ -40,8 +40,8 @@ class SecurityManager:
         """Decode and verify JWT token."""
         try:
             secret_key = self.secret_key or current_app.config.get('SECRET_KEY')
-        if not secret_key:
-            raise ValueError("SECRET_KEY must be set in environment variables")
+            if not secret_key:
+                raise ValueError("SECRET_KEY must be set in environment variables")
             payload = jwt.decode(token, secret_key, algorithms=[self.algorithm])
             return payload
         except jwt.ExpiredSignatureError:

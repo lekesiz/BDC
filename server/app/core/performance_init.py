@@ -87,20 +87,8 @@ def init_performance_optimization(app: Flask):
 def _setup_performance_hooks(app: Flask):
     """Setup application-level performance monitoring hooks"""
     
-    @app.before_first_request
-    def before_first_request():
-        """Run optimizations on first request"""
-        logger.info("Running first-request optimizations...")
-        
-        # Set memory baseline
-        from app.core.memory_optimizer import memory_optimizer
-        memory_optimizer.monitor.set_memory_baseline()
-        
-        # Warm critical caches
-        try:
-            _warm_critical_caches()
-        except Exception as e:
-            logger.error(f"Cache warming failed: {e}")
+    # Note: before_first_request is deprecated in Flask 2.3+
+    # We'll initialize during app creation instead
     
     @app.teardown_appcontext
     def teardown_db(error):

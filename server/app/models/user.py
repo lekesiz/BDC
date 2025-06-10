@@ -48,6 +48,18 @@ class User(db.Model):
     state = Column(String(100), nullable=True)
     zip_code = Column(String(20), nullable=True)
     country = Column(String(100), nullable=True)
+    
+    # Email verification fields
+    email_verified = Column(Boolean, default=False)
+    email_verified_at = Column(DateTime, nullable=True)
+    
+    def check_password(self, password):
+        """Check if the provided password matches the user's password."""
+        return check_password_hash(self.password_hash, password)
+    
+    def set_password(self, password):
+        """Set the user's password."""
+        self.password_hash = generate_password_hash(password)
     organization = Column(String(255), nullable=True)
     bio = Column(db.Text, nullable=True)
     profile_picture = Column(String(255), nullable=True)

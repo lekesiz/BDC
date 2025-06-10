@@ -8,18 +8,18 @@ class BadgeSchema(Schema):
     """Schema for Badge model."""
     id = fields.Integer(dump_only=True)
     name = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    description = fields.String(missing='', validate=validate.Length(max=500))
-    icon_url = fields.String(missing='', validate=validate.Length(max=255))
+    description = fields.String(load_default='', validate=validate.Length(max=500))
+    icon_url = fields.String(load_default='', validate=validate.Length(max=255))
     category = fields.String(required=True, validate=validate.OneOf([
         'learning', 'participation', 'social', 'mastery', 'consistency', 'special'
     ]))
-    rarity = fields.String(missing='common', validate=validate.OneOf([
+    rarity = fields.String(load_default='common', validate=validate.OneOf([
         'common', 'uncommon', 'rare', 'epic', 'legendary'
     ]))
-    points_value = fields.Integer(missing=0, validate=validate.Range(min=0))
+    points_value = fields.Integer(load_default=0, validate=validate.Range(min=0))
     unlock_conditions = fields.Dict(required=True)
-    is_secret = fields.Boolean(missing=False)
-    is_active = fields.Boolean(missing=True)
+    is_secret = fields.Boolean(load_default=False)
+    is_active = fields.Boolean(load_default=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
 
@@ -30,8 +30,8 @@ class UserBadgeSchema(Schema):
     user_id = fields.Integer(required=True)
     badge_id = fields.Integer(required=True)
     earned_at = fields.DateTime(dump_only=True)
-    progress = fields.Float(missing=0.0, validate=validate.Range(min=0.0, max=100.0))
-    metadata = fields.Dict(missing=dict)
+    progress = fields.Float(load_default=0.0, validate=validate.Range(min=0.0, max=100.0))
+    metadata = fields.Dict(load_default=dict)
     badge = fields.Nested(BadgeSchema, dump_only=True)
 
 
@@ -62,10 +62,10 @@ class PointTransactionSchema(Schema):
         'badge_earned', 'referral', 'milestone'
     ]))
     points_earned = fields.Integer(required=True)
-    multiplier_applied = fields.Float(missing=1.0)
+    multiplier_applied = fields.Float(load_default=1.0)
     related_entity_type = fields.String(allow_none=True)
     related_entity_id = fields.Integer(allow_none=True)
-    metadata = fields.Dict(missing=dict)
+    metadata = fields.Dict(load_default=dict)
     created_at = fields.DateTime(dump_only=True)
 
 
@@ -73,7 +73,7 @@ class LeaderboardSchema(Schema):
     """Schema for Leaderboard model."""
     id = fields.Integer(dump_only=True)
     name = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    description = fields.String(missing='', validate=validate.Length(max=500))
+    description = fields.String(load_default='', validate=validate.Length(max=500))
     type = fields.String(required=True, validate=validate.OneOf([
         'global', 'class', 'weekly', 'monthly', 'seasonal'
     ]))
@@ -81,9 +81,9 @@ class LeaderboardSchema(Schema):
     tenant_id = fields.Integer(allow_none=True)
     start_date = fields.DateTime(allow_none=True)
     end_date = fields.DateTime(allow_none=True)
-    max_entries = fields.Integer(missing=100, validate=validate.Range(min=1, max=1000))
-    is_active = fields.Boolean(missing=True)
-    is_public = fields.Boolean(missing=True)
+    max_entries = fields.Integer(load_default=100, validate=validate.Range(min=1, max=1000))
+    is_active = fields.Boolean(load_default=True)
+    is_public = fields.Boolean(load_default=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
 
@@ -104,7 +104,7 @@ class LeaderboardEntrySchema(Schema):
     user_id = fields.Integer(required=True)
     position = fields.Integer(required=True, validate=validate.Range(min=1))
     score = fields.Float(required=True)
-    metadata = fields.Dict(missing=dict)
+    metadata = fields.Dict(load_default=dict)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
     user = fields.Dict(dump_only=True)  # User info will be populated
@@ -119,8 +119,8 @@ class ChallengeSchema(Schema):
         'individual', 'team', 'global', 'daily', 'weekly', 'special_event'
     ]))
     goals = fields.Dict(required=True)
-    rewards = fields.Dict(missing=dict)
-    difficulty = fields.String(missing='medium', validate=validate.OneOf([
+    rewards = fields.Dict(load_default=dict)
+    difficulty = fields.String(load_default='medium', validate=validate.OneOf([
         'easy', 'medium', 'hard', 'expert'
     ]))
     start_date = fields.DateTime(allow_none=True)
@@ -130,8 +130,8 @@ class ChallengeSchema(Schema):
     min_participants = fields.Integer(allow_none=True, validate=validate.Range(min=1))
     tenant_id = fields.Integer(allow_none=True)
     participant_count = fields.Integer(dump_only=True)
-    is_active = fields.Boolean(missing=True)
-    is_featured = fields.Boolean(missing=False)
+    is_active = fields.Boolean(load_default=True)
+    is_featured = fields.Boolean(load_default=False)
     is_ongoing = fields.Boolean(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
@@ -160,11 +160,11 @@ class ChallengeParticipantSchema(Schema):
     challenge_id = fields.Integer(required=True)
     user_id = fields.Integer(required=True)
     team_id = fields.Integer(allow_none=True)
-    progress = fields.Dict(missing=dict)
+    progress = fields.Dict(load_default=dict)
     completion_percentage = fields.Float(dump_only=True)
     is_completed = fields.Boolean(dump_only=True)
     completed_at = fields.DateTime(dump_only=True)
-    score = fields.Float(missing=0.0)
+    score = fields.Float(load_default=0.0)
     rank = fields.Integer(allow_none=True)
     joined_at = fields.DateTime(dump_only=True)
     user = fields.Dict(dump_only=True)  # User info will be populated
@@ -174,12 +174,12 @@ class GamificationTeamSchema(Schema):
     """Schema for GamificationTeam model."""
     id = fields.Integer(dump_only=True)
     name = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    description = fields.String(missing='', validate=validate.Length(max=500))
+    description = fields.String(load_default='', validate=validate.Length(max=500))
     leader_id = fields.Integer(required=True)
     tenant_id = fields.Integer(allow_none=True)
-    max_members = fields.Integer(missing=10, validate=validate.Range(min=1, max=100))
+    max_members = fields.Integer(load_default=10, validate=validate.Range(min=1, max=100))
     member_count = fields.Integer(dump_only=True)
-    is_open = fields.Boolean(missing=True)
+    is_open = fields.Boolean(load_default=True)
     total_xp = fields.Integer(dump_only=True)
     challenges_completed = fields.Integer(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
@@ -191,18 +191,18 @@ class RewardSchema(Schema):
     """Schema for Reward model."""
     id = fields.Integer(dump_only=True)
     name = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    description = fields.String(missing='', validate=validate.Length(max=500))
+    description = fields.String(load_default='', validate=validate.Length(max=500))
     type = fields.String(required=True, validate=validate.OneOf([
         'virtual_item', 'unlockable_content', 'certification', 'real_world', 'points', 'badge'
     ]))
     cost = fields.Integer(required=True, validate=validate.Range(min=0))
     value = fields.Dict(required=True)
-    rarity = fields.String(missing='common', validate=validate.OneOf([
+    rarity = fields.String(load_default='common', validate=validate.OneOf([
         'common', 'uncommon', 'rare', 'epic', 'legendary'
     ]))
     total_quantity = fields.Integer(allow_none=True, validate=validate.Range(min=1))
     remaining_quantity = fields.Integer(allow_none=True)
-    is_active = fields.Boolean(missing=True)
+    is_active = fields.Boolean(load_default=True)
     is_available = fields.Boolean(dump_only=True)
     available_from = fields.DateTime(allow_none=True)
     available_until = fields.DateTime(allow_none=True)
@@ -226,10 +226,10 @@ class RewardRedemptionSchema(Schema):
     user_id = fields.Integer(required=True)
     reward_id = fields.Integer(required=True)
     points_spent = fields.Integer(required=True, validate=validate.Range(min=0))
-    status = fields.String(missing='pending', validate=validate.OneOf([
+    status = fields.String(load_default='pending', validate=validate.OneOf([
         'pending', 'processed', 'delivered', 'cancelled'
     ]))
-    delivery_info = fields.Dict(missing=dict)
+    delivery_info = fields.Dict(load_default=dict)
     processed_at = fields.DateTime(allow_none=True)
     created_at = fields.DateTime(dump_only=True)
     reward = fields.Nested(RewardSchema, dump_only=True)
@@ -240,13 +240,13 @@ class UserGoalSchema(Schema):
     id = fields.Integer(dump_only=True)
     user_id = fields.Integer(required=True)
     title = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    description = fields.String(missing='', validate=validate.Length(max=500))
+    description = fields.String(load_default='', validate=validate.Length(max=500))
     goal_type = fields.String(required=True, validate=validate.Length(min=1, max=50))
     target_value = fields.Float(required=True, validate=validate.Range(min=0))
-    current_value = fields.Float(missing=0.0, validate=validate.Range(min=0))
+    current_value = fields.Float(load_default=0.0, validate=validate.Range(min=0))
     progress_percentage = fields.Float(dump_only=True)
     deadline = fields.DateTime(allow_none=True)
-    is_active = fields.Boolean(missing=True)
+    is_active = fields.Boolean(load_default=True)
     is_completed = fields.Boolean(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     completed_at = fields.DateTime(dump_only=True)
@@ -265,7 +265,7 @@ class GamificationEventSchema(Schema):
     id = fields.Integer(dump_only=True)
     user_id = fields.Integer(required=True)
     event_type = fields.String(required=True, validate=validate.Length(min=1, max=50))
-    event_data = fields.Dict(missing=dict)
+    event_data = fields.Dict(load_default=dict)
     session_id = fields.String(allow_none=True, validate=validate.Length(max=100))
     ip_address = fields.String(allow_none=True, validate=validate.Length(max=45))
     user_agent = fields.String(allow_none=True, validate=validate.Length(max=255))
@@ -278,9 +278,9 @@ class UserProgressSchema(Schema):
     user_id = fields.Integer(required=True)
     category = fields.String(required=True, validate=validate.Length(min=1, max=50))
     entity_id = fields.Integer(allow_none=True)
-    progress_percentage = fields.Float(missing=0.0, validate=validate.Range(min=0.0, max=100.0))
-    milestones_reached = fields.List(fields.String(), missing=list)
-    time_spent_minutes = fields.Integer(missing=0, validate=validate.Range(min=0))
+    progress_percentage = fields.Float(load_default=0.0, validate=validate.Range(min=0.0, max=100.0))
+    milestones_reached = fields.List(fields.String(), load_default=list)
+    time_spent_minutes = fields.Integer(load_default=0, validate=validate.Range(min=0))
     last_activity = fields.DateTime(allow_none=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
@@ -291,17 +291,17 @@ class UserProgressSchema(Schema):
 class BadgeCreateRequestSchema(Schema):
     """Schema for creating a new badge."""
     name = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    description = fields.String(missing='', validate=validate.Length(max=500))
+    description = fields.String(load_default='', validate=validate.Length(max=500))
     category = fields.String(required=True, validate=validate.OneOf([
         'learning', 'participation', 'social', 'mastery', 'consistency', 'special'
     ]))
-    rarity = fields.String(missing='common', validate=validate.OneOf([
+    rarity = fields.String(load_default='common', validate=validate.OneOf([
         'common', 'uncommon', 'rare', 'epic', 'legendary'
     ]))
-    points_value = fields.Integer(missing=0, validate=validate.Range(min=0))
+    points_value = fields.Integer(load_default=0, validate=validate.Range(min=0))
     unlock_conditions = fields.Dict(required=True)
-    icon_url = fields.String(missing='', validate=validate.Length(max=255))
-    is_secret = fields.Boolean(missing=False)
+    icon_url = fields.String(load_default='', validate=validate.Length(max=255))
+    is_secret = fields.Boolean(load_default=False)
 
 
 class ChallengeCreateRequestSchema(Schema):
@@ -312,8 +312,8 @@ class ChallengeCreateRequestSchema(Schema):
         'individual', 'team', 'global', 'daily', 'weekly', 'special_event'
     ]))
     goals = fields.Dict(required=True)
-    rewards = fields.Dict(missing=dict)
-    difficulty = fields.String(missing='medium', validate=validate.OneOf([
+    rewards = fields.Dict(load_default=dict)
+    difficulty = fields.String(load_default='medium', validate=validate.OneOf([
         'easy', 'medium', 'hard', 'expert'
     ]))
     start_date = fields.DateTime(allow_none=True)
@@ -325,13 +325,13 @@ class ChallengeCreateRequestSchema(Schema):
 class RewardCreateRequestSchema(Schema):
     """Schema for creating a new reward."""
     name = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    description = fields.String(missing='', validate=validate.Length(max=500))
+    description = fields.String(load_default='', validate=validate.Length(max=500))
     type = fields.String(required=True, validate=validate.OneOf([
         'virtual_item', 'unlockable_content', 'certification', 'real_world', 'points', 'badge'
     ]))
     cost = fields.Integer(required=True, validate=validate.Range(min=0))
     value = fields.Dict(required=True)
-    rarity = fields.String(missing='common', validate=validate.OneOf([
+    rarity = fields.String(load_default='common', validate=validate.OneOf([
         'common', 'uncommon', 'rare', 'epic', 'legendary'
     ]))
     total_quantity = fields.Integer(allow_none=True, validate=validate.Range(min=1))
@@ -342,15 +342,15 @@ class RewardCreateRequestSchema(Schema):
 class TeamCreateRequestSchema(Schema):
     """Schema for creating a new team."""
     name = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    description = fields.String(missing='', validate=validate.Length(max=500))
-    max_members = fields.Integer(missing=10, validate=validate.Range(min=1, max=100))
-    is_open = fields.Boolean(missing=True)
+    description = fields.String(load_default='', validate=validate.Length(max=500))
+    max_members = fields.Integer(load_default=10, validate=validate.Range(min=1, max=100))
+    is_open = fields.Boolean(load_default=True)
 
 
 class GoalCreateRequestSchema(Schema):
     """Schema for creating a new goal."""
     title = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    description = fields.String(missing='', validate=validate.Length(max=500))
+    description = fields.String(load_default='', validate=validate.Length(max=500))
     goal_type = fields.String(required=True, validate=validate.Length(min=1, max=50))
     target_value = fields.Float(required=True, validate=validate.Range(min=0))
     deadline = fields.DateTime(allow_none=True)
@@ -359,20 +359,20 @@ class GoalCreateRequestSchema(Schema):
 class LeaderboardCreateRequestSchema(Schema):
     """Schema for creating a new leaderboard."""
     name = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    description = fields.String(missing='', validate=validate.Length(max=500))
+    description = fields.String(load_default='', validate=validate.Length(max=500))
     type = fields.String(required=True, validate=validate.OneOf([
         'global', 'class', 'weekly', 'monthly', 'seasonal'
     ]))
     metric = fields.String(required=True, validate=validate.Length(min=1, max=50))
     start_date = fields.DateTime(allow_none=True)
     end_date = fields.DateTime(allow_none=True)
-    max_entries = fields.Integer(missing=100, validate=validate.Range(min=1, max=1000))
+    max_entries = fields.Integer(load_default=100, validate=validate.Range(min=1, max=1000))
 
 
 class EventLogRequestSchema(Schema):
     """Schema for logging gamification events."""
     event_type = fields.String(required=True, validate=validate.Length(min=1, max=50))
-    event_data = fields.Dict(missing=dict)
+    event_data = fields.Dict(load_default=dict)
     session_id = fields.String(allow_none=True, validate=validate.Length(max=100))
 
 
@@ -384,7 +384,7 @@ class ChallengeJoinRequestSchema(Schema):
 class AwardBadgeRequestSchema(Schema):
     """Schema for manually awarding a badge."""
     user_id = fields.Integer(required=True)
-    metadata = fields.Dict(missing=dict)
+    metadata = fields.Dict(load_default=dict)
 
 
 class EvaluationCompletionRequestSchema(Schema):

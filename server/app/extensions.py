@@ -25,3 +25,6 @@ socketio = SocketIO()
 
 # Setup logging
 logger = logging.getLogger('bdc')
+
+# Redis client placeholder (will be initialized in app factory if configured)
+redis_client = None

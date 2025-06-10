@@ -1,3 +1,5 @@
+from flask_babel import _
+
 _('i18n_locale_service.validation.locale_service_for_date_time')
 import locale
 import logging

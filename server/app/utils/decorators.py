@@ -116,3 +116,15 @@ def admin_required(f):
         
         return f(*args, **kwargs)
     return decorated_function
+
+
+def handle_exceptions(f):
+    """Decorator to handle exceptions in routes."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            current_app.logger.error(f"Exception in {f.__name__}: {str(e)}")
+            return jsonify({'error': 'Internal server error'}), 500
+    return decorated_function

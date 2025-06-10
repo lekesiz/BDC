@@ -440,3 +440,7 @@ class UserServiceV2(IUserService):
             generate_cache_key('users_list', page)
             for page in range(1, 10)
         ])
+
+
+# Backward compatibility alias
+UserService = UserServiceV2

@@ -48,7 +48,7 @@ class RedisSessionInterface(SessionInterface):
     def get_redis_expiration_time(self, app, session):
         """Get Redis expiration time for session"""
         if session.permanent:
-            return app.permanent_session_lifetime
+            return app.config.get('PERMANENT_SESSION_LIFETIME', timedelta(days=31))
         return timedelta(seconds=self.ttl)
     
     def get_redis_key(self, sid):
@@ -57,7 +57,7 @@ class RedisSessionInterface(SessionInterface):
     
     def open_session(self, app, request):
         """Open session from Redis"""
-        sid = request.cookies.get(app.session_cookie_name)
+        sid = request.cookies.get(app.config.get('SESSION_COOKIE_NAME', 'session'))
         
         if not sid:
             sid = self.generate_sid()
@@ -100,7 +100,7 @@ class RedisSessionInterface(SessionInterface):
                     logger.error(f"Session deletion error: {e}")
                 
                 response.delete_cookie(
-                    app.session_cookie_name,
+                    app.config.get('SESSION_COOKIE_NAME', 'session'),
                     domain=domain,
                     path=path
                 )
@@ -119,7 +119,7 @@ class RedisSessionInterface(SessionInterface):
             
             # Set cookie
             response.set_cookie(
-                app.session_cookie_name,
+                app.config.get('SESSION_COOKIE_NAME', 'session'),
                 session.sid,
                 expires=cookie_exp,
                 httponly=self.get_cookie_httponly(app),

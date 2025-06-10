@@ -179,7 +179,7 @@ class QuestionGenerationRequest(db.Model):
     # Relationships
     tenant = relationship('Tenant', backref='question_generation_requests')
     creator = relationship('User', backref='question_generation_requests')
-    source_content = relationship('SourceContent', backref='generation_requests')
+    source_content = relationship('SourceContent', back_populates='question_generation_requests')
     
     def to_dict(self):
         return {

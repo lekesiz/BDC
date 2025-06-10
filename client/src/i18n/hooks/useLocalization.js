@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect, useMemo } from 'react';
-import { useLanguage } from './useLanguage';
+import useLanguage from './useLanguage';
 import localizationManager from '../managers/LocalizationManager';
 import { DATE_FORMATS, NUMBER_FORMATS } from '../constants';import { useTranslation } from "react-i18next";
 

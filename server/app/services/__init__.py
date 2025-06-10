@@ -17,7 +17,7 @@ from app.services.email_service import (
 from app.services.two_factor_service import TwoFactorService
 from app.services.recurring_appointment_service import RecurringAppointmentService
 from app.services.performance_prediction_service import PerformancePredictionService
-from app.services.ai_question_generator_service import AIQuestionGeneratorService
+# from app.services.ai_question_generator_service import AIQuestionGeneratorService  # TODO: Fix SourceContent dependency
 
 # Export all services
 __all__ = [
@@ -40,6 +40,6 @@ __all__ = [
     'verify_email_token',
     'TwoFactorService',
     'RecurringAppointmentService',
-    'PerformancePredictionService',
-    'AIQuestionGeneratorService'
+    'PerformancePredictionService'
+    # 'AIQuestionGeneratorService'  # TODO: Fix SourceContent dependency
 ]

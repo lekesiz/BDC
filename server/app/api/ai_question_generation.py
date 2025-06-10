@@ -1,3 +1,5 @@
+from flask_babel import _
+
 _('api_ai_question_generation.message.ai_question_generation_api_end')
 import asyncio
 import os
@@ -9,16 +11,16 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from sqlalchemy import and_, or_, func
 from typing import Dict, List, Any
 from app.extensions import db
-from app.models.ai_question_generation import ContentType, SourceContent, QuestionType, BloomsTaxonomy, LearningObjective, QuestionGenerationRequest, GeneratedQuestion, QuestionDuplicate, QuestionBank, QuestionBankQuestion, GenerationAnalytics
+from app.models.ai_question_generation import ContentType, QuestionType, BloomsTaxonomy, LearningObjective, QuestionGenerationRequest, GeneratedQuestion, QuestionDuplicate, QuestionBank, QuestionBankQuestion, GenerationAnalytics
 from app.models.user import User
 from app.services.ai_question_generator_service import AIQuestionGeneratorService
-from app.utils.decorators import require_permission
-from app.schemas.auth import validate_json_input
+from app.utils.decorators import requires_permission
 from app.utils.logging import logger
 from flask_babel import _, lazy_gettext as _l
 ai_question_generation_bp = Blueprint('ai_question_generation', __name__,
     url_prefix='/api/ai-questions')
-ai_service = AIQuestionGeneratorService()
+# ai_service = AIQuestionGeneratorService()  # TODO: Fix SourceContent dependency
+ai_service = None
 UPLOAD_FOLDER = '/tmp/question_generation_uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'docx', 'doc', _(
     'services_ai_question_generator_service.message.mp3_1'), 'wav', _(

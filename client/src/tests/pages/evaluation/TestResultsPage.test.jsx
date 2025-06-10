@@ -27,18 +27,30 @@ useToast.mockReturnValue({
 // Mock URL utilities
 global.URL.createObjectURL = vi.fn(() => 'mock-url');
 global.Blob = vi.fn(() => ({}));
+
+// Mock download functionality without breaking DOM
+const mockDownloadLink = {
+  href: '',
+  setAttribute: vi.fn(),
+  click: vi.fn(),
+  remove: vi.fn()
+};
+
+const originalCreateElement = document.createElement.bind(document);
 document.createElement = vi.fn().mockImplementation((tag) => {
   if (tag === 'a') {
-    return {
-      href: '',
-      setAttribute: vi.fn(),
-      click: vi.fn(),
-      remove: vi.fn()
-    };
+    return mockDownloadLink;
   }
-  return {};
+  return originalCreateElement(tag);
 });
-document.body.appendChild = vi.fn();
+
+const originalAppendChild = document.body.appendChild.bind(document.body);
+document.body.appendChild = vi.fn().mockImplementation((element) => {
+  if (element === mockDownloadLink) {
+    return element;
+  }
+  return originalAppendChild(element);
+});
 // Sample session data
 const mockSessionData = {
   id: '123',

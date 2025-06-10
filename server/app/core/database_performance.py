@@ -1,419 +1,387 @@
-"""
-Enhanced Database Performance Optimization Module
-Provides comprehensive database optimization including connection pooling,
-query caching, index management, and performance monitoring.
-"""
+"""Database performance optimization utilities."""
 
 import time
 import logging
-from typing import Dict, Any, List, Optional, Callable
-from contextlib import contextmanager
 from functools import wraps
-from datetime import datetime, timedelta
-
-from sqlalchemy import create_engine, event, text, inspect
-from sqlalchemy.pool import QueuePool, NullPool
-from sqlalchemy.orm import sessionmaker, Session
+from typing import Dict, Any, Callable
+from sqlalchemy import event, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.sql import func
+from sqlalchemy.pool import Pool
+from flask import current_app
 
-from app.extensions import db
-from app.core.cache_manager import CacheManager
-from app.utils.logging import logger
+logger = logging.getLogger(__name__)
 
 
 class DatabasePerformanceOptimizer:
-    """Comprehensive database performance optimization"""
+    """Database performance optimization strategies."""
     
-    def __init__(self, app=None, cache_manager=None):
-        self.app = app
-        self.cache_manager = cache_manager or CacheManager()
-        self.query_cache = {}
-        self.performance_stats = {
-            'total_queries': 0,
-            'cache_hits': 0,
-            'cache_misses': 0,
-            'slow_queries': 0,
-            'average_query_time': 0.0,
-            'connection_pool_hits': 0,
-            'connection_pool_misses': 0
-        }
+    def __init__(self):
         self.slow_query_threshold = 1.0  # seconds
-        self.slow_queries = []
-        
-        if app:
-            self.init_app(app)
+        self.query_stats = {}
+        self.enable_monitoring = True
+        self.app = None
     
     def init_app(self, app):
-        """Initialize with Flask app"""
+        """Initialize with Flask app."""
         self.app = app
+        if hasattr(app, 'extensions') and 'sqlalchemy' in app.extensions:
+            db = app.extensions['sqlalchemy']
+            if hasattr(db, 'engine'):
+                setup_sqlalchemy_monitoring(db.engine)
+        logger.info("Database performance optimizer initialized")
         
-        # Configure connection pooling
-        self._configure_connection_pooling()
-        
-        # Set up query performance monitoring
-        self._setup_query_monitoring()
-        
-        # Configure session optimization
-        self._configure_session_optimization()
-        
-        # Register cleanup handlers
-        app.teardown_appcontext(self._cleanup_session)
-    
-    def _configure_connection_pooling(self):
-        """Configure optimized database connection pooling"""
-        if not self.app:
-            return
-        
-        database_url = self.app.config.get('SQLALCHEMY_DATABASE_URI')
-        if not database_url:
-            return
-        
-        # Enhanced connection pool configuration
-        pool_config = {
-            'poolclass': QueuePool,
-            'pool_size': self.app.config.get('DB_POOL_SIZE', 20),
-            'max_overflow': self.app.config.get('DB_MAX_OVERFLOW', 30),
-            'pool_timeout': self.app.config.get('DB_POOL_TIMEOUT', 30),
-            'pool_recycle': self.app.config.get('DB_POOL_RECYCLE', 3600),
-            'pool_pre_ping': True,  # Validate connections before use
-            'pool_reset_on_return': 'commit'  # Reset connections on return
-        }
-        
-        # Update SQLAlchemy engine options
-        engine_options = self.app.config.get('SQLALCHEMY_ENGINE_OPTIONS', {})
-        engine_options.update(pool_config)
-        self.app.config['SQLALCHEMY_ENGINE_OPTIONS'] = engine_options
-        
-        logger.info(f"Configured database connection pool: {pool_config}")
-    
-    def _setup_query_monitoring(self):
-        """Set up query performance monitoring"""
-        @event.listens_for(Engine, "before_cursor_execute")
-        def receive_before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-            context._query_start_time = time.time()
-        
-        @event.listens_for(Engine, "after_cursor_execute")
-        def receive_after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-            total_time = time.time() - context._query_start_time
+    def analyze_query_performance(self, query: str, execution_time: float):
+        """Analyze query performance and log slow queries."""
+        if execution_time > self.slow_query_threshold:
+            logger.warning(
+                f"Slow query detected ({execution_time:.2f}s): {query[:100]}..."
+            )
             
-            # Update statistics
-            self.performance_stats['total_queries'] += 1
-            
-            # Update average query time
-            current_avg = self.performance_stats['average_query_time']
-            query_count = self.performance_stats['total_queries']
-            new_avg = ((current_avg * (query_count - 1)) + total_time) / query_count
-            self.performance_stats['average_query_time'] = new_avg
-            
-            # Track slow queries
-            if total_time > self.slow_query_threshold:
-                self.performance_stats['slow_queries'] += 1
-                self._log_slow_query(statement, parameters, total_time)
-    
-    def _configure_session_optimization(self):
-        """Configure session-level optimizations"""
-        # Configure default session options for better performance
-        session_options = {
-            'expire_on_commit': False,  # Don't expire objects on commit
-            'autoflush': False,  # Manual flush control for better performance
-        }
-        
-        # Apply to existing db session
-        if hasattr(db, 'session') and db.session:
-            for key, value in session_options.items():
-                setattr(db.session, key, value)
-    
-    def _log_slow_query(self, statement: str, parameters: Any, execution_time: float):
-        """Log slow queries for analysis"""
-        slow_query_info = {
-            'statement': str(statement)[:500],  # Truncate long statements
-            'parameters': str(parameters)[:200] if parameters else None,
-            'execution_time': execution_time,
-            'timestamp': datetime.utcnow()
-        }
-        
-        self.slow_queries.append(slow_query_info)
-        
-        # Keep only last 100 slow queries
-        if len(self.slow_queries) > 100:
-            self.slow_queries.pop(0)
-        
-        logger.warning(f"Slow query detected: {execution_time:.3f}s - {statement[:100]}")
-    
-    def _cleanup_session(self, exception=None):
-        """Clean up database session"""
-        try:
-            if exception:
-                db.session.rollback()
-            else:
-                db.session.commit()
-        except Exception as e:
-            logger.error(f"Session cleanup error: {e}")
-            db.session.rollback()
-        finally:
-            db.session.close()
-    
-    @contextmanager
-    def optimized_session(self):
-        """Context manager for optimized database sessions"""
-        session = db.session
-        
-        # Disable autoflush for bulk operations
-        original_autoflush = session.autoflush
-        session.autoflush = False
-        
-        try:
-            yield session
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            logger.error(f"Database session error: {e}")
-            raise
-        finally:
-            session.autoflush = original_autoflush
-            session.close()
-    
-    def cached_query(self, cache_key: str, query_func: Callable, ttl: int = 300):
-        """Execute a query with caching"""
-        # Check cache first
-        cached_result = self.cache_manager.get(cache_key)
-        if cached_result is not None:
-            self.performance_stats['cache_hits'] += 1
-            return cached_result
-        
-        # Execute query
-        start_time = time.time()
-        result = query_func()
-        execution_time = time.time() - start_time
-        
-        # Update statistics
-        self.performance_stats['cache_misses'] += 1
-        
-        # Cache the result
-        self.cache_manager.set(cache_key, result, ttl)
-        
-        logger.debug(f"Query cached: {cache_key} (execution: {execution_time:.3f}s)")
-        return result
-    
-    def bulk_insert_optimized(self, model_class, data: List[Dict], batch_size: int = 1000):
-        """Optimized bulk insert with batching"""
-        total_inserted = 0
-        
-        with self.optimized_session() as session:
-            try:
-                for i in range(0, len(data), batch_size):
-                    batch = data[i:i + batch_size]
-                    session.bulk_insert_mappings(model_class, batch)
-                    total_inserted += len(batch)
-                    
-                    # Periodic commit for large datasets
-                    if i % (batch_size * 10) == 0:
-                        session.commit()
-                
-                session.commit()
-                logger.info(f"Bulk inserted {total_inserted} records")
-                
-            except Exception as e:
-                session.rollback()
-                logger.error(f"Bulk insert failed: {e}")
-                raise
-        
-        return total_inserted
-    
-    def bulk_update_optimized(self, model_class, updates: List[Dict], batch_size: int = 1000):
-        """Optimized bulk update with batching"""
-        total_updated = 0
-        
-        with self.optimized_session() as session:
-            try:
-                for i in range(0, len(updates), batch_size):
-                    batch = updates[i:i + batch_size]
-                    session.bulk_update_mappings(model_class, batch)
-                    total_updated += len(batch)
-                    
-                    # Periodic commit for large datasets
-                    if i % (batch_size * 10) == 0:
-                        session.commit()
-                
-                session.commit()
-                logger.info(f"Bulk updated {total_updated} records")
-                
-            except Exception as e:
-                session.rollback()
-                logger.error(f"Bulk update failed: {e}")
-                raise
-        
-        return total_updated
-    
-    def analyze_query_performance(self, query_sql: str) -> Dict[str, Any]:
-        """Analyze query performance using EXPLAIN"""
-        if not db.engine:
-            return {'error': 'Database engine not available'}
-        
-        try:
-            # Execute EXPLAIN for the query
-            if 'postgresql' in str(db.engine.url):
-                explain_sql = f"EXPLAIN ANALYZE {query_sql}"
-            else:
-                explain_sql = f"EXPLAIN QUERY PLAN {query_sql}"
-            
-            result = db.session.execute(text(explain_sql))
-            plan = [row[0] for row in result]
-            
-            # Analyze the execution plan
-            analysis = self._analyze_execution_plan(plan)
-            
-            return {
-                'query': query_sql,
-                'execution_plan': plan,
-                'analysis': analysis,
-                'database_type': str(db.engine.url).split('://')[0]
+        # Track query statistics
+        query_hash = hash(query)
+        if query_hash not in self.query_stats:
+            self.query_stats[query_hash] = {
+                'query': query[:100],
+                'count': 0,
+                'total_time': 0.0,
+                'max_time': 0.0,
+                'min_time': float('inf')
             }
+            
+        stats = self.query_stats[query_hash]
+        stats['count'] += 1
+        stats['total_time'] += execution_time
+        stats['max_time'] = max(stats['max_time'], execution_time)
+        stats['min_time'] = min(stats['min_time'], execution_time)
         
-        except Exception as e:
-            logger.error(f"Query analysis failed: {e}")
-            return {'error': str(e)}
-    
-    def _analyze_execution_plan(self, plan: List[str]) -> Dict[str, Any]:
-        """Analyze execution plan and provide recommendations"""
-        analysis = {
-            'recommendations': [],
-            'performance_issues': [],
-            'estimated_cost': None
+    def get_performance_report(self) -> Dict[str, Any]:
+        """Generate performance report for all tracked queries."""
+        report = []
+        
+        for query_hash, stats in self.query_stats.items():
+            avg_time = stats['total_time'] / stats['count'] if stats['count'] > 0 else 0
+            report.append({
+                'query': stats['query'],
+                'count': stats['count'],
+                'avg_time': avg_time,
+                'max_time': stats['max_time'],
+                'min_time': stats['min_time'] if stats['min_time'] != float('inf') else 0,
+                'total_time': stats['total_time']
+            })
+            
+        # Sort by total time descending
+        report.sort(key=lambda x: x['total_time'], reverse=True)
+        
+        return {
+            'slow_query_threshold': self.slow_query_threshold,
+            'total_queries': sum(s['count'] for s in self.query_stats.values()),
+            'unique_queries': len(self.query_stats),
+            'top_queries': report[:10]  # Top 10 most time-consuming queries
         }
         
-        for line in plan:
-            line_lower = line.lower()
-            
-            # Check for sequential scans
-            if 'seq scan' in line_lower or 'full table scan' in line_lower:
-                analysis['performance_issues'].append('Sequential scan detected')
-                analysis['recommendations'].append('Consider adding an index')
-            
-            # Check for sorts
-            if 'sort' in line_lower and 'external' in line_lower:
-                analysis['performance_issues'].append('External sort operation')
-                analysis['recommendations'].append('Consider increasing work_mem or adding an index')
-            
-            # Extract cost information
-            if 'cost=' in line_lower:
-                try:
-                    cost_part = line.split('cost=')[1].split()[0]
-                    if '..' in cost_part:
-                        analysis['estimated_cost'] = float(cost_part.split('..')[1])
-                except (IndexError, ValueError):
-                    pass
+    def optimize_database_configuration(self, db_config: Dict[str, Any]) -> Dict[str, Any]:
+        """Optimize database configuration for performance."""
+        optimized_config = db_config.copy()
         
-        return analysis
+        # Connection pool optimization
+        optimized_config.setdefault('pool_size', 10)
+        optimized_config.setdefault('max_overflow', 20)
+        optimized_config.setdefault('pool_timeout', 30)
+        optimized_config.setdefault('pool_recycle', 3600)
+        optimized_config.setdefault('pool_pre_ping', True)
+        
+        # Query optimization
+        optimized_config.setdefault('echo', False)  # Disable SQL logging in production
+        optimized_config.setdefault('echo_pool', False)
+        optimized_config.setdefault('connect_args', {
+            'connect_timeout': 10,
+            'options': '-c statement_timeout=30000'  # 30 second statement timeout
+        })
+        
+        return optimized_config
+    
+    def create_performance_indexes(self) -> Dict[str, Any]:
+        """Create performance indexes for the database."""
+        from app.services.optimization import db_indexing_strategy
+        from app.extensions import db
+        
+        if db and hasattr(db, 'engine'):
+            return db_indexing_strategy.analyze_and_create_indexes(db.engine)
+        return {'error': 'Database engine not available'}
+    
+    def optimize_table_statistics(self) -> None:
+        """Update database table statistics for query optimization."""
+        from app.extensions import db
+        
+        try:
+            with db.engine.connect() as conn:
+                # PostgreSQL ANALYZE command
+                conn.execute(text("ANALYZE"))
+                logger.info("Database table statistics updated")
+        except Exception as e:
+            logger.error(f"Failed to update table statistics: {str(e)}")
     
     def get_database_statistics(self) -> Dict[str, Any]:
-        """Get comprehensive database performance statistics"""
+        """Get comprehensive database statistics."""
         stats = {
-            'performance_stats': self.performance_stats.copy(),
-            'slow_queries': self.slow_queries[-10:],  # Last 10 slow queries
-            'cache_hit_rate': 0.0,
-            'connection_pool_info': {}
+            'performance_stats': self.get_performance_report(),
+            'connection_pool_stats': self._get_connection_pool_stats(),
+            'table_stats': self._get_table_stats(),
+            'index_stats': self._get_index_stats()
         }
-        
-        # Calculate cache hit rate
-        total_cache_requests = stats['performance_stats']['cache_hits'] + stats['performance_stats']['cache_misses']
-        if total_cache_requests > 0:
-            stats['cache_hit_rate'] = (stats['performance_stats']['cache_hits'] / total_cache_requests) * 100
-        
-        # Get connection pool information
-        if db.engine and hasattr(db.engine.pool, 'size'):
-            stats['connection_pool_info'] = {
-                'pool_size': db.engine.pool.size(),
-                'checked_in': db.engine.pool.checkedin(),
-                'checked_out': db.engine.pool.checkedout(),
-                'overflow': db.engine.pool.overflow(),
-                'invalid': db.engine.pool.invalidated()
-            }
-        
         return stats
     
-    def optimize_table_statistics(self, table_names: List[str] = None):
-        """Update table statistics for query optimizer"""
-        if not table_names:
-            # Get all table names
-            inspector = inspect(db.engine)
-            table_names = inspector.get_table_names()
+    def _get_connection_pool_stats(self) -> Dict[str, Any]:
+        """Get connection pool statistics."""
+        from app.extensions import db
         
-        for table_name in table_names:
-            try:
-                if 'postgresql' in str(db.engine.url):
-                    db.session.execute(text(f"ANALYZE {table_name}"))
-                elif 'sqlite' in str(db.engine.url):
-                    db.session.execute(text(f"ANALYZE {table_name}"))
-                
-                logger.info(f"Updated statistics for table: {table_name}")
-            
-            except Exception as e:
-                logger.error(f"Failed to update statistics for {table_name}: {e}")
-        
-        db.session.commit()
+        if db and hasattr(db, 'engine') and hasattr(db.engine.pool, 'size'):
+            pool = db.engine.pool
+            return {
+                'pool_size': pool.size(),
+                'checked_out_connections': pool.checkedout(),
+                'overflow': pool.overflow(),
+                'total': pool.size() + pool.overflow()
+            }
+        return {}
     
-    def create_performance_indexes(self, force_recreate: bool = False):
-        """Create performance-critical indexes"""
-        from app.services.optimization.db_indexing import db_indexing_strategy
+    def _get_table_stats(self) -> list:
+        """Get table statistics."""
+        from app.extensions import db
         
+        stats = []
         try:
-            results = db_indexing_strategy.optimize_database_indexes(db.session)
+            query = """
+            SELECT 
+                schemaname,
+                tablename,
+                n_live_tup as row_count,
+                pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as total_size
+            FROM pg_stat_user_tables
+            WHERE schemaname = 'public'
+            ORDER BY n_live_tup DESC
+            LIMIT 10
+            """
             
-            # Update statistics after index creation
-            self.optimize_table_statistics()
-            
-            logger.info(f"Database indexes optimized: {results}")
-            return results
-        
+            with db.engine.connect() as conn:
+                result = conn.execute(text(query))
+                for row in result:
+                    stats.append({
+                        'schema': row[0],
+                        'table': row[1],
+                        'row_count': row[2],
+                        'total_size': row[3]
+                    })
         except Exception as e:
-            logger.error(f"Index optimization failed: {e}")
-            return {'error': str(e)}
+            logger.error(f"Failed to get table stats: {str(e)}")
+            
+        return stats
     
-    def clear_query_cache(self):
-        """Clear the query cache"""
-        self.query_cache.clear()
-        self.cache_manager.clear_pattern('query:*')
-        logger.info("Query cache cleared")
+    def _get_index_stats(self) -> list:
+        """Get index statistics."""
+        from app.extensions import db
+        
+        stats = []
+        try:
+            query = """
+            SELECT 
+                schemaname,
+                tablename,
+                indexname,
+                idx_scan as scan_count,
+                pg_size_pretty(pg_relation_size(indexrelid)) as size
+            FROM pg_stat_user_indexes
+            WHERE schemaname = 'public'
+            ORDER BY idx_scan DESC
+            LIMIT 10
+            """
+            
+            with db.engine.connect() as conn:
+                result = conn.execute(text(query))
+                for row in result:
+                    stats.append({
+                        'schema': row[0],
+                        'table': row[1],
+                        'index': row[2],
+                        'scan_count': row[3],
+                        'size': row[4]
+                    })
+        except Exception as e:
+            logger.error(f"Failed to get index stats: {str(e)}")
+            
+        return stats
 
 
-# Global performance optimizer instance
+# Global instance
 db_performance_optimizer = DatabasePerformanceOptimizer()
 
 
-def performance_monitor(operation_name: str):
-    """Decorator for monitoring database operation performance"""
-    def decorator(func):
+def performance_monitor(operation_name: str) -> Callable:
+    """Decorator to monitor database operation performance."""
+    def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
             start_time = time.time()
+            
             try:
                 result = func(*args, **kwargs)
                 execution_time = time.time() - start_time
                 
-                logger.info(f"DB Operation '{operation_name}' completed in {execution_time:.3f}s")
+                if db_performance_optimizer.enable_monitoring:
+                    logger.debug(
+                        f"Operation '{operation_name}' completed in {execution_time:.3f}s"
+                    )
+                    
                 return result
-            
+                
             except Exception as e:
                 execution_time = time.time() - start_time
-                logger.error(f"DB Operation '{operation_name}' failed after {execution_time:.3f}s: {e}")
+                logger.error(
+                    f"Operation '{operation_name}' failed after {execution_time:.3f}s: {str(e)}"
+                )
                 raise
-        
+                
         return wrapper
     return decorator
 
 
-@contextmanager
-def transaction_scope():
-    """Provide a transactional scope around a series of operations"""
-    session = db.session
+def setup_sqlalchemy_monitoring(engine: Engine):
+    """Set up SQLAlchemy event listeners for performance monitoring."""
+    
+    @event.listens_for(Engine, "before_cursor_execute")
+    def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        conn.info.setdefault('query_start_time', []).append(time.time())
+        
+    @event.listens_for(Engine, "after_cursor_execute")
+    def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        total = time.time() - conn.info['query_start_time'].pop(-1)
+        db_performance_optimizer.analyze_query_performance(statement, total)
+        
+    @event.listens_for(Pool, "connect")
+    def on_connect(dbapi_conn, connection_record):
+        """Configure connection for optimal performance."""
+        # PostgreSQL specific optimizations
+        with dbapi_conn.cursor() as cursor:
+            # Set work_mem for better sorting/hashing performance
+            cursor.execute("SET work_mem = '8MB'")
+            # Enable parallel query execution
+            cursor.execute("SET max_parallel_workers_per_gather = 2")
+            # Optimize for read-heavy workloads
+            cursor.execute("SET random_page_cost = 1.1")
+            
+    @event.listens_for(Pool, "checkout")
+    def on_checkout(dbapi_conn, connection_record, connection_proxy):
+        """Reset connection state on checkout."""
+        # Reset any session-specific settings if needed
+        pass
+
+
+def analyze_explain_plan(query: str, bind_params: Dict = None) -> Dict[str, Any]:
+    """Analyze query execution plan."""
+    from app.extensions import db
+    
+    explain_query = f"EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) {query}"
+    
     try:
-        yield session
-        session.commit()
+        with db.engine.connect() as conn:
+            result = conn.execute(text(explain_query), bind_params or {})
+            plan = result.fetchone()[0]
+            
+        # Extract key metrics from the plan
+        return {
+            'execution_time': plan[0]['Execution Time'],
+            'planning_time': plan[0]['Planning Time'],
+            'total_cost': plan[0]['Plan']['Total Cost'],
+            'plan_rows': plan[0]['Plan']['Plan Rows'],
+            'plan_width': plan[0]['Plan']['Plan Width'],
+            'shared_blocks_hit': plan[0]['Plan'].get('Shared Hit Blocks', 0),
+            'shared_blocks_read': plan[0]['Plan'].get('Shared Read Blocks', 0),
+            'temp_blocks_written': plan[0]['Plan'].get('Temp Written Blocks', 0)
+        }
     except Exception as e:
-        session.rollback()
-        logger.error(f"Transaction failed: {e}")
-        raise
-    finally:
-        session.close()
+        logger.error(f"Failed to analyze query plan: {str(e)}")
+        return {}
+
+
+def get_table_statistics(table_name: str) -> Dict[str, Any]:
+    """Get table statistics for optimization."""
+    from app.extensions import db
+    
+    stats_query = """
+    SELECT 
+        schemaname,
+        tablename,
+        n_live_tup as live_rows,
+        n_dead_tup as dead_rows,
+        n_mod_since_analyze as modifications_since_analyze,
+        last_vacuum,
+        last_autovacuum,
+        last_analyze,
+        last_autoanalyze
+    FROM pg_stat_user_tables
+    WHERE tablename = :table_name
+    """
+    
+    try:
+        with db.engine.connect() as conn:
+            result = conn.execute(text(stats_query), {'table_name': table_name})
+            row = result.fetchone()
+            
+        if row:
+            return {
+                'schema': row[0],
+                'table': row[1],
+                'live_rows': row[2],
+                'dead_rows': row[3],
+                'modifications_since_analyze': row[4],
+                'last_vacuum': row[5],
+                'last_autovacuum': row[6],
+                'last_analyze': row[7],
+                'last_autoanalyze': row[8],
+                'bloat_ratio': row[3] / row[2] if row[2] > 0 else 0
+            }
+    except Exception as e:
+        logger.error(f"Failed to get table statistics: {str(e)}")
+        
+    return {}
+
+
+def get_missing_indexes_recommendations() -> list:
+    """Get recommendations for missing indexes based on query patterns."""
+    from app.extensions import db
+    
+    # Query to find missing indexes based on pg_stat_user_tables
+    missing_indexes_query = """
+    SELECT 
+        schemaname,
+        tablename,
+        attname,
+        n_distinct,
+        correlation
+    FROM pg_stats
+    WHERE schemaname = 'public'
+    AND n_distinct > 100
+    AND correlation < 0.1
+    ORDER BY n_distinct DESC
+    LIMIT 20
+    """
+    
+    recommendations = []
+    
+    try:
+        with db.engine.connect() as conn:
+            result = conn.execute(text(missing_indexes_query))
+            
+            for row in result:
+                recommendations.append({
+                    'table': f"{row[0]}.{row[1]}",
+                    'column': row[2],
+                    'distinct_values': row[3],
+                    'correlation': row[4],
+                    'recommendation': f"CREATE INDEX idx_{row[1]}_{row[2]} ON {row[0]}.{row[1]} ({row[2]})"
+                })
+                
+    except Exception as e:
+        logger.error(f"Failed to get index recommendations: {str(e)}")
+        
+    return recommendations

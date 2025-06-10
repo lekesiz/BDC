@@ -4,7 +4,7 @@ import shutil
 import logging
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict
-import subprocess
+from app.utils.secure_subprocess import SecureSubprocess, DatabaseBackupSecure
 import json
 
 from app.utils.logging import logger
@@ -61,42 +61,25 @@ class DatabaseBackupManager:
     
     def _backup_postgresql(self, backup_file: str, compress: bool):
         """Backup PostgreSQL database"""
-        # Parse connection string
-        import urllib.parse
-        parsed = urllib.parse.urlparse(self.database_url)
-        
-        env = os.environ.copy()
-        env['PGPASSWORD'] = parsed.password
-        
-        cmd = [
-            'pg_dump',
-            '-h', parsed.hostname,
-            '-p', str(parsed.port or 5432),
-            '-U', parsed.username,
-            '-d', parsed.path[1:],  # Remove leading slash
-            '--no-password',
-            '--verbose',
-            '--format=plain',
-            '--no-owner',
-            '--no-privileges'
-        ]
-        
         if compress:
-            # Use pipe to compress
-            dump_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, env=env)
-            with gzip.open(backup_file, 'wb') as f:
-                f.write(dump_proc.stdout.read())
-            dump_proc.wait()
+            # For compressed backups, create uncompressed first then compress
+            temp_file = backup_file.replace('.gz', '')
+            success = DatabaseBackupSecure.create_postgres_backup(self.database_url, temp_file)
+            if success:
+                with open(temp_file, 'rb') as f_in:
+                    with gzip.open(backup_file, 'wb') as f_out:
+                        f_out.write(f_in.read())
+                os.remove(temp_file)
         else:
-            cmd.extend(['-f', backup_file])
-            subprocess.run(cmd, env=env, check=True)
+            DatabaseBackupSecure.create_postgres_backup(self.database_url, backup_file)
     
     def _backup_mysql(self, backup_file: str, compress: bool):
         """Backup MySQL database"""
-        # Parse connection string
+        # Parse connection string safely
         import urllib.parse
         parsed = urllib.parse.urlparse(self.database_url)
         
+        # Build command securely
         cmd = [
             'mysqldump',
             f'--host={parsed.hostname}',
@@ -109,14 +92,26 @@ class DatabaseBackupManager:
             parsed.path[1:]  # Database name
         ]
         
-        if compress:
-            dump_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-            with gzip.open(backup_file, 'wb') as f:
-                f.write(dump_proc.stdout.read())
-            dump_proc.wait()
-        else:
-            with open(backup_file, 'w') as f:
-                subprocess.run(cmd, stdout=f, check=True)
+        try:
+            if compress:
+                # Create uncompressed first, then compress
+                temp_file = backup_file.replace('.gz', '')
+                result = SecureSubprocess.run_secure(cmd, timeout=3600, check=True)
+                
+                with open(temp_file, 'wb') as f:
+                    f.write(result.stdout)
+                
+                with open(temp_file, 'rb') as f_in:
+                    with gzip.open(backup_file, 'wb') as f_out:
+                        f_out.write(f_in.read())
+                os.remove(temp_file)
+            else:
+                result = SecureSubprocess.run_secure(cmd, timeout=3600, check=True)
+                with open(backup_file, 'wb') as f:
+                    f.write(result.stdout)
+        except Exception as e:
+            logger.error(f"MySQL backup failed: {e}")
+            raise
     
     def _backup_sqlite(self, backup_file: str, compress: bool):
         """Backup SQLite database"""
@@ -151,27 +146,22 @@ class DatabaseBackupManager:
     
     def _restore_postgresql(self, backup_file: str, is_compressed: bool):
         """Restore PostgreSQL database"""
-        import urllib.parse
-        parsed = urllib.parse.urlparse(self.database_url)
-        
-        env = os.environ.copy()
-        env['PGPASSWORD'] = parsed.password
-        
-        cmd = [
-            'psql',
-            '-h', parsed.hostname,
-            '-p', str(parsed.port or 5432),
-            '-U', parsed.username,
-            '-d', parsed.path[1:],
-            '--no-password'
-        ]
-        
         if is_compressed:
-            with gzip.open(backup_file, 'rb') as f:
-                subprocess.run(cmd, input=f.read(), env=env, check=True)
+            # Decompress first
+            temp_file = backup_file.replace('.gz', '')
+            with gzip.open(backup_file, 'rb') as f_in:
+                with open(temp_file, 'wb') as f_out:
+                    f_out.write(f_in.read())
+            
+            success = DatabaseBackupSecure.restore_postgres_backup(self.database_url, temp_file)
+            os.remove(temp_file)
+            
+            if not success:
+                raise Exception("PostgreSQL restore failed")
         else:
-            cmd.extend(['-f', backup_file])
-            subprocess.run(cmd, env=env, check=True)
+            success = DatabaseBackupSecure.restore_postgres_backup(self.database_url, backup_file)
+            if not success:
+                raise Exception("PostgreSQL restore failed")
     
     def _restore_mysql(self, backup_file: str, is_compressed: bool):
         """Restore MySQL database"""
@@ -187,12 +177,19 @@ class DatabaseBackupManager:
             parsed.path[1:]
         ]
         
-        if is_compressed:
-            with gzip.open(backup_file, 'rb') as f:
-                subprocess.run(cmd, input=f.read(), check=True)
-        else:
-            with open(backup_file, 'r') as f:
-                subprocess.run(cmd, stdin=f, check=True)
+        try:
+            if is_compressed:
+                # Decompress first
+                with gzip.open(backup_file, 'rb') as f:
+                    data = f.read()
+                SecureSubprocess.run_secure(cmd, input_data=data, timeout=3600, check=True)
+            else:
+                with open(backup_file, 'rb') as f:
+                    data = f.read()
+                SecureSubprocess.run_secure(cmd, input_data=data, timeout=3600, check=True)
+        except Exception as e:
+            logger.error(f"MySQL restore failed: {e}")
+            raise
     
     def _restore_sqlite(self, backup_file: str, is_compressed: bool):
         """Restore SQLite database"""
@@ -319,25 +316,8 @@ class DatabaseBackupManager:
     
     def schedule_backup(self, schedule: str = "0 2 * * *"):
         """Create cron job for scheduled backups"""
-        cron_command = f"cd {os.path.dirname(__file__)} && python -m backup create"
-        
-        # Add to crontab
-        try:
-            # Get current crontab
-            result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
-            current_crontab = result.stdout
-            
-            # Add new job if not exists
-            if cron_command not in current_crontab:
-                new_crontab = current_crontab + f"\n{schedule} {cron_command}\n"
-                
-                # Update crontab
-                process = subprocess.Popen(['crontab', '-'], stdin=subprocess.PIPE)
-                process.communicate(new_crontab.encode())
-                
-                logger.info(f"Scheduled backup: {schedule}")
-        except Exception as e:
-            logger.error(f"Failed to schedule backup: {e}")
+        logger.warning("Automatic cron scheduling disabled for security. Please configure manually.")
+        logger.info(f"To schedule backup manually, add this to crontab: {schedule} /path/to/backup/script")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,30 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import apiMock from './mocks/api';
+
+// Set React Router future flags to suppress warnings
+window.__REACT_ROUTER_FUTURE__ = {
+  v7_startTransition: true,
+  v7_relativeSplatPath: true,
+};
+
+// Mock API globally
+vi.mock('@/lib/api', () => ({
+  default: apiMock
+}));
+
+// Mock jwt-decode
+vi.mock('jwt-decode', () => ({
+  jwtDecode: vi.fn((token) => {
+    // Return a valid decoded token with future expiry
+    return {
+      sub: '1',
+      email: 'test@example.com',
+      role: 'admin',
+      exp: Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
+    };
+  })
+}));
 
 // Mock i18n for tests
 vi.mock('react-i18next', () => ({

@@ -1,7 +1,5 @@
-"""
-Optimization services module including API optimization, database query optimization, and caching strategies.
-"""
-from server.app.services.optimization.api_optimizer import api_optimizer
-from server.app.services.optimization.cache_strategy import cache_strategy
-from server.app.services.optimization.db_indexing import db_indexing_strategy
-from server.app.services.optimization.query_optimizer import query_optimizer 
+"""Database and performance optimization services."""
+
+from .db_indexing import DatabaseIndexingStrategy, db_indexing_strategy
+
+__all__ = ['DatabaseIndexingStrategy', 'db_indexing_strategy']

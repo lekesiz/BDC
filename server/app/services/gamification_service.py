@@ -22,7 +22,8 @@ class GamificationService:
     """Main service for gamification features."""
     
     def __init__(self):
-        self.notification_service = NotificationService()
+        # self.notification_service = NotificationService()  # TODO: Fix repository dependency
+        self.notification_service = None
     
     # ========== User XP and Levels Management ==========
     

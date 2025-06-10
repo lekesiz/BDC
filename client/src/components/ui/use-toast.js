@@ -2,8 +2,8 @@
 export { useToast } from './toast';
 // Simple toast function
 export const toast = {
-  success: (message) => ,
+  success: (message) => console.log('Success:', message),
   error: (message) => console.error('Error:', message),
   warning: (message) => console.warn('Warning:', message),
-  info: (message) => ,
+  info: (message) => console.log('Info:', message),
 };

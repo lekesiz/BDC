@@ -44,6 +44,7 @@ const TestResultsPageV2 = () => {const { t } = useTranslation();
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [session, setSession] = useState(null);
   const [test, setTest] = useState(null);
   const [analysis, setAnalysis] = useState(null);
@@ -67,8 +68,9 @@ const TestResultsPageV2 = () => {const { t } = useTranslation();
       setAnalysis(sessionRes.data.analysis);
       setHistory(historyRes.data);
       setComparisons(comparisonsRes.data);
-    } catch (error) {
-      console.error('Error fetching results:', error);
+    } catch (err) {
+      console.error('Error fetching results:', err);
+      setError(err.message || 'Sonuçlar yüklenemedi');
       toast({
         title: 'Hata',
         description: 'Sonuçlar yüklenemedi',
@@ -150,6 +152,23 @@ const TestResultsPageV2 = () => {const { t } = useTranslation();
       </div>);
 
   }
+
+  if (error || !session) {
+    return (
+      <div className="p-6">
+        <div className="text-center py-12">
+          <div className="text-red-600 text-lg mb-4">
+            {error || 'Test sonuçları bulunamadı'}
+          </div>
+          <button 
+            onClick={() => navigate('/evaluations')}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Değerlendirmelere Dön
+          </button>
+        </div>
+      </div>);
+  }
   // Chart configurations
   const scoreProgressChart = {
     labels: history.map((h) => new Date(h.completed_at).toLocaleDateString()),
@@ -192,9 +211,9 @@ const TestResultsPageV2 = () => {const { t } = useTranslation();
     datasets: [
     {
       data: [
-      session.correct_answers,
-      session.wrong_answers,
-      session.unanswered_questions],
+      session?.correct_answers || 0,
+      session?.wrong_answers || 0,
+      session?.unanswered_questions || 0],
 
       backgroundColor: [
       'rgba(34, 197, 94, 0.5)',

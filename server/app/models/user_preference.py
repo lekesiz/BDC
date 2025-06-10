@@ -41,3 +41,26 @@ class UserPreference(db.Model):
     
     # Relationship
     user = relationship('User', backref='preferences')
+    
+    def to_dict(self):
+        """Return a dict representation of the user preference."""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'theme': self.theme,
+            'language': self.language,
+            'notifications_enabled': self.notifications_enabled,
+            'email_notifications': self.email_notifications,
+            'sms_notifications': self.sms_notifications,
+            'push_notifications': self.push_notifications,
+            'profile_visibility': self.profile_visibility,
+            'show_online_status': self.show_online_status,
+            'share_activity': self.share_activity,
+            'allow_data_collection': self.allow_data_collection,
+            'sidebar_collapsed': self.sidebar_collapsed,
+            'density': self.density,
+            'accent_color': self.accent_color,
+            'font_size': self.font_size,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }

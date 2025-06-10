@@ -23,3 +23,14 @@ class Activity(db.Model):
     
     # Relationship
     user = relationship('User', backref='activities')
+    
+    def to_dict(self):
+        """Return a dict representation of the activity."""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'type': self.type,
+            'description': self.description,
+            'activity_data': self.activity_data,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }

@@ -1,3 +1,5 @@
+from flask_babel import _
+
 _('services_performance_prediction_service.message.performance_prediction_service'
     )
 import os

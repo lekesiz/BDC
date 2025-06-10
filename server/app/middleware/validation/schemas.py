@@ -23,21 +23,21 @@ class BaseSchema(Schema):
 class PaginationSchema(Schema):
     """Schema for pagination parameters."""
     page = fields.Integer(
-        missing=1,
+        load_default=1,
         validate=validate.Range(min=1),
         error_messages={'invalid': 'Page must be a positive integer'}
     )
     per_page = fields.Integer(
-        missing=20,
+        load_default=20,
         validate=validate.Range(min=1, max=100),
         error_messages={'invalid': 'Items per page must be between 1 and 100'}
     )
     sort_by = fields.String(
-        missing='created_at',
+        load_default='created_at',
         validate=validate.Length(max=50)
     )
     sort_order = fields.String(
-        missing='desc',
+        load_default='desc',
         validate=validate.OneOf(['asc', 'desc'])
     )
 
@@ -47,7 +47,7 @@ class LoginSchema(Schema):
     """Enhanced login schema."""
     email = SecureFields.email(required=True)
     password = fields.String(required=True, load_only=True)
-    remember_me = fields.Boolean(missing=False)
+    remember_me = fields.Boolean(load_default=False)
     two_factor_code = fields.String(
         validate=validate.Regexp(r'^\d{6}$', error='Invalid 2FA code format')
     )
@@ -62,7 +62,7 @@ class RegisterSchema(Schema):
     last_name = SecureFields.name(required=True, max_length=50)
     phone = SecureFields.phone(required=False)
     role = fields.String(
-        missing='student',
+        load_default='student',
         validate=validate.OneOf(['student', 'trainer', 'admin'])
     )
     terms_accepted = fields.Boolean(
@@ -186,7 +186,7 @@ class ProgramCreateSchema(Schema):
     min_age = fields.Integer(validate=validate.Range(min=0, max=100))
     max_age = fields.Integer(validate=validate.Range(min=0, max=100))
     location = SecureFields.safe_string(max_length=255)
-    is_online = fields.Boolean(missing=False)
+    is_online = fields.Boolean(load_default=False)
     sessions_per_week = fields.Integer(
         validate=validate.Range(min=1, max=7)
     )
@@ -230,9 +230,9 @@ class AppointmentCreateSchema(Schema):
         validate=validate.OneOf(['consultation', 'assessment', 'training', 'follow_up'])
     )
     location = SecureFields.safe_string(max_length=255)
-    is_virtual = fields.Boolean(missing=False)
+    is_virtual = fields.Boolean(load_default=False)
     notes = SecureFields.safe_string(max_length=1000, allow_special=True)
-    reminder_sent = fields.Boolean(missing=False)
+    reminder_sent = fields.Boolean(load_default=False)
     
     @validates('appointment_datetime')
     def validate_datetime(self, value):
@@ -313,7 +313,7 @@ class DocumentUploadSchema(Schema):
         validate=validate.Length(max=10)
     )
     access_level = fields.String(
-        missing='private',
+        load_default='private',
         validate=validate.OneOf(['private', 'shared', 'public'])
     )
     allowed_users = fields.List(fields.Integer())
@@ -327,7 +327,7 @@ class MessageSchema(Schema):
     content = SecureFields.safe_string(required=True, max_length=5000, allow_special=True)
     parent_message_id = fields.Integer()
     attachments = fields.List(fields.Dict())
-    is_urgent = fields.Boolean(missing=False)
+    is_urgent = fields.Boolean(load_default=False)
     
     @validates('content')
     def validate_content(self, value):
@@ -346,10 +346,10 @@ class ReportGenerationSchema(Schema):
     date_to = fields.Date(required=True)
     beneficiary_ids = fields.List(fields.Integer())
     program_ids = fields.List(fields.Integer())
-    include_charts = fields.Boolean(missing=True)
-    include_recommendations = fields.Boolean(missing=False)
+    include_charts = fields.Boolean(load_default=True)
+    include_recommendations = fields.Boolean(load_default=False)
     format = fields.String(
-        missing='pdf',
+        load_default='pdf',
         validate=validate.OneOf(['pdf', 'excel', 'csv'])
     )
     
@@ -377,8 +377,8 @@ class SearchSchema(Schema):
         validate=validate.OneOf(['all', 'users', 'beneficiaries', 'programs', 'documents'])
     )
     filters = fields.Dict()
-    page = fields.Integer(missing=1, validate=validate.Range(min=1))
-    per_page = fields.Integer(missing=20, validate=validate.Range(min=1, max=100))
+    page = fields.Integer(load_default=1, validate=validate.Range(min=1))
+    per_page = fields.Integer(load_default=20, validate=validate.Range(min=1, max=100))
     
     @validates('query')
     def validate_query(self, value):

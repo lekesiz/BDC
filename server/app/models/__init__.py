@@ -1,6 +1,30 @@
-_('models___init__.message.models_package_with_improved_i')
 from app.extensions import db
 from flask_babel import _, lazy_gettext as _l
+
+# This is the models package with improved internationalization support
+_('models___init__.message.models_package_with_improved_i')
+
+# Direct imports for backward compatibility and testing
+from app.models.user import User, TokenBlocklist, UserRole
+from app.models.tenant import Tenant
+from app.models.permission import Permission, Role
+from app.models.beneficiary import Beneficiary, Note, BeneficiaryAppointment, BeneficiaryDocument, BeneficiaryProgress
+from app.models.test import Test, TestSet, Question, TestSession, Response, AIFeedback
+from app.models.evaluation import Evaluation
+from app.models.document import Document
+from app.models.appointment import Appointment
+from app.models.program import Program, ProgramModule, ProgramEnrollment, TrainingSession, SessionAttendance
+from app.models.notification import Notification, MessageThread, ThreadParticipant, Message, ReadReceipt
+from app.models.user_activity import UserActivity
+from app.models.profile import UserProfile
+from app.models.adaptive_test import AdaptiveTestPool, AdaptiveQuestion, AdaptiveTestSession, AdaptiveResponse, AdaptiveTestReport
+from app.models.recurring_appointment import RecurringPattern, AppointmentSeries
+from app.models.chat_conversation import ChatConversation, ConversationStatus, ChatRateLimit, ConversationTemplate
+from app.models.two_factor_auth import TwoFactorAuth, TwoFactorSession
+from app.models.assessment import Assessment
+from app.models.source_content import SourceContent
+from app.models.folder import Folder
+from app.models.report import Report, ReportSchedule
 
 
 def _import_models():
@@ -8,6 +32,9 @@ def _import_models():
     from app.models.tenant import Tenant
     from app.models.permission import Permission, Role
     from app.models.user import User, TokenBlocklist, UserRole
+    from app.models.email_verification import EmailVerificationToken
+    from app.models.virus_scan_log import VirusScanLog
+    from app.models.push_notification import PushNotificationDevice, PushNotificationLog
     from app.models.beneficiary import Beneficiary, Note, BeneficiaryAppointment, BeneficiaryDocument
     from app.models.folder import Folder
     from app.models.profile import UserProfile
@@ -42,6 +69,10 @@ def _import_models():
         'i18n_content_translation_service.label.user_2'): User, _(
         'models___init__.label.tokenblocklist_1'): TokenBlocklist, _(
         'models___init__.label.userrole_1'): UserRole, _(
+        'models___init__.label.emailverificationtoken_1'): EmailVerificationToken, _(
+        'models___init__.label.virusscanlog_1'): VirusScanLog, _(
+        'models___init__.label.pushnotificationdevice_1'): PushNotificationDevice, _(
+        'models___init__.label.pushnotificationlog_1'): PushNotificationLog, _(
         'models___init__.label.userprofile_1'): UserProfile, _(
         'models___init__.label.useractivity_1'): UserActivity, _(
         'models___init__.label.userpreference_1'): UserPreference, _(

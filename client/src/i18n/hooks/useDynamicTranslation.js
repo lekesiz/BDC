@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useLanguage } from './useLanguage';
+import useLanguage from './useLanguage';
 import translationManager from '../managers/TranslationManager';
 import api from '../../lib/api';import { useTranslation } from "react-i18next";
 

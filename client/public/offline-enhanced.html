@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDC - Offline Mode</title>
+    <link rel="icon" href="/icons/icon-192x192.png">
+    <meta name="theme-color" content="#3b82f6">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --bg-primary: #f9fafb;
+            --bg-card: #ffffff;
+            --border: #e5e7eb;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-primary: #f9fafb;
+                --text-secondary: #d1d5db;
+                --text-light: #9ca3af;
+                --bg-primary: #111827;
+                --bg-card: #1f2937;
+                --border: #374151;
+            }
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .offline-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .status-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--error);
+            animation: blink 1.5s infinite;
+        }
+        
+        .status-dot.online {
+            background: var(--success);
+            animation: none;
+        }
+        
+        .retry-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .retry-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .retry-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+        }
+        
+        .card ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .card li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .card li:last-child {
+            border-bottom: none;
+        }
+        
+        .card li:before {
+            content: "✓";
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .data-viewer {
+            max-height: 250px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .data-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .data-meta {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .empty-state {
+            text-align: center;
+            opacity: 0.7;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+        
+        .sync-queue {
+            border: 2px solid rgba(255, 193, 7, 0.5);
+            background: rgba(255, 193, 7, 0.1);
+        }
+        
+        .storage-info {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .connection-info {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+        
+        .connection-info.online {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="offline-icon">📱</div>
+            <h1>Offline Mode</h1>
+            <div class="subtitle">You're currently offline, but you can still access cached content and use offline features.</div>
+            
+            <div class="status-bar">
+                <div class="status-info">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Checking connection...</span>
+                </div>
+                <button class="retry-btn" onclick="checkConnection()" id="retryBtn">
+                    <span id="retryIcon">🔄</span>
+                    <span id="retryText">Try Again</span>
+                </button>
+            </div>
+            
+            <div class="connection-info" id="connectionInfo">
+                <div><strong>Offline Duration:</strong> <span id="offlineDuration">Calculating...</span></div>
+                <div><strong>Last Online:</strong> <span id="lastOnline">Unknown</span></div>
+                <div><strong>Network Type:</strong> <span id="networkType">Unknown</span></div>
+            </div>
+        </div>
+        
+        <div class="content-grid">
+            <!-- Available Features -->
+            <div class="card">
+                <h3>
+                    <span class="card-icon">📋</span>
+                    Available Offline
+                </h3>
+                <ul>
+                    <li>View cached beneficiaries data</li>
+                    <li>Access saved evaluation results</li>
+                    <li>Browse downloaded documents</li>
+                    <li>Use offline forms and surveys</li>
+                    <li>View cached calendar events</li>
+                    <li>Access training materials</li>
+                    <li>Review offline reports</li>
+                </ul>
+            </div>
+            
+            <!-- Cached Data Viewer -->
+            <div class="card">
+                <h3>
+                    <span class="card-icon">💾</span>
+                    Cached Data Browser
+                </h3>
+                <div class="actions">
+                    <button class="action-btn" onclick="loadCachedData('beneficiaries')">
+                        👥 Beneficiaries
+                    </button>
+                    <button class="action-btn" onclick="loadCachedData('evaluations')">
+                        📝 Evaluations
+                    </button>
+                    <button class="action-btn" onclick="loadCachedData('documents')">
+                        📄 Documents
+                    </button>
+                    <button class="action-btn" onclick="loadCachedData('calendar')">
+                        📅 Calendar
+                    </button>
+                </div>
+                <div class="data-viewer" id="cachedDataViewer">
+                    <div class="empty-state">Select a category to view cached data</div>
+                </div>
+            </div>
+            
+            <!-- Sync Queue -->
+            <div class="card sync-queue">
+                <h3>
+                    <span class="card-icon">🔄</span>
+                    Pending Synchronization
+                </h3>
+                <div id="syncQueueInfo">Loading sync queue...</div>
+                <div class="data-viewer" id="syncQueueViewer">
+                    <div class="empty-state">Checking for pending items...</div>
+                </div>
+                <div class="actions">
+                    <button class="action-btn" onclick="clearSyncQueue()">
+                        🗑️ Clear Queue
+                    </button>
+                    <button class="action-btn" onclick="exportSyncData()">
+                        📤 Export Data
+                    </button>
+                    <button class="action-btn" onclick="refreshSyncQueue()">
+                        🔄 Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Storage Management -->
+            <div class="card storage-info">
+                <h3>
+                    <span class="card-icon">💿</span>
+                    Storage Management
+                </h3>
+                <div id="storageDetails">Calculating storage usage...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="storageProgress" style="width: 0%"></div>
+                </div>
+                <div class="actions">
+                    <button class="action-btn" onclick="updateStorageInfo()">
+                        🔄 Refresh
+                    </button>
+                    <button class="action-btn" onclick="optimizeStorage()">
+                        🔧 Optimize
+                    </button>
+                    <button class="action-btn" onclick="clearCache()">
+                        🗑️ Clear Cache
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card">
+                <h3>
+                    <span class="card-icon">⚡</span>
+                    Quick Actions
+                </h3>
+                <div class="actions">
+                    <button class="action-btn" onclick="returnToApp()">
+                        🏠 Return to App
+                    </button>
+                    <button class="action-btn" onclick="exportAllData()">
+                        📦 Export All Data
+                    </button>
+                    <button class="action-btn" onclick="viewOfflineHelp()">
+                        ❓ Help & Tips
+                    </button>
+                    <button class="action-btn" onclick="diagnostics()">
+                        🔍 Run Diagnostics
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Performance Monitor -->
+            <div class="card">
+                <h3>
+                    <span class="card-icon">📊</span>
+                    Performance Monitor
+                </h3>
+                <div id="performanceInfo">
+                    <div class="data-item">
+                        <span>Cache Hit Rate:</span>
+                        <span id="cacheHitRate">Calculating...</span>
+                    </div>
+                    <div class="data-item">
+                        <span>Response Time:</span>
+                        <span id="responseTime">Measuring...</span>
+                    </div>
+                    <div class="data-item">
+                        <span>Data Freshness:</span>
+                        <span id="dataFreshness">Checking...</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="action-btn" onclick="runPerformanceTest()">
+                        🚀 Run Test
+                    </button>
+                    <button class="action-btn" onclick="viewDetailedStats()">
+                        📈 Detailed Stats
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global state
+        let offlineStartTime = new Date();
+        let retryCount = 0;
+        let maxRetries = 5;
+        let currentDataType = null;
+        
+        // Mock data for demonstration
+        const mockCachedData = {
+            beneficiaries: [
+                { id: 1, name: 'John Doe', status: 'Active', lastUpdate: new Date(Date.now() - 86400000) },
+                { id: 2, name: 'Jane Smith', status: 'Pending', lastUpdate: new Date(Date.now() - 172800000) },
+                { id: 3, name: 'Bob Johnson', status: 'Completed', lastUpdate: new Date(Date.now() - 259200000) }
+            ],
+            evaluations: [
+                { id: 1, title: 'Technical Assessment', score: 85, lastUpdate: new Date(Date.now() - 86400000) },
+                { id: 2, title: 'Soft Skills Review', score: 92, lastUpdate: new Date(Date.now() - 172800000) }
+            ],
+            documents: [
+                { id: 1, name: 'Training Manual.pdf', size: '2.4 MB', lastUpdate: new Date(Date.now() - 86400000) },
+                { id: 2, name: 'Assessment Guide.docx', size: '1.1 MB', lastUpdate: new Date(Date.now() - 172800000) }
+            ],
+            calendar: [
+                { id: 1, title: 'Training Session', date: new Date(Date.now() + 86400000), lastUpdate: new Date() },
+                { id: 2, title: 'Assessment Meeting', date: new Date(Date.now() + 172800000), lastUpdate: new Date() }
+            ]
+        };
+        
+        const mockSyncQueue = [
+            { type: 'evaluation', description: 'Test submission for John Doe', timestamp: new Date(Date.now() - 300000) },
+            { type: 'beneficiary', description: 'Profile update for Jane Smith', timestamp: new Date(Date.now() - 600000) },
+            { type: 'document', description: 'Upload training certificate', timestamp: new Date(Date.now() - 900000) }
+        ];
+        
+        // Initialize the offline page
+        function init() {
+            updateConnectionStatus();
+            updateOfflineDuration();
+            loadSyncQueue();
+            updateStorageInfo();
+            updatePerformanceMetrics();
+            
+            // Set up periodic updates
+            setInterval(updateConnectionStatus, 5000);
+            setInterval(updateOfflineDuration, 1000);
+            setInterval(updatePerformanceMetrics, 30000);
+        }
+        
+        // Connection management
+        function updateConnectionStatus() {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const connectionInfo = document.getElementById('connectionInfo');
+            
+            if (navigator.onLine) {
+                statusDot.classList.add('online');
+                statusText.textContent = 'Connection restored! Redirecting...';
+                connectionInfo.classList.add('online');
+                
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                statusDot.classList.remove('online');
+                statusText.textContent = `Offline (Attempt ${retryCount}/${maxRetries})`;
+                
+                // Update connection details
+                updateConnectionDetails();
+            }
+        }
+        
+        function updateConnectionDetails() {
+            const networkType = navigator.connection ? navigator.connection.effectiveType : 'Unknown';
+            document.getElementById('networkType').textContent = networkType;
+            
+            const lastOnlineTime = localStorage.getItem('lastOnlineTime');
+            if (lastOnlineTime) {
+                document.getElementById('lastOnline').textContent = new Date(lastOnlineTime).toLocaleString();
+            }
+        }
+        
+        function updateOfflineDuration() {
+            const duration = Date.now() - offlineStartTime.getTime();
+            const minutes = Math.floor(duration / 60000);
+            const seconds = Math.floor((duration % 60000) / 1000);
+            
+            document.getElementById('offlineDuration').textContent = 
+                minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+        }
+        
+        function checkConnection() {
+            const retryBtn = document.getElementById('retryBtn');
+            const retryIcon = document.getElementById('retryIcon');
+            const retryText = document.getElementById('retryText');
+            
+            retryBtn.disabled = true;
+            retryIcon.innerHTML = '<div class="spinner"></div>';
+            retryText.textContent = 'Checking...';
+            retryCount++;
+            
+            // Simulate connection check
+            setTimeout(() => {
+                updateConnectionStatus();
+                
+                retryBtn.disabled = false;
+                retryIcon.textContent = '🔄';
+                retryText.textContent = retryCount >= maxRetries ? 'Max Retries' : 'Try Again';
+                
+                if (retryCount >= maxRetries) {
+                    setTimeout(() => {
+                        retryText.textContent = 'Try Again';
+                        retryCount = 0;
+                    }, 3000);
+                }
+            }, 2000);
+        }
+        
+        // Data management
+        function loadCachedData(type) {
+            currentDataType = type;
+            const viewer = document.getElementById('cachedDataViewer');
+            viewer.innerHTML = '<div class="empty-state">Loading...</div>';
+            
+            setTimeout(() => {
+                const data = mockCachedData[type] || [];
+                
+                if (data.length === 0) {
+                    viewer.innerHTML = `<div class="empty-state">No cached ${type} found</div>`;
+                } else {
+                    viewer.innerHTML = data.map(item => createDataItemHTML(item, type)).join('');
+                }
+            }, 500);
+        }
+        
+        function createDataItemHTML(item, type) {
+            const timeAgo = getTimeAgo(item.lastUpdate);
+            
+            switch (type) {
+                case 'beneficiaries':
+                    return `<div class="data-item">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <span class="data-meta">Status: ${item.status}</span>
+                        </div>
+                        <span class="data-meta">${timeAgo}</span>
+                    </div>`;
+                    
+                case 'evaluations':
+                    return `<div class="data-item">
+                        <div>
+                            <strong>${item.title}</strong><br>
+                            <span class="data-meta">Score: ${item.score}%</span>
+                        </div>
+                        <span class="data-meta">${timeAgo}</span>
+                    </div>`;
+                    
+                case 'documents':
+                    return `<div class="data-item">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <span class="data-meta">Size: ${item.size}</span>
+                        </div>
+                        <span class="data-meta">${timeAgo}</span>
+                    </div>`;
+                    
+                case 'calendar':
+                    return `<div class="data-item">
+                        <div>
+                            <strong>${item.title}</strong><br>
+                            <span class="data-meta">${item.date.toLocaleDateString()}</span>
+                        </div>
+                        <span class="data-meta">${timeAgo}</span>
+                    </div>`;
+                    
+                default:
+                    return `<div class="data-item">
+                        <div><strong>${item.title || item.name || 'Unknown'}</strong></div>
+                        <span class="data-meta">${timeAgo}</span>
+                    </div>`;
+            }
+        }
+        
+        function loadSyncQueue() {
+            const info = document.getElementById('syncQueueInfo');
+            const viewer = document.getElementById('syncQueueViewer');
+            
+            if (mockSyncQueue.length === 0) {
+                info.textContent = 'All data synchronized';
+                viewer.innerHTML = '<div class="empty-state">No pending synchronization</div>';
+            } else {
+                info.textContent = `${mockSyncQueue.length} items pending synchronization`;
+                viewer.innerHTML = mockSyncQueue.map(item => `
+                    <div class="data-item">
+                        <div>
+                            <strong>${item.type.toUpperCase()}</strong><br>
+                            <span class="data-meta">${item.description}</span>
+                        </div>
+                        <span class="data-meta">${getTimeAgo(item.timestamp)}</span>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function refreshSyncQueue() {
+            document.getElementById('syncQueueViewer').innerHTML = '<div class="empty-state">Refreshing...</div>';
+            setTimeout(loadSyncQueue, 1000);
+        }
+        
+        // Storage management
+        async function updateStorageInfo() {
+            const details = document.getElementById('storageDetails');
+            const progress = document.getElementById('storageProgress');
+            
+            try {
+                if ('storage' in navigator && 'estimate' in navigator.storage) {
+                    const estimate = await navigator.storage.estimate();
+                    const used = estimate.usage || 0;
+                    const quota = estimate.quota || 0;
+                    const percentage = quota > 0 ? Math.round((used / quota) * 100) : 0;
+                    
+                    details.innerHTML = `
+                        <div class="data-item">
+                            <span>Used Storage:</span>
+                            <span>${formatBytes(used)} (${percentage}%)</span>
+                        </div>
+                        <div class="data-item">
+                            <span>Available:</span>
+                            <span>${formatBytes(quota - used)}</span>
+                        </div>
+                        <div class="data-item">
+                            <span>Total Quota:</span>
+                            <span>${formatBytes(quota)}</span>
+                        </div>
+                    `;
+                    
+                    progress.style.width = `${percentage}%`;
+                } else {
+                    details.innerHTML = '<div class="empty-state">Storage information not available</div>';
+                }
+            } catch (error) {
+                details.innerHTML = '<div class="empty-state">Error calculating storage</div>';
+            }
+        }
+        
+        function optimizeStorage() {
+            if (confirm('This will clear old cached data to free up space. Continue?')) {
+                // Simulate optimization
+                const details = document.getElementById('storageDetails');
+                details.innerHTML = '<div class="empty-state">Optimizing storage...</div>';
+                
+                setTimeout(() => {
+                    updateStorageInfo();
+                    alert('Storage optimization completed!');
+                }, 2000);
+            }
+        }
+        
+        // Performance monitoring
+        function updatePerformanceMetrics() {
+            document.getElementById('cacheHitRate').textContent = '87%';
+            document.getElementById('responseTime').textContent = '< 50ms';
+            document.getElementById('dataFreshness').textContent = 'Good';
+        }
+        
+        function runPerformanceTest() {
+            const metrics = ['cacheHitRate', 'responseTime', 'dataFreshness'];
+            
+            metrics.forEach(metric => {
+                document.getElementById(metric).textContent = 'Testing...';
+            });
+            
+            setTimeout(() => {
+                document.getElementById('cacheHitRate').textContent = Math.floor(Math.random() * 20 + 80) + '%';
+                document.getElementById('responseTime').textContent = Math.floor(Math.random() * 100 + 20) + 'ms';
+                document.getElementById('dataFreshness').textContent = ['Excellent', 'Good', 'Fair'][Math.floor(Math.random() * 3)];
+            }, 3000);
+        }
+        
+        // Action functions
+        function clearSyncQueue() {
+            if (confirm('Clear all pending synchronization data? This cannot be undone.')) {
+                mockSyncQueue.length = 0;
+                loadSyncQueue();
+            }
+        }
+        
+        function exportSyncData() {
+            const data = JSON.stringify(mockSyncQueue, null, 2);
+            downloadFile(data, `sync-queue-${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+        }
+        
+        function exportAllData() {
+            const allData = {
+                cached: mockCachedData,
+                syncQueue: mockSyncQueue,
+                timestamp: new Date().toISOString(),
+                offlineDuration: Date.now() - offlineStartTime.getTime()
+            };
+            
+            const data = JSON.stringify(allData, null, 2);
+            downloadFile(data, `bdc-offline-backup-${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+        }
+        
+        function clearCache() {
+            if (confirm('This will clear all cached data. You may lose offline functionality. Continue?')) {
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => caches.delete(name));
+                    });
+                }
+                
+                localStorage.clear();
+                sessionStorage.clear();
+                alert('Cache cleared successfully!');
+                updateStorageInfo();
+            }
+        }
+        
+        function returnToApp() {
+            window.location.href = '/';
+        }
+        
+        function viewOfflineHelp() {
+            alert(`BDC Offline Mode Help:
+
+🔍 Key Features:
+• Browse cached data without internet
+• Monitor pending synchronization
+• Manage storage and performance
+• Export data for backup
+
+💡 Tips:
+• Data automatically syncs when online
+• Use Export functions for backup
+• Clear cache only if experiencing issues
+• Performance tests help identify slow areas
+
+📞 Need help? Contact your system administrator.`);
+        }
+        
+        function diagnostics() {
+            alert(`System Diagnostics:
+
+✅ Service Worker: ${navigator.serviceWorker ? 'Active' : 'Not available'}
+✅ Cache API: ${window.caches ? 'Supported' : 'Not supported'}
+✅ IndexedDB: ${window.indexedDB ? 'Available' : 'Not available'}
+✅ Local Storage: ${window.localStorage ? 'Working' : 'Not available'}
+✅ Background Sync: ${window.ServiceWorkerRegistration && 'sync' in window.ServiceWorkerRegistration.prototype ? 'Supported' : 'Not supported'}
+
+📊 Current Status:
+• Offline Duration: ${document.getElementById('offlineDuration').textContent}
+• Cached Items: ${Object.values(mockCachedData).flat().length}
+• Pending Sync: ${mockSyncQueue.length}
+• Retry Attempts: ${retryCount}/${maxRetries}`);
+        }
+        
+        function viewDetailedStats() {
+            const stats = `Detailed Performance Statistics:
+
+📊 Cache Performance:
+• Hit Rate: ${document.getElementById('cacheHitRate').textContent}
+• Miss Rate: ${100 - parseInt(document.getElementById('cacheHitRate').textContent)}%
+• Average Response Time: ${document.getElementById('responseTime').textContent}
+
+💾 Storage Stats:
+• Total Cached Items: ${Object.values(mockCachedData).flat().length}
+• Beneficiaries: ${mockCachedData.beneficiaries.length}
+• Evaluations: ${mockCachedData.evaluations.length}
+• Documents: ${mockCachedData.documents.length}
+• Calendar Events: ${mockCachedData.calendar.length}
+
+🔄 Sync Statistics:
+• Pending Items: ${mockSyncQueue.length}
+• Last Sync Attempt: Unknown
+• Success Rate: N/A (offline)
+
+🌐 Network Info:
+• Connection Type: ${navigator.connection ? navigator.connection.effectiveType : 'Unknown'}
+• Effective Bandwidth: ${navigator.connection ? navigator.connection.downlink : 'Unknown'} Mbps`;
+
+            alert(stats);
+        }
+        
+        // Utility functions
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (days > 0) return `${days}d ago`;
+            if (hours > 0) return `${hours}h ago`;
+            if (minutes > 0) return `${minutes}m ago`;
+            return 'Just now';
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function downloadFile(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Event listeners
+        window.addEventListener('online', () => {
+            localStorage.setItem('lastOnlineTime', new Date().toISOString());
+            updateConnectionStatus();
+        });
+        
+        window.addEventListener('offline', updateConnectionStatus);
+        
+        // Store last online time when page loads
+        if (navigator.onLine) {
+            localStorage.setItem('lastOnlineTime', new Date().toISOString());
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

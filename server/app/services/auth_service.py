@@ -286,3 +286,7 @@ class AuthServiceV2(IAuthService):
             db.session.commit()
         except Exception as e:
             current_app.logger.error(f"Failed to log activity: {str(e)}")
+
+
+# Backward compatibility alias
+AuthService = AuthServiceV2

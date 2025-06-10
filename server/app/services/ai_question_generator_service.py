@@ -1,3 +1,5 @@
+from flask_babel import _
+
 _('services_ai_question_generator_service.message.ai_powered_question_generation'
     )
 import os
@@ -54,7 +56,7 @@ class ContentProcessor:
         else:
             self.nlp = None
 
-    def process_content(self, source_content: SourceContent) ->Dict[str, Any]:
+    def process_content(self, source_content: Any) -> Dict[str, Any]:
         _('services_ai_question_generator_service.message.process_source_content_and_ext'
             )
         try:
@@ -1035,7 +1037,7 @@ class AIQuestionGeneratorService:
     def create_source_content(self, tenant_id: int, creator_id: int, title:
         str, description: str=None, content_type_name: str='text',
         file_path: str=None, url: str=None, text_content: str=None
-        ) ->SourceContent:
+        ) -> Any:
         _('services_ai_question_generator_service.message.create_and_process_source_cont'
             )
         content_type = db.session.query(ContentType).filter(ContentType.

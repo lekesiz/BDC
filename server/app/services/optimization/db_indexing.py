@@ -1,260 +1,227 @@
-"""
-Database indexing strategy
-"""
-from typing import Dict, Any, List, Optional
-from sqlalchemy import inspect, Index, text
-from sqlalchemy.orm import Session
-from sqlalchemy.schema import Table
-from functools import wraps
-import time
+"""Database indexing strategy for performance optimization."""
 
-from app.extensions import db
-from app.utils.logging import logger
+import logging
+from typing import Dict, List, Any, Optional
+from sqlalchemy import text, inspect
+from flask import current_app
 
-# Geçici olarak Base modeli
-class Base:
-    __subclasses__ = lambda: []
+logger = logging.getLogger(__name__)
 
-# Geçici servis sınıfı
-class PerformanceMonitor:
-    def track_performance(self, operation_name):
-        def decorator(func):
-            @wraps(func)
-            def wrapper(*args, **kwargs):
-                start_time = time.time()
-                result = func(*args, **kwargs)
-                end_time = time.time()
-                execution_time = (end_time - start_time) * 1000  # ms
-                logger.info(f"Performance: {operation_name} took {execution_time:.2f}ms")
-                return result
-            return wrapper
-        return decorator
-
-performance_monitor = PerformanceMonitor()
 
 class DatabaseIndexingStrategy:
-    """Enhanced database indexing strategy implementation"""
+    """Manages database indexing strategies for optimal performance."""
     
     def __init__(self):
-        self.index_stats = {
-            'indexes_created': 0,
-            'indexes_analyzed': 0,
-            'indexes_dropped': 0,
-            'query_improvements': [],
-            'composite_indexes_created': 0,
-            'partial_indexes_created': 0,
-            'covering_indexes_created': 0
-        }
-        
-        # Critical indexes for BDC application
+        """Initialize database indexing strategy."""
         self.critical_indexes = {
             'users': [
-                {'columns': ['email'], 'unique': True, 'reason': 'Login lookups'},
-                {'columns': ['role', 'is_active'], 'reason': 'Role-based filtering'},
-                {'columns': ['tenant_id', 'role'], 'reason': 'Tenant user queries'},
-                {'columns': ['created_at'], 'reason': 'Chronological queries'},
-                {'columns': ['last_login'], 'reason': 'Activity tracking'}
+                {
+                    'name': 'idx_users_email',
+                    'columns': ['email'],
+                    'unique': True,
+                    'description': 'Unique email index for fast user lookups'
+                },
+                {
+                    'name': 'idx_users_tenant_role',
+                    'columns': ['tenant_id', 'role'],
+                    'unique': False,
+                    'description': 'Composite index for tenant-based role queries'
+                },
+                {
+                    'name': 'idx_users_role_active',
+                    'columns': ['role', 'is_active'],
+                    'unique': False,
+                    'description': 'Index for filtering active users by role'
+                }
             ],
             'beneficiaries': [
-                {'columns': ['user_id'], 'unique': True, 'reason': 'User-beneficiary mapping'},
-                {'columns': ['trainer_id'], 'reason': 'Trainer assignment queries'},
-                {'columns': ['tenant_id', 'status'], 'reason': 'Tenant beneficiary filtering'},
-                {'columns': ['status', 'created_at'], 'reason': 'Status timeline queries'},
-                {'columns': ['birth_date'], 'reason': 'Age-based filtering'}
+                {
+                    'name': 'idx_beneficiaries_user_id',
+                    'columns': ['user_id'],
+                    'unique': True,
+                    'description': 'Foreign key index for user relationship'
+                },
+                {
+                    'name': 'idx_beneficiaries_trainer_id',
+                    'columns': ['trainer_id'],
+                    'unique': False,
+                    'description': 'Index for trainer assignments'
+                },
+                {
+                    'name': 'idx_beneficiaries_tenant_status',
+                    'columns': ['tenant_id', 'status'],
+                    'unique': False,
+                    'description': 'Composite index for tenant-based status queries'
+                }
             ],
             'appointments': [
-                {'columns': ['beneficiary_id', 'start_time'], 'reason': 'Beneficiary schedule'},
-                {'columns': ['trainer_id', 'start_time'], 'reason': 'Trainer schedule'},
-                {'columns': ['status', 'start_time'], 'reason': 'Status-based scheduling'},
-                {'columns': ['start_time', 'end_time'], 'reason': 'Time range queries'},
-                {'columns': ['series_id'], 'reason': 'Recurring appointments'}
-            ],
-            'evaluations': [
-                {'columns': ['beneficiary_id', 'created_at'], 'reason': 'Beneficiary evaluation history'},
-                {'columns': ['status'], 'reason': 'Status filtering'},
-                {'columns': ['assessment_type', 'created_at'], 'reason': 'Type-based queries'}
-            ],
-            'programs': [
-                {'columns': ['status'], 'reason': 'Program status filtering'},
-                {'columns': ['created_by', 'created_at'], 'reason': 'Creator queries'},
-                {'columns': ['start_date', 'end_date'], 'reason': 'Date range filtering'}
+                {
+                    'name': 'idx_appointments_beneficiary_time',
+                    'columns': ['beneficiary_id', 'start_time'],
+                    'unique': False,
+                    'description': 'Index for beneficiary appointment lookups'
+                },
+                {
+                    'name': 'idx_appointments_trainer_time',
+                    'columns': ['trainer_id', 'start_time'],
+                    'unique': False,
+                    'description': 'Index for trainer schedule queries'
+                },
+                {
+                    'name': 'idx_appointments_status_time',
+                    'columns': ['status', 'start_time'],
+                    'unique': False,
+                    'description': 'Index for appointment status filtering'
+                }
             ],
             'documents': [
-                {'columns': ['beneficiary_id', 'created_at'], 'reason': 'Document timeline'},
-                {'columns': ['created_by', 'created_at'], 'reason': 'Creator history'},
-                {'columns': ['file_type'], 'reason': 'Type filtering'}
+                {
+                    'name': 'idx_documents_beneficiary_created',
+                    'columns': ['beneficiary_id', 'created_at'],
+                    'unique': False,
+                    'description': 'Index for beneficiary document timeline'
+                },
+                {
+                    'name': 'idx_documents_file_type',
+                    'columns': ['file_type'],
+                    'unique': False,
+                    'description': 'Index for document type filtering'
+                },
+                {
+                    'name': 'idx_documents_tenant_type',
+                    'columns': ['tenant_id', 'file_type'],
+                    'unique': False,
+                    'description': 'Composite index for tenant document queries'
+                }
             ],
-            'notifications': [
-                {'columns': ['user_id', 'is_read'], 'reason': 'User notification queries'},
-                {'columns': ['created_at'], 'reason': 'Chronological sorting'},
-                {'columns': ['notification_type'], 'reason': 'Type filtering'}
+            'test_sessions': [
+                {
+                    'name': 'idx_test_sessions_beneficiary',
+                    'columns': ['beneficiary_id'],
+                    'unique': False,
+                    'description': 'Index for beneficiary test history'
+                },
+                {
+                    'name': 'idx_test_sessions_test_status',
+                    'columns': ['test_id', 'status'],
+                    'unique': False,
+                    'description': 'Index for test completion tracking'
+                },
+                {
+                    'name': 'idx_test_sessions_created',
+                    'columns': ['created_at'],
+                    'unique': False,
+                    'description': 'Index for time-based queries'
+                }
+            ],
+            'audit_logs': [
+                {
+                    'name': 'idx_audit_logs_user_time',
+                    'columns': ['user_id', 'created_at'],
+                    'unique': False,
+                    'description': 'Index for user activity tracking'
+                },
+                {
+                    'name': 'idx_audit_logs_entity',
+                    'columns': ['entity_type', 'entity_id'],
+                    'unique': False,
+                    'description': 'Index for entity-based audit queries'
+                },
+                {
+                    'name': 'idx_audit_logs_action',
+                    'columns': ['action', 'created_at'],
+                    'unique': False,
+                    'description': 'Index for action-based filtering'
+                }
             ]
         }
         
-    def analyze_and_create_indexes(self, db: Session, models: List[type] = None):
-        """Analyze database and create necessary indexes"""
-        if models is None:
-            models = Base.__subclasses__()
-            
-        for model in models:
-            self._analyze_model_indexes(model, db)
-            
-        return self.index_stats
-        
-    def _analyze_model_indexes(self, model: type, db: Session):
-        """Analyze indexes for a specific model"""
-        table_name = model.__tablename__
-        inspector = inspect(db.bind)
-        
-        # Get existing indexes
-        existing_indexes = inspector.get_indexes(table_name)
-        existing_index_columns = {
-            tuple(idx['column_names']) for idx in existing_indexes
+    def analyze_and_create_indexes(self, db_engine) -> Dict[str, Any]:
+        """Analyze database and create missing critical indexes."""
+        results = {
+            'analyzed_tables': 0,
+            'existing_indexes': 0,
+            'created_indexes': 0,
+            'failed_indexes': 0,
+            'recommendations': []
         }
         
-        # Analyze common query patterns
-        suggested_indexes = self._get_suggested_indexes(model)
-        
-        # Create missing indexes
-        for index_config in suggested_indexes:
-            columns = tuple(index_config['columns'])
-            if columns not in existing_index_columns:
-                self._create_index(
-                    table_name,
-                    index_config['columns'],
-                    index_config.get('unique', False),
-                    index_config.get('name'),
-                    db
-                )
-                
-        self.index_stats['indexes_analyzed'] += 1
-        
-    def _get_suggested_indexes(self, model: type) -> List[Dict[str, Any]]:
-        """Get suggested indexes for a model based on common patterns"""
-        suggestions = []
-        table = model.__table__
-        
-        # Foreign key indexes
-        for column in table.columns:
-            if column.foreign_keys:
-                suggestions.append({
-                    'columns': [column.name],
-                    'name': f'idx_{table.name}_{column.name}',
-                    'reason': 'Foreign key column'
-                })
-                
-        # Common lookup patterns
-        common_patterns = self._get_common_query_patterns(model)
-        for pattern in common_patterns:
-            suggestions.append({
-                'columns': pattern['columns'],
-                'name': pattern.get('name', f"idx_{table.name}_{'_'.join(pattern['columns'])}"),
-                'reason': pattern.get('reason', 'Common query pattern')
-            })
-            
-        # Composite indexes for common filters
-        if hasattr(model, '__search_fields__'):
-            search_fields = model.__search_fields__
-            if len(search_fields) > 1:
-                suggestions.append({
-                    'columns': search_fields[:3],  # Limit to 3 columns
-                    'name': f'idx_{table.name}_search',
-                    'reason': 'Search optimization'
-                })
-                
-        return suggestions
-        
-    def _get_common_query_patterns(self, model: type) -> List[Dict[str, Any]]:
-        """Define common query patterns for models"""
-        patterns = []
-        table_name = model.__tablename__
-        
-        # Common patterns for all models
-        if 'created_at' in model.__table__.columns:
-            patterns.append({
-                'columns': ['created_at'],
-                'reason': 'Chronological queries'
-            })
-            
-        if 'status' in model.__table__.columns:
-            patterns.append({
-                'columns': ['status'],
-                'reason': 'Status filtering'
-            })
-            
-        if 'is_active' in model.__table__.columns:
-            patterns.append({
-                'columns': ['is_active'],
-                'reason': 'Active record filtering'
-            })
-            
-        # Model-specific patterns
-        if table_name == 'users':
-            patterns.extend([
-                {'columns': ['email'], 'unique': True, 'reason': 'Email lookup'},
-                {'columns': ['username'], 'unique': True, 'reason': 'Username lookup'},
-                {'columns': ['role', 'is_active'], 'reason': 'Role-based queries'}
-            ])
-        elif table_name == 'beneficiaries':
-            patterns.extend([
-                {'columns': ['trainer_id'], 'reason': 'Trainer lookup'},
-                {'columns': ['status', 'created_at'], 'reason': 'Status timeline'},
-                {'columns': ['program_id', 'status'], 'reason': 'Program filtering'}
-            ])
-        elif table_name == 'assessments':
-            patterns.extend([
-                {'columns': ['beneficiary_id', 'status'], 'reason': 'Beneficiary assessments'},
-                {'columns': ['assessment_type', 'created_at'], 'reason': 'Type filtering'},
-                {'columns': ['completed_at'], 'reason': 'Completion queries'}
-            ])
-        elif table_name == 'appointments':
-            patterns.extend([
-                {'columns': ['beneficiary_id', 'scheduled_at'], 'reason': 'Schedule lookup'},
-                {'columns': ['trainer_id', 'scheduled_at'], 'reason': 'Trainer schedule'},
-                {'columns': ['status', 'scheduled_at'], 'reason': 'Status filtering'}
-            ])
-        elif table_name == 'notes':
-            patterns.extend([
-                {'columns': ['beneficiary_id', 'created_at'], 'reason': 'Beneficiary timeline'},
-                {'columns': ['author_id', 'created_at'], 'reason': 'Author history'},
-                {'columns': ['note_type'], 'reason': 'Type filtering'}
-            ])
-            
-        return patterns
-        
-    def _create_index(self, table_name: str, columns: List[str], 
-                     unique: bool = False, name: Optional[str] = None,
-                     db: Session = None):
-        """Create an index on specified columns"""
-        if not name:
-            name = f"idx_{table_name}_{'_'.join(columns)}"
-            
         try:
-            # Create index using raw SQL for better control
-            columns_str = ', '.join(columns)
-            unique_str = 'UNIQUE' if unique else ''
+            inspector = inspect(db_engine)
             
-            sql = f"""
-            CREATE {unique_str} INDEX IF NOT EXISTS {name}
-            ON {table_name} ({columns_str})
-            """
+            for table_name, required_indexes in self.critical_indexes.items():
+                results['analyzed_tables'] += 1
+                
+                # Check if table exists
+                if table_name not in inspector.get_table_names():
+                    logger.warning(f"Table '{table_name}' does not exist")
+                    continue
+                    
+                # Get existing indexes
+                existing_indexes = inspector.get_indexes(table_name)
+                existing_index_names = {idx['name'] for idx in existing_indexes}
+                
+                # Check and create missing indexes
+                for index_config in required_indexes:
+                    if index_config['name'] in existing_index_names:
+                        results['existing_indexes'] += 1
+                        logger.debug(f"Index '{index_config['name']}' already exists")
+                    else:
+                        # Create missing index
+                        if self._create_index(db_engine, table_name, index_config):
+                            results['created_indexes'] += 1
+                            logger.info(f"Created index '{index_config['name']}' on table '{table_name}'")
+                        else:
+                            results['failed_indexes'] += 1
+                            results['recommendations'].append({
+                                'table': table_name,
+                                'index': index_config['name'],
+                                'action': 'manual_creation_required',
+                                'sql': self._generate_index_sql(table_name, index_config)
+                            })
+                            
+        except Exception as e:
+            logger.error(f"Error analyzing indexes: {str(e)}")
             
-            db.execute(text(sql))
-            db.commit()
+        return results
+        
+    def _create_index(self, db_engine, table_name: str, index_config: Dict) -> bool:
+        """Create a single index."""
+        try:
+            sql = self._generate_index_sql(table_name, index_config)
             
-            self.index_stats['indexes_created'] += 1
-            logger.info(f"Created index {name} on {table_name}({columns_str})")
+            with db_engine.connect() as conn:
+                conn.execute(text(sql))
+                conn.commit()
+                
+            return True
             
         except Exception as e:
-            logger.error(f"Failed to create index {name}: {str(e)}")
-            db.rollback()
+            logger.error(f"Failed to create index '{index_config['name']}': {str(e)}")
+            return False
             
-    def drop_unused_indexes(self, db: Session, threshold_days: int = 30):
-        """Drop indexes that haven't been used recently"""
-        inspector = inspect(db.bind)
+    def _generate_index_sql(self, table_name: str, index_config: Dict) -> str:
+        """Generate SQL for creating an index."""
+        unique = 'UNIQUE' if index_config.get('unique', False) else ''
+        columns = ', '.join(index_config['columns'])
         
-        # Get index usage statistics (PostgreSQL specific)
-        if db.bind.dialect.name == 'postgresql':
+        return f"""
+        CREATE {unique} INDEX IF NOT EXISTS {index_config['name']}
+        ON {table_name} ({columns})
+        """
+        
+    def optimize_database_indexes(self, db_engine) -> Dict[str, Any]:
+        """Optimize existing indexes and provide recommendations."""
+        optimization_results = {
+            'analyzed_indexes': 0,
+            'unused_indexes': [],
+            'duplicate_indexes': [],
+            'missing_statistics': [],
+            'recommendations': []
+        }
+        
+        try:
+            # Analyze index usage
             usage_query = """
             SELECT 
                 schemaname,
@@ -263,198 +230,173 @@ class DatabaseIndexingStrategy:
                 idx_scan,
                 idx_tup_read,
                 idx_tup_fetch,
-                pg_relation_size(indexrelid) as index_size
+                pg_size_pretty(pg_relation_size(indexrelid)) as index_size
             FROM pg_stat_user_indexes
-            WHERE idx_scan = 0
-            AND idx_tup_read = 0
-            AND indexrelid > 16384
+            WHERE schemaname = 'public'
+            ORDER BY idx_scan ASC
             """
             
-            unused_indexes = db.execute(text(usage_query)).fetchall()
-            
-            for index in unused_indexes:
-                if self._should_drop_index(index):
-                    self._drop_index(index.indexname, db)
+            with db_engine.connect() as conn:
+                result = conn.execute(text(usage_query))
+                
+                for row in result:
+                    optimization_results['analyzed_indexes'] += 1
                     
-    def _should_drop_index(self, index_stats: Any) -> bool:
-        """Determine if an index should be dropped"""
-        # Don't drop primary keys or unique constraints
-        if 'pkey' in index_stats.indexname or 'unique' in index_stats.indexname:
-            return False
-            
-        # Don't drop small indexes
-        if index_stats.index_size < 1024 * 1024:  # 1MB
-            return False
-            
-        # Drop if never used and larger than 10MB
-        if index_stats.idx_scan == 0 and index_stats.index_size > 10 * 1024 * 1024:
-            return True
-            
-        return False
-        
-    def _drop_index(self, index_name: str, db: Session):
-        """Drop an index"""
-        try:
-            sql = f"DROP INDEX IF EXISTS {index_name}"
-            db.execute(text(sql))
-            db.commit()
-            
-            self.index_stats['indexes_dropped'] += 1
-            logger.info(f"Dropped unused index {index_name}")
-            
-        except Exception as e:
-            logger.error(f"Failed to drop index {index_name}: {str(e)}")
-            db.rollback()
-            
-    def analyze_query_performance(self, query: str, db: Session) -> Dict[str, Any]:
-        """Analyze query performance and suggest index improvements"""
-        analysis = {}
-        
-        if db.bind.dialect.name == 'postgresql':
-            # Use EXPLAIN ANALYZE
-            explain_query = f"EXPLAIN ANALYZE {query}"
-            result = db.execute(text(explain_query))
-            
-            plan = []
-            for row in result:
-                plan.append(row[0])
-                
-            analysis['execution_plan'] = plan
-            analysis['suggestions'] = self._analyze_execution_plan(plan)
-            
-        return analysis
-        
-    def _analyze_execution_plan(self, plan: List[str]) -> List[str]:
-        """Analyze execution plan and provide suggestions"""
-        suggestions = []
-        
-        for line in plan:
-            # Check for sequential scans
-            if 'Seq Scan' in line:
-                suggestions.append(
-                    "Sequential scan detected - consider adding an index"
-                )
-                
-            # Check for high cost operations
-            if 'cost=' in line:
-                cost_str = line.split('cost=')[1].split()[0]
-                try:
-                    cost = float(cost_str.split('..')[1])
-                    if cost > 1000:
-                        suggestions.append(
-                            f"High cost operation detected (cost={cost}) - optimize query or add indexes"
-                        )
-                except:
-                    pass
-                    
-        return suggestions
-        
-    @performance_monitor.track_performance('index_optimization')
-    def optimize_database_indexes(self, db: Session) -> Dict[str, Any]:
-        """Comprehensive database index optimization"""
-        results = {
-            'indexes_created': 0,
-            'indexes_dropped': 0,
-            'tables_analyzed': 0,
-            'suggestions': []
-        }
-        
-        # Analyze all models
-        models = Base.__subclasses__()
-        for model in models:
-            self._analyze_model_indexes(model, db)
-            results['tables_analyzed'] += 1
-            
-        # Drop unused indexes (PostgreSQL only)
-        if db.bind.dialect.name == 'postgresql':
-            self.drop_unused_indexes(db)
-            
-        # Update results
-        results['indexes_created'] = self.index_stats['indexes_created']
-        results['indexes_dropped'] = self.index_stats['indexes_dropped']
-        
-        # Add general suggestions
-        results['suggestions'] = [
-            "Consider partitioning large tables",
-            "Use covering indexes for frequently accessed column combinations",
-            "Monitor slow query log for optimization opportunities",
-            "Consider using partial indexes for filtered queries"
-        ]
-        
-        return results
-        
-    def create_covering_index(self, table_name: str, columns: List[str],
-                            include_columns: List[str], db: Session):
-        """Create a covering index (PostgreSQL specific)"""
-        if db.bind.dialect.name == 'postgresql':
-            name = f"idx_{table_name}_covering_{'_'.join(columns[:2])}"
-            columns_str = ', '.join(columns)
-            include_str = ', '.join(include_columns)
-            
-            sql = f"""
-            CREATE INDEX {name} ON {table_name} ({columns_str})
-            INCLUDE ({include_str})
-            """
-            
-            try:
-                db.execute(text(sql))
-                db.commit()
-                logger.info(f"Created covering index {name}")
-            except Exception as e:
-                logger.error(f"Failed to create covering index: {str(e)}")
-                db.rollback()
-                
-    def create_partial_index(self, table_name: str, columns: List[str],
-                           condition: str, db: Session):
-        """Create a partial index with a WHERE clause"""
-        name = f"idx_{table_name}_partial_{'_'.join(columns[:2])}"
-        columns_str = ', '.join(columns)
-        
-        sql = f"""
-        CREATE INDEX {name} ON {table_name} ({columns_str})
-        WHERE {condition}
-        """
-        
-        try:
-            db.execute(text(sql))
-            db.commit()
-            logger.info(f"Created partial index {name}")
-        except Exception as e:
-            logger.error(f"Failed to create partial index: {str(e)}")
-            db.rollback()
-            
-    def get_index_statistics(self, db: Session) -> Dict[str, Any]:
-        """Get comprehensive index statistics"""
-        stats = {}
-        
-        if db.bind.dialect.name == 'postgresql':
-            # Get index usage statistics
-            query = """
+                    # Identify unused indexes
+                    if row[3] == 0:  # idx_scan
+                        optimization_results['unused_indexes'].append({
+                            'schema': row[0],
+                            'table': row[1],
+                            'index': row[2],
+                            'size': row[6],
+                            'recommendation': f"Consider dropping unused index: {row[2]}"
+                        })
+                        
+            # Analyze duplicate indexes
+            duplicate_query = """
             SELECT 
-                schemaname,
-                tablename,
-                indexname,
-                idx_scan,
-                idx_tup_read,
-                pg_relation_size(indexrelid) as size_bytes,
-                pg_size_pretty(pg_relation_size(indexrelid)) as size_pretty
-            FROM pg_stat_user_indexes
-            ORDER BY idx_scan DESC
+                a.indrelid::regclass AS table_name,
+                a.indexrelid::regclass AS index1,
+                b.indexrelid::regclass AS index2
+            FROM pg_index a
+            JOIN pg_index b ON a.indrelid = b.indrelid 
+                AND a.indexrelid != b.indexrelid
+                AND a.indkey = b.indkey
+            WHERE a.indexrelid > b.indexrelid
             """
             
-            result = db.execute(text(query))
+            with db_engine.connect() as conn:
+                result = conn.execute(text(duplicate_query))
+                
+                for row in result:
+                    optimization_results['duplicate_indexes'].append({
+                        'table': str(row[0]),
+                        'index1': str(row[1]),
+                        'index2': str(row[2]),
+                        'recommendation': f"Duplicate indexes found: {row[1]} and {row[2]}"
+                    })
+                    
+        except Exception as e:
+            logger.error(f"Error optimizing indexes: {str(e)}")
             
-            stats['index_usage'] = []
-            for row in result:
-                stats['index_usage'].append({
-                    'table': row.tablename,
-                    'index': row.indexname,
-                    'scans': row.idx_scan,
-                    'tuples_read': row.idx_tup_read,
-                    'size': row.size_pretty
+        return optimization_results
+        
+    def get_index_statistics(self, db_engine, table_name: str = None) -> List[Dict]:
+        """Get detailed statistics for indexes."""
+        statistics = []
+        
+        try:
+            if table_name:
+                stats_query = """
+                SELECT 
+                    schemaname,
+                    tablename,
+                    indexname,
+                    idx_scan,
+                    idx_tup_read,
+                    idx_tup_fetch,
+                    pg_size_pretty(pg_relation_size(indexrelid)) as index_size,
+                    pg_stat_get_last_analyze_time(indexrelid) as last_analyze
+                FROM pg_stat_user_indexes
+                WHERE schemaname = 'public' AND tablename = :table_name
+                ORDER BY idx_scan DESC
+                """
+                params = {'table_name': table_name}
+            else:
+                stats_query = """
+                SELECT 
+                    schemaname,
+                    tablename,
+                    indexname,
+                    idx_scan,
+                    idx_tup_read,
+                    idx_tup_fetch,
+                    pg_size_pretty(pg_relation_size(indexrelid)) as index_size,
+                    pg_stat_get_last_analyze_time(indexrelid) as last_analyze
+                FROM pg_stat_user_indexes
+                WHERE schemaname = 'public'
+                ORDER BY idx_scan DESC
+                LIMIT 50
+                """
+                params = {}
+                
+            with db_engine.connect() as conn:
+                result = conn.execute(text(stats_query), params)
+                
+                for row in result:
+                    statistics.append({
+                        'schema': row[0],
+                        'table': row[1],
+                        'index': row[2],
+                        'scan_count': row[3],
+                        'tuples_read': row[4],
+                        'tuples_fetched': row[5],
+                        'size': row[6],
+                        'last_analyze': row[7],
+                        'efficiency': row[5] / row[4] if row[4] > 0 else 0
+                    })
+                    
+        except Exception as e:
+            logger.error(f"Error getting index statistics: {str(e)}")
+            
+        return statistics
+        
+    def recommend_indexes_for_query(self, query: str, db_engine) -> List[Dict]:
+        """Recommend indexes for a specific query."""
+        recommendations = []
+        
+        try:
+            # Use EXPLAIN to analyze query
+            explain_query = f"EXPLAIN (FORMAT JSON) {query}"
+            
+            with db_engine.connect() as conn:
+                result = conn.execute(text(explain_query))
+                plan = result.fetchone()[0]
+                
+            # Analyze the plan for potential index improvements
+            self._analyze_plan_for_indexes(plan[0]['Plan'], recommendations)
+            
+        except Exception as e:
+            logger.error(f"Error analyzing query for index recommendations: {str(e)}")
+            
+        return recommendations
+        
+    def _analyze_plan_for_indexes(self, plan: Dict, recommendations: List[Dict], depth: int = 0):
+        """Recursively analyze query plan for index opportunities."""
+        node_type = plan.get('Node Type', '')
+        
+        # Check for sequential scans on large tables
+        if node_type == 'Seq Scan':
+            table_name = plan.get('Relation Name', '')
+            filter_cond = plan.get('Filter', '')
+            rows = plan.get('Plan Rows', 0)
+            
+            if rows > 1000 and filter_cond:
+                recommendations.append({
+                    'table': table_name,
+                    'reason': f'Sequential scan on {rows} rows with filter',
+                    'filter': filter_cond,
+                    'recommendation': f'Consider adding index on filter columns for table {table_name}'
                 })
                 
-        return stats
+        # Check for expensive sorts
+        elif node_type == 'Sort':
+            sort_key = plan.get('Sort Key', [])
+            rows = plan.get('Plan Rows', 0)
+            
+            if rows > 5000:
+                recommendations.append({
+                    'operation': 'Sort',
+                    'rows': rows,
+                    'sort_key': sort_key,
+                    'recommendation': 'Consider adding index on sort columns to avoid sorting'
+                })
+                
+        # Recursively analyze child plans
+        if 'Plans' in plan:
+            for child_plan in plan['Plans']:
+                self._analyze_plan_for_indexes(child_plan, recommendations, depth + 1)
 
-# Initialize the database indexing strategy
-db_indexing_strategy = DatabaseIndexingStrategy() 
+
+# Global instance
+db_indexing_strategy = DatabaseIndexingStrategy()

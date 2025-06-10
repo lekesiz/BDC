@@ -1,7 +1,7 @@
 """Beneficiary model module."""
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, JSON, Float
 from sqlalchemy.orm import relationship
 
 from app.extensions import db
@@ -242,6 +242,39 @@ class BeneficiaryDocument(db.Model):
             'file_type': self.file_type,
             'file_size': self.file_size,
             'is_private': self.is_private,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+
+class BeneficiaryProgress(db.Model):
+    """Model for tracking beneficiary progress (placeholder)."""
+    __tablename__ = 'beneficiary_progress'
+    
+    id = Column(Integer, primary_key=True)
+    beneficiary_id = Column(Integer, ForeignKey('beneficiaries.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    
+    progress_type = Column(String(50), nullable=False)
+    progress_value = Column(Float, nullable=True)
+    progress_description = Column(Text, nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    beneficiary = relationship('Beneficiary', backref='progress_records')
+    user = relationship('User', backref='beneficiary_progress_records')
+    
+    def to_dict(self):
+        """Return a dict representation of the progress."""
+        return {
+            'id': self.id,
+            'beneficiary_id': self.beneficiary_id,
+            'user_id': self.user_id,
+            'progress_type': self.progress_type,
+            'progress_value': self.progress_value,
+            'progress_description': self.progress_description,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

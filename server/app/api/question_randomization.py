@@ -36,17 +36,17 @@ class RandomizationConfigSchema(Schema):
         'easy_to_hard', 'hard_to_easy', 'mixed_difficulty', 'topic_grouped', 
         'alternating_difficulty', 'cognitive_progression'
     ]))
-    anchor_positions = fields.Dict(keys=fields.Str(), values=fields.Int(), missing=dict)
-    time_based_seed = fields.Bool(missing=False)
-    time_window = fields.Str(validate=fields.validate.OneOf(['daily', 'weekly', 'monthly', 'hourly']), missing='daily')
-    strata_key = fields.Str(validate=fields.validate.OneOf(['difficulty', 'topic', 'both']), missing='difficulty')
-    randomness_factor = fields.Float(validate=fields.validate.Range(min=0.0, max=1.0), missing=0.2)
-    blocking_rules = fields.List(fields.Dict(), missing=list)
-    enable_answer_randomization = fields.Bool(missing=True)
-    preserve_answer_positions = fields.List(fields.Int(), missing=list)
-    prevent_repetition = fields.Bool(missing=True)
-    lookback_sessions = fields.Int(validate=fields.validate.Range(min=1, max=10), missing=3)
-    min_gap_between_exposure = fields.Int(validate=fields.validate.Range(min=1, max=20), missing=5)
+    anchor_positions = fields.Dict(keys=fields.Str(), values=fields.Int(), load_default=dict)
+    time_based_seed = fields.Bool(load_default=False)
+    time_window = fields.Str(validate=fields.validate.OneOf(['daily', 'weekly', 'monthly', 'hourly']), load_default='daily')
+    strata_key = fields.Str(validate=fields.validate.OneOf(['difficulty', 'topic', 'both']), load_default='difficulty')
+    randomness_factor = fields.Float(validate=fields.validate.Range(min=0.0, max=1.0), load_default=0.2)
+    blocking_rules = fields.List(fields.Dict(), load_default=list)
+    enable_answer_randomization = fields.Bool(load_default=True)
+    preserve_answer_positions = fields.List(fields.Int(), load_default=list)
+    prevent_repetition = fields.Bool(load_default=True)
+    lookback_sessions = fields.Int(validate=fields.validate.Range(min=1, max=10), load_default=3)
+    min_gap_between_exposure = fields.Int(validate=fields.validate.Range(min=1, max=20), load_default=5)
 
 
 class QuestionOrderRequestSchema(Schema):
@@ -54,7 +54,7 @@ class QuestionOrderRequestSchema(Schema):
     
     test_set_id = fields.Int(required=True)
     beneficiary_id = fields.Int(required=True)
-    config = fields.Nested(RandomizationConfigSchema, missing=dict)
+    config = fields.Nested(RandomizationConfigSchema, load_default=dict)
     session_id = fields.Int(allow_none=True)
 
 
@@ -62,7 +62,7 @@ class ExposureAnalysisSchema(Schema):
     """Schema for exposure analysis requests."""
     
     question_ids = fields.List(fields.Int(), required=True)
-    time_period = fields.Int(validate=fields.validate.Range(min=1, max=90), missing=30)  # days
+    time_period = fields.Int(validate=fields.validate.Range(min=1, max=90), load_default=30)  # days
 
 
 @randomization_bp.route('/strategies', methods=['GET'])

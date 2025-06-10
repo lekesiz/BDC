@@ -5,10 +5,9 @@ Configures Content Delivery Network settings for optimal static asset delivery.
 
 import os
 from typing import Dict, Any, List, Optional
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse as url_parse
 
 from flask import Flask, url_for, current_app
-from werkzeug.urls import url_parse
 
 from app.utils.logging import logger
 

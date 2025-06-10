@@ -8,6 +8,9 @@ from itsdangerous import URLSafeTimedSerializer
 from itsdangerous.exc import SignatureExpired, BadTimeSignature
 
 from app.extensions import mail
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def send_async_email(app, msg):
@@ -48,11 +51,32 @@ def send_email(subject, recipients, text_body, html_body=None, sender=None, atta
         
         # Send email asynchronously
         Thread(target=send_async_email, args=(app, msg)).start()
-        
         return True
     except Exception as e:
-        current_app.logger.error(f"Email sending error: {str(e)}")
+        logger.error(f"Failed to send email: {str(e)}")
         return False
+
+
+class EmailService:
+    """Email service class for sending various types of emails."""
+    
+    @staticmethod
+    def send_email(to_email, subject, html_body=None, text_body=None, attachments=None):
+        """Send an email using the configured mail service."""
+        try:
+            recipients = [to_email] if isinstance(to_email, str) else to_email
+            
+            # Use the global send_email function
+            return send_email(
+                subject=subject,
+                recipients=recipients,
+                text_body=text_body or "",
+                html_body=html_body,
+                attachments=attachments
+            )
+        except Exception as e:
+            logger.error(f"EmailService.send_email failed: {str(e)}")
+            return False
 
 
 def generate_email_token(data, salt=None, expires_in=3600):

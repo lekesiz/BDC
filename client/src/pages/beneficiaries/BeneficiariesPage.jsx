@@ -21,9 +21,11 @@ import AsyncData from '@/components/ui/async-data';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import TableSkeleton from '@/components/ui/skeleton/table-skeleton';
 import Retry from '@/components/ui/retry';
-import Badge from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import Select from '@/components/ui/select';
 import { formatDate } from '@/lib/utils';
+import { ResponsiveContainer, ResponsiveCard } from '@/components/responsive/ResponsiveContainer';
+import { ResponsiveTable } from '@/components/responsive/ResponsiveTable';
 /**
  * Enhanced BeneficiariesPage showcasing best practices for loading states,
  * error handling, and async operations
@@ -58,20 +60,20 @@ const BeneficiariesPageV2 = () => {
     loading,
     error,
     retry: refetchBeneficiaries
-  } = useApiCall(
-    '/api/beneficiaries',
-    {
-      params: queryParams,
-      debounce: 300 // Debounce search requests
+  } = useAsync(
+    async () => {
+      const response = await fetch(`/api/beneficiaries?${new URLSearchParams(queryParams)}`);
+      if (!response.ok) throw new Error('Failed to fetch beneficiaries');
+      return response.json();
     },
     [pagination.page, pagination.pageSize, filters, searchTerm]
   );
+  
   // Secondary loading state for UI interactions
-  const {
-    loading: isUpdating,
-    startLoading: startUpdating,
-    stopLoading: stopUpdating
-  } = useLoadingState();
+  const [isUpdating, setIsUpdating] = useState(false);
+  const startUpdating = () => setIsUpdating(true);
+  const stopUpdating = () => setIsUpdating(false);
+  
   // Calculate total pages
   const totalPages = beneficiariesData?.total_pages || beneficiariesData?.pages || 1;
   const beneficiaries = beneficiariesData?.items || [];
@@ -171,140 +173,98 @@ const BeneficiariesPageV2 = () => {
       </div>
     </Card>
   );
+  // Table columns configuration for ResponsiveTable
+  const tableColumns = [
+    {
+      header: 'Name',
+      accessor: 'full_name',
+      cell: ({ row }) => (
+        <div className="flex items-center">
+          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+            <span className="text-primary font-medium">
+              {row.first_name?.charAt(0)}{row.last_name?.charAt(0)}
+            </span>
+          </div>
+          <div className="ml-4">
+            <div className="text-sm font-medium text-gray-900">
+              {row.first_name} {row.last_name}
+            </div>
+            <div className="text-sm text-gray-500">
+              {row.phone || 'No phone'}
+            </div>
+          </div>
+        </div>
+      ),
+      className: "cursor-pointer",
+      hideOnMobile: false
+    },
+    {
+      header: 'Email',
+      accessor: 'email',
+      cell: ({ value }) => <div className="text-sm text-gray-900">{value}</div>,
+      hideOnMobile: false
+    },
+    {
+      header: 'Created',
+      accessor: 'created_at',
+      cell: ({ value }) => <div className="text-sm text-gray-900">{formatDate(value)}</div>,
+      hideOnMobile: true
+    },
+    {
+      header: 'Status',
+      accessor: 'status',
+      cell: ({ value }) => renderStatusBadge(value),
+      hideOnMobile: false
+    },
+    {
+      header: 'Progress',
+      accessor: 'evaluation_count',
+      cell: ({ row }) => (
+        <div className="flex items-center">
+          <div className="flex-1">
+            <div className="text-sm text-gray-900">
+              {row.evaluation_count || 0} evaluations
+            </div>
+            <div className="text-xs text-gray-500 flex items-center mt-1">
+              <UserCheck className="w-3 h-3 mr-1" />
+              {row.completed_evaluation_count || 0} completed
+            </div>
+          </div>
+          {row.evaluation_count > 0 && (
+            <div className="ml-4">
+              <div className="w-16 bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-primary h-2 rounded-full transition-all"
+                  style={{ 
+                    width: `${(row.completed_evaluation_count / row.evaluation_count) * 100}%` 
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      ),
+      hideOnMobile: true
+    }
+  ];
+
+  // Table actions configuration
+  const tableActions = [
+    {
+      label: 'View',
+      onClick: (row) => handleViewBeneficiary(row.id)
+    }
+  ];
+
   // Beneficiaries table component
   const BeneficiariesTable = () => (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th 
-              scope="col" 
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-              onClick={() => handleSort('last_name')}
-            >
-              <div className="flex items-center">
-                Name
-                {renderSortIcon('last_name')}
-              </div>
-            </th>
-            <th 
-              scope="col" 
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-              onClick={() => handleSort('email')}
-            >
-              <div className="flex items-center">
-                Email
-                {renderSortIcon('email')}
-              </div>
-            </th>
-            <th 
-              scope="col" 
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-              onClick={() => handleSort('created_at')}
-            >
-              <div className="flex items-center">
-                Created
-                {renderSortIcon('created_at')}
-              </div>
-            </th>
-            <th 
-              scope="col" 
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-              onClick={() => handleSort('status')}
-            >
-              <div className="flex items-center">
-                Status
-                {renderSortIcon('status')}
-              </div>
-            </th>
-            <th 
-              scope="col" 
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Progress
-            </th>
-            <th scope="col" className="relative px-6 py-3">
-              <span className="sr-only">Actions</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {beneficiaries.map((beneficiary) => (
-            <tr 
-              key={beneficiary.id} 
-              className="hover:bg-gray-50 cursor-pointer transition-colors"
-              onClick={() => handleViewBeneficiary(beneficiary.id)}
-            >
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                    <span className="text-primary font-medium">
-                      {beneficiary.first_name?.charAt(0)}{beneficiary.last_name?.charAt(0)}
-                    </span>
-                  </div>
-                  <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">
-                      {beneficiary.first_name} {beneficiary.last_name}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {beneficiary.phone || 'No phone'}
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{beneficiary.email}</div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">
-                  {formatDate(beneficiary.created_at)}
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {renderStatusBadge(beneficiary.status)}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center">
-                  <div className="flex-1">
-                    <div className="text-sm text-gray-900">
-                      {beneficiary.evaluation_count || 0} evaluations
-                    </div>
-                    <div className="text-xs text-gray-500 flex items-center mt-1">
-                      <UserCheck className="w-3 h-3 mr-1" />
-                      {beneficiary.completed_evaluation_count || 0} completed
-                    </div>
-                  </div>
-                  {beneficiary.evaluation_count > 0 && (
-                    <div className="ml-4">
-                      <div className="w-16 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-primary h-2 rounded-full transition-all"
-                          style={{ 
-                            width: `${(beneficiary.completed_evaluation_count / beneficiary.evaluation_count) * 100}%` 
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleViewBeneficiary(beneficiary.id);
-                  }}
-                >
-                  View
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <ResponsiveTable
+      columns={tableColumns}
+      data={beneficiaries}
+      onRowClick={(row) => handleViewBeneficiary(row.id)}
+      actions={tableActions}
+      className=""
+    />
   );
   // Enhanced pagination component
   const Pagination = () => (
@@ -390,9 +350,10 @@ const BeneficiariesPageV2 = () => {
   );
   return (
     <ErrorBoundary fallback={<ErrorState />}>
-      <div className="space-y-6">
+      <ResponsiveContainer>
+        <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Beneficiaries</h1>
             <p className="text-sm text-gray-500">Manage your beneficiaries and track their progress</p>
@@ -406,7 +367,7 @@ const BeneficiariesPageV2 = () => {
           </Button>
         </div>
         {/* Filters Card */}
-        <Card>
+        <ResponsiveCard>
           <div className="p-4 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
@@ -515,8 +476,9 @@ const BeneficiariesPageV2 = () => {
               </>
             )}
           </AsyncData>
-        </Card>
-      </div>
+        </ResponsiveCard>
+        </div>
+      </ResponsiveContainer>
     </ErrorBoundary>
   );
 };

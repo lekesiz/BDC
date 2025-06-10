@@ -5,6 +5,7 @@ from typing import Dict, List
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import Schema, fields, ValidationError
+from marshmallow.validate import Range, Length
 from sqlalchemy import desc, func
 
 from app.extensions import db
@@ -30,59 +31,59 @@ gamification_service = GamificationService()
 # ========== Schemas for Request/Response Validation ==========
 
 class BadgeSchema(Schema):
-    name = fields.String(required=True, validate=fields.Length(min=1, max=100))
-    description = fields.String(missing='')
+    name = fields.String(required=True, validate=Length(min=1, max=100))
+    description = fields.String(load_default='')
     category = fields.String(required=True)
-    rarity = fields.String(missing='common')
-    points_value = fields.Integer(missing=0)
+    rarity = fields.String(load_default='common')
+    points_value = fields.Integer(load_default=0)
     unlock_conditions = fields.Dict(required=True)
-    icon_url = fields.String(missing='')
-    is_secret = fields.Boolean(missing=False)
+    icon_url = fields.String(load_default='')
+    is_secret = fields.Boolean(load_default=False)
 
 class ChallengeSchema(Schema):
-    title = fields.String(required=True, validate=fields.Length(min=1, max=100))
+    title = fields.String(required=True, validate=Length(min=1, max=100))
     description = fields.String(required=True)
     type = fields.String(required=True)
     goals = fields.Dict(required=True)
-    rewards = fields.Dict(missing=dict)
-    difficulty = fields.String(missing='medium')
-    start_date = fields.DateTime(missing=None)
-    end_date = fields.DateTime(missing=None)
-    duration_hours = fields.Integer(missing=None)
-    max_participants = fields.Integer(missing=None)
+    rewards = fields.Dict(load_default=dict)
+    difficulty = fields.String(load_default='medium')
+    start_date = fields.DateTime(load_default=None)
+    end_date = fields.DateTime(load_default=None)
+    duration_hours = fields.Integer(load_default=None)
+    max_participants = fields.Integer(load_default=None)
 
 class RewardSchema(Schema):
-    name = fields.String(required=True, validate=fields.Length(min=1, max=100))
+    name = fields.String(required=True, validate=Length(min=1, max=100))
     type = fields.String(required=True)
-    cost = fields.Integer(required=True, validate=fields.Range(min=0))
+    cost = fields.Integer(required=True, validate=Range(min=0))
     value = fields.Dict(required=True)
-    description = fields.String(missing='')
-    rarity = fields.String(missing='common')
-    total_quantity = fields.Integer(missing=None)
-    available_from = fields.DateTime(missing=None)
-    available_until = fields.DateTime(missing=None)
+    description = fields.String(load_default='')
+    rarity = fields.String(load_default='common')
+    total_quantity = fields.Integer(load_default=None)
+    available_from = fields.DateTime(load_default=None)
+    available_until = fields.DateTime(load_default=None)
 
 class TeamSchema(Schema):
-    name = fields.String(required=True, validate=fields.Length(min=1, max=100))
-    description = fields.String(missing='')
-    max_members = fields.Integer(missing=10)
-    is_open = fields.Boolean(missing=True)
+    name = fields.String(required=True, validate=Length(min=1, max=100))
+    description = fields.String(load_default='')
+    max_members = fields.Integer(load_default=10)
+    is_open = fields.Boolean(load_default=True)
 
 class GoalSchema(Schema):
-    title = fields.String(required=True, validate=fields.Length(min=1, max=100))
-    description = fields.String(missing='')
+    title = fields.String(required=True, validate=Length(min=1, max=100))
+    description = fields.String(load_default='')
     goal_type = fields.String(required=True)
     target_value = fields.Float(required=True)
-    deadline = fields.DateTime(missing=None)
+    deadline = fields.DateTime(load_default=None)
 
 class LeaderboardSchema(Schema):
-    name = fields.String(required=True, validate=fields.Length(min=1, max=100))
+    name = fields.String(required=True, validate=Length(min=1, max=100))
     type = fields.String(required=True)
     metric = fields.String(required=True)
-    description = fields.String(missing='')
-    start_date = fields.DateTime(missing=None)
-    end_date = fields.DateTime(missing=None)
-    max_entries = fields.Integer(missing=100)
+    description = fields.String(load_default='')
+    start_date = fields.DateTime(load_default=None)
+    end_date = fields.DateTime(load_default=None)
+    max_entries = fields.Integer(load_default=100)
 
 
 # ========== User XP and Progress Endpoints ==========

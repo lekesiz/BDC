@@ -304,3 +304,58 @@ def student_headers(test_student):
         }
     )
     return {'Authorization': f'Bearer {access_token}'}
+
+@pytest.fixture
+def admin_user(db_session):
+    """Create an admin user for testing."""
+    from app.models.user import User
+    admin = User(
+        email='admin@bdc.com',
+        username='admin',
+        first_name='Admin',
+        last_name='User',
+        role='super_admin',
+        is_active=True
+    )
+    admin.set_password('Admin123!')
+    db_session.add(admin)
+    db_session.commit()
+    return admin
+
+@pytest.fixture
+def valid_jwt_token(test_user):
+    """Create a valid JWT token for testing."""
+    return create_access_token(
+        identity=test_user.id,
+        additional_claims={
+            'user_id': test_user.id,
+            'tenant_id': test_user.tenant_id,
+            'role': test_user.role
+        }
+    )
+
+@pytest.fixture
+def expired_jwt_token(test_user):
+    """Create an expired JWT token for testing."""
+    from datetime import timedelta
+    return create_access_token(
+        identity=test_user.id,
+        additional_claims={
+            'user_id': test_user.id,
+            'tenant_id': test_user.tenant_id,
+            'role': test_user.role
+        },
+        expires_delta=timedelta(seconds=-1)
+    )
+
+@pytest.fixture
+def refresh_token(test_user):
+    """Create a refresh token for testing."""
+    from flask_jwt_extended import create_refresh_token
+    return create_refresh_token(
+        identity=test_user.id,
+        additional_claims={
+            'tenant_id': test_user.tenant_id,
+            'role': test_user.role
+        }
+    )

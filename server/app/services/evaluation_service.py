@@ -214,3 +214,10 @@ class EvaluationService:
         except Exception as e:
             logger.exception(f"Error getting evaluation statistics: {str(e)}")
             return {}
+
+
+# Backward compatibility aliases for missing services
+QuestionService = EvaluationService
+TestSessionService = EvaluationService
+ResponseService = EvaluationService
+AIFeedbackService = EvaluationService

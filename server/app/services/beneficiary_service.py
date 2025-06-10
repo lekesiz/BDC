@@ -520,3 +520,9 @@ class BeneficiaryServiceV2(IBeneficiaryService):
             generate_cache_key('beneficiary_stats'),
             generate_cache_key('beneficiaries_list')
         )
+
+
+# Backward compatibility aliases
+BeneficiaryService = BeneficiaryServiceV2
+NoteService = BeneficiaryServiceV2  # Assuming NoteService is part of BeneficiaryService
+AppointmentService = BeneficiaryServiceV2  # Assuming AppointmentService is part of BeneficiaryService

@@ -1,16 +1,41 @@
 // TODO: i18n - processed
-import React, { useState, useEffect } from 'react';
-import { Bell, BellOff, Settings, Check, X, AlertCircle, Shield } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  Bell, 
+  BellOff, 
+  Settings, 
+  Check, 
+  X, 
+  AlertCircle, 
+  Shield,
+  Clock,
+  Smartphone,
+  Globe,
+  Volume2,
+  VolumeX,
+  Calendar,
+  FileText,
+  Users,
+  Megaphone,
+  Trash2,
+  Edit,
+  Play,
+  Pause,
+  BarChart3
+} from 'lucide-react';
 import { usePushNotifications } from '../../hooks/usePWA';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Switch } from '../ui/switch';
 import { Alert, AlertDescription } from '../ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Progress } from '../ui/progress';
+import { useToast } from '../ui/use-toast';
 
 /**
- * Push Notification Manager Component
- * Manages push notification permissions and settings
+ * Advanced Push Notification Manager Component
+ * Comprehensive push notification management with scheduling, analytics, and advanced settings
  */import { useTranslation } from "react-i18next";
 export function PushNotificationManager({ className = '' }) {const { t } = useTranslation();
   const {
@@ -21,29 +46,112 @@ export function PushNotificationManager({ className = '' }) {const { t } = useTr
     subscribe,
     isSupported
   } = usePushNotifications();
+  const { toast } = useToast();
 
+  // Enhanced notification settings with more categories and options
   const [notificationSettings, setNotificationSettings] = useState({
-    evaluations: true,
-    appointments: true,
-    documents: true,
-    general: true,
-    marketing: false
+    evaluations: { enabled: true, priority: 'high', sound: true, vibrate: true },
+    appointments: { enabled: true, priority: 'high', sound: true, vibrate: true },
+    documents: { enabled: true, priority: 'normal', sound: false, vibrate: true },
+    general: { enabled: true, priority: 'normal', sound: false, vibrate: false },
+    marketing: { enabled: false, priority: 'low', sound: false, vibrate: false },
+    reminders: { enabled: true, priority: 'normal', sound: true, vibrate: false },
+    system: { enabled: true, priority: 'high', sound: false, vibrate: true }
   });
 
+  // Advanced settings
+  const [advancedSettings, setAdvancedSettings] = useState({
+    quietHours: { enabled: true, start: '22:00', end: '08:00' },
+    batching: { enabled: true, interval: 15 }, // minutes
+    persistence: { enabled: true, duration: 24 }, // hours
+    location: { enabled: false },
+    frequency: { enabled: true, maxPerHour: 5 }
+  });
+
+  // Notification history and analytics
+  const [notificationHistory, setNotificationHistory] = useState([]);
+  const [notificationStats, setNotificationStats] = useState({
+    sent: 0,
+    delivered: 0,
+    clicked: 0,
+    dismissed: 0
+  });
+
+  const [activeTab, setActiveTab] = useState('settings');
+  const [scheduledNotifications, setScheduledNotifications] = useState([]);
   const [testNotification, setTestNotification] = useState(null);
 
-  // Load saved notification preferences
+  // Load saved preferences and initialize
   useEffect(() => {
-    const saved = localStorage.getItem('bdc-notification-settings');
-    if (saved) {
-      setNotificationSettings(JSON.parse(saved));
-    }
+    loadSettings();
+    loadNotificationHistory();
+    updateNotificationStats();
   }, []);
 
-  // Save notification preferences
+  const loadSettings = () => {
+    const savedSettings = localStorage.getItem('bdc-notification-settings');
+    const savedAdvanced = localStorage.getItem('bdc-notification-advanced');
+    
+    if (savedSettings) {
+      setNotificationSettings(JSON.parse(savedSettings));
+    }
+    if (savedAdvanced) {
+      setAdvancedSettings(JSON.parse(savedAdvanced));
+    }
+  };
+
   const saveSettings = (newSettings) => {
     setNotificationSettings(newSettings);
     localStorage.setItem('bdc-notification-settings', JSON.stringify(newSettings));
+  };
+
+  const saveAdvancedSettings = (newSettings) => {
+    setAdvancedSettings(newSettings);
+    localStorage.setItem('bdc-notification-advanced', JSON.stringify(newSettings));
+  };
+
+  const loadNotificationHistory = () => {
+    // Mock history data - in real implementation, this would come from storage or API
+    const mockHistory = [
+      {
+        id: '1',
+        title: 'New Evaluation Available',
+        body: 'Technical Assessment is ready for review',
+        timestamp: Date.now() - 3600000,
+        category: 'evaluations',
+        clicked: true,
+        delivered: true
+      },
+      {
+        id: '2',
+        title: 'Appointment Reminder',
+        body: 'Meeting with John Doe in 30 minutes',
+        timestamp: Date.now() - 7200000,
+        category: 'appointments',
+        clicked: false,
+        delivered: true
+      },
+      {
+        id: '3',
+        title: 'Document Shared',
+        body: 'Training materials have been shared with you',
+        timestamp: Date.now() - 86400000,
+        category: 'documents',
+        clicked: true,
+        delivered: true
+      }
+    ];
+    setNotificationHistory(mockHistory);
+  };
+
+  const updateNotificationStats = () => {
+    // Mock stats - in real implementation, this would be calculated from actual data
+    setNotificationStats({
+      sent: 45,
+      delivered: 42,
+      clicked: 18,
+      dismissed: 24
+    });
   };
 
   const handlePermissionRequest = async () => {
@@ -65,28 +173,104 @@ export function PushNotificationManager({ className = '' }) {const { t } = useTr
     }
   };
 
-  const sendTestNotification = () => {
-    if (permission === 'granted') {
-      const notification = new Notification('BDC Test Notification', {
-        body: 'This is a test notification from BDC app.',
+  const sendTestNotification = useCallback((type = 'basic') => {
+    if (permission !== 'granted') {
+      toast({
+        title: 'Permission required',
+        description: 'Please enable notifications first',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const notificationTypes = {
+      basic: {
+        title: 'BDC Test Notification',
+        body: 'This is a basic test notification from BDC app.',
+        actions: []
+      },
+      interactive: {
+        title: 'Interactive Test',
+        body: 'This notification has action buttons.',
+        actions: [
+          { action: 'view', title: 'View', icon: '/icons/view.png' },
+          { action: 'dismiss', title: 'Dismiss', icon: '/icons/dismiss.png' }
+        ]
+      },
+      rich: {
+        title: 'Rich Notification',
+        body: 'This notification includes an image and vibration.',
+        image: '/icons/notification-image.png',
+        vibrate: [200, 100, 200]
+      }
+    };
+
+    const config = notificationTypes[type];
+    
+    const notification = new Notification(config.title, {
+      body: config.body,
+      icon: '/icons/icon-192x192.png',
+      badge: '/icons/badge-72x72.png',
+      tag: `test-notification-${type}`,
+      requireInteraction: type === 'interactive',
+      actions: config.actions || [],
+      image: config.image,
+      vibrate: config.vibrate || [100]
+    });
+
+    setTestNotification(`${type} test notification sent!`);
+
+    setTimeout(() => {
+      setTestNotification(null);
+    }, 3000);
+
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+      // Track click
+      updateNotificationStats();
+    };
+  }, [permission, toast]);
+
+  const scheduleNotification = useCallback((title, body, delay, category = 'general') => {
+    if (permission !== 'granted') return;
+
+    const scheduleId = setTimeout(() => {
+      const notification = new Notification(title, {
+        body,
         icon: '/icons/icon-192x192.png',
         badge: '/icons/badge-72x72.png',
-        tag: 'test-notification',
-        requireInteraction: false
+        tag: `scheduled-${Date.now()}`,
+        vibrate: notificationSettings[category]?.vibrate ? [200, 100, 200] : undefined
       });
 
-      setTestNotification('Test notification sent!');
-
-      setTimeout(() => {
-        setTestNotification(null);
-      }, 3000);
+      // Remove from scheduled list
+      setScheduledNotifications(prev => 
+        prev.filter(item => item.id !== scheduleId)
+      );
 
       notification.onclick = () => {
         window.focus();
         notification.close();
       };
-    }
-  };
+    }, delay);
+
+    // Add to scheduled list
+    setScheduledNotifications(prev => [...prev, {
+      id: scheduleId,
+      title,
+      body,
+      category,
+      scheduledFor: Date.now() + delay
+    }]);
+
+    return scheduleId;
+  }, [permission, notificationSettings]);
+
+  const cancelScheduledNotification = useCallback((id) => {
+    clearTimeout(id);
+    setScheduledNotifications(prev => prev.filter(item => item.id !== id));
+  }, []);
 
   const getPermissionStatus = () => {
     switch (permission) {

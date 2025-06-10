@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime, timedelta
 from sqlalchemy import and_, func
 from sqlalchemy.sql.expression import case
-from app.models import Beneficiary, User, Evaluation, Appointment, Document, BeneficiaryProgress
+from app.models import Beneficiary, User, Evaluation, Appointment, Document
 from app.extensions import db
 
 class BeneficiaryDashboardResource(Resource):

@@ -1,6 +1,6 @@
 """Factory for creating evaluation service instances."""
 
-from app.services.evaluation_service_refactored import EvaluationServiceRefactored
+from app.services.evaluation_service import EvaluationService
 from app import db
 
 
@@ -10,4 +10,4 @@ class EvaluationServiceFactory:
     @staticmethod
     def create():
         """Create an evaluation service instance with all dependencies."""
-        return EvaluationServiceRefactored(db.session)
+        return EvaluationService(db.session)

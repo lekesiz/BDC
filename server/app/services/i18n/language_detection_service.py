@@ -4,7 +4,7 @@ import re
 import logging
 from typing import Optional, List, Dict, Tuple
 from dataclasses import dataclass
-from app.utils.cache import cache_manager
+from app.utils.cache import cache, generate_cache_key
 
 logger = logging.getLogger(__name__)
 
@@ -358,7 +358,6 @@ class LanguageDetectionService:
         
         return self.DEFAULT_LANGUAGE
     
-    @cache_manager.memoize(timeout=3600)
     def is_rtl_language(self, language_code: str) -> bool:
         """
         Check if a language is right-to-left.

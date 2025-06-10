@@ -17,6 +17,7 @@ export const Form = ({ onSubmit, children, className = '', ...props }) => {const
   };
   return (
     <form
+      role="form"
       className={cn('space-y-4 sm:space-y-6', className)}
       onSubmit={handleSubmit}
       {...props}>
