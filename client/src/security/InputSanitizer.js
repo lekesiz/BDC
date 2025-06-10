@@ -1,4 +1,5 @@
-/**
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; /**
  * Input Sanitization and Validation Service
  * Protects against XSS, injection attacks, and data validation issues
  */
@@ -6,56 +7,56 @@ class InputSanitizer {
   constructor() {
     // XSS patterns to detect and remove
     this.xssPatterns = [
-      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-      /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
-      /<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi,
-      /<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi,
-      /<link\b[^>]*>/gi,
-      /<meta\b[^>]*>/gi,
-      /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi,
-      /javascript:/gi,
-      /vbscript:/gi,
-      /onload\s*=/gi,
-      /onerror\s*=/gi,
-      /onclick\s*=/gi,
-      /onmouseover\s*=/gi,
-      /onfocus\s*=/gi,
-      /onblur\s*=/gi,
-      /onchange\s*=/gi,
-      /onsubmit\s*=/gi,
-      /expression\s*\(/gi,
-      /url\s*\(/gi,
-      /@import/gi,
-      /binding\s*:/gi,
-      /document\.cookie/gi,
-      /document\.write/gi,
-      /eval\s*\(/gi,
-      /setTimeout\s*\(/gi,
-      /setInterval\s*\(/gi,
-    ];
+    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
+    /<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi,
+    /<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi,
+    /<link\b[^>]*>/gi,
+    /<meta\b[^>]*>/gi,
+    /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi,
+    /javascript:/gi,
+    /vbscript:/gi,
+    /onload\s*=/gi,
+    /onerror\s*=/gi,
+    /onclick\s*=/gi,
+    /onmouseover\s*=/gi,
+    /onfocus\s*=/gi,
+    /onblur\s*=/gi,
+    /onchange\s*=/gi,
+    /onsubmit\s*=/gi,
+    /expression\s*\(/gi,
+    /url\s*\(/gi,
+    /@import/gi,
+    /binding\s*:/gi,
+    /document\.cookie/gi,
+    /document\.write/gi,
+    /eval\s*\(/gi,
+    /setTimeout\s*\(/gi,
+    /setInterval\s*\(/gi];
+
     // SQL injection patterns
     this.sqlPatterns = [
-      /('|(\\')|(;)|(\||(\*)|(%)|(\-\-)|(\+)|(\,)|(\<)|(\>)|(\{)|(\})|(\[)|(\])|(\()|(\))|(\&)|(\#))/gi,
-      /(\b(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})\b)/gi,
-      /(\/\*(\*(?!\/)|[^*])*\*\/)/gi,
-      /(\b(AND|OR)\b.*(=|>|<|\!|<>|><))/gi,
-      /(\b(GRANT|REVOKE)\b)/gi,
-      /(\b(GROUP\s+BY|ORDER\s+BY|HAVING)\b)/gi,
-    ];
+    /('|(\\')|(;)|(\||(\*)|(%)|(\-\-)|(\+)|(\,)|(\<)|(\>)|(\{)|(\})|(\[)|(\])|(\()|(\))|(\&)|(\#))/gi,
+    /(\b(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})\b)/gi,
+    /(\/\*(\*(?!\/)|[^*])*\*\/)/gi,
+    /(\b(AND|OR)\b.*(=|>|<|\!|<>|><))/gi,
+    /(\b(GRANT|REVOKE)\b)/gi,
+    /(\b(GROUP\s+BY|ORDER\s+BY|HAVING)\b)/gi];
+
     // Command injection patterns
     this.commandPatterns = [
-      /[;&|`$(){}[\]]/g,
-      /\b(cat|ls|pwd|whoami|id|uname|ps|kill|rm|mv|cp|chmod|chown|grep|awk|sed|sort|uniq|wc|head|tail|more|less)\b/gi,
-      /(\\|\/)(bin|etc|usr|var|tmp|home)/gi,
-      /(\.\.|\.\/|~\/)/gi,
-    ];
+    /[;&|`$(){}[\]]/g,
+    /\b(cat|ls|pwd|whoami|id|uname|ps|kill|rm|mv|cp|chmod|chown|grep|awk|sed|sort|uniq|wc|head|tail|more|less)\b/gi,
+    /(\\|\/)(bin|etc|usr|var|tmp|home)/gi,
+    /(\.\.|\.\/|~\/)/gi];
+
     // Allowed HTML tags for rich text content
     this.allowedTags = [
-      'p', 'br', 'strong', 'em', 'u', 'b', 'i',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'ul', 'ol', 'li', 'blockquote', 'code', 'pre',
-      'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'
-    ];
+    'p', 'br', 'strong', 'em', 'u', 'b', 'i',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li', 'blockquote', 'code', 'pre',
+    'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'];
+
     // Allowed attributes for HTML tags
     this.allowedAttributes = {
       'a': ['href', 'title', 'target'],
@@ -119,25 +120,25 @@ class InputSanitizer {
    * HTML encode special characters
    */
   htmlEncode(str) {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;')
-      .replace(/\//g, '&#x2F;');
+    return str.
+    replace(/&/g, '&amp;').
+    replace(/</g, '&lt;').
+    replace(/>/g, '&gt;').
+    replace(/"/g, '&quot;').
+    replace(/'/g, '&#x27;').
+    replace(/\//g, '&#x2F;');
   }
   /**
    * HTML decode special characters
    */
   htmlDecode(str) {
-    return str
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#x27;/g, "'")
-      .replace(/&#x2F;/g, '/');
+    return str.
+    replace(/&amp;/g, '&').
+    replace(/&lt;/g, '<').
+    replace(/&gt;/g, '>').
+    replace(/&quot;/g, '"').
+    replace(/&#x27;/g, "'").
+    replace(/&#x2F;/g, '/');
   }
   /**
    * Sanitize HTML content while preserving allowed tags
@@ -155,7 +156,7 @@ class InputSanitizer {
    */
   cleanElement(element, config) {
     const children = Array.from(element.children);
-    children.forEach(child => {
+    children.forEach((child) => {
       const tagName = child.tagName.toLowerCase();
       // Remove disallowed tags
       if (!config.allowedTags.includes(tagName)) {
@@ -178,7 +179,7 @@ class InputSanitizer {
     const allowedList = [...allowedForTag, ...allowedForAll];
     // Get all attributes
     const attributes = Array.from(element.attributes);
-    attributes.forEach(attr => {
+    attributes.forEach((attr) => {
       const attrName = attr.name.toLowerCase();
       // Remove disallowed attributes
       if (!allowedList.includes(attrName)) {
@@ -205,14 +206,14 @@ class InputSanitizer {
    */
   containsJavaScript(text) {
     const jsPatterns = [
-      /javascript:/gi,
-      /vbscript:/gi,
-      /on\w+\s*=/gi,
-      /expression\s*\(/gi,
-      /url\s*\(/gi,
-      /eval\s*\(/gi,
-    ];
-    return jsPatterns.some(pattern => pattern.test(text));
+    /javascript:/gi,
+    /vbscript:/gi,
+    /on\w+\s*=/gi,
+    /expression\s*\(/gi,
+    /url\s*\(/gi,
+    /eval\s*\(/gi];
+
+    return jsPatterns.some((pattern) => pattern.test(text));
   }
   /**
    * Validate URL safety
@@ -233,7 +234,7 @@ class InputSanitizer {
    */
   removeXSSPatterns(text) {
     let cleaned = text;
-    this.xssPatterns.forEach(pattern => {
+    this.xssPatterns.forEach((pattern) => {
       cleaned = cleaned.replace(pattern, '');
     });
     return cleaned;
@@ -243,7 +244,7 @@ class InputSanitizer {
    */
   removeSQLPatterns(text) {
     let cleaned = text;
-    this.sqlPatterns.forEach(pattern => {
+    this.sqlPatterns.forEach((pattern) => {
       cleaned = cleaned.replace(pattern, '');
     });
     return cleaned;
@@ -253,7 +254,7 @@ class InputSanitizer {
    */
   removeCommandPatterns(text) {
     let cleaned = text;
-    this.commandPatterns.forEach(pattern => {
+    this.commandPatterns.forEach((pattern) => {
       cleaned = cleaned.replace(pattern, '');
     });
     return cleaned;
@@ -263,7 +264,7 @@ class InputSanitizer {
    */
   validate(input, rules = []) {
     const errors = [];
-    rules.forEach(rule => {
+    rules.forEach((rule) => {
       switch (rule.type) {
         case 'required':
           if (!input || input.toString().trim() === '') {
@@ -348,11 +349,11 @@ class InputSanitizer {
     if (typeof fileName !== 'string') {
       return 'file';
     }
-    return fileName
-      .replace(/[^a-zA-Z0-9._-]/g, '_')
-      .replace(/_{2,}/g, '_')
-      .replace(/^[._-]+|[._-]+$/g, '')
-      .substring(0, 255);
+    return fileName.
+    replace(/[^a-zA-Z0-9._-]/g, '_').
+    replace(/_{2,}/g, '_').
+    replace(/^[._-]+|[._-]+$/g, '').
+    substring(0, 255);
   }
   /**
    * Validate and sanitize form data
@@ -360,7 +361,7 @@ class InputSanitizer {
   sanitizeFormData(formData, rules = {}) {
     const sanitized = {};
     const errors = {};
-    Object.keys(formData).forEach(key => {
+    Object.keys(formData).forEach((key) => {
       const value = formData[key];
       const fieldRules = rules[key] || [];
       // Sanitize value

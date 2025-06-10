@@ -1,4 +1,5 @@
-export { AnimatedCard } from './AnimatedCard';
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next";export { AnimatedCard } from './AnimatedCard';
 export { AnimatedButton } from './AnimatedButton';
 export { AnimatedList, AnimatedListItem } from './AnimatedList';
 export { AnimatedPage } from './AnimatedPage';

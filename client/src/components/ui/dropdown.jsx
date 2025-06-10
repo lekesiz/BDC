@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -10,16 +11,16 @@ import { cn } from '@/lib/utils';
  * @param {string} props.className - Additional CSS classes for the dropdown
  * @param {string} props.triggerClassName - Additional CSS classes for the trigger
  * @returns {JSX.Element} Dropdown component
- */
-export const Dropdown = ({ 
-  trigger, 
-  children, 
+ */import { useTranslation } from "react-i18next";
+export const Dropdown = ({
+  trigger,
+  children,
   align = 'left',
   className = '',
   triggerClassName = '',
   'aria-label': ariaLabel,
   closeOnSelect = true
-}) => {
+}) => {const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const triggerRef = useRef(null);
@@ -43,7 +44,7 @@ export const Dropdown = ({
           break;
         case 'ArrowDown':
           event.preventDefault();
-          setFocusedIndex(prev => {
+          setFocusedIndex((prev) => {
             const nextIndex = prev < itemRefs.current.length - 1 ? prev + 1 : 0;
             itemRefs.current[nextIndex]?.focus();
             return nextIndex;
@@ -51,7 +52,7 @@ export const Dropdown = ({
           break;
         case 'ArrowUp':
           event.preventDefault();
-          setFocusedIndex(prev => {
+          setFocusedIndex((prev) => {
             const nextIndex = prev > 0 ? prev - 1 : itemRefs.current.length - 1;
             itemRefs.current[nextIndex]?.focus();
             return nextIndex;
@@ -90,48 +91,48 @@ export const Dropdown = ({
   };
   return (
     <div className="relative inline-block" ref={dropdownRef}>
-      <button 
+      <button
         ref={triggerRef}
         className={cn("cursor-pointer", triggerClassName)}
         onClick={toggleDropdown}
         aria-haspopup="true"
         aria-expanded={isOpen}
         aria-label={ariaLabel}
-        type="button"
-      >
+        type="button">
+
         {trigger}
       </button>
-      {isOpen && (
-        <div 
-          className={cn(
-            "absolute z-50 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5",
-            {
-              "right-0": align === 'right',
-              "left-0": align === 'left',
-            },
-            className
-          )}
-          role="menu"
-          aria-orientation="vertical"
-          aria-labelledby={ariaLabel}
-        >
+      {isOpen &&
+      <div
+        className={cn(
+          "absolute z-50 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5",
+          {
+            "right-0": align === 'right',
+            "left-0": align === 'left'
+          },
+          className
+        )}
+        role="menu"
+        aria-orientation="vertical"
+        aria-labelledby={ariaLabel}>
+
           <div className="py-1 rounded-md bg-white shadow-xs">
             {React.Children.map(children, (child, index) => {
-              if (React.isValidElement(child) && child.type === DropdownItem) {
-                return React.cloneElement(child, {
-                  ref: (el) => itemRefs.current[index] = el,
-                  tabIndex: focusedIndex === index ? 0 : -1,
-                  onClose: closeOnSelect ? () => setIsOpen(false) : undefined,
-                  role: "menuitem"
-                });
-              }
-              return child;
-            })}
+            if (React.isValidElement(child) && child.type === DropdownItem) {
+              return React.cloneElement(child, {
+                ref: (el) => itemRefs.current[index] = el,
+                tabIndex: focusedIndex === index ? 0 : -1,
+                onClose: closeOnSelect ? () => setIsOpen(false) : undefined,
+                role: "menuitem"
+              });
+            }
+            return child;
+          })}
           </div>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 /**
  * Dropdown Item component
@@ -142,13 +143,13 @@ export const Dropdown = ({
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Dropdown item component
  */
-export const DropdownItem = React.forwardRef(({ 
-  children, 
-  onClick, 
+export const DropdownItem = React.forwardRef(({
+  children,
+  onClick,
   className = '',
   onClose,
   disabled = false,
-  ...props 
+  ...props
 }, ref) => {
   const handleClick = (e) => {
     e.preventDefault();
@@ -175,11 +176,11 @@ export const DropdownItem = React.forwardRef(({
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       aria-disabled={disabled}
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </a>
-  );
+    </a>);
+
 });
 DropdownItem.displayName = 'DropdownItem';
 /**
@@ -189,13 +190,13 @@ DropdownItem.displayName = 'DropdownItem';
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Dropdown divider component
  */
-export const DropdownDivider = ({ className = '', ...props }) => {
+export const DropdownDivider = ({ className = '', ...props }) => {const { t } = useTranslation();
   return (
-    <div 
+    <div
       className={cn("border-t border-gray-100 my-1", className)}
       role="separator"
       aria-orientation="horizontal"
-      {...props}
-    />
-  );
+      {...props} />);
+
+
 };

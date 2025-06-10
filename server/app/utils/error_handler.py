@@ -7,6 +7,7 @@ from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from marshmallow import ValidationError
 import traceback
+from app.middleware.i18n_middleware import i18n_response
 
 
 class AppError(Exception):
@@ -35,7 +36,7 @@ class ValidationError(AppError):
 class AuthenticationError(AppError):
     """Authentication error class."""
     
-    def __init__(self, message: str = 'Authentication required'):
+    def __init__(self, message: str = '$t:api.error.unauthorized'):
         super().__init__(
             message=message,
             code='AUTHENTICATION_ERROR',
@@ -46,7 +47,7 @@ class AuthenticationError(AppError):
 class AuthorizationError(AppError):
     """Authorization error class."""
     
-    def __init__(self, message: str = 'Insufficient permissions'):
+    def __init__(self, message: str = '$t:api.error.forbidden'):
         super().__init__(
             message=message,
             code='AUTHORIZATION_ERROR',
@@ -57,7 +58,7 @@ class AuthorizationError(AppError):
 class NotFoundError(AppError):
     """Not found error class."""
     
-    def __init__(self, message: str = 'Resource not found', resource: str = None):
+    def __init__(self, message: str = '$t:api.error.not_found', resource: str = None):
         super().__init__(
             message=message,
             code='NOT_FOUND',
@@ -69,7 +70,7 @@ class NotFoundError(AppError):
 class ConflictError(AppError):
     """Conflict error class."""
     
-    def __init__(self, message: str = 'Resource conflict', field: str = None):
+    def __init__(self, message: str = '$t:api.error.conflict', field: str = None):
         super().__init__(
             message=message,
             code='CONFLICT',
@@ -81,7 +82,7 @@ class ConflictError(AppError):
 class RateLimitError(AppError):
     """Rate limit error class."""
     
-    def __init__(self, message: str = 'Rate limit exceeded', retry_after: int = None):
+    def __init__(self, message: str = '$t:api.error.rate_limit', retry_after: int = None):
         super().__init__(
             message=message,
             code='RATE_LIMIT_EXCEEDED',
@@ -120,7 +121,7 @@ def format_error_response(error: Exception) -> Tuple[Dict[str, Any], int]:
         response = {
             'error': {
                 'code': 'VALIDATION_ERROR',
-                'message': 'Validation failed',
+                'message': '$t:api.error.validation',
                 'details': {
                     'fields': error.messages if hasattr(error, 'messages') else str(error)
                 }
@@ -133,7 +134,7 @@ def format_error_response(error: Exception) -> Tuple[Dict[str, Any], int]:
         response = {
             'error': {
                 'code': 'DATABASE_INTEGRITY_ERROR',
-                'message': 'Database integrity constraint violated',
+                'message': '$t:api.error.database_integrity',
                 'details': {
                     'constraint': str(error.orig) if hasattr(error, 'orig') else str(error)
                 }
@@ -145,7 +146,7 @@ def format_error_response(error: Exception) -> Tuple[Dict[str, Any], int]:
         response = {
             'error': {
                 'code': 'DATABASE_ERROR',
-                'message': 'Database operation failed',
+                'message': '$t:api.error.database',
                 'details': {}
             }
         }
@@ -166,7 +167,7 @@ def format_error_response(error: Exception) -> Tuple[Dict[str, Any], int]:
     response = {
         'error': {
             'code': 'INTERNAL_ERROR',
-            'message': 'An unexpected error occurred',
+            'message': '$t:api.error.server',
             'details': {}
         }
     }
@@ -181,6 +182,7 @@ def format_error_response(error: Exception) -> Tuple[Dict[str, Any], int]:
 def handle_errors(f):
     """Decorator to handle errors in view functions."""
     @wraps(f)
+    @i18n_response
     def decorated_function(*args, **kwargs):
         try:
             return f(*args, **kwargs)
@@ -227,6 +229,7 @@ def register_error_handlers(app):
     """Register error handlers with Flask app."""
     
     @app.errorhandler(Exception)
+    @i18n_response
     def handle_exception(e):
         """Handle all exceptions."""
         log_error(e)
@@ -234,20 +237,22 @@ def register_error_handlers(app):
         return jsonify(response), status_code
     
     @app.errorhandler(404)
+    @i18n_response
     def handle_not_found(e):
         """Handle 404 errors."""
-        error = NotFoundError('The requested resource was not found')
+        error = NotFoundError('$t:api.error.not_found')
         response, status_code = format_error_response(error)
         return jsonify(response), status_code
     
     @app.errorhandler(500)
+    @i18n_response
     def handle_internal_error(e):
         """Handle 500 errors."""
         log_error(e)
         response = {
             'error': {
                 'code': 'INTERNAL_ERROR',
-                'message': 'An internal server error occurred',
+                'message': '$t:api.error.server',
                 'details': {}
             }
         }
@@ -260,8 +265,8 @@ def validate_request_data(data: Dict, required_fields: list) -> Dict:
     missing = [field for field in required_fields if field not in data]
     if missing:
         raise ValidationError(
-            message='Missing required fields',
-            fields={field: 'This field is required' for field in missing}
+            message='$t:api.validation.missing_fields',
+            fields={field: '$t:api.validation.field_required' for field in missing}
         )
     return data
 
@@ -269,9 +274,9 @@ def validate_request_data(data: Dict, required_fields: list) -> Dict:
 def validate_pagination_params(page: int = 1, per_page: int = 10) -> Tuple[int, int]:
     """Validate pagination parameters."""
     if page < 1:
-        raise ValidationError('Page must be greater than 0')
+        raise ValidationError('$t:api.validation.page_invalid')
     if per_page < 1 or per_page > 100:
-        raise ValidationError('Per page must be between 1 and 100')
+        raise ValidationError('$t:api.validation.per_page_invalid')
     return page, per_page
 
 
@@ -281,10 +286,10 @@ def handle_database_error(error: SQLAlchemyError):
         # Parse constraint name from error
         constraint = str(error.orig)
         if 'unique constraint' in constraint.lower():
-            raise ConflictError('Resource already exists')
+            raise ConflictError('$t:api.error.resource_exists')
         elif 'foreign key constraint' in constraint.lower():
-            raise ValidationError('Invalid reference to related resource')
+            raise ValidationError('$t:api.error.invalid_reference')
         else:
-            raise ConflictError('Database constraint violation')
+            raise ConflictError('$t:api.error.constraint_violation')
     else:
-        raise AppError('Database operation failed', code='DATABASE_ERROR', status_code=500)
+        raise AppError('$t:api.error.database', code='DATABASE_ERROR', status_code=500)

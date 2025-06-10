@@ -1,4 +1,5 @@
-/**
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; /**
  * Centralized animation configurations for consistent animations throughout the app
  */
 // Framer Motion animation variants with GPU acceleration
@@ -73,16 +74,16 @@ export const staggerItem = {
 // Page transition variants
 export const pageTransition = {
   initial: { opacity: 0, y: 20 },
-  animate: { 
-    opacity: 1, 
+  animate: {
+    opacity: 1,
     y: 0,
     transition: {
       duration: 0.3,
       ease: 'easeOut'
     }
   },
-  exit: { 
-    opacity: 0, 
+  exit: {
+    opacity: 0,
     y: -20,
     transition: {
       duration: 0.2,
@@ -98,9 +99,9 @@ export const modalOverlay = {
 };
 export const modalContent = {
   initial: { opacity: 0, scale: 0.95, y: 20 },
-  animate: { 
-    opacity: 1, 
-    scale: 1, 
+  animate: {
+    opacity: 1,
+    scale: 1,
     y: 0,
     transition: {
       type: 'spring',
@@ -108,9 +109,9 @@ export const modalContent = {
       stiffness: 300
     }
   },
-  exit: { 
-    opacity: 0, 
-    scale: 0.95, 
+  exit: {
+    opacity: 0,
+    scale: 0.95,
     y: 20,
     transition: {
       duration: 0.2
@@ -164,7 +165,7 @@ export const buttonHover = {
 };
 // Card hover animations
 export const cardHover = {
-  whileHover: { 
+  whileHover: {
     y: -4,
     boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)'
   },
@@ -191,9 +192,9 @@ export const menuItemVariants = {
 // Toast notification animations
 export const toastAnimation = {
   initial: { opacity: 0, y: 50, scale: 0.9 },
-  animate: { 
-    opacity: 1, 
-    y: 0, 
+  animate: {
+    opacity: 1,
+    y: 0,
     scale: 1,
     transition: {
       type: 'spring',
@@ -201,9 +202,9 @@ export const toastAnimation = {
       stiffness: 300
     }
   },
-  exit: { 
-    opacity: 0, 
-    y: 20, 
+  exit: {
+    opacity: 0,
+    y: 20,
     scale: 0.9,
     transition: {
       duration: 0.2

@@ -1,8 +1,9 @@
-import { 
-  generateComplianceData, 
+// TODO: i18n - processed
+import {
+  generateComplianceData,
   generateComplianceMetrics,
-  generateComplianceReports 
-} from './mockComplianceData';
+  generateComplianceReports } from
+'./mockComplianceData';import { useTranslation } from "react-i18next";
 export const setupComplianceMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -11,7 +12,7 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     delete: originalDelete || api.delete.bind(api)
   };
   // Compliance endpoints
-  api.get = function(url, ...args) {
+  api.get = function (url, ...args) {
     // Audit logs endpoint
     if (url === '/api/compliance/audit-logs' || url.startsWith('/api/compliance/audit-logs?')) {
       const complianceData = generateComplianceData();
@@ -26,28 +27,28 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
       let logs = complianceData.auditLogs;
       // Filter by user
       if (user) {
-        logs = logs.filter(log => 
-          log.user.toLowerCase().includes(user.toLowerCase()) ||
-          log.userId?.toLowerCase().includes(user.toLowerCase())
+        logs = logs.filter((log) =>
+        log.user.toLowerCase().includes(user.toLowerCase()) ||
+        log.userId?.toLowerCase().includes(user.toLowerCase())
         );
       }
       // Filter by action
       if (action) {
-        logs = logs.filter(log => log.action === action);
+        logs = logs.filter((log) => log.action === action);
       }
       // Filter by resource
       if (resource) {
-        logs = logs.filter(log => log.resource === resource);
+        logs = logs.filter((log) => log.resource === resource);
       }
       // Filter by risk level
       if (risk) {
-        logs = logs.filter(log => log.risk === risk);
+        logs = logs.filter((log) => log.risk === risk);
       }
       // Filter by date range
       if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
-        logs = logs.filter(log => {
+        logs = logs.filter((log) => {
           const logDate = new Date(log.timestamp);
           return logDate >= start && logDate <= end;
         });
@@ -132,7 +133,7 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     if (url.match(/^\/api\/compliance\/backups\/\d+$/)) {
       const backupId = parseInt(url.split('/').pop());
       const complianceData = generateComplianceData();
-      const backup = complianceData.dataBackup.backups.find(b => b.id === backupId);
+      const backup = complianceData.dataBackup.backups.find((b) => b.id === backupId);
       if (backup) {
         return Promise.resolve({
           status: 200,
@@ -148,43 +149,43 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     // Compliance policies
     if (url === '/api/compliance/policies') {
       const policies = [
-        {
-          id: 1,
-          name: "Data Retention Policy",
-          version: "2.1",
-          effectiveDate: "2023-01-01",
-          lastReview: "2023-12-15",
-          nextReview: "2024-06-15",
-          status: "active"
-        },
-        {
-          id: 2,
-          name: "Privacy Policy",
-          version: "3.0",
-          effectiveDate: "2023-05-01",
-          lastReview: "2024-01-10",
-          nextReview: "2024-07-10",
-          status: "active"
-        },
-        {
-          id: 3,
-          name: "Security Policy",
-          version: "2.5",
-          effectiveDate: "2023-06-15",
-          lastReview: "2023-11-30",
-          nextReview: "2024-05-30",
-          status: "active"
-        },
-        {
-          id: 4,
-          name: "Incident Response Policy",
-          version: "1.8",
-          effectiveDate: "2023-09-01",
-          lastReview: "2023-12-01",
-          nextReview: "2024-06-01",
-          status: "active"
-        }
-      ];
+      {
+        id: 1,
+        name: "Data Retention Policy",
+        version: "2.1",
+        effectiveDate: "2023-01-01",
+        lastReview: "2023-12-15",
+        nextReview: "2024-06-15",
+        status: "active"
+      },
+      {
+        id: 2,
+        name: "Privacy Policy",
+        version: "3.0",
+        effectiveDate: "2023-05-01",
+        lastReview: "2024-01-10",
+        nextReview: "2024-07-10",
+        status: "active"
+      },
+      {
+        id: 3,
+        name: "Security Policy",
+        version: "2.5",
+        effectiveDate: "2023-06-15",
+        lastReview: "2023-11-30",
+        nextReview: "2024-05-30",
+        status: "active"
+      },
+      {
+        id: 4,
+        name: "Incident Response Policy",
+        version: "1.8",
+        effectiveDate: "2023-09-01",
+        lastReview: "2023-12-01",
+        nextReview: "2024-06-01",
+        status: "active"
+      }];
+
       return Promise.resolve({
         status: 200,
         data: {
@@ -197,7 +198,7 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     return originalFunctions.get.call(api, url, ...args);
   };
   // Compliance POST endpoints
-  api.post = function(url, data, ...args) {
+  api.post = function (url, data, ...args) {
     // Create audit log entry
     if (url === '/api/compliance/audit-logs') {
       const newLog = {
@@ -285,7 +286,7 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     return originalFunctions.post.call(api, url, data, ...args);
   };
   // Compliance PUT endpoints
-  api.put = function(url, data, ...args) {
+  api.put = function (url, data, ...args) {
     // Update compliance settings
     if (url === '/api/compliance/settings') {
       return Promise.resolve({
@@ -358,7 +359,7 @@ export const setupComplianceMockApi = (api, originalGet, originalPost, originalP
     return originalFunctions.put.call(api, url, data, ...args);
   };
   // Compliance DELETE endpoints
-  api.delete = function(url, ...args) {
+  api.delete = function (url, ...args) {
     // Delete old audit logs
     if (url === '/api/compliance/audit-logs/old') {
       return Promise.resolve({

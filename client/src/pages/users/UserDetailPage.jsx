@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Edit, Mail, Phone, Calendar, Clock, Building, MapPin, User, Shield, Activity, FileText, AlignLeft } from 'lucide-react';
@@ -13,8 +14,8 @@ import { formatDate, formatDateTime } from '@/lib/utils';
 import api from '@/lib/api';
 /**
  * User detail page
- */
-const UserDetailPage = () => {
+ */import { useTranslation } from "react-i18next";
+const UserDetailPage = () => {const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { hasRole } = useAuth();
@@ -41,7 +42,7 @@ const UserDetailPage = () => {
         addToast({
           type: 'error',
           title: 'Failed to load user',
-          message: error.response?.data?.message || 'An error occurred while loading user data.',
+          message: error.response?.data?.message || 'An error occurred while loading user data.'
         });
         // Navigate back to users list on error
         navigate('/users');
@@ -59,15 +60,15 @@ const UserDetailPage = () => {
           setIsLoadingActivities(true);
           const response = await api.get(`/api/users/${id}/activities`);
           // Ensure activities is always an array
-          const activitiesData = Array.isArray(response.data) ? response.data : 
-                                Array.isArray(response.data.activities) ? response.data.activities : [];
+          const activitiesData = Array.isArray(response.data) ? response.data :
+          Array.isArray(response.data.activities) ? response.data.activities : [];
           setActivities(activitiesData);
         } catch (error) {
           console.error('Error fetching user activities:', error);
           addToast({
             type: 'error',
             title: 'Failed to load activities',
-            message: 'An error occurred while loading user activities.',
+            message: 'An error occurred while loading user activities.'
           });
         } finally {
           setIsLoadingActivities(false);
@@ -84,15 +85,15 @@ const UserDetailPage = () => {
           setIsLoadingActivities(true);
           const response = await api.get(`/api/users/${id}/sessions`);
           // Ensure sessions is always an array
-          const sessionsData = Array.isArray(response.data) ? response.data : 
-                              Array.isArray(response.data.sessions) ? response.data.sessions : [];
+          const sessionsData = Array.isArray(response.data) ? response.data :
+          Array.isArray(response.data.sessions) ? response.data.sessions : [];
           setSessions(sessionsData);
         } catch (error) {
           console.error('Error fetching user sessions:', error);
           addToast({
             type: 'error',
             title: 'Failed to load sessions',
-            message: 'An error occurred while loading user sessions.',
+            message: 'An error occurred while loading user sessions.'
           });
         } finally {
           setIsLoadingActivities(false);
@@ -109,15 +110,15 @@ const UserDetailPage = () => {
           setIsLoadingActivities(true);
           const response = await api.get(`/api/users/${id}/documents`);
           // Ensure documents is always an array
-          const documentsData = Array.isArray(response.data) ? response.data : 
-                               Array.isArray(response.data.documents) ? response.data.documents : [];
+          const documentsData = Array.isArray(response.data) ? response.data :
+          Array.isArray(response.data.documents) ? response.data.documents : [];
           setDocuments(documentsData);
         } catch (error) {
           console.error('Error fetching user documents:', error);
           addToast({
             type: 'error',
             title: 'Failed to load documents',
-            message: 'An error occurred while loading user documents.',
+            message: 'An error occurred while loading user documents.'
           });
         } finally {
           setIsLoadingActivities(false);
@@ -180,26 +181,26 @@ const UserDetailPage = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+      </div>);
+
   }
   // If user not found
   if (!user) {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">User Not Found</h1>
-          <p className="text-gray-600 mt-2">The requested user could not be found.</p>
+          <h1 className="text-2xl font-bold">{t("pages.user_not_found")}</h1>
+          <p className="text-gray-600 mt-2">{t("pages.the_requested_user_could_not_be_found")}</p>
           <Button
             onClick={() => navigate('/users')}
-            className="mt-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Users
+            className="mt-4">
+
+            <ArrowLeft className="h-4 w-4 mr-2" />{t("pages.back_to_users")}
+
           </Button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
   return (
     <div className="container mx-auto py-8 px-4">
@@ -207,25 +208,25 @@ const UserDetailPage = () => {
         <Button
           variant="outline"
           onClick={() => navigate('/users')}
-          className="mb-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Users
+          className="mb-4">
+
+          <ArrowLeft className="h-4 w-4 mr-2" />{t("pages.back_to_users")}
+
         </Button>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
           <div>
             <h1 className="text-2xl font-bold">{user.first_name} {user.last_name}</h1>
             <p className="text-gray-600">{user.email}</p>
           </div>
-          {canManageUsers && (
-            <Button
-              onClick={handleEditUser}
-              className="mt-4 md:mt-0"
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Edit User
-            </Button>
-          )}
+          {canManageUsers &&
+          <Button
+            onClick={handleEditUser}
+            className="mt-4 md:mt-0">
+
+              <Edit className="h-4 w-4 mr-2" />{t("pages.edit_user")}
+
+          </Button>
+          }
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -234,13 +235,13 @@ const UserDetailPage = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
-                <Avatar 
+                <Avatar
                   src={user.profile_picture}
                   alt={`${user.first_name} ${user.last_name}`}
                   initials={`${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`}
                   size="xl"
-                  className="mb-4"
-                />
+                  className="mb-4" />
+
                 <h2 className="text-xl font-semibold">
                   {user.first_name} {user.last_name}
                 </h2>
@@ -249,35 +250,35 @@ const UserDetailPage = () => {
                   {renderRoleBadge(user.role)}
                   {renderStatusBadge(user.status)}
                 </div>
-                {user.organization && (
-                  <p className="text-sm text-muted-foreground mt-2 flex items-center justify-center">
+                {user.organization &&
+                <p className="text-sm text-muted-foreground mt-2 flex items-center justify-center">
                     <Building className="h-4 w-4 mr-1" />
                     {user.organization}
                   </p>
-                )}
+                }
               </div>
               <div className="mt-6 border-t pt-6 space-y-4">
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 text-gray-500 mr-3" />
                   <div>
-                    <p className="text-sm font-medium">Email</p>
+                    <p className="text-sm font-medium">{t("components.email")}</p>
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                   </div>
                 </div>
-                {user.phone && (
-                  <div className="flex items-center">
+                {user.phone &&
+                <div className="flex items-center">
                     <Phone className="h-4 w-4 text-gray-500 mr-3" />
                     <div>
-                      <p className="text-sm font-medium">Phone</p>
+                      <p className="text-sm font-medium">{t("components.phone")}</p>
                       <p className="text-sm text-muted-foreground">{user.phone}</p>
                     </div>
                   </div>
-                )}
-                {user.address && (
-                  <div className="flex items-center">
+                }
+                {user.address &&
+                <div className="flex items-center">
                     <MapPin className="h-4 w-4 text-gray-500 mr-3" />
                     <div>
-                      <p className="text-sm font-medium">Address</p>
+                      <p className="text-sm font-medium">{t("pages.address")}</p>
                       <p className="text-sm text-muted-foreground">
                         {user.address}
                         {user.city && `, ${user.city}`}
@@ -287,18 +288,18 @@ const UserDetailPage = () => {
                       </p>
                     </div>
                   </div>
-                )}
+                }
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 text-gray-500 mr-3" />
                   <div>
-                    <p className="text-sm font-medium">Created</p>
+                    <p className="text-sm font-medium">{t("components.created")}</p>
                     <p className="text-sm text-muted-foreground">{formatDate(user.created_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 text-gray-500 mr-3" />
                   <div>
-                    <p className="text-sm font-medium">Last Login</p>
+                    <p className="text-sm font-medium">{t("pages.last_login")}</p>
                     <p className="text-sm text-muted-foreground">
                       {user.last_login ? formatDateTime(user.last_login) : 'Never'}
                     </p>
@@ -315,43 +316,43 @@ const UserDetailPage = () => {
               <CardHeader className="pb-0">
                 <TabsList>
                   <TabTrigger value="overview">
-                    <User className="h-4 w-4 mr-2" />
-                    Overview
+                    <User className="h-4 w-4 mr-2" />{t("components.overview")}
+
                   </TabTrigger>
                   <TabTrigger value="activity">
-                    <Activity className="h-4 w-4 mr-2" />
-                    Activity
+                    <Activity className="h-4 w-4 mr-2" />{t("pages.activity")}
+
                   </TabTrigger>
                   <TabTrigger value="sessions">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Sessions
+                    <Calendar className="h-4 w-4 mr-2" />{t("pages.sessions")}
+
                   </TabTrigger>
                   <TabTrigger value="documents">
-                    <FileText className="h-4 w-4 mr-2" />
-                    Documents
+                    <FileText className="h-4 w-4 mr-2" />{t("components.documents")}
+
                   </TabTrigger>
                 </TabsList>
               </CardHeader>
               <TabContent value="overview">
                 <CardContent className="pt-6">
-                  {user.bio ? (
-                    <div className="mb-6">
-                      <h3 className="text-lg font-medium mb-2">About</h3>
+                  {user.bio ?
+                  <div className="mb-6">
+                      <h3 className="text-lg font-medium mb-2">{t("pages.about")}</h3>
                       <p className="text-gray-600">{user.bio}</p>
-                    </div>
-                  ) : (
-                    <div className="mb-6">
-                      <h3 className="text-lg font-medium mb-2">About</h3>
+                    </div> :
+
+                  <div className="mb-6">
+                      <h3 className="text-lg font-medium mb-2">{t("pages.about")}</h3>
                       <p className="text-gray-500 italic">No bio provided</p>
                     </div>
-                  )}
+                  }
                   <div>
-                    <h3 className="text-lg font-medium mb-2">Permissions & Access</h3>
+                    <h3 className="text-lg font-medium mb-2">{t("pages.permissions_access")}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="border rounded-md p-4">
                         <div className="flex items-center mb-2">
                           <Shield className="h-5 w-5 text-primary mr-2" />
-                          <h4 className="font-medium">Role</h4>
+                          <h4 className="font-medium">{t("components.role")}</h4>
                         </div>
                         <p className="text-gray-600">{renderRoleBadge(user.role)}</p>
                         <p className="text-sm text-gray-500 mt-1">
@@ -364,7 +365,7 @@ const UserDetailPage = () => {
                       <div className="border rounded-md p-4">
                         <div className="flex items-center mb-2">
                           <User className="h-5 w-5 text-primary mr-2" />
-                          <h4 className="font-medium">Account Status</h4>
+                          <h4 className="font-medium">{t("pages.account_status")}</h4>
                         </div>
                         <p className="text-gray-600">{renderStatusBadge(user.status)}</p>
                         <p className="text-sm text-gray-500 mt-1">
@@ -379,22 +380,22 @@ const UserDetailPage = () => {
               </TabContent>
               <TabContent value="activity">
                 <CardContent className="pt-6">
-                  <h3 className="text-lg font-medium mb-4">User Activity</h3>
-                  {isLoadingActivities ? (
-                    <div className="text-center py-8">
+                  <h3 className="text-lg font-medium mb-4">{t("pages.user_activity")}</h3>
+                  {isLoadingActivities ?
+                  <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                      <p className="text-gray-500">Loading activity data...</p>
-                    </div>
-                  ) : !Array.isArray(activities) || activities.length === 0 ? (
-                    <div className="text-center py-8 border rounded-md">
+                      <p className="text-gray-500">{t("pages.loading_activity_data")}</p>
+                    </div> :
+                  !Array.isArray(activities) || activities.length === 0 ?
+                  <div className="text-center py-8 border rounded-md">
                       <AlignLeft className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                      <h4 className="text-lg font-medium text-gray-500">No activity recorded</h4>
-                      <p className="text-gray-400">This user hasn't performed any actions yet</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {Array.isArray(activities) && activities.map((activity) => (
-                        <div key={activity.id} className="border-b pb-4 last:border-b-0 last:pb-0">
+                      <h4 className="text-lg font-medium text-gray-500">{t("pages.no_activity_recorded")}</h4>
+                      <p className="text-gray-400">{t("pages.this_user_hasnt_performed_any_actions_yet")}</p>
+                    </div> :
+
+                  <div className="space-y-4">
+                      {Array.isArray(activities) && activities.map((activity) =>
+                    <div key={activity.id} className="border-b pb-4 last:border-b-0 last:pb-0">
                           <div className="flex items-start">
                             <div className="flex-shrink-0 mt-1">
                               <div className="h-8 w-8 rounded-full bg-primary bg-opacity-10 flex items-center justify-center">
@@ -404,136 +405,136 @@ const UserDetailPage = () => {
                             <div className="ml-3">
                               <p className="text-sm font-medium">{activity.description}</p>
                               <p className="text-xs text-gray-500">{formatDateTime(activity.timestamp)}</p>
-                              {activity.details && (
-                                <p className="text-sm text-gray-600 mt-1">{activity.details}</p>
-                              )}
+                              {activity.details &&
+                          <p className="text-sm text-gray-600 mt-1">{activity.details}</p>
+                          }
                             </div>
                           </div>
                         </div>
-                      ))}
+                    )}
                     </div>
-                  )}
+                  }
                 </CardContent>
               </TabContent>
               <TabContent value="sessions">
                 <CardContent className="pt-6">
-                  <h3 className="text-lg font-medium mb-4">Training Sessions</h3>
-                  {isLoadingActivities ? (
-                    <div className="text-center py-8">
+                  <h3 className="text-lg font-medium mb-4">{t("pages.training_sessions")}</h3>
+                  {isLoadingActivities ?
+                  <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                      <p className="text-gray-500">Loading session data...</p>
-                    </div>
-                  ) : !Array.isArray(sessions) || sessions.length === 0 ? (
-                    <div className="text-center py-8 border rounded-md">
+                      <p className="text-gray-500">{t("pages.loading_session_data")}</p>
+                    </div> :
+                  !Array.isArray(sessions) || sessions.length === 0 ?
+                  <div className="text-center py-8 border rounded-md">
                       <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                      <h4 className="text-lg font-medium text-gray-500">No sessions found</h4>
-                      <p className="text-gray-400">This user hasn't participated in any sessions yet</p>
-                    </div>
-                  ) : (
-                    <div className="overflow-x-auto">
+                      <h4 className="text-lg font-medium text-gray-500">{t("pages.no_sessions_found")}</h4>
+                      <p className="text-gray-400">{t("pages.this_user_hasnt_participated_in_any_sessions_yet")}</p>
+                    </div> :
+
+                  <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableCell>Session Name</TableCell>
-                            <TableCell>Date</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell>Duration</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell>{t("pages.session_name")}</TableCell>
+                            <TableCell>{t("components.date")}</TableCell>
+                            <TableCell>{t("components.status")}</TableCell>
+                            <TableCell>{t("components.duration")}</TableCell>
+                            <TableCell>{t("components.actions")}</TableCell>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {Array.isArray(sessions) && sessions.map((session) => (
-                            <TableRow key={session.id}>
+                          {Array.isArray(sessions) && sessions.map((session) =>
+                        <TableRow key={session.id}>
                               <TableCell className="font-medium">{session.title}</TableCell>
                               <TableCell>{formatDate(session.scheduled_at)}</TableCell>
                               <TableCell>
                                 <Badge color={
-                                  session.status === 'completed' ? 'green' :
-                                  session.status === 'scheduled' ? 'blue' :
-                                  session.status === 'cancelled' ? 'red' : 'gray'
-                                }>
+                            session.status === 'completed' ? 'green' :
+                            session.status === 'scheduled' ? 'blue' :
+                            session.status === 'cancelled' ? 'red' : 'gray'
+                            }>
                                   {session.status}
                                 </Badge>
                               </TableCell>
                               <TableCell>{session.duration} minutes</TableCell>
                               <TableCell>
-                                <Link 
-                                  to={`/sessions/${session.id}`}
-                                  className="text-primary hover:underline text-sm"
-                                >
-                                  View Details
-                                </Link>
+                                <Link
+                              to={`/sessions/${session.id}`}
+                              className="text-primary hover:underline text-sm">{t("components.view_details")}
+
+
+                            </Link>
                               </TableCell>
                             </TableRow>
-                          ))}
+                        )}
                         </TableBody>
                       </Table>
                     </div>
-                  )}
+                  }
                 </CardContent>
               </TabContent>
               <TabContent value="documents">
                 <CardContent className="pt-6">
-                  <h3 className="text-lg font-medium mb-4">Documents</h3>
-                  {isLoadingActivities ? (
-                    <div className="text-center py-8">
+                  <h3 className="text-lg font-medium mb-4">{t("components.documents")}</h3>
+                  {isLoadingActivities ?
+                  <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                      <p className="text-gray-500">Loading documents...</p>
-                    </div>
-                  ) : !Array.isArray(documents) || documents.length === 0 ? (
-                    <div className="text-center py-8 border rounded-md">
+                      <p className="text-gray-500">{t("pages.loading_documents")}</p>
+                    </div> :
+                  !Array.isArray(documents) || documents.length === 0 ?
+                  <div className="text-center py-8 border rounded-md">
                       <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                      <h4 className="text-lg font-medium text-gray-500">No documents found</h4>
-                      <p className="text-gray-400">This user doesn't have any documents yet</p>
-                    </div>
-                  ) : (
-                    <div className="overflow-x-auto">
+                      <h4 className="text-lg font-medium text-gray-500">{t("pages.no_documents_found")}</h4>
+                      <p className="text-gray-400">{t("pages.this_user_doesnt_have_any_documents_yet")}</p>
+                    </div> :
+
+                  <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Type</TableCell>
-                            <TableCell>Uploaded</TableCell>
-                            <TableCell>Size</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell>{t("components.name")}</TableCell>
+                            <TableCell>{t("components.type")}</TableCell>
+                            <TableCell>{t("components.uploaded")}</TableCell>
+                            <TableCell>{t("pages.size")}</TableCell>
+                            <TableCell>{t("components.actions")}</TableCell>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {Array.isArray(documents) && documents.map((document) => (
-                            <TableRow key={document.id}>
+                          {Array.isArray(documents) && documents.map((document) =>
+                        <TableRow key={document.id}>
                               <TableCell className="font-medium">{document.name}</TableCell>
                               <TableCell>{document.type}</TableCell>
                               <TableCell>{formatDate(document.created_at)}</TableCell>
                               <TableCell>{document.size_formatted}</TableCell>
                               <TableCell>
-                                <Link 
-                                  to={`/documents/${document.id}`}
-                                  className="text-primary hover:underline text-sm mr-3"
-                                >
-                                  View
-                                </Link>
-                                <a 
-                                  href={document.download_url}
-                                  className="text-primary hover:underline text-sm"
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  Download
-                                </a>
+                                <Link
+                              to={`/documents/${document.id}`}
+                              className="text-primary hover:underline text-sm mr-3">{t("mobile.view")}
+
+
+                            </Link>
+                                <a
+                              href={document.download_url}
+                              className="text-primary hover:underline text-sm"
+                              target="_blank"
+                              rel="noopener noreferrer">{t("pages.download")}
+
+
+                            </a>
                               </TableCell>
                             </TableRow>
-                          ))}
+                        )}
                         </TableBody>
                       </Table>
                     </div>
-                  )}
+                  }
                 </CardContent>
               </TabContent>
             </Tabs>
           </Card>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export default UserDetailPage;

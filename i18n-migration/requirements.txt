@@ -1,0 +1,3 @@
+# Python dependencies for i18n migration scripts
+astor>=0.8.1
+flask-babel>=2.0.0

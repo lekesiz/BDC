@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -8,8 +9,8 @@ import { cn } from '@/lib/utils';
  * @param {React.ReactNode} props.children - Form content
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Form component
- */
-export const Form = ({ onSubmit, children, className = '', ...props }) => {
+ */import { useTranslation } from "react-i18next";
+export const Form = ({ onSubmit, children, className = '', ...props }) => {const { t } = useTranslation();
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit && onSubmit(e);
@@ -18,11 +19,11 @@ export const Form = ({ onSubmit, children, className = '', ...props }) => {
     <form
       className={cn('space-y-4 sm:space-y-6', className)}
       onSubmit={handleSubmit}
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </form>
-  );
+    </form>);
+
 };
 /**
  * FormGroup component
@@ -32,12 +33,12 @@ export const Form = ({ onSubmit, children, className = '', ...props }) => {
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Form group component
  */
-export const FormGroup = ({ children, className = '', ...props }) => {
+export const FormGroup = ({ children, className = '', ...props }) => {const { t } = useTranslation();
   return (
     <div className={cn('space-y-2', className)} {...props}>
       {children}
-    </div>
-  );
+    </div>);
+
 };
 /**
  * FormLabel component
@@ -49,23 +50,23 @@ export const FormGroup = ({ children, className = '', ...props }) => {
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Form label component
  */
-export const FormLabel = ({ 
-  htmlFor, 
-  children, 
+export const FormLabel = ({
+  htmlFor,
+  children,
   required = false,
-  className = '', 
-  ...props 
-}) => {
+  className = '',
+  ...props
+}) => {const { t } = useTranslation();
   return (
     <label
       htmlFor={htmlFor}
       className={cn('block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1', className)}
-      {...props}
-    >
+      {...props}>
+
       {children}
       {required && <span className="ml-1 text-red-500">*</span>}
-    </label>
-  );
+    </label>);
+
 };
 /**
  * FormControl component
@@ -78,14 +79,14 @@ export const FormLabel = ({
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Form control component
  */
-export const FormControl = ({ 
-  children, 
-  id, 
-  name, 
+export const FormControl = ({
+  children,
+  id,
+  name,
   invalid = false,
-  className = '', 
-  ...props 
-}) => {
+  className = '',
+  ...props
+}) => {const { t } = useTranslation();
   return React.cloneElement(React.Children.only(children), {
     id,
     name,
@@ -107,13 +108,13 @@ export const FormControl = ({
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Form helper component
  */
-export const FormHelper = ({ 
-  children, 
-  id, 
-  error = false, 
+export const FormHelper = ({
+  children,
+  id,
+  error = false,
   className = '',
-  ...props 
-}) => {
+  ...props
+}) => {const { t } = useTranslation();
   return (
     <p
       id={id ? `${id}-helper` : undefined}
@@ -122,11 +123,11 @@ export const FormHelper = ({
         error ? 'text-red-600' : 'text-gray-500',
         className
       )}
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </p>
-  );
+    </p>);
+
 };
 /**
  * Checkbox component
@@ -140,15 +141,15 @@ export const FormHelper = ({
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Checkbox component
  */
-export const Checkbox = ({ 
-  id, 
-  name, 
-  checked, 
-  onChange, 
+export const Checkbox = ({
+  id,
+  name,
+  checked,
+  onChange,
   label,
-  className = '', 
-  ...props 
-}) => {
+  className = '',
+  ...props
+}) => {const { t } = useTranslation();
   return (
     <div className="flex items-start sm:items-center min-h-[44px] py-2">
       <input
@@ -161,18 +162,18 @@ export const Checkbox = ({
           'h-5 w-5 sm:h-4 sm:w-4 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary mt-0.5 sm:mt-0',
           className
         )}
-        {...props}
-      />
-      {label && (
-        <label
-          htmlFor={id}
-          className="ml-3 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none"
-        >
+        {...props} />
+
+      {label &&
+      <label
+        htmlFor={id}
+        className="ml-3 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+
           {label}
         </label>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 /**
  * Radio component
@@ -186,15 +187,15 @@ export const Checkbox = ({
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Radio component
  */
-export const Radio = ({ 
-  id, 
-  name, 
-  checked, 
-  onChange, 
+export const Radio = ({
+  id,
+  name,
+  checked,
+  onChange,
   label,
-  className = '', 
-  ...props 
-}) => {
+  className = '',
+  ...props
+}) => {const { t } = useTranslation();
   return (
     <div className="flex items-start sm:items-center min-h-[44px] py-2">
       <input
@@ -207,18 +208,18 @@ export const Radio = ({
           'h-5 w-5 sm:h-4 sm:w-4 border-gray-300 dark:border-gray-600 text-primary focus:ring-primary mt-0.5 sm:mt-0',
           className
         )}
-        {...props}
-      />
-      {label && (
-        <label
-          htmlFor={id}
-          className="ml-3 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none"
-        >
+        {...props} />
+
+      {label &&
+      <label
+        htmlFor={id}
+        className="ml-3 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+
           {label}
         </label>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 /**
  * Select component
@@ -232,15 +233,15 @@ export const Radio = ({
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Select component
  */
-export const Select = ({ 
-  id, 
-  name, 
-  onChange, 
-  options = [], 
+export const Select = ({
+  id,
+  name,
+  onChange,
+  options = [],
   placeholder = 'Select an option',
-  className = '', 
-  ...props 
-}) => {
+  className = '',
+  ...props
+}) => {const { t } = useTranslation();
   return (
     <select
       id={id}
@@ -251,18 +252,18 @@ export const Select = ({
         'min-h-[44px] px-3 py-2 text-base sm:text-sm',
         className
       )}
-      {...props}
-    >
-      {placeholder && (
-        <option value="" disabled>
+      {...props}>
+
+      {placeholder &&
+      <option value="" disabled>
           {placeholder}
         </option>
-      )}
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
+      }
+      {options.map((option) =>
+      <option key={option.value} value={option.value}>
           {option.label}
         </option>
-      ))}
-    </select>
-  );
+      )}
+    </select>);
+
 };

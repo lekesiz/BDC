@@ -1,26 +1,27 @@
+// TODO: i18n - processed
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import * as ThemeContext from '@/contexts/ThemeContext';
 // Mock framer-motion to avoid animation issues in tests
-vi.mock('framer-motion', () => ({
+import { useTranslation } from "react-i18next";vi.mock('framer-motion', () => ({
   motion: {
-    button: ({ 
-      children, 
-      whileHover, 
-      whileTap, 
-      initial, 
-      animate, 
-      transition, 
-      ...props 
+    button: ({
+      children,
+      whileHover,
+      whileTap,
+      initial,
+      animate,
+      transition,
+      ...props
     }) => <button {...props}>{children}</button>,
-    div: ({ 
-      children, 
-      initial, 
-      animate, 
-      transition, 
-      ...props 
+    div: ({
+      children,
+      initial,
+      animate,
+      transition,
+      ...props
     }) => <div {...props}>{children}</div>
   }
 }));

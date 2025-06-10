@@ -1,9 +1,10 @@
+// TODO: i18n - processed
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import axios from 'axios';
 // Mock axios
-vi.mock('axios', () => ({
+import { useTranslation } from "react-i18next";vi.mock('axios', () => ({
   default: {
     get: vi.fn(() => Promise.resolve({ data: [] })),
     post: vi.fn(),
@@ -14,7 +15,7 @@ vi.mock('axios', () => ({
 // Mock components and contexts that would be used in a real implementation
 vi.mock('@/contexts/SocketContext', () => ({
   SocketContext: {
-    Provider: ({ children }) => children,
+    Provider: ({ children }) => children
   },
   useSocket: () => ({
     on: mockSocket.on,
@@ -25,7 +26,7 @@ vi.mock('@/contexts/SocketContext', () => ({
 }));
 vi.mock('@/components/ui/toast', () => ({
   ToastContext: {
-    Provider: ({ children }) => children,
+    Provider: ({ children }) => children
   },
   useToast: () => ({
     toast: vi.fn()
@@ -59,7 +60,7 @@ describe('ProgramsListPage WebSocket Integration', () => {
     vi.clearAllMocks();
   });
   afterEach(() => {
-    Object.keys(savedHandlers).forEach(key => {
+    Object.keys(savedHandlers).forEach((key) => {
       delete savedHandlers[key];
     });
   });

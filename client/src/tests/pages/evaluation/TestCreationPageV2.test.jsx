@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -7,7 +8,7 @@ import axios from '../../../lib/api';
 import * as useToastModule from '../../../hooks/useToast';
 import { EVALUATION_STATUS, QUESTION_TYPES } from '../../../lib/constants';
 // Mock modules
-vi.mock('@/lib/api');
+import { useTranslation } from "react-i18next";vi.mock('@/lib/api');
 vi.mock('@/hooks/useToast');
 // Mock DragDropContext
 vi.mock('@hello-pangea/dnd', () => ({
@@ -15,7 +16,7 @@ vi.mock('@hello-pangea/dnd', () => ({
     return <div data-testid="drag-drop-context">{children}</div>;
   },
   Droppable: ({ children }) => children({ droppableProps: {}, innerRef: vi.fn() }),
-  Draggable: ({ children }) => children({ innerRef: vi.fn(), draggableProps: {}, dragHandleProps: {} }, { isDragging: false }),
+  Draggable: ({ children }) => children({ innerRef: vi.fn(), draggableProps: {}, dragHandleProps: {} }, { isDragging: false })
 }));
 // Mock useNavigate hook
 const mockNavigate = vi.fn();
@@ -24,7 +25,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    useParams: () => ({ id: undefined }), // Default to create mode
+    useParams: () => ({ id: undefined }) // Default to create mode
   };
 });
 // Mock toast functions properly
@@ -38,48 +39,48 @@ vi.mock('../../../hooks/useToast', () => ({
 }));
 // Sample response data for API calls
 const mockCategories = [
-  { id: 'cat1', name: 'Programming' },
-  { id: 'cat2', name: 'Web Development' },
-  { id: 'cat3', name: 'Data Science' },
-];
+{ id: 'cat1', name: 'Programming' },
+{ id: 'cat2', name: 'Web Development' },
+{ id: 'cat3', name: 'Data Science' }];
+
 const mockTemplates = [
+{
+  id: 'temp1',
+  title: { tr: 'Programlama Temelleri', en: 'Programming Basics' },
+  description: { tr: 'Temel programlama konseptlerini test edin', en: 'Test basic programming concepts' },
+  questions: [
   {
-    id: 'temp1',
-    title: { tr: 'Programlama Temelleri', en: 'Programming Basics' },
-    description: { tr: 'Temel programlama konseptlerini test edin', en: 'Test basic programming concepts' },
-    questions: [
-      {
-        id: '1',
-        question_text: { tr: 'JavaScript nedir?', en: 'What is JavaScript?' },
-        question_type: QUESTION_TYPES.MULTIPLE_CHOICE,
-        options: [
-          { text: { tr: 'Programlama dili', en: 'Programming language' }, is_correct: true },
-          { text: { tr: 'Veritabanı', en: 'Database' }, is_correct: false },
-        ]
-      }
-    ]
-  }
-];
-const mockQuestionBank = [
-  {
-    id: 'bank1',
-    question_text: { tr: 'HTML nedir?', en: 'What is HTML?' },
+    id: '1',
+    question_text: { tr: 'JavaScript nedir?', en: 'What is JavaScript?' },
     question_type: QUESTION_TYPES.MULTIPLE_CHOICE,
-    points: 5,
     options: [
-      { text: { tr: 'İşaretleme dili', en: 'Markup language' }, is_correct: true },
-      { text: { tr: 'Programlama dili', en: 'Programming language' }, is_correct: false },
-    ]
-  }
-];
+    { text: { tr: 'Programlama dili', en: 'Programming language' }, is_correct: true },
+    { text: { tr: 'Veritabanı', en: 'Database' }, is_correct: false }]
+
+  }]
+
+}];
+
+const mockQuestionBank = [
+{
+  id: 'bank1',
+  question_text: { tr: 'HTML nedir?', en: 'What is HTML?' },
+  question_type: QUESTION_TYPES.MULTIPLE_CHOICE,
+  points: 5,
+  options: [
+  { text: { tr: 'İşaretleme dili', en: 'Markup language' }, is_correct: true },
+  { text: { tr: 'Programlama dili', en: 'Programming language' }, is_correct: false }]
+
+}];
+
 const mockAiSuggestions = [
-  {
-    question_text: { tr: 'CSS seçicileri nelerdir?', en: 'What are CSS selectors?' },
-    question_type: QUESTION_TYPES.TEXT,
-    points: 5,
-    difficulty: 'medium',
-  }
-];
+{
+  question_text: { tr: 'CSS seçicileri nelerdir?', en: 'What are CSS selectors?' },
+  question_type: QUESTION_TYPES.TEXT,
+  points: 5,
+  difficulty: 'medium'
+}];
+
 describe('TestCreationPageV2', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -359,7 +360,7 @@ describe('TestCreationPageV2', () => {
     const file = new File(['dummy content'], 'test-image.png', { type: 'image/png' });
     const fileInput = screen.getByLabelText('Yükle');
     Object.defineProperty(fileInput, 'files', {
-      value: [file],
+      value: [file]
     });
     fireEvent.change(fileInput);
     // Should call upload API
@@ -386,7 +387,7 @@ describe('TestCreationPageV2', () => {
       return {
         ...actual,
         useNavigate: () => mockNavigate,
-        useParams: () => ({ id: 'existing-test-id' }),
+        useParams: () => ({ id: 'existing-test-id' })
       };
     });
     // Mock fetch test data response
@@ -399,7 +400,7 @@ describe('TestCreationPageV2', () => {
             description: { tr: 'Mevcut test açıklaması', en: '' },
             category: 'cat1',
             status: EVALUATION_STATUS.ACTIVE,
-            questions: [],
+            questions: []
           }
         });
       }

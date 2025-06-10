@@ -1,16 +1,17 @@
+// TODO: i18n - processed
 import React from 'react';
 import { format } from 'date-fns';
 import { FileText, Calendar, User, Building } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Badge } from '../ui/badge';
-import { Separator } from '../ui/separator';
-const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) => {
+import { Separator } from '../ui/separator';import { useTranslation } from "react-i18next";
+const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) => {const { t } = useTranslation();
   // Simulate report metadata
   const metadata = {
     generatedBy: 'Admin User',
     organization: 'BDC Organization',
     generatedAt: new Date(),
-    totalPages: Math.ceil(sections.length * 1.5),
+    totalPages: Math.ceil(sections.length * 1.5)
   };
   const renderWidgetPreview = (widget) => {
     switch (widget.type) {
@@ -20,8 +21,8 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {widget.config.chartType || 'Chart'} - {widget.config.title || 'Untitled'}
             </p>
-          </div>
-        );
+          </div>);
+
       case 'kpi':
         return (
           <div className="bg-gray-100 dark:bg-gray-700 rounded p-4">
@@ -31,43 +32,43 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
             <p className="text-2xl font-bold mt-1">
               {widget.config.value || 0}{widget.config.unit || ''}
             </p>
-          </div>
-        );
+          </div>);
+
       case 'table':
         return (
           <div className="bg-gray-100 dark:bg-gray-700 rounded p-4 h-32 flex items-center justify-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Table - {widget.config.title || 'Data Table'}
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t("components.table_")}
+              {widget.config.title || 'Data Table'}
             </p>
-          </div>
-        );
+          </div>);
+
       case 'text':
         return (
           <div className="bg-gray-100 dark:bg-gray-700 rounded p-4">
-            <div 
+            <div
               className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3"
-              dangerouslySetInnerHTML={{ 
-                __html: widget.config.content || '<p>Text content...</p>' 
-              }}
-            />
-          </div>
-        );
+              dangerouslySetInnerHTML={{
+                __html: widget.config.content || '<p>Text content...</p>'
+              }} />
+
+          </div>);
+
       case 'image':
         return (
           <div className="bg-gray-100 dark:bg-gray-700 rounded p-4 h-32 flex items-center justify-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Image - {widget.config.alt || 'Image placeholder'}
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t("components.image_")}
+              {widget.config.alt || 'Image placeholder'}
             </p>
-          </div>
-        );
+          </div>);
+
       default:
         return (
           <div className="bg-gray-100 dark:bg-gray-700 rounded p-4 h-20 flex items-center justify-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {widget.type} widget
             </p>
-          </div>
-        );
+          </div>);
+
     }
   };
   const getLayoutClass = (layout) => {
@@ -86,11 +87,11 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
       <div className="text-center space-y-2">
         <FileText className="w-8 h-8 mx-auto text-gray-400" />
         <h2 className="text-lg font-bold">{reportName || 'Untitled Report'}</h2>
-        {reportDescription && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+        {reportDescription &&
+        <p className="text-sm text-gray-500 dark:text-gray-400">
             {reportDescription}
           </p>
-        )}
+        }
       </div>
       <Separator />
       {/* Metadata */}
@@ -100,8 +101,8 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
             <User className="w-3 h-3" />
             <span>{metadata.generatedBy}</span>
           </div>
-          <Badge variant="outline" className="text-xs">
-            Draft
+          <Badge variant="outline" className="text-xs">{t("components.draft")}
+
           </Badge>
         </div>
         <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
@@ -117,45 +118,45 @@ const ReportPreview = ({ reportName, reportDescription, sections, darkMode }) =>
       {/* Sections Preview */}
       <ScrollArea className="h-[calc(100vh-400px)]">
         <div className="space-y-4">
-          {sections.length === 0 ? (
-            <div className="text-center py-8">
+          {sections.length === 0 ?
+          <div className="text-center py-8">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 No sections added yet. Start building your report by adding sections and widgets.
               </p>
-            </div>
-          ) : (
-            sections.map((section, sectionIndex) => (
-              <div 
-                key={section.id} 
-                className="border border-gray-200 dark:border-gray-700 rounded-lg p-3"
-              >
+            </div> :
+
+          sections.map((section, sectionIndex) =>
+          <div
+            key={section.id}
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+
                 <h3 className="text-sm font-semibold mb-2">
                   {sectionIndex + 1}. {section.title}
                 </h3>
-                {section.widgets.length === 0 ? (
-                  <div className="text-xs text-gray-500 dark:text-gray-400 text-center py-4">
-                    Empty section
-                  </div>
-                ) : (
-                  <div className={getLayoutClass(section.layout)}>
-                    {section.widgets.map((widget) => (
-                      <div key={widget.id}>
+                {section.widgets.length === 0 ?
+            <div className="text-xs text-gray-500 dark:text-gray-400 text-center py-4">{t("components.empty_section")}
+
+            </div> :
+
+            <div className={getLayoutClass(section.layout)}>
+                    {section.widgets.map((widget) =>
+              <div key={widget.id}>
                         {renderWidgetPreview(widget)}
                       </div>
-                    ))}
+              )}
                   </div>
-                )}
+            }
               </div>
-            ))
-          )}
+          )
+          }
         </div>
       </ScrollArea>
       <Separator />
       {/* Footer */}
       <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-        <p>Preview • {metadata.totalPages} estimated pages</p>
+        <p>{t("components.preview_")}{metadata.totalPages}{t("components.estimated_pages")}</p>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export default ReportPreview;

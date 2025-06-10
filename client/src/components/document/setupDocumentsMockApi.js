@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import {
   fetchDocuments,
   fetchDocument,
@@ -14,12 +15,12 @@ import {
   uploadDocument,
   createFolder,
   searchUsers,
-  fetchMultipleDocuments
-} from './mockDocumentsData';
+  fetchMultipleDocuments } from
+'./mockDocumentsData';
 // This function sets up mock API handlers for document endpoints
-export const setupDocumentsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
+import { useTranslation } from "react-i18next";export const setupDocumentsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Override GET requests for document endpoints
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     // List documents in root or specific folder
     const documentsMatch = url.match(/\/api\/documents$/);
     if (documentsMatch) {
@@ -47,7 +48,7 @@ export const setupDocumentsMockApi = (api, originalGet, originalPost, originalPu
     if (downloadMatch) {
       return Promise.resolve({
         status: 200,
-        data: new Blob(['Mock document content'], { type: 'application/octet-stream' }),
+        data: new Blob(['Mock document content'], { type: 'application/octet-stream' })
       });
     }
     // Download specific version (return empty blob)
@@ -55,7 +56,7 @@ export const setupDocumentsMockApi = (api, originalGet, originalPost, originalPu
     if (versionDownloadMatch) {
       return Promise.resolve({
         status: 200,
-        data: new Blob(['Mock version content'], { type: 'application/octet-stream' }),
+        data: new Blob(['Mock version content'], { type: 'application/octet-stream' })
       });
     }
     // Search users
@@ -86,7 +87,7 @@ export const setupDocumentsMockApi = (api, originalGet, originalPost, originalPu
     return originalGet.call(api, url, config);
   };
   // Override POST requests for document endpoints
-  api.post = function(url, data, config) {
+  api.post = function (url, data, config) {
     // Create document comment
     const commentMatch = url.match(/\/api\/documents\/(\d+)\/comments$/);
     if (commentMatch) {
@@ -122,7 +123,7 @@ export const setupDocumentsMockApi = (api, originalGet, originalPost, originalPu
     return originalPost.call(api, url, data, config);
   };
   // Override PUT requests for document endpoints
-  api.put = function(url, data, config) {
+  api.put = function (url, data, config) {
     // Update document
     const documentMatch = url.match(/\/api\/documents\/(\d+)$/);
     if (documentMatch) {
@@ -132,7 +133,7 @@ export const setupDocumentsMockApi = (api, originalGet, originalPost, originalPu
     return originalPut.call(api, url, data, config);
   };
   // Override DELETE requests for document endpoints
-  api.delete = function(url, config) {
+  api.delete = function (url, config) {
     // Delete document
     const documentMatch = url.match(/\/api\/documents\/(\d+)$/);
     if (documentMatch) {

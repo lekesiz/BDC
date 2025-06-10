@@ -1,4 +1,5 @@
-import { vi } from 'vitest'
+// TODO: i18n - processed
+import { vi } from 'vitest';import { useTranslation } from "react-i18next";
 const api = {
   get: vi.fn(),
   post: vi.fn(),
@@ -14,5 +15,5 @@ const api = {
       common: {}
     }
   }
-}
-export default api
+};
+export default api;

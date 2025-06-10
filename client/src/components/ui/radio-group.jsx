@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -8,32 +9,32 @@ import { cn } from '@/lib/utils';
  * @param {function} props.onValueChange - Callback when value changes
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} RadioGroup component
- */
-export const RadioGroup = React.forwardRef(({ 
+ */import { useTranslation } from "react-i18next";
+export const RadioGroup = React.forwardRef(({
   value,
   onValueChange,
   className,
   children,
-  ...props 
+  ...props
 }, ref) => {
   return (
-    <div 
+    <div
       ref={ref}
       role="radiogroup"
       className={cn("space-y-2", className)}
-      {...props}
-    >
-      {React.Children.map(children, child => {
+      {...props}>
+
+      {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
             checked: value === child.props.value,
-            onChange: () => onValueChange(child.props.value),
+            onChange: () => onValueChange(child.props.value)
           });
         }
         return child;
       })}
-    </div>
-  );
+    </div>);
+
 });
 RadioGroup.displayName = "RadioGroup";
 /**
@@ -46,13 +47,13 @@ RadioGroup.displayName = "RadioGroup";
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} RadioGroupItem component
  */
-export const RadioGroupItem = React.forwardRef(({ 
+export const RadioGroupItem = React.forwardRef(({
   value,
   checked,
   onChange,
   className,
   children,
-  ...props 
+  ...props
 }, ref) => {
   const id = props.id || `radio-${value}`;
   return (
@@ -68,14 +69,14 @@ export const RadioGroupItem = React.forwardRef(({
           "h-4 w-4 border-gray-300 text-primary focus:ring-primary",
           className
         )}
-        {...props}
-      />
-      {children && (
-        <label htmlFor={id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+        {...props} />
+
+      {children &&
+      <label htmlFor={id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           {children}
         </label>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 });
 RadioGroupItem.displayName = "RadioGroupItem";

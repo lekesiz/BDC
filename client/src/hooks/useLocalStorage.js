@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect, useCallback } from 'react';
 
 /**
@@ -5,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
  * @param {string} key - The localStorage key
  * @param {*} initialValue - The initial value
  * @returns {Array} [value, setValue, removeValue]
- */
+ */import { useTranslation } from "react-i18next";
 export const useLocalStorage = (key, initialValue) => {
   // Get from local storage then parse stored json or return initialValue
   const readValue = useCallback(() => {
@@ -35,13 +36,13 @@ export const useLocalStorage = (key, initialValue) => {
     try {
       // Allow value to be a function so we have the same API as useState
       const newValue = value instanceof Function ? value(storedValue) : value;
-      
+
       // Save to local storage
       window.localStorage.setItem(key, JSON.stringify(newValue));
-      
+
       // Save state
       setStoredValue(newValue);
-      
+
       // We dispatch a custom event so every useLocalStorage hook are notified
       window.dispatchEvent(new Event('local-storage'));
     } catch (error) {
@@ -67,7 +68,7 @@ export const useLocalStorage = (key, initialValue) => {
 
     // This only works for other tabs/windows
     window.addEventListener('storage', handleStorageChange);
-    
+
     // This works for the current tab
     window.addEventListener('local-storage', handleStorageChange);
 

@@ -1,19 +1,20 @@
-import { 
-  getAssessments, 
-  getAssessmentById, 
-  getQuizById, 
-  getAssessmentResult, 
-  submitQuizResults
-} from './mockData';
+// TODO: i18n - processed
+import {
+  getAssessments,
+  getAssessmentById,
+  getQuizById,
+  getAssessmentResult,
+  submitQuizResults } from
+'./mockData';
 /**
  * Setup mock API handlers for assessments
- */
+ */import { useTranslation } from "react-i18next";
 export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
   // Store original methods
   const baseGet = originalGet || api.get;
   const basePost = originalPost || api.post;
   // Override get method
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     // Get all assessments
     if (url === '/api/portal/assessments') {
       try {
@@ -129,7 +130,7 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost) => {
     return baseGet(url, config);
   };
   // Override post method
-  api.post = function(url, data, config) {
+  api.post = function (url, data, config) {
     // Submit quiz results
     const submitMatch = url.match(/^\/api\/portal\/assessments\/(\d+)\/quiz\/(\d+)\/submit$/);
     if (submitMatch) {

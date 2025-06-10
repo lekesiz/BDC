@@ -1,4 +1,5 @@
-// Mock data for assessment statistics
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // Mock data for assessment statistics
 export const generateMockStatistics = (startDate, endDate) => {
   const days = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
   return {
@@ -13,30 +14,30 @@ export const generateMockStatistics = (startDate, endDate) => {
     },
     performance: {
       scoreDistribution: [
-        { range: '0-20%', count: 12 },
-        { range: '21-40%', count: 28 },
-        { range: '41-60%', count: 65 },
-        { range: '61-80%', count: 142 },
-        { range: '81-100%', count: 95 }
-      ],
+      { range: '0-20%', count: 12 },
+      { range: '21-40%', count: 28 },
+      { range: '41-60%', count: 65 },
+      { range: '61-80%', count: 142 },
+      { range: '81-100%', count: 95 }],
+
       timeToComplete: [
-        { type: 'Quick Quiz', minutes: 15 },
-        { type: 'Standard Quiz', minutes: 35 },
-        { type: 'Project', minutes: 120 }
-      ],
+      { type: 'Quick Quiz', minutes: 15 },
+      { type: 'Standard Quiz', minutes: 35 },
+      { type: 'Project', minutes: 120 }],
+
       byCourse: [
-        { id: 1, name: 'Python Programming', assessmentCount: 24, averageScore: 82, passRate: 85 },
-        { id: 2, name: 'Web Development', assessmentCount: 18, averageScore: 75, passRate: 78 },
-        { id: 3, name: 'Data Science', assessmentCount: 31, averageScore: 79, passRate: 82 },
-        { id: 4, name: 'Mobile Development', assessmentCount: 15, averageScore: 71, passRate: 72 },
-        { id: 5, name: 'Cloud Computing', assessmentCount: 22, averageScore: 84, passRate: 88 }
-      ],
+      { id: 1, name: 'Python Programming', assessmentCount: 24, averageScore: 82, passRate: 85 },
+      { id: 2, name: 'Web Development', assessmentCount: 18, averageScore: 75, passRate: 78 },
+      { id: 3, name: 'Data Science', assessmentCount: 31, averageScore: 79, passRate: 82 },
+      { id: 4, name: 'Mobile Development', assessmentCount: 15, averageScore: 71, passRate: 72 },
+      { id: 5, name: 'Cloud Computing', assessmentCount: 22, averageScore: 84, passRate: 88 }],
+
       byTrainer: [
-        { id: 1, name: 'John Smith', studentCount: 45, averageScore: 79, completionRate: 88 },
-        { id: 2, name: 'Sarah Johnson', studentCount: 52, averageScore: 82, completionRate: 91 },
-        { id: 3, name: 'Mike Chen', studentCount: 38, averageScore: 77, completionRate: 85 },
-        { id: 4, name: 'Emily Davis', studentCount: 41, averageScore: 80, completionRate: 87 }
-      ],
+      { id: 1, name: 'John Smith', studentCount: 45, averageScore: 79, completionRate: 88 },
+      { id: 2, name: 'Sarah Johnson', studentCount: 52, averageScore: 82, completionRate: 91 },
+      { id: 3, name: 'Mike Chen', studentCount: 38, averageScore: 77, completionRate: 85 },
+      { id: 4, name: 'Emily Davis', studentCount: 41, averageScore: 80, completionRate: 87 }],
+
       passRateTrends: generateTrendData(days, ['quiz', 'project', 'overall'])
     },
     completion: {
@@ -44,147 +45,147 @@ export const generateMockStatistics = (startDate, endDate) => {
     },
     assessmentStats: {
       typeDistribution: [
-        { name: 'Quiz', value: 78 },
-        { name: 'Project', value: 49 }
-      ],
+      { name: 'Quiz', value: 78 },
+      { name: 'Project', value: 49 }],
+
       topAssessments: [
-        {
-          id: 1,
-          title: 'Python Basics Quiz',
-          type: 'quiz',
-          completions: 234,
-          averageScore: 85,
-          passRate: 88
-        },
-        {
-          id: 2,
-          title: 'JavaScript Fundamentals',
-          type: 'quiz',
-          completions: 189,
-          averageScore: 78,
-          passRate: 82
-        },
-        {
-          id: 3,
-          title: 'React Project',
-          type: 'project',
-          completions: 67,
-          averageScore: 73,
-          passRate: 75
-        },
-        {
-          id: 4,
-          title: 'Database Design Quiz',
-          type: 'quiz',
-          completions: 156,
-          averageScore: 81,
-          passRate: 84
-        },
-        {
-          id: 5,
-          title: 'API Development Project',
-          type: 'project',
-          completions: 89,
-          averageScore: 76,
-          passRate: 78
-        }
-      ]
+      {
+        id: 1,
+        title: 'Python Basics Quiz',
+        type: 'quiz',
+        completions: 234,
+        averageScore: 85,
+        passRate: 88
+      },
+      {
+        id: 2,
+        title: 'JavaScript Fundamentals',
+        type: 'quiz',
+        completions: 189,
+        averageScore: 78,
+        passRate: 82
+      },
+      {
+        id: 3,
+        title: 'React Project',
+        type: 'project',
+        completions: 67,
+        averageScore: 73,
+        passRate: 75
+      },
+      {
+        id: 4,
+        title: 'Database Design Quiz',
+        type: 'quiz',
+        completions: 156,
+        averageScore: 81,
+        passRate: 84
+      },
+      {
+        id: 5,
+        title: 'API Development Project',
+        type: 'project',
+        completions: 89,
+        averageScore: 76,
+        passRate: 78
+      }]
+
     },
     studentStats: {
       topStudents: [
-        {
-          id: 1,
-          name: 'Alice Johnson',
-          email: 'alice@example.com',
-          assessmentCount: 15,
-          averageScore: 92,
-          badges: ['🏆', '⭐', '🎯']
-        },
-        {
-          id: 2,
-          name: 'Bob Wilson',
-          email: 'bob@example.com',
-          assessmentCount: 12,
-          averageScore: 88,
-          badges: ['🏆', '⭐']
-        },
-        {
-          id: 3,
-          name: 'Carol Martinez',
-          email: 'carol@example.com',
-          assessmentCount: 18,
-          averageScore: 86,
-          badges: ['⭐', '🎯']
-        },
-        {
-          id: 4,
-          name: 'David Lee',
-          email: 'david@example.com',
-          assessmentCount: 11,
-          averageScore: 85,
-          badges: ['⭐']
-        }
-      ],
+      {
+        id: 1,
+        name: 'Alice Johnson',
+        email: 'alice@example.com',
+        assessmentCount: 15,
+        averageScore: 92,
+        badges: ['🏆', '⭐', '🎯']
+      },
+      {
+        id: 2,
+        name: 'Bob Wilson',
+        email: 'bob@example.com',
+        assessmentCount: 12,
+        averageScore: 88,
+        badges: ['🏆', '⭐']
+      },
+      {
+        id: 3,
+        name: 'Carol Martinez',
+        email: 'carol@example.com',
+        assessmentCount: 18,
+        averageScore: 86,
+        badges: ['⭐', '🎯']
+      },
+      {
+        id: 4,
+        name: 'David Lee',
+        email: 'david@example.com',
+        assessmentCount: 11,
+        averageScore: 85,
+        badges: ['⭐']
+      }],
+
       needingSupport: [
-        {
-          id: 5,
-          name: 'Eve Brown',
-          email: 'eve@example.com',
-          failedCount: 4,
-          averageScore: 42
-        },
-        {
-          id: 6,
-          name: 'Frank Davis',
-          email: 'frank@example.com',
-          failedCount: 3,
-          averageScore: 48
-        },
-        {
-          id: 7,
-          name: 'Grace Wilson',
-          email: 'grace@example.com',
-          failedCount: 5,
-          averageScore: 38
-        }
-      ],
+      {
+        id: 5,
+        name: 'Eve Brown',
+        email: 'eve@example.com',
+        failedCount: 4,
+        averageScore: 42
+      },
+      {
+        id: 6,
+        name: 'Frank Davis',
+        email: 'frank@example.com',
+        failedCount: 3,
+        averageScore: 48
+      },
+      {
+        id: 7,
+        name: 'Grace Wilson',
+        email: 'grace@example.com',
+        failedCount: 5,
+        averageScore: 38
+      }],
+
       engagementTrends: generateEngagementTrends(days)
     },
     questionStats: {
       mostChallenging: [
-        {
-          id: 1,
-          text: 'What is the time complexity of binary search?',
-          assessmentTitle: 'Algorithms Quiz',
-          attempts: 234,
-          successRate: 42,
-          avgTime: 120
-        },
-        {
-          id: 2,
-          text: 'Explain the difference between SQL JOIN types',
-          assessmentTitle: 'Database Quiz',
-          attempts: 189,
-          successRate: 38,
-          avgTime: 180
-        },
-        {
-          id: 3,
-          text: 'Implement a recursive function for factorial',
-          assessmentTitle: 'Programming Basics',
-          attempts: 156,
-          successRate: 45,
-          avgTime: 150
-        },
-        {
-          id: 4,
-          text: 'What is closure in JavaScript?',
-          assessmentTitle: 'JavaScript Advanced',
-          attempts: 145,
-          successRate: 35,
-          avgTime: 200
-        }
-      ]
+      {
+        id: 1,
+        text: 'What is the time complexity of binary search?',
+        assessmentTitle: 'Algorithms Quiz',
+        attempts: 234,
+        successRate: 42,
+        avgTime: 120
+      },
+      {
+        id: 2,
+        text: 'Explain the difference between SQL JOIN types',
+        assessmentTitle: 'Database Quiz',
+        attempts: 189,
+        successRate: 38,
+        avgTime: 180
+      },
+      {
+        id: 3,
+        text: 'Implement a recursive function for factorial',
+        assessmentTitle: 'Programming Basics',
+        attempts: 156,
+        successRate: 45,
+        avgTime: 150
+      },
+      {
+        id: 4,
+        text: 'What is closure in JavaScript?',
+        assessmentTitle: 'JavaScript Advanced',
+        attempts: 145,
+        successRate: 35,
+        avgTime: 200
+      }]
+
     }
   };
 };
@@ -198,7 +199,7 @@ function generateTrendData(days, metrics) {
     const dataPoint = {
       date: date.toISOString().split('T')[0]
     };
-    metrics.forEach(metric => {
+    metrics.forEach((metric) => {
       dataPoint[metric] = Math.floor(Math.random() * 20) + 70; // Random value between 70-90
     });
     data.push(dataPoint);

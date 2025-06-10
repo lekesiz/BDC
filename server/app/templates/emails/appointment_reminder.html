@@ -1,0 +1,61 @@
+{% extends "emails/base.html" %}
+
+{% block title %}{{ subject }}{% endblock %}
+
+{% block header %}{{ subject }}{% endblock %}
+
+{% block content %}
+    <h2>{{ greeting }}</h2>
+    
+    <p>{{ reminder_message }}</p>
+    
+    <div style="background-color: #f3f4f6; padding: 24px; border-radius: 8px; margin: 24px 0;">
+        <h3 style="margin: 0 0 16px; color: #1f2937;">{{ appointment_details_title }}</h3>
+        
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+                <td style="padding: 8px 0;">
+                    <strong>{{ date_label }}:</strong> {{ appointment_date }}
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0;">
+                    <strong>{{ time_label }}:</strong> {{ appointment_time }}
+                </td>
+            </tr>
+            {% if location %}
+            <tr>
+                <td style="padding: 8px 0;">
+                    <strong>{{ location_label }}:</strong> {{ location }}
+                </td>
+            </tr>
+            {% endif %}
+            {% if with_person %}
+            <tr>
+                <td style="padding: 8px 0;">
+                    <strong>{{ with_label }}:</strong> {{ with_person }}
+                </td>
+            </tr>
+            {% endif %}
+            {% if notes %}
+            <tr>
+                <td style="padding: 8px 0;">
+                    <strong>{{ notes_label }}:</strong> {{ notes }}
+                </td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+    
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+        <tr>
+            <td>
+                <a href="{{ calendar_url }}" class="button">{{ view_calendar_button }}</a>
+            </td>
+        </tr>
+    </table>
+    
+    <p>{{ reschedule_message }}</p>
+    
+    <p class="text-muted">{{ contact_message }}</p>
+{% endblock %}

@@ -1,9 +1,10 @@
+// TODO: i18n - processed
 import React, { memo, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
  * Optimized List Item component
- */
+ */import { useTranslation } from "react-i18next";
 const ListItem = memo(({ item, onItemClick, renderItem, isSelected = false }) => {
   const handleClick = useCallback(() => {
     if (onItemClick) {
@@ -17,11 +18,11 @@ const ListItem = memo(({ item, onItemClick, renderItem, isSelected = false }) =>
         'p-3 cursor-pointer transition-colors',
         isSelected ? 'bg-primary/10' : 'hover:bg-gray-100'
       )}
-      onClick={handleClick}
-    >
+      onClick={handleClick}>
+
       {renderItem(item)}
-    </div>
-  );
+    </div>);
+
 });
 
 ListItem.displayName = 'ListItem';
@@ -38,25 +39,25 @@ const OptimizedList = memo(({
   className,
   emptyMessage = 'No items found',
   loading = false,
-  keyExtractor = (item) => item.id,
+  keyExtractor = (item) => item.id
 }) => {
   // Memoize the list of items to prevent unnecessary re-renders
   const memoizedItems = useMemo(() => items, [items]);
 
   // Memoize the empty state
-  const emptyState = useMemo(() => (
-    <div className="text-center py-8 text-gray-500">
+  const emptyState = useMemo(() =>
+  <div className="text-center py-8 text-gray-500">
       {emptyMessage}
-    </div>
-  ), [emptyMessage]);
+    </div>,
+  [emptyMessage]);
 
   // Memoize the loading state
-  const loadingState = useMemo(() => (
-    <div className="text-center py-8">
+  const loadingState = useMemo(() =>
+  <div className="text-center py-8">
       <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
       <p className="mt-2 text-gray-500">Loading...</p>
-    </div>
-  ), []);
+    </div>,
+  []);
 
   if (loading) {
     return loadingState;
@@ -76,12 +77,12 @@ const OptimizedList = memo(({
             item={item}
             onItemClick={onItemClick}
             renderItem={renderItem}
-            isSelected={selectedId === key}
-          />
-        );
+            isSelected={selectedId === key} />);
+
+
       })}
-    </div>
-  );
+    </div>);
+
 });
 
 OptimizedList.displayName = 'OptimizedList';
@@ -98,7 +99,7 @@ export const VirtualizedList = memo(({
   onItemClick,
   selectedId,
   className,
-  keyExtractor = (item) => item.id,
+  keyExtractor = (item) => item.id
 }) => {
   const [scrollTop, setScrollTop] = React.useState(0);
   const scrollRef = React.useRef(null);
@@ -128,14 +129,14 @@ export const VirtualizedList = memo(({
       ref={scrollRef}
       className={cn('overflow-auto', className)}
       style={{ height: containerHeight }}
-      onScroll={handleScroll}
-    >
+      onScroll={handleScroll}>
+
       <div style={{ height: totalHeight, position: 'relative' }}>
         <div
           style={{
-            transform: `translateY(${visibleRange.start * itemHeight}px)`,
-          }}
-        >
+            transform: `translateY(${visibleRange.start * itemHeight}px)`
+          }}>
+
           {visibleItems.map((item) => {
             const key = keyExtractor(item);
             return (
@@ -146,16 +147,16 @@ export const VirtualizedList = memo(({
                   'flex items-center px-4 cursor-pointer transition-colors',
                   selectedId === key ? 'bg-primary/10' : 'hover:bg-gray-100'
                 )}
-                onClick={() => onItemClick && onItemClick(item)}
-              >
+                onClick={() => onItemClick && onItemClick(item)}>
+
                 {renderItem(item)}
-              </div>
-            );
+              </div>);
+
           })}
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 });
 
 VirtualizedList.displayName = 'VirtualizedList';

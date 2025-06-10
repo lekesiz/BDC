@@ -1,4 +1,5 @@
-// Integration Templates - Pre-configured settings for common use cases
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // Integration Templates - Pre-configured settings for common use cases
 export const integrationTemplates = {
   'google-calendar': {
     educational: {
@@ -115,10 +116,10 @@ export const integrationTemplates = {
       settings: {
         paymentMethods: ['card', 'sepa'],
         subscriptionPlans: [
-          { name: 'Basic', price: 29, interval: 'month' },
-          { name: 'Pro', price: 59, interval: 'month' },
-          { name: 'Enterprise', custom: true }
-        ],
+        { name: 'Basic', price: 29, interval: 'month' },
+        { name: 'Pro', price: 59, interval: 'month' },
+        { name: 'Enterprise', custom: true }],
+
         trialPeriod: 14,
         automaticTax: true,
         invoicing: true,
@@ -198,10 +199,10 @@ export const integrationTemplates = {
           byLocation: false
         },
         automations: [
-          'Welcome Series',
-          'Course Completion',
-          'Re-engagement'
-        ]
+        'Welcome Series',
+        'Course Completion',
+        'Re-engagement']
+
       }
     },
     automated: {
@@ -267,10 +268,10 @@ export const integrationTemplates = {
       description: 'Essential events only',
       settings: {
         events: [
-          'user.enrolled',
-          'course.completed',
-          'payment.success'
-        ],
+        'user.enrolled',
+        'course.completed',
+        'payment.success'],
+
         security: {
           signatureVerification: true,
           ipWhitelist: false

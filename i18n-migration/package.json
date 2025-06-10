@@ -1,0 +1,33 @@
+{
+  "name": "bdc-i18n-migration",
+  "version": "1.0.0",
+  "description": "I18n migration scripts for the BDC project",
+  "main": "index.js",
+  "scripts": {
+    "extract:frontend": "node scripts/extract-hardcoded-strings.js",
+    "extract:backend": "python3 scripts/extract-backend-strings.py",
+    "extract:all": "npm run extract:frontend && npm run extract:backend",
+    "update:translations": "node scripts/update-translation-files.js",
+    "migrate:frontend": "node scripts/migrate-frontend.js",
+    "migrate:frontend:dry": "node scripts/migrate-frontend.js --dry-run",
+    "migrate:backend": "python3 scripts/migrate-backend.py",
+    "migrate:backend:dry": "python3 scripts/migrate-backend.py --dry-run",
+    "migrate:all": "npm run migrate:frontend && npm run migrate:backend",
+    "validate": "node scripts/validate-translations.js",
+    "migration:complete": "npm run extract:all && npm run update:translations && npm run migrate:all && npm run validate",
+    "migration:dry-run": "npm run extract:all && npm run update:translations && npm run migrate:frontend:dry && npm run migrate:backend:dry"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.22.0",
+    "@babel/traverse": "^7.22.0",
+    "@babel/generator": "^7.22.0",
+    "@babel/types": "^7.22.0",
+    "glob": "^8.0.3"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "BDC Development Team",
+  "license": "MIT"
+}

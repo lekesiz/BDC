@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 
 /**
@@ -5,7 +6,7 @@ import { useState, useEffect } from 'react';
  * @param {*} value - The value to debounce
  * @param {number} delay - The delay in milliseconds
  * @returns {*} The debounced value
- */
+ */import { useTranslation } from "react-i18next";
 export const useDebounce = (value, delay = 500) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 

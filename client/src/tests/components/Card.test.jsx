@@ -1,6 +1,7 @@
+// TODO: i18n - processed
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../../components/ui/card';import { useTranslation } from "react-i18next";
 describe('Card Component', () => {
   it('renders children correctly', () => {
     render(

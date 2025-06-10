@@ -1,7 +1,8 @@
+// TODO: i18n - processed
 import jsPDF from 'jspdf';
 import { format } from 'date-fns';
 // Helper function to extract widget data
-const extractWidgetData = (widget) => {
+import { useTranslation } from "react-i18next";const extractWidgetData = (widget) => {
   switch (widget.type) {
     case 'kpi':
       return {
@@ -23,10 +24,10 @@ const extractWidgetData = (widget) => {
         title: widget.config.title || 'Table',
         headers: ['Name', 'Value', 'Status'],
         rows: [
-          ['Sample Row 1', '100', 'Active'],
-          ['Sample Row 2', '200', 'Active'],
-          ['Sample Row 3', '300', 'Inactive']
-        ]
+        ['Sample Row 1', '100', 'Active'],
+        ['Sample Row 2', '200', 'Active'],
+        ['Sample Row 3', '300', 'Inactive']]
+
       };
     case 'chart':
       // In a real implementation, this would fetch actual chart data
@@ -35,11 +36,11 @@ const extractWidgetData = (widget) => {
         title: widget.config.title || 'Chart',
         chartType: widget.config.chartType,
         data: [
-          { label: 'Jan', value: 100 },
-          { label: 'Feb', value: 150 },
-          { label: 'Mar', value: 120 },
-          { label: 'Apr', value: 180 }
-        ]
+        { label: 'Jan', value: 100 },
+        { label: 'Feb', value: 150 },
+        { label: 'Mar', value: 120 },
+        { label: 'Apr', value: 180 }]
+
       };
     default:
       return null;
@@ -129,7 +130,7 @@ export const exportToPDF = async (reportData) => {
           // Headers
           pdf.setFont(undefined, 'bold');
           widgetData.headers.forEach((header, index) => {
-            pdf.text(header, margin + (index * 50), yPosition);
+            pdf.text(header, margin + index * 50, yPosition);
           });
           pdf.setFont(undefined, 'normal');
           yPosition += 5;
@@ -140,7 +141,7 @@ export const exportToPDF = async (reportData) => {
               yPosition = 20;
             }
             row.forEach((cell, index) => {
-              pdf.text(cell.toString(), margin + (index * 50), yPosition);
+              pdf.text(cell.toString(), margin + index * 50, yPosition);
             });
             yPosition += 5;
           });
@@ -174,7 +175,7 @@ export const exportToExcel = async (reportData) => {
   reportData.sections.forEach((section) => {
     csvContent += `\n${section.title}\n`;
     // Extract KPIs
-    const kpiWidgets = section.widgets.filter(w => w.type === 'kpi');
+    const kpiWidgets = section.widgets.filter((w) => w.type === 'kpi');
     if (kpiWidgets.length > 0) {
       csvContent += 'KPI,Value,Trend,Change %\n';
       kpiWidgets.forEach((widget) => {
@@ -186,14 +187,14 @@ export const exportToExcel = async (reportData) => {
       csvContent += '\n';
     }
     // Extract tables
-    const tableWidgets = section.widgets.filter(w => w.type === 'table');
+    const tableWidgets = section.widgets.filter((w) => w.type === 'table');
     tableWidgets.forEach((widget) => {
       const widgetData = extractWidgetData(widget);
       if (widgetData && widgetData.type === 'table') {
         csvContent += `${widgetData.title}\n`;
         csvContent += widgetData.headers.join(',') + '\n';
-        widgetData.rows.forEach(row => {
-          csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
+        widgetData.rows.forEach((row) => {
+          csvContent += row.map((cell) => `"${cell}"`).join(',') + '\n';
         });
         csvContent += '\n';
       }
@@ -223,8 +224,8 @@ export const exportToCSV = async (reportData) => {
           // Add headers
           csvContent += widgetData.headers.join(',') + '\n';
           // Add rows
-          widgetData.rows.forEach(row => {
-            csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
+          widgetData.rows.forEach((row) => {
+            csvContent += row.map((cell) => `"${cell}"`).join(',') + '\n';
           });
           tableFound = true;
           break;
@@ -236,8 +237,8 @@ export const exportToCSV = async (reportData) => {
   if (!tableFound) {
     // If no table found, export KPIs
     csvContent = 'KPI,Value,Trend,Change\n';
-    reportData.sections.forEach(section => {
-      section.widgets.forEach(widget => {
+    reportData.sections.forEach((section) => {
+      section.widgets.forEach((widget) => {
         if (widget.type === 'kpi') {
           const widgetData = extractWidgetData(widget);
           if (widgetData) {
@@ -260,12 +261,12 @@ export const exportToCSV = async (reportData) => {
 };
 // Helper function to export widget as image (for future use)
 export const exportWidgetAsImage = async (widgetElement, filename) => {
+
+
   // This would require a library like html2canvas
   // Implementation would go here
-};
-// Helper function to print report
-export const printReport = (reportData) => {
-  // Create a new window with print-friendly styling
+}; // Helper function to print report
+export const printReport = (reportData) => {// Create a new window with print-friendly styling
   const printWindow = window.open('', '_blank');
   const printContent = `
     <!DOCTYPE html>
@@ -295,41 +296,41 @@ export const printReport = (reportData) => {
       <div class="metadata">
         Generated on: ${format(new Date(reportData.generatedAt), 'PPP')}
       </div>
-      ${reportData.sections.map(section => `
+      ${reportData.sections.map((section) => `
         <div class="section">
           <h2>${section.title}</h2>
-          ${section.widgets.map(widget => {
-            const data = extractWidgetData(widget);
-            if (!data) return '';
-            switch (data.type) {
-              case 'kpi':
-                return `
+          ${section.widgets.map((widget) => {
+    const data = extractWidgetData(widget);
+    if (!data) return '';
+    switch (data.type) {
+      case 'kpi':
+        return `
                   <div class="kpi">
                     <strong>${data.title}:</strong>
                     <span class="kpi-value">${data.value}</span>
                     ${data.trendValue ? `<span class="kpi-trend">${data.trend === 'up' ? '↑' : '↓'} ${data.trendValue}%</span>` : ''}
                   </div>
                 `;
-              case 'text':
-                return `<div>${data.content}</div>`;
-              case 'table':
-                return `
+      case 'text':
+        return `<div>${data.content}</div>`;
+      case 'table':
+        return `
                   <h3>${data.title}</h3>
                   <table>
                     <thead>
-                      <tr>${data.headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                      <tr>${data.headers.map((h) => `<th>${h}</th>`).join('')}</tr>
                     </thead>
                     <tbody>
-                      ${data.rows.map(row => `
-                        <tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>
+                      ${data.rows.map((row) => `
+                        <tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>
                       `).join('')}
                     </tbody>
                   </table>
                 `;
-              default:
-                return '';
-            }
-          }).join('')}
+      default:
+        return '';
+    }
+  }).join('')}
         </div>
       `).join('<div class="page-break"></div>')}
     </body>

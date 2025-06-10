@@ -1,7 +1,8 @@
+// TODO: i18n - processed
 import axios from 'axios';
 /**
  * Base API configuration with default settings
- */
+ */import { useTranslation } from "react-i18next";
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001',
   headers: {

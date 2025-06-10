@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -11,10 +12,10 @@ import { cn } from '@/lib/utils';
  * @param {React.ReactNode} props.leftIcon - Icon to display on the left side
  * @param {React.ReactNode} props.rightIcon - Icon to display on the right side
  * @returns {JSX.Element} Input component
- */
-const Input = React.forwardRef(({ 
-  className, 
-  type = "text", 
+ */import { useTranslation } from "react-i18next";
+const Input = React.forwardRef(({
+  className,
+  type = "text",
   label,
   error,
   labelProps,
@@ -24,33 +25,33 @@ const Input = React.forwardRef(({
   helpText,
   size = 'default',
   fullWidth = true,
-  ...props 
+  ...props
 }, ref) => {
   const id = props.id || props.name || React.useId();
   const errorId = error ? `${id}-error` : undefined;
   const helpTextId = helpText ? `${id}-help` : undefined;
   return (
     <div className="w-full space-y-2">
-      {label && (
-        <label 
-          htmlFor={id}
-          className={cn(
-            "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1",
-            error && "text-red-500 dark:text-red-400",
-            labelProps?.className
-          )}
-          {...labelProps}
-        >
+      {label &&
+      <label
+        htmlFor={id}
+        className={cn(
+          "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1",
+          error && "text-red-500 dark:text-red-400",
+          labelProps?.className
+        )}
+        {...labelProps}>
+
           {label}
           {required && <span className="text-red-500 dark:text-red-400 ml-1" aria-label="required">*</span>}
         </label>
-      )}
+      }
       <div className="relative">
-        {leftIcon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" aria-hidden="true">
+        {leftIcon &&
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" aria-hidden="true">
             {leftIcon}
           </div>
-        )}
+        }
         <input
           id={id}
           type={type}
@@ -73,31 +74,31 @@ const Input = React.forwardRef(({
             // Width
             fullWidth && "w-full",
             // Border and error states
-            error 
-              ? "border-red-500 dark:border-red-400 focus-visible:ring-red-500 dark:focus-visible:ring-red-400" 
-              : "border-gray-300 dark:border-gray-600",
+            error ?
+            "border-red-500 dark:border-red-400 focus-visible:ring-red-500 dark:focus-visible:ring-red-400" :
+            "border-gray-300 dark:border-gray-600",
             className
           )}
           ref={ref}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={[errorId, helpTextId].filter(Boolean).join(' ') || undefined}
           aria-required={required}
-          {...props}
-        />
-        {rightIcon && (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center" aria-hidden="true">
+          {...props} />
+
+        {rightIcon &&
+        <div className="absolute inset-y-0 right-0 pr-3 flex items-center" aria-hidden="true">
             {rightIcon}
           </div>
-        )}
+        }
       </div>
-      {helpText && !error && (
-        <p id={helpTextId} className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">{helpText}</p>
-      )}
-      {error && (
-        <p id={errorId} className="text-xs sm:text-sm text-red-500 dark:text-red-400 mt-1" role="alert">{error}</p>
-      )}
-    </div>
-  );
+      {helpText && !error &&
+      <p id={helpTextId} className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">{helpText}</p>
+      }
+      {error &&
+      <p id={errorId} className="text-xs sm:text-sm text-red-500 dark:text-red-400 mt-1" role="alert">{error}</p>
+      }
+    </div>);
+
 });
 Input.displayName = "Input";
 export { Input };

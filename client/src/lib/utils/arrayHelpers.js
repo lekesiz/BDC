@@ -1,4 +1,5 @@
-/**
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; /**
  * Safe array helper functions to prevent undefined errors
  */
 /**

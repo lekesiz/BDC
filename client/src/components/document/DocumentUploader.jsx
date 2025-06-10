@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React, { useState, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useDropzone } from 'react-dropzone';
@@ -5,7 +6,7 @@ import { FaUpload, FaFilePdf, FaFileImage, FaFileAlt, FaFileArchive, FaFile, FaT
 import DocumentService from './DocumentService';
 /**
  * DocumentUploader - Component for uploading documents with drag and drop
- */
+ */import { useTranslation } from "react-i18next";
 const DocumentUploader = ({
   onUploadComplete,
   onUploadError,
@@ -17,7 +18,7 @@ const DocumentUploader = ({
   showPreview = true,
   metadata = {},
   disableDefaultToast = false
-}) => {
+}) => {const { t } = useTranslation();
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
@@ -30,7 +31,7 @@ const DocumentUploader = ({
     if (Array.isArray(acceptedFileTypes)) {
       return acceptedFileTypes.reduce((acc, ext) => {
         const type = DocumentService.SUPPORTED_DOCUMENT_TYPES[ext]?.mimeTypes || [];
-        type.forEach(mime => {
+        type.forEach((mime) => {
           acc[mime] = [];
         });
         return acc;
@@ -44,7 +45,7 @@ const DocumentUploader = ({
     // Handle rejected files first
     if (rejectedFiles.length > 0) {
       const errorMessages = rejectedFiles.map(({ file, errors }) => {
-        const errorMsg = errors.map(e => e.message).join(', ');
+        const errorMsg = errors.map((e) => e.message).join(', ');
         return `${file.name}: ${errorMsg}`;
       });
       if (onUploadError) {
@@ -52,7 +53,7 @@ const DocumentUploader = ({
       }
     }
     // Process accepted files
-    const newFiles = acceptedFiles.map(file => ({
+    const newFiles = acceptedFiles.map((file) => ({
       file,
       id: `${file.name}-${file.size}-${Date.now()}`,
       progress: 0,
@@ -60,7 +61,7 @@ const DocumentUploader = ({
       error: null
     }));
     // Add to existing files, ensuring we don't exceed maxFiles
-    setFiles(prevFiles => {
+    setFiles((prevFiles) => {
       const combinedFiles = [...prevFiles, ...newFiles];
       return combinedFiles.slice(0, maxFiles);
     });
@@ -75,7 +76,7 @@ const DocumentUploader = ({
   });
   // Handle file removal before upload
   const removeFile = (fileId) => {
-    setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
+    setFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
   };
   // Get file icon based on type
   const getFileIcon = (file) => {
@@ -94,7 +95,7 @@ const DocumentUploader = ({
   };
   // Handle upload progress updates
   const updateProgress = (fileId, progress) => {
-    setUploadProgress(prev => ({
+    setUploadProgress((prev) => ({
       ...prev,
       [fileId]: progress
     }));
@@ -108,7 +109,7 @@ const DocumentUploader = ({
   };
   // Update status for a file
   const updateStatus = (fileId, status, error = null) => {
-    setUploadStatus(prev => ({
+    setUploadStatus((prev) => ({
       ...prev,
       [fileId]: { status, error }
     }));
@@ -128,7 +129,7 @@ const DocumentUploader = ({
       updateStatus(id, 'uploading');
       try {
         const data = await DocumentService.uploadDocument(
-          file, 
+          file,
           metadata,
           (progress) => updateProgress(id, progress)
         );
@@ -144,8 +145,8 @@ const DocumentUploader = ({
     });
     try {
       const results = await Promise.all(uploadPromises);
-      const successfulUploads = results.filter(r => r.success).map(r => r.data);
-      const failedUploads = results.filter(r => !r.success);
+      const successfulUploads = results.filter((r) => r.success).map((r) => r.data);
+      const failedUploads = results.filter((r) => !r.success);
       // Call the complete callback with results
       if (onUploadComplete) {
         onUploadComplete(successfulUploads, failedUploads);
@@ -165,11 +166,11 @@ const DocumentUploader = ({
     const status = uploadStatus[id]?.status || 'pending';
     const error = uploadStatus[id]?.error;
     return (
-      <div 
-        key={id} 
+      <div
+        key={id}
         className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border mb-2"
-        data-cy="file-item"
-      >
+        data-cy="file-item">
+
         <div className="flex items-center mr-3">
           {getFileIcon(file)}
           <div className="ml-3">
@@ -181,32 +182,32 @@ const DocumentUploader = ({
           </div>
         </div>
         <div className="flex items-center">
-          {status === 'pending' && (
-            <button
-              onClick={() => removeFile(id)}
-              className="text-gray-500 hover:text-red-500 p-1"
-              data-cy="remove-file"
-            >
+          {status === 'pending' &&
+          <button
+            onClick={() => removeFile(id)}
+            className="text-gray-500 hover:text-red-500 p-1"
+            data-cy="remove-file">
+
               <FaTimes />
             </button>
-          )}
-          {status === 'uploading' && (
-            <div className="w-24 bg-gray-200 h-2 rounded-full overflow-hidden">
-              <div 
-                className="bg-blue-500 h-full" 
-                style={{ width: `${progress}%` }}
-              ></div>
+          }
+          {status === 'uploading' &&
+          <div className="w-24 bg-gray-200 h-2 rounded-full overflow-hidden">
+              <div
+              className="bg-blue-500 h-full"
+              style={{ width: `${progress}%` }}>
             </div>
-          )}
-          {status === 'success' && (
-            <FaCheck className="text-green-500" />
-          )}
-          {status === 'error' && (
-            <FaTimes className="text-red-500" />
-          )}
+            </div>
+          }
+          {status === 'success' &&
+          <FaCheck className="text-green-500" />
+          }
+          {status === 'error' &&
+          <FaTimes className="text-red-500" />
+          }
         </div>
-      </div>
-    );
+      </div>);
+
   };
   return (
     <div className={`document-uploader ${className}`} data-cy="document-uploader">
@@ -216,50 +217,50 @@ const DocumentUploader = ({
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition duration-200 
           ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:bg-gray-50'} 
           ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
-        data-cy="dropzone"
-      >
+        data-cy="dropzone">
+
         <input {...getInputProps()} data-cy="file-input" />
         <FaUpload className="mx-auto h-12 w-12 text-gray-400" />
         <p className="mt-2 text-sm font-medium text-gray-900">
           {isDragActive ? 'Dosyaları buraya bırakın' : 'Dosyaları seçmek için tıklayın veya sürükleyin'}
         </p>
         <p className="mt-1 text-xs text-gray-500">
-          {acceptedFileTypes 
-            ? `Desteklenen dosya türleri: ${Object.keys(DocumentService.SUPPORTED_DOCUMENT_TYPES).join(', ')}`
-            : 'Tüm dosya türleri desteklenir'}
+          {acceptedFileTypes ?
+          `Desteklenen dosya türleri: ${Object.keys(DocumentService.SUPPORTED_DOCUMENT_TYPES).join(', ')}` :
+          'Tüm dosya türleri desteklenir'}
         </p>
-        <p className="text-xs text-gray-500">
-          Maksimum dosya boyutu: {DocumentService.formatFileSize(maxFileSize)}
+        <p className="text-xs text-gray-500">{t("components.maksimum_dosya_boyutu")}
+          {DocumentService.formatFileSize(maxFileSize)}
         </p>
-        {allowMultiple && (
-          <p className="text-xs text-gray-500">
-            Maksimum dosya sayısı: {maxFiles}
+        {allowMultiple &&
+        <p className="text-xs text-gray-500">{t("components.maksimum_dosya_says")}
+          {maxFiles}
           </p>
-        )}
+        }
       </div>
       {/* File list */}
-      {showPreview && files.length > 0 && (
-        <div className="mt-4" data-cy="file-list">
-          <h3 className="text-sm font-medium mb-2">Yüklenecek Dosyalar ({files.length})</h3>
+      {showPreview && files.length > 0 &&
+      <div className="mt-4" data-cy="file-list">
+          <h3 className="text-sm font-medium mb-2">{t("components.yklenecek_dosyalar_")}{files.length})</h3>
           <div className="space-y-2">
-            {files.map(fileObj => renderFilePreview(fileObj))}
+            {files.map((fileObj) => renderFilePreview(fileObj))}
           </div>
         </div>
-      )}
+      }
       {/* Upload button */}
-      {files.length > 0 && (
-        <button
-          onClick={handleUpload}
-          disabled={uploading}
-          className={`mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
+      {files.length > 0 &&
+      <button
+        onClick={handleUpload}
+        disabled={uploading}
+        className={`mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
             ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          data-cy="upload-button"
-        >
+        data-cy="upload-button">
+
           {uploading ? 'Yükleniyor...' : 'Dosyaları Yükle'}
         </button>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 DocumentUploader.propTypes = {
   /** Callback function when upload is complete */
@@ -268,9 +269,9 @@ DocumentUploader.propTypes = {
   onUploadError: PropTypes.func,
   /** Accepted file types (array of extensions or dropzone accept object) */
   acceptedFileTypes: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.arrayOf(PropTypes.string)
-  ]),
+  PropTypes.object,
+  PropTypes.arrayOf(PropTypes.string)]
+  ),
   /** Maximum file size in bytes */
   maxFileSize: PropTypes.number,
   /** Maximum number of files that can be uploaded */

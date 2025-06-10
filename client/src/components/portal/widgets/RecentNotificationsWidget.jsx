@@ -1,22 +1,23 @@
+// TODO: i18n - processed
 import { useNavigate } from 'react-router-dom';
-import { 
-  Bell, 
-  CalendarCheck, 
-  BarChart, 
-  MessageSquare, 
+import {
+  Bell,
+  CalendarCheck,
+  BarChart,
+  MessageSquare,
   AlertCircle,
   Clock,
   CheckCircle,
   AlertTriangle,
   Info,
-  Loader 
-} from 'lucide-react';
+  Loader } from
+'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 /**
  * Displays recent notifications for the student
- */
-const RecentNotificationsWidget = ({ data, isLoading, error }) => {
+ */import { useTranslation } from "react-i18next";
+const RecentNotificationsWidget = ({ data, isLoading, error }) => {const { t } = useTranslation();
   const navigate = useNavigate();
   // Format date
   const formatDate = (dateString) => {
@@ -85,25 +86,25 @@ const RecentNotificationsWidget = ({ data, isLoading, error }) => {
     return (
       <Card className="overflow-hidden h-full">
         <div className="p-6 flex justify-between items-center border-b">
-          <h2 className="text-lg font-medium">Recent Notifications</h2>
+          <h2 className="text-lg font-medium">{t("components.recent_notifications")}</h2>
         </div>
         <div className="flex justify-center items-center p-12">
           <Loader className="h-8 w-8 text-primary animate-spin" />
         </div>
-      </Card>
-    );
+      </Card>);
+
   }
   if (error) {
     return (
       <Card className="overflow-hidden h-full">
         <div className="p-6 flex justify-between items-center border-b">
-          <h2 className="text-lg font-medium">Recent Notifications</h2>
+          <h2 className="text-lg font-medium">{t("components.recent_notifications")}</h2>
         </div>
-        <div className="p-6 text-center text-red-500">
-          Failed to load notifications
+        <div className="p-6 text-center text-red-500">{t("components.failed_to_load_notifications")}
+
         </div>
-      </Card>
-    );
+      </Card>);
+
   }
   // Get notifications to display (limit to 5)
   const notifications = data?.notifications?.slice(0, 5) || [];
@@ -111,67 +112,67 @@ const RecentNotificationsWidget = ({ data, isLoading, error }) => {
     <Card className="overflow-hidden h-full">
       <div className="p-6 flex justify-between items-center border-b">
         <div className="flex items-center">
-          <h2 className="text-lg font-medium">Recent Notifications</h2>
-          {data?.unreadCount > 0 && (
-            <span className="ml-2 bg-primary text-white text-xs rounded-full px-2 py-0.5">
+          <h2 className="text-lg font-medium">{t("components.recent_notifications")}</h2>
+          {data?.unreadCount > 0 &&
+          <span className="ml-2 bg-primary text-white text-xs rounded-full px-2 py-0.5">
               {data.unreadCount} new
             </span>
-          )}
+          }
         </div>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="sm"
-          onClick={() => navigate('/portal/notifications')}
-        >
-          View All
+          onClick={() => navigate('/portal/notifications')}>{t("archive-components.view_all")}
+
+
         </Button>
       </div>
-      {notifications.length > 0 ? (
-        <div className="divide-y max-h-80 overflow-auto">
-          {notifications.map(notification => (
-            <div key={notification.id} className={`p-4 hover:bg-gray-50 ${!notification.isRead ? 'bg-blue-50/20' : ''}`}>
+      {notifications.length > 0 ?
+      <div className="divide-y max-h-80 overflow-auto">
+          {notifications.map((notification) =>
+        <div key={notification.id} className={`p-4 hover:bg-gray-50 ${!notification.isRead ? 'bg-blue-50/20' : ''}`}>
               <div className="flex items-start">
                 <div className={`p-2 rounded-full mr-3 ${getNotificationColorClass(notification.type)}`}>
                   {getNotificationIcon(notification.type)}
                 </div>
                 <div>
-                  {notification.title && (
-                    <h4 className="text-sm font-medium">{notification.title}</h4>
-                  )}
+                  {notification.title &&
+              <h4 className="text-sm font-medium">{notification.title}</h4>
+              }
                   <p className="text-sm">{notification.message}</p>
                   <p className="text-xs text-gray-500 mt-1">
                     {formatDate(notification.timestamp)}
                   </p>
-                  {notification.link && (
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="p-0 h-auto mt-1 text-xs"
-                      onClick={() => navigate(notification.link)}
-                    >
+                  {notification.link &&
+              <Button
+                variant="link"
+                size="sm"
+                className="p-0 h-auto mt-1 text-xs"
+                onClick={() => navigate(notification.link)}>
+
                       {notification.linkText || 'View Details'}
                     </Button>
-                  )}
+              }
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="p-8 text-center">
+        )}
+        </div> :
+
+      <div className="p-8 text-center">
           <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">No notifications</p>
+          <p className="text-gray-500">{t("components.no_notifications")}</p>
         </div>
-      )}
+      }
       <div className="bg-gray-50 p-4 text-center border-t">
         <Button
           variant="link"
-          onClick={() => navigate('/portal/notifications')}
-        >
-          View All Notifications
+          onClick={() => navigate('/portal/notifications')}>{t("components.view_all_notifications")}
+
+
         </Button>
       </div>
-    </Card>
-  );
+    </Card>);
+
 };
 export default RecentNotificationsWidget;

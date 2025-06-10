@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * Centralized route configuration
  * This file consolidates all routes and eliminates duplicates
@@ -5,7 +6,7 @@
 import { lazy } from 'react';
 import { ROUTE_ACCESS, ROLES } from '../roles';
 // Lazy load components - using the latest/best versions
-const DashboardPageEnhanced = lazy(() => import('../../pages/dashboard/DashboardPageEnhanced'));
+import { useTranslation } from "react-i18next";const DashboardPageEnhanced = lazy(() => import('../../pages/dashboard/DashboardPageEnhanced'));
 // User Management
 const UsersPage = lazy(() => import('../../pages/users/UsersPage'));
 const UserFormPage = lazy(() => import('../../pages/users/UserFormPage'));

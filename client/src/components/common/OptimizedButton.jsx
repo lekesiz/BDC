@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React, { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -5,7 +6,7 @@ import { cn } from '@/lib/utils';
 /**
  * Optimized Button component with React.memo
  * Only re-renders when props actually change
- */
+ */import { useTranslation } from "react-i18next";
 const OptimizedButton = memo(({
   children,
   onClick,
@@ -25,18 +26,18 @@ const OptimizedButton = memo(({
       disabled={disabled || loading}
       onClick={onClick}
       className={cn(className, loading && 'opacity-70 cursor-wait')}
-      {...props}
-    >
-      {loading ? (
-        <>
+      {...props}>
+
+      {loading ?
+      <>
           <span className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full inline-block" />
           {children}
-        </>
-      ) : (
-        children
-      )}
-    </Button>
-  );
+        </> :
+
+      children
+      }
+    </Button>);
+
 }, (prevProps, nextProps) => {
   // Custom comparison function for better performance
   return (
@@ -47,8 +48,8 @@ const OptimizedButton = memo(({
     prevProps.disabled === nextProps.disabled &&
     prevProps.loading === nextProps.loading &&
     prevProps.className === nextProps.className &&
-    prevProps.type === nextProps.type
-  );
+    prevProps.type === nextProps.type);
+
 });
 
 OptimizedButton.displayName = 'OptimizedButton';

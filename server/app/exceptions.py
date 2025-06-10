@@ -64,3 +64,19 @@ class ExternalServiceException(AppException):
     def __init__(self, message):
         """Initialize the external service exception."""
         super().__init__(message, status_code=503)
+
+
+class TenantAccessError(AppException):
+    """Exception for tenant access violations."""
+    
+    def __init__(self, message):
+        """Initialize the tenant access error."""
+        super().__init__(message, status_code=403)
+
+
+class TenantContextError(AppException):
+    """Exception for tenant context errors."""
+    
+    def __init__(self, message):
+        """Initialize the tenant context error."""
+        super().__init__(message, status_code=400)

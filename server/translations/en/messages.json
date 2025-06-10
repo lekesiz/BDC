@@ -1,0 +1,278 @@
+{
+  "api": {
+    "success": {
+      "created": "Successfully created",
+      "updated": "Successfully updated", 
+      "deleted": "Successfully deleted",
+      "generic": "Operation completed successfully"
+    },
+    "error": {
+      "not_found": "Resource not found",
+      "unauthorized": "Unauthorized access",
+      "forbidden": "Access forbidden",
+      "validation": "Validation error",
+      "generic": "An error occurred",
+      "server": "Internal server error",
+      "conflict": "Resource conflict",
+      "rate_limit": "Rate limit exceeded",
+      "database": "Database operation failed",
+      "database_integrity": "Database integrity constraint violated",
+      "resource_exists": "Resource already exists",
+      "invalid_reference": "Invalid reference to related resource",
+      "constraint_violation": "Database constraint violation"
+    },
+    "auth": {
+      "login_success": "Successfully logged in",
+      "login_failed": "Invalid credentials",
+      "logout_success": "Successfully logged out",
+      "logout_failed": "Failed to logout",
+      "register_success": "Registration successful",
+      "registration_failed": "User registration failed. Email may already exist.",
+      "token_expired": "Token has expired",
+      "invalid_token": "Invalid token",
+      "refresh_failed": "Failed to refresh token",
+      "password_reset_sent": "Password reset email sent",
+      "password_reset_failed": "Failed to reset password. User may not exist.",
+      "password_changed": "Password changed successfully",
+      "password_change_failed": "Failed to change password. Current password may be incorrect.",
+      "account_locked": "Account is locked",
+      "account_disabled": "Account is disabled",
+      "email_not_verified": "Please verify your email",
+      "2fa_required": "Two-factor authentication required",
+      "2fa_invalid": "Invalid verification code"
+    },
+    "validation": {
+      "field_required": "{field} is required",
+      "invalid_email": "Invalid email format",
+      "invalid_phone": "Invalid phone number",
+      "invalid_date": "Invalid date format",
+      "min_length": "{field} must be at least {length} characters",
+      "max_length": "{field} must not exceed {length} characters",
+      "min_value": "{field} must be at least {value}",
+      "max_value": "{field} must not exceed {value}",
+      "unique": "{field} already exists",
+      "invalid_format": "Invalid format for {field}",
+      "password_weak": "Password is too weak",
+      "passwords_not_match": "Passwords do not match",
+      "request_empty": "Request body is empty",
+      "missing_fields": "Missing required fields",
+      "page_invalid": "Page must be greater than 0",
+      "per_page_invalid": "Per page must be between 1 and 100",
+      "invalid_role": "Invalid role specified"
+    },
+    "beneficiary": {
+      "created": "Beneficiary created successfully",
+      "updated": "Beneficiary updated successfully",
+      "deleted": "Beneficiary deleted successfully",
+      "not_found": "Beneficiary not found",
+      "enrolled": "Successfully enrolled in program",
+      "unenrolled": "Successfully unenrolled from program",
+      "already_enrolled": "Already enrolled in this program",
+      "enrollment_limit": "Enrollment limit reached"
+    },
+    "program": {
+      "created": "Program created successfully",
+      "updated": "Program updated successfully",
+      "deleted": "Program deleted successfully",
+      "not_found": "Program not found",
+      "published": "Program published successfully",
+      "unpublished": "Program unpublished successfully",
+      "capacity_reached": "Program capacity reached",
+      "registration_closed": "Registration is closed",
+      "already_started": "Program has already started",
+      "cannot_delete": "Cannot delete program with active enrollments"
+    },
+    "evaluation": {
+      "created": "Evaluation created successfully",
+      "updated": "Evaluation updated successfully",
+      "deleted": "Evaluation deleted successfully",
+      "not_found": "Evaluation not found",
+      "submitted": "Evaluation submitted successfully",
+      "graded": "Evaluation graded successfully",
+      "already_submitted": "Evaluation already submitted",
+      "deadline_passed": "Submission deadline has passed",
+      "attempts_exceeded": "Maximum attempts exceeded",
+      "not_available": "Evaluation is not available"
+    },
+    "document": {
+      "uploaded": "Document uploaded successfully",
+      "updated": "Document updated successfully",
+      "deleted": "Document deleted successfully",
+      "not_found": "Document not found",
+      "shared": "Document shared successfully",
+      "access_denied": "Access denied to this document",
+      "size_exceeded": "File size exceeds limit",
+      "type_not_allowed": "File type not allowed",
+      "quota_exceeded": "Storage quota exceeded"
+    },
+    "appointment": {
+      "created": "Appointment scheduled successfully",
+      "updated": "Appointment updated successfully",
+      "cancelled": "Appointment cancelled successfully",
+      "not_found": "Appointment not found",
+      "confirmed": "Appointment confirmed",
+      "reminder_sent": "Reminder sent successfully",
+      "time_conflict": "Time slot conflicts with another appointment",
+      "invalid_time": "Invalid appointment time",
+      "past_time": "Cannot schedule appointment in the past"
+    },
+    "user": {
+      "created": "User created successfully",
+      "updated": "User updated successfully",
+      "deleted": "User deleted successfully",
+      "not_found": "User not found",
+      "activated": "User activated successfully",
+      "deactivated": "User deactivated successfully",
+      "role_changed": "User role changed successfully",
+      "password_reset": "Password reset email sent",
+      "email_exists": "Email already exists",
+      "username_exists": "Username already exists",
+      "cannot_delete_self": "Cannot delete your own account",
+      "cannot_deactivate_self": "Cannot deactivate your own account"
+    },
+    "report": {
+      "generated": "Report generated successfully",
+      "scheduled": "Report scheduled successfully",
+      "not_found": "Report not found",
+      "generation_failed": "Report generation failed",
+      "no_data": "No data available for the selected criteria",
+      "exported": "Report exported successfully",
+      "emailed": "Report emailed successfully"
+    },
+    "notification": {
+      "sent": "Notification sent successfully",
+      "marked_read": "Notification marked as read",
+      "cleared": "Notifications cleared",
+      "preferences_updated": "Notification preferences updated"
+    },
+    "settings": {
+      "updated": "Settings updated successfully",
+      "reset": "Settings reset to default",
+      "invalid_value": "Invalid value for setting",
+      "cannot_modify": "Cannot modify this setting"
+    }
+  },
+  "email": {
+    "subject": {
+      "welcome": "Welcome to BDC",
+      "password_reset": "Password Reset Request",
+      "account_activation": "Activate Your Account",
+      "appointment_reminder": "Appointment Reminder",
+      "evaluation_assigned": "New Evaluation Assigned",
+      "evaluation_graded": "Evaluation Graded",
+      "program_enrollment": "Program Enrollment Confirmation",
+      "document_shared": "Document Shared With You",
+      "weekly_summary": "Your Weekly Summary",
+      "certificate_ready": "Your Certificate is Ready"
+    },
+    "greeting": {
+      "formal": "Dear {name}",
+      "informal": "Hi {name}",
+      "generic": "Hello"
+    },
+    "footer": {
+      "regards": "Best regards",
+      "team": "The BDC Team",
+      "unsubscribe": "Unsubscribe from these emails",
+      "help": "Need help? Contact support",
+      "copyright": "© 2024 BDC. All rights reserved."
+    }
+  },
+  "sms": {
+    "appointment_reminder": "Reminder: You have an appointment on {date} at {time}",
+    "evaluation_due": "Your evaluation '{title}' is due on {date}",
+    "verification_code": "Your verification code is: {code}",
+    "password_reset": "Your password reset code is: {code}",
+    "program_update": "Update on your program '{program}': {message}"
+  },
+  "push": {
+    "title": {
+      "new_message": "New Message",
+      "appointment_reminder": "Appointment Reminder",
+      "evaluation_assigned": "New Evaluation",
+      "grade_posted": "Grade Posted",
+      "document_shared": "Document Shared"
+    },
+    "body": {
+      "new_message": "You have a new message from {sender}",
+      "appointment_reminder": "Don't forget your appointment at {time}",
+      "evaluation_assigned": "'{title}' has been assigned to you",
+      "grade_posted": "Your grade for '{title}' is now available",
+      "document_shared": "{sender} shared a document with you"
+    }
+  },
+  "exports": {
+    "headers": {
+      "beneficiaries": {
+        "first_name": "First Name",
+        "last_name": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "date_of_birth": "Date of Birth",
+        "status": "Status",
+        "enrollment_date": "Enrollment Date"
+      },
+      "programs": {
+        "name": "Program Name",
+        "code": "Code",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "capacity": "Capacity",
+        "enrolled": "Enrolled",
+        "status": "Status"
+      },
+      "evaluations": {
+        "title": "Title",
+        "type": "Type",
+        "due_date": "Due Date",
+        "average_score": "Average Score",
+        "completion_rate": "Completion Rate",
+        "status": "Status"
+      }
+    }
+  },
+  "reports": {
+    "attendance": {
+      "title": "Attendance Report",
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "excused": "Excused",
+      "attendance_rate": "Attendance Rate"
+    },
+    "progress": {
+      "title": "Progress Report",
+      "completed_modules": "Completed Modules",
+      "average_score": "Average Score",
+      "completion_rate": "Completion Rate",
+      "time_spent": "Time Spent"
+    },
+    "evaluation": {
+      "title": "Evaluation Report",
+      "total_evaluations": "Total Evaluations",
+      "average_score": "Average Score",
+      "pass_rate": "Pass Rate",
+      "pending_grading": "Pending Grading"
+    }
+  },
+  "dates": {
+    "formats": {
+      "short": "%m/%d/%Y",
+      "medium": "%b %d, %Y",
+      "long": "%B %d, %Y",
+      "full": "%A, %B %d, %Y",
+      "time": "%I:%M %p",
+      "datetime": "%m/%d/%Y %I:%M %p"
+    },
+    "relative": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "tomorrow": "Tomorrow",
+      "in_days": "In {count} days",
+      "days_ago": "{count} days ago",
+      "just_now": "Just now",
+      "minutes_ago": "{count} minutes ago",
+      "hours_ago": "{count} hours ago"
+    }
+  }
+}

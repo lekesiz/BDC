@@ -1,9 +1,10 @@
+// TODO: i18n - processed
 import React from 'react';
 /**
  * Advanced caching utilities for API responses and data
  */
 // Cache storage types
-export const CacheType = {
+import { useTranslation } from "react-i18next";export const CacheType = {
   MEMORY: 'memory',
   LOCAL_STORAGE: 'localStorage',
   SESSION_STORAGE: 'sessionStorage',
@@ -110,7 +111,7 @@ class StorageCache {
   }
   clear() {
     const keys = Object.keys(this.storage);
-    keys.forEach(key => {
+    keys.forEach((key) => {
       if (key.startsWith(this.prefix)) {
         this.storage.removeItem(key);
       }
@@ -118,7 +119,7 @@ class StorageCache {
   }
   clearExpired() {
     const keys = Object.keys(this.storage);
-    keys.forEach(key => {
+    keys.forEach((key) => {
       if (key.startsWith(this.prefix)) {
         try {
           const item = JSON.parse(this.storage.getItem(key));
@@ -255,9 +256,9 @@ export class CacheManager {
     }
   }
   async get(key, options = {}) {
-    const { 
+    const {
       fallback = null,
-      deserialize = JSON.parse 
+      deserialize = JSON.parse
     } = options;
     try {
       const value = await this.cache.get(key);
@@ -269,9 +270,9 @@ export class CacheManager {
     }
   }
   async set(key, value, options = {}) {
-    const { 
+    const {
       ttl = this.defaultTTL,
-      serialize = JSON.stringify 
+      serialize = JSON.stringify
     } = options;
     try {
       const serialized = serialize ? serialize(value) : value;
@@ -310,9 +311,9 @@ export class CacheManager {
     // Return stale data immediately
     if (cached !== null) {
       // Revalidate in background
-      factory().then(value => {
+      factory().then((value) => {
         this.set(key, value, options);
-      }).catch(error => {
+      }).catch((error) => {
         console.error('Revalidation error:', error);
       });
       return cached;

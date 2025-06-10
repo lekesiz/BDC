@@ -1,15 +1,16 @@
+// TODO: i18n - processed
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 /**
  * Reusable spinner component with different sizes and variants
- */
-export const Spinner = ({ 
-  size = 'default', 
+ */import { useTranslation } from "react-i18next";
+export const Spinner = ({
+  size = 'default',
   variant = 'default',
   className = '',
-  ...props 
-}) => {
+  ...props
+}) => {const { t } = useTranslation();
   const sizes = {
     xs: 'h-3 w-3',
     sm: 'h-4 w-4',
@@ -24,55 +25,55 @@ export const Spinner = ({
     muted: 'text-muted-foreground'
   };
   return (
-    <Loader2 
+    <Loader2
       className={cn(
         'animate-spin',
         sizes[size],
         variants[variant],
         className
       )}
-      {...props}
-    />
-  );
+      {...props} />);
+
+
 };
 /**
  * Full page spinner for page transitions
  */
-export const PageSpinner = ({ message = 'Loading...', className = '' }) => {
+export const PageSpinner = ({ message = 'Loading...', className = '' }) => {const { t } = useTranslation();
   return (
     <div className={cn('min-h-screen flex items-center justify-center', className)}>
       <div className="text-center">
         <Spinner size="xl" className="mx-auto" />
-        {message && (
-          <p className="mt-4 text-sm text-muted-foreground">{message}</p>
-        )}
+        {message &&
+        <p className="mt-4 text-sm text-muted-foreground">{message}</p>
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 /**
  * Inline spinner for buttons and small sections
  */
-export const InlineSpinner = ({ 
-  text = 'Loading...', 
+export const InlineSpinner = ({
+  text = 'Loading...',
   size = 'sm',
-  className = '' 
-}) => {
+  className = ''
+}) => {const { t } = useTranslation();
   return (
     <span className={cn('inline-flex items-center gap-2', className)}>
       <Spinner size={size} />
       {text && <span>{text}</span>}
-    </span>
-  );
+    </span>);
+
 };
 /**
  * Overlay spinner for covering content while loading
  */
-export const OverlaySpinner = ({ 
-  show = false, 
+export const OverlaySpinner = ({
+  show = false,
   message = 'Loading...',
-  className = '' 
-}) => {
+  className = ''
+}) => {const { t } = useTranslation();
   if (!show) return null;
   return (
     <div className={cn(
@@ -81,11 +82,11 @@ export const OverlaySpinner = ({
     )}>
       <div className="text-center">
         <Spinner size="lg" />
-        {message && (
-          <p className="mt-3 text-sm text-muted-foreground">{message}</p>
-        )}
+        {message &&
+        <p className="mt-3 text-sm text-muted-foreground">{message}</p>
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export default Spinner;

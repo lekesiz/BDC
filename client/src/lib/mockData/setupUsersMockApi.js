@@ -1,7 +1,8 @@
+// TODO: i18n - processed
 /**
  * Users Mock API Setup
  */
-import { mockUsers, userStats } from './usersMockData.js';
+import { mockUsers, userStats } from './usersMockData.js';import { useTranslation } from "react-i18next";
 export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Store original methods if not provided
   const get = originalGet || api.get;
@@ -9,7 +10,7 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
   const put = originalPut || api.put;
   const del = originalDelete || api.delete;
   // GET /api/users - List users with filtering, pagination, search
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     if (url.includes('/api/users') && !url.includes('/api/users/')) {
       return new Promise((resolve) => {
         // Parse query parameters
@@ -25,20 +26,20 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
         let filteredUsers = [...mockUsers];
         // Apply search filter
         if (search) {
-          filteredUsers = filteredUsers.filter(u => 
-            u.firstName.toLowerCase().includes(search.toLowerCase()) ||
-            u.lastName.toLowerCase().includes(search.toLowerCase()) ||
-            u.email.toLowerCase().includes(search.toLowerCase()) ||
-            u.username.toLowerCase().includes(search.toLowerCase())
+          filteredUsers = filteredUsers.filter((u) =>
+          u.firstName.toLowerCase().includes(search.toLowerCase()) ||
+          u.lastName.toLowerCase().includes(search.toLowerCase()) ||
+          u.email.toLowerCase().includes(search.toLowerCase()) ||
+          u.username.toLowerCase().includes(search.toLowerCase())
           );
         }
         // Apply role filter
         if (role) {
-          filteredUsers = filteredUsers.filter(u => u.role === role);
+          filteredUsers = filteredUsers.filter((u) => u.role === role);
         }
         // Apply status filter  
         if (status) {
-          filteredUsers = filteredUsers.filter(u => u.status === status);
+          filteredUsers = filteredUsers.filter((u) => u.status === status);
         }
         // Apply sorting
         filteredUsers.sort((a, b) => {
@@ -54,7 +55,7 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
         const endIndex = startIndex + limit;
         const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
         // Remove sensitive data
-        const sanitizedUsers = paginatedUsers.map(user => {
+        const sanitizedUsers = paginatedUsers.map((user) => {
           const { ...sanitized } = user;
           return sanitized;
         });
@@ -89,7 +90,7 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
       const id = parseInt(url.split('/').pop());
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          const user = mockUsers.find(u => u.id === id);
+          const user = mockUsers.find((u) => u.id === id);
           if (user) {
             resolve({
               data: {
@@ -97,35 +98,35 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
                   ...user,
                   // Add additional detailed info for single user view
                   loginHistory: [
-                    {
-                      id: 1,
-                      loginTime: new Date().toISOString(),
-                      ip: '192.168.1.100',
-                      userAgent: 'Mozilla/5.0...',
-                      location: 'Istanbul, Turkey'
-                    },
-                    {
-                      id: 2,
-                      loginTime: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-                      ip: '192.168.1.100',
-                      userAgent: 'Mozilla/5.0...',
-                      location: 'Istanbul, Turkey'
-                    }
-                  ],
+                  {
+                    id: 1,
+                    loginTime: new Date().toISOString(),
+                    ip: '192.168.1.100',
+                    userAgent: 'Mozilla/5.0...',
+                    location: 'Istanbul, Turkey'
+                  },
+                  {
+                    id: 2,
+                    loginTime: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+                    ip: '192.168.1.100',
+                    userAgent: 'Mozilla/5.0...',
+                    location: 'Istanbul, Turkey'
+                  }],
+
                   activityLog: [
-                    {
-                      id: 1,
-                      action: 'profile_update',
-                      timestamp: new Date().toISOString(),
-                      description: 'Profile information updated'
-                    },
-                    {
-                      id: 2,
-                      action: 'login',
-                      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-                      description: 'User logged in'
-                    }
-                  ]
+                  {
+                    id: 1,
+                    action: 'profile_update',
+                    timestamp: new Date().toISOString(),
+                    description: 'Profile information updated'
+                  },
+                  {
+                    id: 2,
+                    action: 'login',
+                    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                    description: 'User logged in'
+                  }]
+
                 }
               }
             });
@@ -155,16 +156,16 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
                 roleDistribution: Object.entries(userStats.byRole).map(([role, count]) => ({
                   role,
                   count,
-                  percentage: Math.round((count / userStats.total) * 100)
+                  percentage: Math.round(count / userStats.total * 100)
                 })),
                 registrationTrend: [
-                  { month: 'Jan', count: 5 },
-                  { month: 'Feb', count: 8 },
-                  { month: 'Mar', count: 12 },
-                  { month: 'Apr', count: 7 },
-                  { month: 'May', count: 10 },
-                  { month: 'Jun', count: 15 }
-                ]
+                { month: 'Jan', count: 5 },
+                { month: 'Feb', count: 8 },
+                { month: 'Mar', count: 12 },
+                { month: 'Apr', count: 7 },
+                { month: 'May', count: 10 },
+                { month: 'Jun', count: 15 }]
+
               }
             }
           });
@@ -175,12 +176,12 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
     return get.call(this, url, config);
   };
   // POST /api/users - Create new user
-  api.post = function(url, data, config) {
+  api.post = function (url, data, config) {
     if (url === '/api/users') {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           try {
-            const newId = Math.max(...mockUsers.map(u => u.id)) + 1;
+            const newId = Math.max(...mockUsers.map((u) => u.id)) + 1;
             const newUser = {
               id: newId,
               ...data,
@@ -211,12 +212,12 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
     return post.call(this, url, data, config);
   };
   // PUT /api/users/:id - Update user
-  api.put = function(url, data, config) {
+  api.put = function (url, data, config) {
     if (url.match(/\/api\/users\/\d+$/)) {
       const id = parseInt(url.split('/').pop());
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          const index = mockUsers.findIndex(u => u.id === id);
+          const index = mockUsers.findIndex((u) => u.id === id);
           if (index !== -1) {
             mockUsers[index] = {
               ...mockUsers[index],
@@ -244,12 +245,12 @@ export const setupUsersMockApi = (api, originalGet, originalPost, originalPut, o
     return put.call(this, url, data, config);
   };
   // DELETE /api/users/:id - Delete user
-  api.delete = function(url, config) {
+  api.delete = function (url, config) {
     if (url.match(/\/api\/users\/\d+$/)) {
       const id = parseInt(url.split('/').pop());
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          const index = mockUsers.findIndex(u => u.id === id);
+          const index = mockUsers.findIndex((u) => u.id === id);
           if (index !== -1) {
             const deletedUser = mockUsers.splice(index, 1)[0];
             resolve({

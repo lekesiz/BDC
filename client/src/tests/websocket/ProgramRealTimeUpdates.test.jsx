@@ -1,23 +1,24 @@
+// TODO: i18n - processed
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { act } from 'react';
 import ProgramsListPage from '@/pages/programs/ProgramsListPage';
 // Mock dependencies
-const mockPrograms = [
-  {
-    id: 1,
-    name: 'Initial Program',
-    description: 'Initial program description',
-    status: 'active',
-    category: 'technical',
-    level: 'beginner',
-    duration: 30,
-    enrolled_count: 5,
-    max_participants: 20,
-    module_count: 3
-  }
-];
+import { useTranslation } from "react-i18next";const mockPrograms = [
+{
+  id: 1,
+  name: 'Initial Program',
+  description: 'Initial program description',
+  status: 'active',
+  category: 'technical',
+  level: 'beginner',
+  duration: 30,
+  enrolled_count: 5,
+  max_participants: 20,
+  module_count: 3
+}];
+
 const mockSocket = {
   on: vi.fn(),
   off: vi.fn(),
@@ -25,10 +26,10 @@ const mockSocket = {
   connected: true
 };
 const mockAuth = {
-  user: { 
-    id: 1, 
+  user: {
+    id: 1,
     role: 'tenant_admin',
-    email: 'admin@test.com' 
+    email: 'admin@test.com'
   },
   isAuthenticated: true
 };
@@ -261,7 +262,7 @@ describe('ProgramsListPage Real-time Updates', () => {
     });
     unmount();
     // Verify cleanup functions were called
-    cleanupFunctions.forEach(cleanup => {
+    cleanupFunctions.forEach((cleanup) => {
       expect(cleanup).toHaveBeenCalled();
     });
   });

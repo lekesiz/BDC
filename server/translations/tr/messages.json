@@ -1,0 +1,259 @@
+{
+  "api": {
+    "success": {
+      "created": "Başarıyla oluşturuldu",
+      "updated": "Başarıyla güncellendi", 
+      "deleted": "Başarıyla silindi",
+      "generic": "İşlem başarıyla tamamlandı"
+    },
+    "error": {
+      "not_found": "Kaynak bulunamadı",
+      "unauthorized": "Yetkisiz erişim",
+      "forbidden": "Erişim engellendi",
+      "validation": "Doğrulama hatası",
+      "generic": "Bir hata oluştu",
+      "server": "Sunucu hatası"
+    },
+    "auth": {
+      "login_success": "Başarıyla giriş yapıldı",
+      "login_failed": "Geçersiz kimlik bilgileri",
+      "logout_success": "Başarıyla çıkış yapıldı",
+      "register_success": "Kayıt başarılı",
+      "token_expired": "Oturum süresi doldu",
+      "invalid_token": "Geçersiz token",
+      "password_reset_sent": "Şifre sıfırlama e-postası gönderildi",
+      "password_changed": "Şifre başarıyla değiştirildi",
+      "account_locked": "Hesap kilitlendi",
+      "account_disabled": "Hesap devre dışı",
+      "email_not_verified": "Lütfen e-postanızı doğrulayın",
+      "2fa_required": "İki faktörlü doğrulama gerekli",
+      "2fa_invalid": "Geçersiz doğrulama kodu"
+    },
+    "validation": {
+      "field_required": "{field} zorunludur",
+      "invalid_email": "Geçersiz e-posta formatı",
+      "invalid_phone": "Geçersiz telefon numarası",
+      "invalid_date": "Geçersiz tarih formatı",
+      "min_length": "{field} en az {length} karakter olmalıdır",
+      "max_length": "{field} en fazla {length} karakter olabilir",
+      "min_value": "{field} en az {value} olmalıdır",
+      "max_value": "{field} en fazla {value} olabilir",
+      "unique": "{field} zaten mevcut",
+      "invalid_format": "{field} için geçersiz format",
+      "password_weak": "Şifre çok zayıf",
+      "passwords_not_match": "Şifreler eşleşmiyor"
+    },
+    "beneficiary": {
+      "created": "Yararlanıcı başarıyla oluşturuldu",
+      "updated": "Yararlanıcı başarıyla güncellendi",
+      "deleted": "Yararlanıcı başarıyla silindi",
+      "not_found": "Yararlanıcı bulunamadı",
+      "enrolled": "Programa başarıyla kaydolundu",
+      "unenrolled": "Programdan başarıyla çıkarıldı",
+      "already_enrolled": "Bu programa zaten kayıtlı",
+      "enrollment_limit": "Kayıt limiti aşıldı"
+    },
+    "program": {
+      "created": "Program başarıyla oluşturuldu",
+      "updated": "Program başarıyla güncellendi",
+      "deleted": "Program başarıyla silindi",
+      "not_found": "Program bulunamadı",
+      "published": "Program başarıyla yayınlandı",
+      "unpublished": "Program yayından kaldırıldı",
+      "capacity_reached": "Program kapasitesi doldu",
+      "registration_closed": "Kayıtlar kapalı",
+      "already_started": "Program zaten başladı",
+      "cannot_delete": "Aktif kayıtları olan program silinemez"
+    },
+    "evaluation": {
+      "created": "Değerlendirme başarıyla oluşturuldu",
+      "updated": "Değerlendirme başarıyla güncellendi",
+      "deleted": "Değerlendirme başarıyla silindi",
+      "not_found": "Değerlendirme bulunamadı",
+      "submitted": "Değerlendirme başarıyla gönderildi",
+      "graded": "Değerlendirme başarıyla notlandırıldı",
+      "already_submitted": "Değerlendirme zaten gönderildi",
+      "deadline_passed": "Son teslim tarihi geçti",
+      "attempts_exceeded": "Maksimum deneme sayısı aşıldı",
+      "not_available": "Değerlendirme mevcut değil"
+    },
+    "document": {
+      "uploaded": "Belge başarıyla yüklendi",
+      "updated": "Belge başarıyla güncellendi",
+      "deleted": "Belge başarıyla silindi",
+      "not_found": "Belge bulunamadı",
+      "shared": "Belge başarıyla paylaşıldı",
+      "access_denied": "Bu belgeye erişim engellendi",
+      "size_exceeded": "Dosya boyutu limiti aşıldı",
+      "type_not_allowed": "Bu dosya türüne izin verilmiyor",
+      "quota_exceeded": "Depolama kotası aşıldı"
+    },
+    "appointment": {
+      "created": "Randevu başarıyla oluşturuldu",
+      "updated": "Randevu başarıyla güncellendi",
+      "cancelled": "Randevu başarıyla iptal edildi",
+      "not_found": "Randevu bulunamadı",
+      "confirmed": "Randevu onaylandı",
+      "reminder_sent": "Hatırlatma başarıyla gönderildi",
+      "time_conflict": "Bu zaman dilimi başka bir randevu ile çakışıyor",
+      "invalid_time": "Geçersiz randevu zamanı",
+      "past_time": "Geçmiş tarihte randevu oluşturulamaz"
+    },
+    "user": {
+      "created": "Kullanıcı başarıyla oluşturuldu",
+      "updated": "Kullanıcı başarıyla güncellendi",
+      "deleted": "Kullanıcı başarıyla silindi",
+      "not_found": "Kullanıcı bulunamadı",
+      "activated": "Kullanıcı başarıyla etkinleştirildi",
+      "deactivated": "Kullanıcı başarıyla devre dışı bırakıldı",
+      "role_changed": "Kullanıcı rolü başarıyla değiştirildi",
+      "password_reset": "Şifre sıfırlama e-postası gönderildi",
+      "email_exists": "E-posta zaten kayıtlı",
+      "username_exists": "Kullanıcı adı zaten mevcut"
+    },
+    "report": {
+      "generated": "Rapor başarıyla oluşturuldu",
+      "scheduled": "Rapor başarıyla zamanlandı",
+      "not_found": "Rapor bulunamadı",
+      "generation_failed": "Rapor oluşturma başarısız",
+      "no_data": "Seçilen kriterler için veri yok",
+      "exported": "Rapor başarıyla dışa aktarıldı",
+      "emailed": "Rapor başarıyla e-posta ile gönderildi"
+    },
+    "notification": {
+      "sent": "Bildirim başarıyla gönderildi",
+      "marked_read": "Bildirim okundu olarak işaretlendi",
+      "cleared": "Bildirimler temizlendi",
+      "preferences_updated": "Bildirim tercihleri güncellendi"
+    },
+    "settings": {
+      "updated": "Ayarlar başarıyla güncellendi",
+      "reset": "Ayarlar varsayılana döndürüldü",
+      "invalid_value": "Ayar için geçersiz değer",
+      "cannot_modify": "Bu ayar değiştirilemez"
+    }
+  },
+  "email": {
+    "subject": {
+      "welcome": "BDC'ye Hoş Geldiniz",
+      "password_reset": "Şifre Sıfırlama Talebi",
+      "account_activation": "Hesabınızı Etkinleştirin",
+      "appointment_reminder": "Randevu Hatırlatması",
+      "evaluation_assigned": "Yeni Değerlendirme Atandı",
+      "evaluation_graded": "Değerlendirme Notlandı",
+      "program_enrollment": "Program Kayıt Onayı",
+      "document_shared": "Sizinle Belge Paylaşıldı",
+      "weekly_summary": "Haftalık Özetiniz",
+      "certificate_ready": "Sertifikanız Hazır"
+    },
+    "greeting": {
+      "formal": "Sayın {name}",
+      "informal": "Merhaba {name}",
+      "generic": "Merhaba"
+    },
+    "footer": {
+      "regards": "Saygılarımızla",
+      "team": "BDC Ekibi",
+      "unsubscribe": "Bu e-postalardan çıkış yap",
+      "help": "Yardıma mı ihtiyacınız var? Destek ile iletişime geçin",
+      "copyright": "© 2024 BDC. Tüm hakları saklıdır."
+    }
+  },
+  "sms": {
+    "appointment_reminder": "Hatırlatma: {date} tarihinde saat {time}'de randevunuz var",
+    "evaluation_due": "'{title}' değerlendirmenizin son tarihi: {date}",
+    "verification_code": "Doğrulama kodunuz: {code}",
+    "password_reset": "Şifre sıfırlama kodunuz: {code}",
+    "program_update": "'{program}' programı güncelleme: {message}"
+  },
+  "push": {
+    "title": {
+      "new_message": "Yeni Mesaj",
+      "appointment_reminder": "Randevu Hatırlatması",
+      "evaluation_assigned": "Yeni Değerlendirme",
+      "grade_posted": "Not Açıklandı",
+      "document_shared": "Belge Paylaşıldı"
+    },
+    "body": {
+      "new_message": "{sender} size yeni bir mesaj gönderdi",
+      "appointment_reminder": "Saat {time}'deki randevunuzu unutmayın",
+      "evaluation_assigned": "'{title}' size atandı",
+      "grade_posted": "'{title}' için notunuz açıklandı",
+      "document_shared": "{sender} sizinle bir belge paylaştı"
+    }
+  },
+  "dates": {
+    "formats": {
+      "short": "%d/%m/%Y",
+      "medium": "%d %b %Y",
+      "long": "%d %B %Y",
+      "full": "%A, %d %B %Y",
+      "time": "%H:%M",
+      "datetime": "%d/%m/%Y %H:%M"
+    },
+    "relative": {
+      "today": "Bugün",
+      "yesterday": "Dün",
+      "tomorrow": "Yarın",
+      "in_days": "{count} gün içinde",
+      "days_ago": "{count} gün önce",
+      "just_now": "Şimdi",
+      "minutes_ago": "{count} dakika önce",
+      "hours_ago": "{count} saat önce"
+    }
+  },
+  "exports": {
+    "headers": {
+      "beneficiaries": {
+        "first_name": "Ad",
+        "last_name": "Soyad",
+        "email": "E-posta",
+        "phone": "Telefon",
+        "date_of_birth": "Doğum Tarihi",
+        "status": "Durum",
+        "enrollment_date": "Kayıt Tarihi"
+      },
+      "programs": {
+        "name": "Program Adı",
+        "code": "Kod",
+        "start_date": "Başlangıç Tarihi",
+        "end_date": "Bitiş Tarihi",
+        "capacity": "Kapasite",
+        "enrolled": "Kayıtlı",
+        "status": "Durum"
+      },
+      "evaluations": {
+        "title": "Başlık",
+        "type": "Tür",
+        "due_date": "Son Tarih",
+        "average_score": "Ortalama Puan",
+        "completion_rate": "Tamamlanma Oranı",
+        "status": "Durum"
+      }
+    }
+  },
+  "reports": {
+    "attendance": {
+      "title": "Katılım Raporu",
+      "present": "Mevcut",
+      "absent": "Yok",
+      "late": "Geç",
+      "excused": "İzinli",
+      "attendance_rate": "Katılım Oranı"
+    },
+    "progress": {
+      "title": "İlerleme Raporu",
+      "completed_modules": "Tamamlanan Modüller",
+      "average_score": "Ortalama Puan",
+      "completion_rate": "Tamamlanma Oranı",
+      "time_spent": "Harcanan Süre"
+    },
+    "evaluation": {
+      "title": "Değerlendirme Raporu",
+      "total_evaluations": "Toplam Değerlendirme",
+      "average_score": "Ortalama Puan",
+      "pass_rate": "Geçme Oranı",
+      "pending_grading": "Notlandırma Bekleyen"
+    }
+  }
+}

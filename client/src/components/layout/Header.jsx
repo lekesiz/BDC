@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
@@ -19,6 +20,7 @@ import {
  * Header component for the dashboard layout
  */
 const Header = ({ onToggleSidebar }) => {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const { isMobile, isTablet } = useBreakpoint();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -74,7 +76,7 @@ const Header = ({ onToggleSidebar }) => {
             <button
               onClick={onToggleSidebar}
               className={`${tapTargetClasses.medium} flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-md lg:hidden`}
-              aria-label="Toggle navigation menu"
+              aria-label={t('components.navigation.toggle_navigation')}
               aria-expanded="false"
             >
               <AlignJustify className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
@@ -105,7 +107,7 @@ const Header = ({ onToggleSidebar }) => {
               <button
                 onClick={toggleUserMenu}
                 className={`flex items-center space-x-1 sm:space-x-2 ${tapTargetClasses.medium} rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
-                aria-label="User menu"
+                aria-label={t('components.navigation.user_menu')}
                 aria-expanded={userMenuOpen}
                 aria-haspopup="true"
               >
@@ -136,7 +138,7 @@ const Header = ({ onToggleSidebar }) => {
                     onClick={() => setUserMenuOpen(false)}
                   >
                     <User className="w-4 h-4 mr-3" aria-hidden="true" />
-                    Profile
+                    {t('components.navigation.profile')}
                   </Link>
                   <Link 
                     to="/settings" 
@@ -145,7 +147,7 @@ const Header = ({ onToggleSidebar }) => {
                     onClick={() => setUserMenuOpen(false)}
                   >
                     <Settings className="w-4 h-4 mr-3" aria-hidden="true" />
-                    Settings
+                    {t('components.navigation.settings')}
                   </Link>
                   {/* Language selector for mobile */}
                   <div className="xs:hidden px-4 py-3 border-t border-gray-200 dark:border-gray-700">
@@ -157,7 +159,7 @@ const Header = ({ onToggleSidebar }) => {
                     role="menuitem"
                   >
                     <LogOut className="w-4 h-4 mr-3" aria-hidden="true" />
-                    Log out
+                    {t('components.navigation.log_out')}
                   </button>
                 </div>
               )}

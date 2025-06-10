@@ -1,6 +1,7 @@
+// TODO: i18n - processed
 import { motion } from 'framer-motion';
-import { fadeInUp } from '@/lib/animations';
-export const AnimatedForm = ({ children, className, onSubmit, ...props }) => {
+import { fadeInUp } from '@/lib/animations';import { useTranslation } from "react-i18next";
+export const AnimatedForm = ({ children, className, onSubmit, ...props }) => {const { t } = useTranslation();
   return (
     <motion.form
       variants={fadeInUp}
@@ -9,26 +10,26 @@ export const AnimatedForm = ({ children, className, onSubmit, ...props }) => {
       exit="exit"
       className={className}
       onSubmit={onSubmit}
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </motion.form>
-  );
+    </motion.form>);
+
 };
-export const AnimatedFormField = ({ children, className, ...props }) => {
+export const AnimatedFormField = ({ children, className, ...props }) => {const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
       className={className}
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </motion.div>
-  );
+    </motion.div>);
+
 };
-export const AnimatedFormError = ({ children, className, ...props }) => {
+export const AnimatedFormError = ({ children, className, ...props }) => {const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -36,9 +37,9 @@ export const AnimatedFormError = ({ children, className, ...props }) => {
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.2 }}
       className={`text-red-500 text-sm ${className || ''}`}
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </motion.div>
-  );
+    </motion.div>);
+
 };

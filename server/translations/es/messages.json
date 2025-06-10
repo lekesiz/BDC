@@ -1,0 +1,278 @@
+{
+  "api": {
+    "success": {
+      "created": "Creado exitosamente",
+      "updated": "Actualizado exitosamente", 
+      "deleted": "Eliminado exitosamente",
+      "generic": "Operación completada exitosamente"
+    },
+    "error": {
+      "not_found": "Recurso no encontrado",
+      "unauthorized": "Acceso no autorizado",
+      "forbidden": "Acceso prohibido",
+      "validation": "Error de validación",
+      "generic": "Ocurrió un error",
+      "server": "Error interno del servidor",
+      "conflict": "Conflicto de recursos",
+      "rate_limit": "Límite de tasa excedido",
+      "database": "Operación de base de datos fallida",
+      "database_integrity": "Violación de restricción de integridad de base de datos",
+      "resource_exists": "El recurso ya existe",
+      "invalid_reference": "Referencia inválida al recurso relacionado",
+      "constraint_violation": "Violación de restricción de base de datos"
+    },
+    "auth": {
+      "login_success": "Sesión iniciada exitosamente",
+      "login_failed": "Credenciales inválidas",
+      "logout_success": "Sesión cerrada exitosamente",
+      "logout_failed": "Error al cerrar sesión",
+      "register_success": "Registro exitoso",
+      "registration_failed": "Error en el registro de usuario. El correo electrónico puede ya existir.",
+      "token_expired": "El token ha expirado",
+      "invalid_token": "Token inválido",
+      "refresh_failed": "Error al actualizar el token",
+      "password_reset_sent": "Correo de restablecimiento de contraseña enviado",
+      "password_reset_failed": "Error al restablecer la contraseña. El usuario puede no existir.",
+      "password_changed": "Contraseña cambiada exitosamente",
+      "password_change_failed": "Error al cambiar la contraseña. La contraseña actual puede ser incorrecta.",
+      "account_locked": "La cuenta está bloqueada",
+      "account_disabled": "La cuenta está deshabilitada",
+      "email_not_verified": "Por favor verifica tu correo electrónico",
+      "2fa_required": "Se requiere autenticación de dos factores",
+      "2fa_invalid": "Código de verificación inválido"
+    },
+    "validation": {
+      "field_required": "{field} es requerido",
+      "invalid_email": "Formato de correo electrónico inválido",
+      "invalid_phone": "Número de teléfono inválido",
+      "invalid_date": "Formato de fecha inválido",
+      "min_length": "{field} debe tener al menos {length} caracteres",
+      "max_length": "{field} no debe exceder {length} caracteres",
+      "min_value": "{field} debe ser al menos {value}",
+      "max_value": "{field} no debe exceder {value}",
+      "unique": "{field} ya existe",
+      "invalid_format": "Formato inválido para {field}",
+      "password_weak": "La contraseña es muy débil",
+      "passwords_not_match": "Las contraseñas no coinciden",
+      "request_empty": "El cuerpo de la solicitud está vacío",
+      "missing_fields": "Faltan campos requeridos",
+      "page_invalid": "La página debe ser mayor que 0",
+      "per_page_invalid": "Los elementos por página deben estar entre 1 y 100",
+      "invalid_role": "Rol especificado inválido"
+    },
+    "beneficiary": {
+      "created": "Beneficiario creado exitosamente",
+      "updated": "Beneficiario actualizado exitosamente",
+      "deleted": "Beneficiario eliminado exitosamente",
+      "not_found": "Beneficiario no encontrado",
+      "enrolled": "Inscrito exitosamente en el programa",
+      "unenrolled": "Desinscrito exitosamente del programa",
+      "already_enrolled": "Ya está inscrito en este programa",
+      "enrollment_limit": "Límite de inscripción alcanzado"
+    },
+    "program": {
+      "created": "Programa creado exitosamente",
+      "updated": "Programa actualizado exitosamente",
+      "deleted": "Programa eliminado exitosamente",
+      "not_found": "Programa no encontrado",
+      "published": "Programa publicado exitosamente",
+      "unpublished": "Programa despublicado exitosamente",
+      "capacity_reached": "Capacidad del programa alcanzada",
+      "registration_closed": "El registro está cerrado",
+      "already_started": "El programa ya ha comenzado",
+      "cannot_delete": "No se puede eliminar un programa con inscripciones activas"
+    },
+    "evaluation": {
+      "created": "Evaluación creada exitosamente",
+      "updated": "Evaluación actualizada exitosamente",
+      "deleted": "Evaluación eliminada exitosamente",
+      "not_found": "Evaluación no encontrada",
+      "submitted": "Evaluación enviada exitosamente",
+      "graded": "Evaluación calificada exitosamente",
+      "already_submitted": "La evaluación ya fue enviada",
+      "deadline_passed": "La fecha límite de entrega ha pasado",
+      "attempts_exceeded": "Número máximo de intentos excedido",
+      "not_available": "La evaluación no está disponible"
+    },
+    "document": {
+      "uploaded": "Documento subido exitosamente",
+      "updated": "Documento actualizado exitosamente",
+      "deleted": "Documento eliminado exitosamente",
+      "not_found": "Documento no encontrado",
+      "shared": "Documento compartido exitosamente",
+      "access_denied": "Acceso denegado a este documento",
+      "size_exceeded": "El tamaño del archivo excede el límite",
+      "type_not_allowed": "Tipo de archivo no permitido",
+      "quota_exceeded": "Cuota de almacenamiento excedida"
+    },
+    "appointment": {
+      "created": "Cita programada exitosamente",
+      "updated": "Cita actualizada exitosamente",
+      "cancelled": "Cita cancelada exitosamente",
+      "not_found": "Cita no encontrada",
+      "confirmed": "Cita confirmada",
+      "reminder_sent": "Recordatorio enviado exitosamente",
+      "time_conflict": "El horario entra en conflicto con otra cita",
+      "invalid_time": "Hora de cita inválida",
+      "past_time": "No se puede programar una cita en el pasado"
+    },
+    "user": {
+      "created": "Usuario creado exitosamente",
+      "updated": "Usuario actualizado exitosamente",
+      "deleted": "Usuario eliminado exitosamente",
+      "not_found": "Usuario no encontrado",
+      "activated": "Usuario activado exitosamente",
+      "deactivated": "Usuario desactivado exitosamente",
+      "role_changed": "Rol de usuario cambiado exitosamente",
+      "password_reset": "Correo de restablecimiento de contraseña enviado",
+      "email_exists": "El correo electrónico ya existe",
+      "username_exists": "El nombre de usuario ya existe",
+      "cannot_delete_self": "No puedes eliminar tu propia cuenta",
+      "cannot_deactivate_self": "No puedes desactivar tu propia cuenta"
+    },
+    "report": {
+      "generated": "Informe generado exitosamente",
+      "scheduled": "Informe programado exitosamente",
+      "not_found": "Informe no encontrado",
+      "generation_failed": "Error al generar el informe",
+      "no_data": "No hay datos disponibles para los criterios seleccionados",
+      "exported": "Informe exportado exitosamente",
+      "emailed": "Informe enviado por correo exitosamente"
+    },
+    "notification": {
+      "sent": "Notificación enviada exitosamente",
+      "marked_read": "Notificación marcada como leída",
+      "cleared": "Notificaciones borradas",
+      "preferences_updated": "Preferencias de notificación actualizadas"
+    },
+    "settings": {
+      "updated": "Configuración actualizada exitosamente",
+      "reset": "Configuración restablecida a valores predeterminados",
+      "invalid_value": "Valor inválido para la configuración",
+      "cannot_modify": "No se puede modificar esta configuración"
+    }
+  },
+  "email": {
+    "subject": {
+      "welcome": "Bienvenido a BDC",
+      "password_reset": "Solicitud de Restablecimiento de Contraseña",
+      "account_activation": "Activa Tu Cuenta",
+      "appointment_reminder": "Recordatorio de Cita",
+      "evaluation_assigned": "Nueva Evaluación Asignada",
+      "evaluation_graded": "Evaluación Calificada",
+      "program_enrollment": "Confirmación de Inscripción al Programa",
+      "document_shared": "Documento Compartido Contigo",
+      "weekly_summary": "Tu Resumen Semanal",
+      "certificate_ready": "Tu Certificado está Listo"
+    },
+    "greeting": {
+      "formal": "Estimado/a {name}",
+      "informal": "Hola {name}",
+      "generic": "Hola"
+    },
+    "footer": {
+      "regards": "Saludos cordiales",
+      "team": "El Equipo de BDC",
+      "unsubscribe": "Darse de baja de estos correos",
+      "help": "¿Necesitas ayuda? Contacta soporte",
+      "copyright": "© 2024 BDC. Todos los derechos reservados."
+    }
+  },
+  "sms": {
+    "appointment_reminder": "Recordatorio: Tienes una cita el {date} a las {time}",
+    "evaluation_due": "Tu evaluación '{title}' vence el {date}",
+    "verification_code": "Tu código de verificación es: {code}",
+    "password_reset": "Tu código de restablecimiento de contraseña es: {code}",
+    "program_update": "Actualización sobre tu programa '{program}': {message}"
+  },
+  "push": {
+    "title": {
+      "new_message": "Nuevo Mensaje",
+      "appointment_reminder": "Recordatorio de Cita",
+      "evaluation_assigned": "Nueva Evaluación",
+      "grade_posted": "Calificación Publicada",
+      "document_shared": "Documento Compartido"
+    },
+    "body": {
+      "new_message": "Tienes un nuevo mensaje de {sender}",
+      "appointment_reminder": "No olvides tu cita a las {time}",
+      "evaluation_assigned": "'{title}' ha sido asignada a ti",
+      "grade_posted": "Tu calificación para '{title}' ya está disponible",
+      "document_shared": "{sender} compartió un documento contigo"
+    }
+  },
+  "exports": {
+    "headers": {
+      "beneficiaries": {
+        "first_name": "Nombre",
+        "last_name": "Apellido",
+        "email": "Correo Electrónico",
+        "phone": "Teléfono",
+        "date_of_birth": "Fecha de Nacimiento",
+        "status": "Estado",
+        "enrollment_date": "Fecha de Inscripción"
+      },
+      "programs": {
+        "name": "Nombre del Programa",
+        "code": "Código",
+        "start_date": "Fecha de Inicio",
+        "end_date": "Fecha de Fin",
+        "capacity": "Capacidad",
+        "enrolled": "Inscritos",
+        "status": "Estado"
+      },
+      "evaluations": {
+        "title": "Título",
+        "type": "Tipo",
+        "due_date": "Fecha de Vencimiento",
+        "average_score": "Puntaje Promedio",
+        "completion_rate": "Tasa de Finalización",
+        "status": "Estado"
+      }
+    }
+  },
+  "reports": {
+    "attendance": {
+      "title": "Informe de Asistencia",
+      "present": "Presente",
+      "absent": "Ausente",
+      "late": "Tarde",
+      "excused": "Justificado",
+      "attendance_rate": "Tasa de Asistencia"
+    },
+    "progress": {
+      "title": "Informe de Progreso",
+      "completed_modules": "Módulos Completados",
+      "average_score": "Puntaje Promedio",
+      "completion_rate": "Tasa de Finalización",
+      "time_spent": "Tiempo Empleado"
+    },
+    "evaluation": {
+      "title": "Informe de Evaluación",
+      "total_evaluations": "Total de Evaluaciones",
+      "average_score": "Puntaje Promedio",
+      "pass_rate": "Tasa de Aprobación",
+      "pending_grading": "Pendiente de Calificación"
+    }
+  },
+  "dates": {
+    "formats": {
+      "short": "%d/%m/%Y",
+      "medium": "%d %b %Y",
+      "long": "%d de %B de %Y",
+      "full": "%A, %d de %B de %Y",
+      "time": "%H:%M",
+      "datetime": "%d/%m/%Y %H:%M"
+    },
+    "relative": {
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "tomorrow": "Mañana",
+      "in_days": "En {count} días",
+      "days_ago": "Hace {count} días",
+      "just_now": "Ahora mismo",
+      "minutes_ago": "Hace {count} minutos",
+      "hours_ago": "Hace {count} horas"
+    }
+  }
+}

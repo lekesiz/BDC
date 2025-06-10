@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React, { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -9,8 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogClose,
-  DialogFooter
-} from '../../../components/ui/dialog';
+  DialogFooter } from
+'../../../components/ui/dialog';import { useTranslation } from "react-i18next";
 describe('Modal/Dialog Component', () => {
   it('renders a simple dialog when open', () => {
     render(
@@ -73,11 +74,11 @@ describe('Modal/Dialog Component', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
   it('can be controlled externally', () => {
-    const ControlledDialog = () => {
+    const ControlledDialog = () => {const { t } = useTranslation();
       const [open, setOpen] = useState(false);
       return (
         <>
-          <button onClick={() => setOpen(true)}>Open Dialog</button>
+          <button onClick={() => setOpen(true)}>{t("components.open_dialog")}</button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent>
               <DialogHeader>
@@ -85,8 +86,8 @@ describe('Modal/Dialog Component', () => {
               </DialogHeader>
             </DialogContent>
           </Dialog>
-        </>
-      );
+        </>);
+
     };
     render(<ControlledDialog />);
     // Initially closed

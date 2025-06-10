@@ -1,0 +1,377 @@
+{
+  "settings": {
+    "ai": {
+      "title": "AI Settings",
+      "subtitle": "Configure AI providers and API keys for intelligent features",
+      "providers": {
+        "openai": {
+          "name": "OpenAI",
+          "description": "GPT models for text generation and analysis",
+          "apiKey": "API Key",
+          "apiKeyPlaceholder": "sk-...",
+          "getApiKey": "Get your API key from",
+          "platform": "OpenAI Platform",
+          "model": "Model",
+          "models": {
+            "gpt4": "GPT-4",
+            "gpt4Turbo": "GPT-4 Turbo",
+            "gpt35Turbo": "GPT-3.5 Turbo"
+          },
+          "temperature": "Temperature",
+          "maxTokens": "Max Tokens"
+        },
+        "anthropic": {
+          "name": "Anthropic Claude",
+          "description": "Advanced AI assistant for complex tasks",
+          "apiKey": "API Key",
+          "apiKeyPlaceholder": "sk-ant-...",
+          "getApiKey": "Get your API key from",
+          "platform": "Anthropic Console",
+          "model": "Model",
+          "models": {
+            "claude3Opus": "Claude 3 Opus",
+            "claude3Sonnet": "Claude 3 Sonnet",
+            "claude3Haiku": "Claude 3 Haiku",
+            "claude21": "Claude 2.1"
+          }
+        },
+        "google": {
+          "name": "Google AI",
+          "description": "Gemini models for multimodal AI tasks",
+          "apiKey": "API Key",
+          "apiKeyPlaceholder": "AIza...",
+          "getApiKey": "Get your API key from",
+          "platform": "Google AI Studio",
+          "model": "Model",
+          "models": {
+            "geminiPro": "Gemini Pro",
+            "geminiProVision": "Gemini Pro Vision"
+          }
+        }
+      },
+      "customEndpoints": {
+        "title": "Custom AI Endpoints",
+        "description": "Add custom AI endpoints for specialized models",
+        "namePlaceholder": "Endpoint name",
+        "urlPlaceholder": "Endpoint URL",
+        "apiKeyPlaceholder": "API Key (optional)",
+        "addEndpoint": "Add Endpoint"
+      },
+      "features": {
+        "title": "AI Features",
+        "description": "Configure which AI features are enabled",
+        "evaluationAnalysis": "Enable AI-powered evaluation analysis",
+        "recommendations": "Enable AI recommendations",
+        "contentGeneration": "Enable AI content generation",
+        "chatbotAssistance": "Enable AI chatbot assistance"
+      },
+      "actions": {
+        "test": "Test",
+        "save": "Save Settings"
+      },
+      "messages": {
+        "saveSuccess": "AI settings have been updated successfully",
+        "saveFailed": "Failed to save AI settings",
+        "connectionSuccess": "Successfully connected to {{provider}} API",
+        "connectionFailed": "Failed to connect to {{provider}} API"
+      }
+    },
+    "page": {
+      "title": "Settings",
+      "accountSettings": "Account Settings",
+      "accountSettingsDescription": "Manage your account preferences and settings",
+      "tabs": {
+        "notifications": "Notifications",
+        "privacy": "Privacy",
+        "preferences": "Preferences",
+        "ai": "AI",
+        "integrations": "Integrations"
+      },
+      "notifications": {
+        "email": {
+          "title": "Email Notifications",
+          "description": "Receive email notifications for important updates",
+          "marketing": "Marketing Emails",
+          "marketingDescription": "Receive emails about new features and offers"
+        },
+        "push": {
+          "title": "Push Notifications",
+          "description": "Receive push notifications in your browser",
+          "newMessages": "New Messages",
+          "newMessagesDescription": "Get notified when you receive new messages",
+          "sessionReminders": "Session Reminders",
+          "sessionRemindersDescription": "Get reminders for upcoming sessions",
+          "evaluationResults": "Evaluation Results",
+          "evaluationResultsDescription": "Get notified when your evaluation results are ready"
+        },
+        "sms": {
+          "title": "SMS Notifications",
+          "description": "Receive text message notifications (carrier charges may apply)"
+        },
+        "saveButton": "Save Notification Settings"
+      },
+      "privacy": {
+        "title": "Privacy Settings",
+        "profileVisibility": {
+          "title": "Profile Visibility",
+          "description": "Control who can see your profile information",
+          "everyone": "Everyone",
+          "connections": "Only connections",
+          "private": "Private"
+        },
+        "onlineStatus": {
+          "title": "Show Online Status",
+          "description": "Allow others to see when you're online"
+        },
+        "activitySharing": {
+          "title": "Share Activity",
+          "description": "Share your learning progress and achievements"
+        },
+        "dataCollection": {
+          "title": "Data Collection",
+          "allowCollection": "Allow Data Collection",
+          "description": "Help us improve our platform by sharing usage data"
+        },
+        "dataPrivacyNotice": {
+          "title": "Data Privacy",
+          "message": "Your data is always protected and never shared with third parties without your consent.",
+          "privacyPolicyLink": "Privacy Policy"
+        },
+        "saveButton": "Save Privacy Settings"
+      },
+      "preferences": {
+        "appearance": {
+          "title": "Appearance",
+          "theme": {
+            "title": "Theme",
+            "description": "Choose your preferred theme",
+            "light": "Light",
+            "dark": "Dark",
+            "system": "System"
+          }
+        },
+        "language": {
+          "title": "Language",
+          "displayLanguage": "Display Language",
+          "description": "Choose your preferred language for the interface"
+        },
+        "themeSupport": {
+          "title": "Theme Support",
+          "message": "Theme settings are currently in beta and may not apply to all parts of the application."
+        },
+        "saveButton": "Save Preferences"
+      },
+      "integrations": {
+        "title": "External Service Integrations",
+        "description": "Configure connections to external services and APIs",
+        "wedof": {
+          "name": "Wedof API",
+          "description": "Sync beneficiary and program data",
+          "configure": "Configure"
+        },
+        "google": {
+          "name": "Google Workspace",
+          "description": "Calendar, Drive, and Gmail integration",
+          "calendar": {
+            "name": "Google Calendar",
+            "description": "Sync appointments and sessions",
+            "setup": "Setup"
+          },
+          "drive": {
+            "name": "Google Drive",
+            "description": "Store and share documents",
+            "clientId": "Client ID",
+            "clientIdPlaceholder": "Google OAuth Client ID",
+            "clientSecret": "Client Secret",
+            "clientSecretPlaceholder": "Google OAuth Client Secret"
+          },
+          "gmail": {
+            "name": "Gmail Integration",
+            "description": "Send automated emails and notifications",
+            "smtpSettings": "SMTP Settings",
+            "usernamePlaceholder": "smtp-username@gmail.com",
+            "passwordPlaceholder": "App Password"
+          }
+        },
+        "other": {
+          "title": "Other Integrations",
+          "pennylane": {
+            "name": "Pennylane",
+            "description": "Financial management integration"
+          },
+          "sms": {
+            "name": "SMS Service",
+            "description": "Send SMS notifications",
+            "provider": "Provider",
+            "selectProvider": "Select SMS Provider",
+            "providers": {
+              "twilio": "Twilio",
+              "messageBird": "MessageBird",
+              "orangeSms": "Orange SMS"
+            },
+            "apiKeyPlaceholder": "API Key"
+          },
+          "webhooks": {
+            "name": "Webhook URLs",
+            "description": "Configure external service notifications",
+            "manage": "Manage"
+          }
+        },
+        "health": {
+          "title": "Integration Health",
+          "connected": "Connected",
+          "partial": "Partial",
+          "active": "Active",
+          "notConfigured": "Not Configured"
+        },
+        "saveButton": "Save Integration Settings"
+      },
+      "accessRestricted": {
+        "title": "Access Restricted",
+        "privacyMessage": "Advanced privacy settings are only available to administrators and trainers.",
+        "aiMessage": "AI settings are only available to administrators and trainers.",
+        "integrationsMessage": "Integration settings are only available to administrators.",
+        "currentRole": "Current role:"
+      },
+      "messages": {
+        "updateSuccess": "Your {{type}} settings have been saved.",
+        "updateFailed": "Failed to update settings. Please try again.",
+        "settingsSaved": "Settings saved",
+        "integrationsSaved": "Integration settings have been saved."
+      }
+    }
+  },
+  "portal": {
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Stay updated with important announcements and notifications",
+      "settings": "Settings",
+      "markAllAsRead": "Mark All as Read",
+      "settingsPanel": {
+        "title": "Notification Settings",
+        "deliveryMethods": {
+          "title": "Delivery Methods",
+          "email": "Email notifications",
+          "push": "Push notifications (browser)"
+        },
+        "categories": {
+          "title": "Notification Categories",
+          "schedule": "Schedule updates",
+          "messages": "Messages from instructors",
+          "progress": "Progress updates",
+          "reminders": "Reminders",
+          "alerts": "Alerts and important announcements"
+        },
+        "saveButton": "Save Settings"
+      },
+      "search": {
+        "placeholder": "Search notifications..."
+      },
+      "filters": {
+        "all": "All",
+        "schedule": "Schedule",
+        "messages": "Messages",
+        "progress": "Progress"
+      },
+      "empty": {
+        "title": "No notifications found",
+        "searchMessage": "Try adjusting your search or filter to find what you're looking for",
+        "defaultMessage": "You don't have any notifications yet"
+      },
+      "actions": {
+        "viewDetails": "View Details",
+        "markAsRead": "Mark as read",
+        "markAsUnread": "Mark as unread",
+        "delete": "Delete"
+      },
+      "dateFormats": {
+        "today": "Today at {{time}}",
+        "yesterday": "Yesterday at {{time}}"
+      },
+      "messages": {
+        "loadError": "Failed to load notifications",
+        "markAsReadError": "Failed to mark notification as read",
+        "markAllAsReadSuccess": "All notifications marked as read",
+        "markAllAsReadError": "Failed to mark all notifications as read",
+        "deleteSuccess": "Notification deleted",
+        "deleteError": "Failed to delete notification",
+        "settingsUpdateSuccess": "Notification settings updated",
+        "settingsUpdateError": "Failed to update notification settings"
+      }
+    },
+    "dashboard": {
+      "welcome": "Welcome back, {{name}}!",
+      "subtitle": "Track your progress and achieve your goals",
+      "currentLevel": "Current Level",
+      "defaultLevel": "Beginner",
+      "defaultStudent": "Student",
+      "retry": "Retry",
+      "stats": {
+        "enrolledPrograms": "Enrolled Programs",
+        "enrolledProgramsSubtitle": "{{count}} completed",
+        "averageProgress": "Average Progress",
+        "averageProgressSubtitle": "Across all programs",
+        "attendanceRate": "Attendance Rate",
+        "attendanceRateSubtitle": "Keep it up!",
+        "achievements": "Achievements",
+        "achievementsSubtitle": "Badges earned"
+      },
+      "sections": {
+        "activePrograms": {
+          "title": "Active Programs",
+          "viewAll": "View All",
+          "empty": "No active programs",
+          "moduleProgress": "Module {{current}} of {{total}}"
+        },
+        "recentAssessments": {
+          "title": "Recent Assessments",
+          "viewAll": "View All",
+          "empty": "No recent assessments",
+          "defaultTitle": "Assessment",
+          "inProgress": "In Progress"
+        },
+        "performanceTrend": {
+          "title": "Performance Trend",
+          "empty": "No performance data available",
+          "assessmentScore": "Assessment Score",
+          "completionRate": "Completion Rate",
+          "attendanceRate": "Attendance Rate"
+        },
+        "upcomingSchedule": {
+          "title": "Upcoming Schedule",
+          "viewCalendar": "View Calendar",
+          "empty": "No upcoming sessions",
+          "defaultSession": "Training Session"
+        },
+        "skillsDevelopment": {
+          "title": "Skills Development",
+          "empty": "No skills data available",
+          "viewDetailed": "View Detailed Progress"
+        },
+        "recentAchievements": {
+          "title": "Recent Achievements",
+          "viewAll": "View All",
+          "empty": "No achievements yet"
+        },
+        "quickActions": {
+          "title": "Quick Actions",
+          "resources": "Resources",
+          "takeTest": "Take Test",
+          "progress": "Progress",
+          "profile": "Profile"
+        }
+      },
+      "dateFormats": {
+        "today": "Today at {{time}}",
+        "tomorrow": "Tomorrow at {{time}}"
+      },
+      "scoreLabels": {
+        "excellent": "Excellent",
+        "veryGood": "Very Good",
+        "good": "Good",
+        "satisfactory": "Satisfactory",
+        "needsImprovement": "Needs Improvement"
+      }
+    }
+  }
+}

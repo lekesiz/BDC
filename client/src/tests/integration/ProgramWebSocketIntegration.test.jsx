@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * Integration test for Program WebSocket functionality
  * Tests real-time updates for program operations
@@ -9,7 +10,7 @@ import { SocketProvider } from '../../contexts/SocketContext';
 import { AuthProvider } from '../../hooks/useAuth';
 import ProgramsListPage from '../../pages/programs/ProgramsListPage';
 // Mock socket.io-client
-vi.mock('socket.io-client', () => ({
+import { useTranslation } from "react-i18next";vi.mock('socket.io-client', () => ({
   default: vi.fn(() => ({
     on: vi.fn(),
     emit: vi.fn(),
@@ -20,18 +21,18 @@ vi.mock('socket.io-client', () => ({
 // Mock API
 vi.mock('@/lib/api', () => ({
   default: {
-    get: vi.fn(() => Promise.resolve({ 
+    get: vi.fn(() => Promise.resolve({
       data: [
-        {
-          id: 1,
-          name: 'Test Program',
-          description: 'Test Description',
-          category: 'technical',
-          level: 'beginner',
-          status: 'active',
-          duration_weeks: 4
-        }
-      ]
+      {
+        id: 1,
+        name: 'Test Program',
+        description: 'Test Description',
+        category: 'technical',
+        level: 'beginner',
+        status: 'active',
+        duration_weeks: 4
+      }]
+
     }))
   }
 }));
@@ -100,8 +101,8 @@ describe('Program WebSocket Integration', () => {
       duration_weeks: 6
     };
     // Trigger the custom event that our Socket context dispatches
-    window.dispatchEvent(new CustomEvent('programCreated', { 
-      detail: newProgram 
+    window.dispatchEvent(new CustomEvent('programCreated', {
+      detail: newProgram
     }));
     // Check if new program appears in the list
     await waitFor(() => {
@@ -125,8 +126,8 @@ describe('Program WebSocket Integration', () => {
       duration_weeks: 8
     };
     // Trigger the custom event
-    window.dispatchEvent(new CustomEvent('programUpdated', { 
-      detail: updatedProgram 
+    window.dispatchEvent(new CustomEvent('programUpdated', {
+      detail: updatedProgram
     }));
     // Check if program data is updated
     await waitFor(() => {
@@ -145,8 +146,8 @@ describe('Program WebSocket Integration', () => {
       name: 'Test Program'
     };
     // Trigger the custom event
-    window.dispatchEvent(new CustomEvent('programDeleted', { 
-      detail: deletedProgram 
+    window.dispatchEvent(new CustomEvent('programDeleted', {
+      detail: deletedProgram
     }));
     // Check if program is removed from the list
     await waitFor(() => {

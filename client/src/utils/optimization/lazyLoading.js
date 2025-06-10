@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * Lazy loading utilities for React applications
  */
@@ -5,7 +6,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Skeleton, Box } from '@mui/material';
 /**
  * Intersection Observer hook for lazy loading
- */
+ */import { useTranslation } from "react-i18next";
 export const useIntersectionObserver = (options = {}) => {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const targetRef = useRef(null);
@@ -49,7 +50,7 @@ export const LazyImage = ({
   onLoad,
   onError,
   ...props
-}) => {
+}) => {const { t } = useTranslation();
   const [targetRef, isIntersecting] = useIntersectionObserver();
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -76,45 +77,45 @@ export const LazyImage = ({
         height,
         position: 'relative',
         ...style
-      }}
-    >
+      }}>
+
       {!isLoaded && !hasError && (
-        placeholder || (
-          <Skeleton
-            variant="rectangular"
-            width={width}
-            height={height}
-            animation="wave"
-          />
-        )
-      )}
-      {isLoaded && (
-        <img
-          src={src}
-          alt={alt}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover'
-          }}
-          {...props}
-        />
-      )}
-      {hasError && (
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          width={width}
-          height={height}
-          bgcolor="grey.200"
-          color="grey.600"
-        >
-          Failed to load image
-        </Box>
-      )}
-    </div>
-  );
+      placeholder ||
+      <Skeleton
+        variant="rectangular"
+        width={width}
+        height={height}
+        animation="wave" />)
+
+
+      }
+      {isLoaded &&
+      <img
+        src={src}
+        alt={alt}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover'
+        }}
+        {...props} />
+
+      }
+      {hasError &&
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        width={width}
+        height={height}
+        bgcolor="grey.200"
+        color="grey.600">{t("components.failed_to_load_image")}
+
+
+      </Box>
+      }
+    </div>);
+
 };
 /**
  * Lazy component wrapper
@@ -125,20 +126,20 @@ export const LazyComponent = ({
   threshold = 0.1,
   rootMargin = '50px',
   ...props
-}) => {
+}) => {const { t } = useTranslation();
   const [targetRef, isIntersecting] = useIntersectionObserver({
     threshold,
     rootMargin
   });
   return (
     <div ref={targetRef}>
-      {isIntersecting ? (
-        <Component {...props} />
-      ) : (
-        fallback || <Skeleton variant="rectangular" height={200} />
-      )}
-    </div>
-  );
+      {isIntersecting ?
+      <Component {...props} /> :
+
+      fallback || <Skeleton variant="rectangular" height={200} />
+      }
+    </div>);
+
 };
 /**
  * Lazy list component for virtual scrolling
@@ -150,7 +151,7 @@ export const LazyList = ({
   overscan = 5,
   className,
   style
-}) => {
+}) => {const { t } = useTranslation();
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 10 });
   const containerRef = useRef(null);
   const scrollTimeoutRef = useRef(null);
@@ -196,8 +197,8 @@ export const LazyList = ({
         height: '100%',
         overflowY: 'auto',
         ...style
-      }}
-    >
+      }}>
+
       <div style={{ height: totalHeight, position: 'relative' }}>
         <div
           style={{
@@ -206,20 +207,20 @@ export const LazyList = ({
             top: 0,
             left: 0,
             right: 0
-          }}
-        >
-          {items.slice(visibleRange.start, visibleRange.end).map((item, index) => (
-            <div
-              key={visibleRange.start + index}
-              style={{ height: itemHeight }}
-            >
+          }}>
+
+          {items.slice(visibleRange.start, visibleRange.end).map((item, index) =>
+          <div
+            key={visibleRange.start + index}
+            style={{ height: itemHeight }}>
+
               {renderItem(item, visibleRange.start + index)}
             </div>
-          ))}
+          )}
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 /**
  * Progressive image loading
@@ -232,7 +233,7 @@ export const ProgressiveImage = ({
   height,
   className,
   style
-}) => {
+}) => {const { t } = useTranslation();
   const [currentSrc, setCurrentSrc] = useState(placeholder);
   const [isLoading, setIsLoading] = useState(true);
   const [targetRef, isIntersecting] = useIntersectionObserver();
@@ -256,8 +257,8 @@ export const ProgressiveImage = ({
         height,
         overflow: 'hidden',
         ...style
-      }}
-    >
+      }}>
+
       <img
         src={currentSrc}
         alt={alt}
@@ -267,10 +268,10 @@ export const ProgressiveImage = ({
           objectFit: 'cover',
           filter: isLoading ? 'blur(10px)' : 'none',
           transition: 'filter 0.3s ease-in-out'
-        }}
-      />
-    </div>
-  );
+        }} />
+
+    </div>);
+
 };
 /**
  * Lazy load content based on scroll
@@ -280,7 +281,7 @@ export const LazyContent = ({
   fallback,
   offset = 100,
   once = true
-}) => {
+}) => {const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
   const contentRef = useRef(null);
@@ -290,7 +291,7 @@ export const LazyContent = ({
       if (!contentRef.current) return;
       const rect = contentRef.current.getBoundingClientRect();
       const isInViewport = rect.top <= window.innerHeight + offset &&
-                          rect.bottom >= -offset;
+      rect.bottom >= -offset;
       if (isInViewport) {
         setIsVisible(true);
         if (once) {
@@ -310,8 +311,8 @@ export const LazyContent = ({
   return (
     <div ref={contentRef}>
       {isVisible ? children : fallback}
-    </div>
-  );
+    </div>);
+
 };
 /**
  * Lazy iframe component
@@ -324,7 +325,7 @@ export const LazyIframe = ({
   className,
   style,
   ...props
-}) => {
+}) => {const { t } = useTranslation();
   const [targetRef, isIntersecting] = useIntersectionObserver();
   const [isLoaded, setIsLoaded] = useState(false);
   return (
@@ -336,32 +337,32 @@ export const LazyIframe = ({
         height,
         position: 'relative',
         ...style
-      }}
-    >
-      {!isLoaded && (
-        <Skeleton
-          variant="rectangular"
-          width={width}
-          height={height}
-          animation="wave"
-        />
-      )}
-      {isIntersecting && (
-        <iframe
-          src={src}
-          title={title}
-          width={width}
-          height={height}
-          onLoad={() => setIsLoaded(true)}
-          style={{
-            border: 'none',
-            display: isLoaded ? 'block' : 'none'
-          }}
-          {...props}
-        />
-      )}
-    </div>
-  );
+      }}>
+
+      {!isLoaded &&
+      <Skeleton
+        variant="rectangular"
+        width={width}
+        height={height}
+        animation="wave" />
+
+      }
+      {isIntersecting &&
+      <iframe
+        src={src}
+        title={title}
+        width={width}
+        height={height}
+        onLoad={() => setIsLoaded(true)}
+        style={{
+          border: 'none',
+          display: isLoaded ? 'block' : 'none'
+        }}
+        {...props} />
+
+      }
+    </div>);
+
 };
 /**
  * Lazy video component
@@ -376,7 +377,7 @@ export const LazyVideo = ({
   className,
   style,
   ...props
-}) => {
+}) => {const { t } = useTranslation();
   const [targetRef, isIntersecting] = useIntersectionObserver();
   const videoRef = useRef(null);
   useEffect(() => {
@@ -393,28 +394,28 @@ export const LazyVideo = ({
         height,
         position: 'relative',
         ...style
-      }}
-    >
-      {isIntersecting ? (
-        <video
-          ref={videoRef}
-          src={src}
-          poster={poster}
-          width={width}
-          height={height}
-          controls={controls}
-          style={{ width: '100%', height: '100%' }}
-          {...props}
-        />
-      ) : (
-        <img
-          src={poster}
-          alt="Video thumbnail"
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-      )}
-    </div>
-  );
+      }}>
+
+      {isIntersecting ?
+      <video
+        ref={videoRef}
+        src={src}
+        poster={poster}
+        width={width}
+        height={height}
+        controls={controls}
+        style={{ width: '100%', height: '100%' }}
+        {...props} /> :
+
+
+      <img
+        src={poster}
+        alt="Video thumbnail"
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+
+      }
+    </div>);
+
 };
 /**
  * Lazy loading utilities
@@ -425,7 +426,7 @@ export const lazyLoadingUtils = {
    */
   preloadImages: (urls) => {
     return Promise.all(
-      urls.map(url => {
+      urls.map((url) => {
         return new Promise((resolve, reject) => {
           const img = new Image();
           img.onload = () => resolve(url);

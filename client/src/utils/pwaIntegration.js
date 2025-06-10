@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 // PWA Integration Utilities
 // Comprehensive integration guide and utilities for BDC PWA
 import { pwaService } from '../services/pwa.service';
@@ -5,7 +6,7 @@ import { PWAOptimizations } from './pwaOptimizations';
 /**
  * PWA Integration Manager
  * Centralizes all PWA functionality for easy integration
- */
+ */import { useTranslation } from "react-i18next";
 export class PWAIntegration {
   constructor() {
     this.isInitialized = false;
@@ -205,8 +206,8 @@ export class PWAIntegration {
    */
   isInstalled() {
     return window.matchMedia('(display-mode: standalone)').matches ||
-           window.navigator.standalone === true ||
-           localStorage.getItem('pwa-installed') !== null;
+    window.navigator.standalone === true ||
+    localStorage.getItem('pwa-installed') !== null;
   }
   /**
    * Get PWA metrics
@@ -242,7 +243,7 @@ export const PWAReactIntegration = {
    * Create PWA-aware route configuration
    */
   createPWARoutes(routes) {
-    return routes.map(route => ({
+    return routes.map((route) => ({
       ...route,
       component: PWAOptimizations.codeSplitter.importModule(route.component),
       preload: () => PWAOptimizations.resourcePreloader.preloadRoute(route.path)
@@ -269,7 +270,7 @@ export const PWAConfig = {
   // Cache strategies
   cacheStrategies: {
     static: 'cache-first',
-    api: 'network-first', 
+    api: 'network-first',
     images: 'cache-first',
     runtime: 'stale-while-revalidate'
   },

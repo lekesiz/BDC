@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Brain,
   Key,
@@ -22,6 +23,7 @@ import AsyncBoundary from '@/components/common/AsyncBoundary';
 import { CardLoader } from '@/components/common/LoadingStates';
 import api from '@/lib/api';
 const AISettingsPage = () => {
+  const { t } = useTranslation();
   const { addToast } = useToast();
   // State for AI providers and their settings
   const [aiProviders, setAiProviders] = useState({
@@ -89,14 +91,14 @@ const AISettingsPage = () => {
       });
       addToast({
         type: 'success',
-        title: 'Settings saved',
-        message: 'AI settings have been updated successfully'
+        title: t('settings.messages.saveSuccess'),
+        message: t('settings.ai.messages.saveSuccess')
       });
     } catch (error) {
       addToast({
         type: 'error',
-        title: 'Save failed',
-        message: error.response?.data?.message || 'Failed to save AI settings'
+        title: t('common.error'),
+        message: error.response?.data?.message || t('settings.ai.messages.saveFailed')
       });
     }
   };
@@ -109,14 +111,14 @@ const AISettingsPage = () => {
       });
       addToast({
         type: 'success',
-        title: 'Connection successful',
-        message: `Successfully connected to ${provider} API`
+        title: t('common.success'),
+        message: t('settings.ai.messages.connectionSuccess', { provider })
       });
     } catch (error) {
       addToast({
         type: 'error',
-        title: 'Connection failed',
-        message: error.response?.data?.message || `Failed to connect to ${provider} API`
+        title: t('common.error'),
+        message: error.response?.data?.message || t('settings.ai.messages.connectionFailed', { provider })
       });
     }
   };
@@ -161,9 +163,9 @@ const AISettingsPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">AI Settings</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('settings.ai.title')}</h1>
         <p className="mt-1 text-sm text-gray-700">
-          Configure AI providers and API keys for intelligent features
+          {t('settings.ai.subtitle')}
         </p>
       </div>
       <AsyncBoundary
@@ -182,8 +184,8 @@ const AISettingsPage = () => {
                     <Brain className="h-6 w-6 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900">OpenAI</h3>
-                    <p className="text-sm text-gray-500">GPT models for text generation and analysis</p>
+                    <h3 className="text-lg font-medium text-gray-900">{t('settings.ai.providers.openai.name')}</h3>
+                    <p className="text-sm text-gray-500">{t('settings.ai.providers.openai.description')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -202,7 +204,7 @@ const AISettingsPage = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      API Key
+                      {t('settings.ai.providers.openai.apiKey')}
                     </label>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
@@ -210,7 +212,7 @@ const AISettingsPage = () => {
                           type={aiProviders.openai.showKey ? 'text' : 'password'}
                           value={aiProviders.openai.apiKey}
                           onChange={(e) => updateProvider('openai', 'apiKey', e.target.value)}
-                          placeholder="sk-..."
+                          placeholder={t('settings.ai.providers.openai.apiKeyPlaceholder')}
                           className="pr-10"
                         />
                         <button
@@ -229,18 +231,18 @@ const AISettingsPage = () => {
                         variant="outline"
                         onClick={() => testConnection('openai')}
                       >
-                        Test
+                        {t('settings.ai.actions.test')}
                       </Button>
                     </div>
                     <p className="mt-1 text-xs text-gray-500">
-                      Get your API key from{' '}
+                      {t('settings.ai.providers.openai.getApiKey')}{' '}
                       <a
                         href="https://platform.openai.com/api-keys"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline inline-flex items-center gap-1"
                       >
-                        OpenAI Platform
+                        {t('settings.ai.providers.openai.platform')}
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     </p>
@@ -248,21 +250,21 @@ const AISettingsPage = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Model
+                        {t('settings.ai.providers.openai.model')}
                       </label>
                       <select
                         value={aiProviders.openai.model}
                         onChange={(e) => updateProvider('openai', 'model', e.target.value)}
                         className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                       >
-                        <option value="gpt-4">GPT-4</option>
-                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        <option value="gpt-4">{t('settings.ai.providers.openai.models.gpt4')}</option>
+                        <option value="gpt-4-turbo">{t('settings.ai.providers.openai.models.gpt4Turbo')}</option>
+                        <option value="gpt-3.5-turbo">{t('settings.ai.providers.openai.models.gpt35Turbo')}</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Temperature
+                        {t('settings.ai.providers.openai.temperature')}
                       </label>
                       <Input
                         type="number"
@@ -276,7 +278,7 @@ const AISettingsPage = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Max Tokens
+                      {t('settings.ai.providers.openai.maxTokens')}
                     </label>
                     <Input
                       type="number"
@@ -299,8 +301,8 @@ const AISettingsPage = () => {
                     <Brain className="h-6 w-6 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900">Anthropic Claude</h3>
-                    <p className="text-sm text-gray-500">Advanced AI assistant for complex tasks</p>
+                    <h3 className="text-lg font-medium text-gray-900">{t('settings.ai.providers.anthropic.name')}</h3>
+                    <p className="text-sm text-gray-500">{t('settings.ai.providers.anthropic.description')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -319,7 +321,7 @@ const AISettingsPage = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      API Key
+                      {t('settings.ai.providers.anthropic.apiKey')}
                     </label>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
@@ -327,7 +329,7 @@ const AISettingsPage = () => {
                           type={aiProviders.anthropic.showKey ? 'text' : 'password'}
                           value={aiProviders.anthropic.apiKey}
                           onChange={(e) => updateProvider('anthropic', 'apiKey', e.target.value)}
-                          placeholder="sk-ant-..."
+                          placeholder={t('settings.ai.providers.anthropic.apiKeyPlaceholder')}
                           className="pr-10"
                         />
                         <button
@@ -346,18 +348,18 @@ const AISettingsPage = () => {
                         variant="outline"
                         onClick={() => testConnection('anthropic')}
                       >
-                        Test
+                        {t('settings.ai.actions.test')}
                       </Button>
                     </div>
                     <p className="mt-1 text-xs text-gray-500">
-                      Get your API key from{' '}
+                      {t('settings.ai.providers.anthropic.getApiKey')}{' '}
                       <a
                         href="https://console.anthropic.com/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline inline-flex items-center gap-1"
                       >
-                        Anthropic Console
+                        {t('settings.ai.providers.anthropic.platform')}
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     </p>
@@ -365,22 +367,22 @@ const AISettingsPage = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Model
+                        {t('settings.ai.providers.anthropic.model')}
                       </label>
                       <select
                         value={aiProviders.anthropic.model}
                         onChange={(e) => updateProvider('anthropic', 'model', e.target.value)}
                         className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                       >
-                        <option value="claude-3-opus">Claude 3 Opus</option>
-                        <option value="claude-3-sonnet">Claude 3 Sonnet</option>
-                        <option value="claude-3-haiku">Claude 3 Haiku</option>
-                        <option value="claude-2.1">Claude 2.1</option>
+                        <option value="claude-3-opus">{t('settings.ai.providers.anthropic.models.claude3Opus')}</option>
+                        <option value="claude-3-sonnet">{t('settings.ai.providers.anthropic.models.claude3Sonnet')}</option>
+                        <option value="claude-3-haiku">{t('settings.ai.providers.anthropic.models.claude3Haiku')}</option>
+                        <option value="claude-2.1">{t('settings.ai.providers.anthropic.models.claude21')}</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Temperature
+                        {t('settings.ai.providers.openai.temperature')}
                       </label>
                       <Input
                         type="number"
@@ -405,8 +407,8 @@ const AISettingsPage = () => {
                     <Brain className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900">Google AI</h3>
-                    <p className="text-sm text-gray-500">Gemini models for multimodal AI tasks</p>
+                    <h3 className="text-lg font-medium text-gray-900">{t('settings.ai.providers.google.name')}</h3>
+                    <p className="text-sm text-gray-500">{t('settings.ai.providers.google.description')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -425,7 +427,7 @@ const AISettingsPage = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      API Key
+                      {t('settings.ai.providers.google.apiKey')}
                     </label>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
@@ -433,7 +435,7 @@ const AISettingsPage = () => {
                           type={aiProviders.google.showKey ? 'text' : 'password'}
                           value={aiProviders.google.apiKey}
                           onChange={(e) => updateProvider('google', 'apiKey', e.target.value)}
-                          placeholder="AIza..."
+                          placeholder={t('settings.ai.providers.google.apiKeyPlaceholder')}
                           className="pr-10"
                         />
                         <button
@@ -452,18 +454,18 @@ const AISettingsPage = () => {
                         variant="outline"
                         onClick={() => testConnection('google')}
                       >
-                        Test
+                        {t('settings.ai.actions.test')}
                       </Button>
                     </div>
                     <p className="mt-1 text-xs text-gray-500">
-                      Get your API key from{' '}
+                      {t('settings.ai.providers.google.getApiKey')}{' '}
                       <a
                         href="https://makersuite.google.com/app/apikey"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline inline-flex items-center gap-1"
                       >
-                        Google AI Studio
+                        {t('settings.ai.providers.google.platform')}
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     </p>
@@ -471,20 +473,20 @@ const AISettingsPage = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Model
+                        {t('settings.ai.providers.google.model')}
                       </label>
                       <select
                         value={aiProviders.google.model}
                         onChange={(e) => updateProvider('google', 'model', e.target.value)}
                         className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                       >
-                        <option value="gemini-pro">Gemini Pro</option>
-                        <option value="gemini-pro-vision">Gemini Pro Vision</option>
+                        <option value="gemini-pro">{t('settings.ai.providers.google.models.geminiPro')}</option>
+                        <option value="gemini-pro-vision">{t('settings.ai.providers.google.models.geminiProVision')}</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Temperature
+                        {t('settings.ai.providers.openai.temperature')}
                       </label>
                       <Input
                         type="number"
@@ -504,8 +506,8 @@ const AISettingsPage = () => {
           <Card>
             <div className="p-6">
               <div className="mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Custom AI Endpoints</h3>
-                <p className="text-sm text-gray-500">Add custom AI endpoints for specialized models</p>
+                <h3 className="text-lg font-medium text-gray-900">{t('settings.ai.customEndpoints.title')}</h3>
+                <p className="text-sm text-gray-500">{t('settings.ai.customEndpoints.description')}</p>
               </div>
               <div className="space-y-4">
                 {customEndpoints.map((endpoint) => (
@@ -526,17 +528,17 @@ const AISettingsPage = () => {
                 <div className="border-t pt-4">
                   <div className="grid grid-cols-3 gap-3">
                     <Input
-                      placeholder="Endpoint name"
+                      placeholder={t('settings.ai.customEndpoints.namePlaceholder')}
                       value={newEndpoint.name}
                       onChange={(e) => setNewEndpoint(prev => ({ ...prev, name: e.target.value }))}
                     />
                     <Input
-                      placeholder="Endpoint URL"
+                      placeholder={t('settings.ai.customEndpoints.urlPlaceholder')}
                       value={newEndpoint.url}
                       onChange={(e) => setNewEndpoint(prev => ({ ...prev, url: e.target.value }))}
                     />
                     <Input
-                      placeholder="API Key (optional)"
+                      placeholder={t('settings.ai.customEndpoints.apiKeyPlaceholder')}
                       value={newEndpoint.apiKey}
                       onChange={(e) => setNewEndpoint(prev => ({ ...prev, apiKey: e.target.value }))}
                     />
@@ -548,7 +550,7 @@ const AISettingsPage = () => {
                     disabled={!newEndpoint.name || !newEndpoint.url}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Endpoint
+                    {t('settings.ai.customEndpoints.addEndpoint')}
                   </Button>
                 </div>
               </div>
@@ -558,25 +560,25 @@ const AISettingsPage = () => {
           <Card>
             <div className="p-6">
               <div className="mb-4">
-                <h3 className="text-lg font-medium text-gray-900">AI Features</h3>
-                <p className="text-sm text-gray-500">Configure which AI features are enabled</p>
+                <h3 className="text-lg font-medium text-gray-900">{t('settings.ai.features.title')}</h3>
+                <p className="text-sm text-gray-500">{t('settings.ai.features.description')}</p>
               </div>
               <div className="space-y-3">
                 <label className="flex items-center space-x-3">
                   <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary" />
-                  <span className="text-sm font-medium text-gray-700">Enable AI-powered evaluation analysis</span>
+                  <span className="text-sm font-medium text-gray-700">{t('settings.ai.features.evaluationAnalysis')}</span>
                 </label>
                 <label className="flex items-center space-x-3">
                   <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary" />
-                  <span className="text-sm font-medium text-gray-700">Enable AI recommendations</span>
+                  <span className="text-sm font-medium text-gray-700">{t('settings.ai.features.recommendations')}</span>
                 </label>
                 <label className="flex items-center space-x-3">
                   <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary" />
-                  <span className="text-sm font-medium text-gray-700">Enable AI content generation</span>
+                  <span className="text-sm font-medium text-gray-700">{t('settings.ai.features.contentGeneration')}</span>
                 </label>
                 <label className="flex items-center space-x-3">
                   <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary" />
-                  <span className="text-sm font-medium text-gray-700">Enable AI chatbot assistance</span>
+                  <span className="text-sm font-medium text-gray-700">{t('settings.ai.features.chatbotAssistance')}</span>
                 </label>
               </div>
             </div>
@@ -585,7 +587,7 @@ const AISettingsPage = () => {
           <div className="flex justify-end">
             <Button onClick={handleSave}>
               <Save className="h-4 w-4 mr-2" />
-              Save Settings
+              {t('settings.ai.actions.save')}
             </Button>
           </div>
         </div>

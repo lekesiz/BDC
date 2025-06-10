@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -15,8 +16,8 @@ import { generateId } from '@/utils/accessibility';
  * @param {boolean} props.required - Whether the select is required
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Accessible Select component
- */
-export const AccessibleSelect = React.forwardRef(({ 
+ */import { useTranslation } from "react-i18next";
+export const AccessibleSelect = React.forwardRef(({
   options = [],
   value,
   onValueChange,
@@ -26,7 +27,7 @@ export const AccessibleSelect = React.forwardRef(({
   required = false,
   disabled = false,
   className,
-  ...props 
+  ...props
 }, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
@@ -39,21 +40,21 @@ export const AccessibleSelect = React.forwardRef(({
   const labelId = `${id}-label`;
   const listboxId = `${id}-listbox`;
   const errorId = error ? `${id}-error` : undefined;
-  const selectedOption = options.find(opt => opt.value === value);
-  const selectedIndex = options.findIndex(opt => opt.value === value);
+  const selectedOption = options.find((opt) => opt.value === value);
+  const selectedIndex = options.findIndex((opt) => opt.value === value);
   // Filter options based on search
-  const filteredOptions = options.filter(option => 
-    option.label.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredOptions = options.filter((option) =>
+  option.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        buttonRef.current && 
-        !buttonRef.current.contains(event.target) &&
-        listRef.current && 
-        !listRef.current.contains(event.target)
-      ) {
+      buttonRef.current &&
+      !buttonRef.current.contains(event.target) &&
+      listRef.current &&
+      !listRef.current.contains(event.target))
+      {
         setIsOpen(false);
         setSearchQuery('');
       }
@@ -81,13 +82,13 @@ export const AccessibleSelect = React.forwardRef(({
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
-        setFocusedIndex(prev => 
-          prev < filteredOptions.length - 1 ? prev + 1 : prev
+        setFocusedIndex((prev) =>
+        prev < filteredOptions.length - 1 ? prev + 1 : prev
         );
         break;
       case 'ArrowUp':
         event.preventDefault();
-        setFocusedIndex(prev => prev > 0 ? prev - 1 : prev);
+        setFocusedIndex((prev) => prev > 0 ? prev - 1 : prev);
         break;
       case 'Home':
         event.preventDefault();
@@ -121,8 +122,8 @@ export const AccessibleSelect = React.forwardRef(({
           const newQuery = searchQuery + event.key;
           setSearchQuery(newQuery);
           // Find first matching option
-          const matchIndex = options.findIndex(opt => 
-            opt.label.toLowerCase().startsWith(newQuery.toLowerCase())
+          const matchIndex = options.findIndex((opt) =>
+          opt.label.toLowerCase().startsWith(newQuery.toLowerCase())
           );
           if (matchIndex >= 0) {
             setFocusedIndex(matchIndex);
@@ -153,19 +154,19 @@ export const AccessibleSelect = React.forwardRef(({
   };
   return (
     <div className="w-full space-y-2">
-      {label && (
-        <label 
-          id={labelId}
-          htmlFor={id}
-          className={cn(
-            "block text-sm font-medium text-gray-700",
-            error && "text-red-500"
-          )}
-        >
+      {label &&
+      <label
+        id={labelId}
+        htmlFor={id}
+        className={cn(
+          "block text-sm font-medium text-gray-700",
+          error && "text-red-500"
+        )}>
+
           {label}
           {required && <span className="text-red-500 ml-1" aria-label="required">*</span>}
         </label>
-      )}
+      }
       <div className="relative" ref={ref}>
         <button
           ref={buttonRef}
@@ -190,76 +191,76 @@ export const AccessibleSelect = React.forwardRef(({
             error && "border-red-500 focus:ring-red-500",
             className
           )}
-          {...props}
-        >
+          {...props}>
+
           <span className={!selectedOption ? 'text-muted-foreground' : ''}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <ChevronDown 
+          <ChevronDown
             className={cn(
               "h-4 w-4 opacity-50 transition-transform",
               isOpen && "transform rotate-180"
-            )} 
-            aria-hidden="true"
-          />
-        </button>
-        {isOpen && (
-          <ul
-            ref={listRef}
-            id={listboxId}
-            role="listbox"
-            aria-labelledby={label ? labelId : undefined}
-            aria-activedescendant={
-              focusedIndex >= 0 ? `${id}-option-${focusedIndex}` : undefined
-            }
-            className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-background shadow-lg focus:outline-none"
-          >
-            {filteredOptions.length === 0 ? (
-              <li className="px-2 py-1.5 text-sm text-muted-foreground">
-                No options found
-              </li>
-            ) : (
-              filteredOptions.map((option, index) => (
-                <li
-                  key={option.value}
-                  id={`${id}-option-${index}`}
-                  ref={el => optionRefs.current[index] = el}
-                  role="option"
-                  aria-selected={value === option.value}
-                  aria-disabled={option.disabled}
-                  tabIndex={-1}
-                  onClick={() => selectOption(option)}
-                  onMouseEnter={() => setFocusedIndex(index)}
-                  className={cn(
-                    "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    "focus:bg-accent focus:text-accent-foreground",
-                    value === option.value && "bg-accent text-accent-foreground",
-                    option.disabled && "opacity-50 cursor-not-allowed",
-                    focusedIndex === index && "bg-accent text-accent-foreground"
-                  )}
-                >
-                  <span className="flex-1">{option.label}</span>
-                  {value === option.value && (
-                    <Check className="h-4 w-4" aria-hidden="true" />
-                  )}
-                </li>
-              ))
             )}
+            aria-hidden="true" />
+
+        </button>
+        {isOpen &&
+        <ul
+          ref={listRef}
+          id={listboxId}
+          role="listbox"
+          aria-labelledby={label ? labelId : undefined}
+          aria-activedescendant={
+          focusedIndex >= 0 ? `${id}-option-${focusedIndex}` : undefined
+          }
+          className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-background shadow-lg focus:outline-none">
+
+            {filteredOptions.length === 0 ?
+          <li className="px-2 py-1.5 text-sm text-muted-foreground">
+                No options found
+              </li> :
+
+          filteredOptions.map((option, index) =>
+          <li
+            key={option.value}
+            id={`${id}-option-${index}`}
+            ref={(el) => optionRefs.current[index] = el}
+            role="option"
+            aria-selected={value === option.value}
+            aria-disabled={option.disabled}
+            tabIndex={-1}
+            onClick={() => selectOption(option)}
+            onMouseEnter={() => setFocusedIndex(index)}
+            className={cn(
+              "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+              "hover:bg-accent hover:text-accent-foreground",
+              "focus:bg-accent focus:text-accent-foreground",
+              value === option.value && "bg-accent text-accent-foreground",
+              option.disabled && "opacity-50 cursor-not-allowed",
+              focusedIndex === index && "bg-accent text-accent-foreground"
+            )}>
+
+                  <span className="flex-1">{option.label}</span>
+                  {value === option.value &&
+            <Check className="h-4 w-4" aria-hidden="true" />
+            }
+                </li>
+          )
+          }
           </ul>
-        )}
+        }
       </div>
-      {error && (
-        <p id={errorId} className="text-sm text-red-500 mt-1" role="alert">
+      {error &&
+      <p id={errorId} className="text-sm text-red-500 mt-1" role="alert">
           {error}
         </p>
-      )}
+      }
       {/* Screen reader only live region for search */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {searchQuery && `Searching for ${searchQuery}`}
       </div>
-    </div>
-  );
+    </div>);
+
 });
 AccessibleSelect.displayName = "AccessibleSelect";
 export default AccessibleSelect;

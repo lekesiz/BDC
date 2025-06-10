@@ -1,6 +1,7 @@
-import { 
-  getPortalDashboard, 
-  getPortalCourses, 
+// TODO: i18n - processed
+import {
+  getPortalDashboard,
+  getPortalCourses,
   getPortalModuleDetail,
   completeLesson,
   getPortalCalendar,
@@ -17,13 +18,13 @@ import {
   markNotificationAsRead,
   markAllNotificationsAsRead,
   deleteNotification,
-  updateNotificationSettings
-} from './mockPortalData';
+  updateNotificationSettings } from
+'./mockPortalData';
 // Import assessment mock API
 import { setupAssessmentMockApi } from './assessment/setupAssessmentMockApi';
 /**
  * Setup mock API handlers for student portal
- */
+ */import { useTranslation } from "react-i18next";
 export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Setup assessment mock API
   setupAssessmentMockApi(api, originalGet, originalPost, originalPut, originalDelete);
@@ -32,7 +33,7 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
   const basePost = api.post;
   const basePut = api.put;
   const baseDelete = api.delete;
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     // Portal Dashboard
     if (url === '/api/portal/dashboard') {
       const dashboard = getPortalDashboard();
@@ -186,7 +187,7 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
     // Fall back to base get method (which includes assessment endpoints)
     return baseGet(url, config);
   };
-  api.post = function(url, data, config) {
+  api.post = function (url, data, config) {
     // Complete Lesson
     const completeMatch = url.match(/^\/api\/portal\/lessons\/(\d+)\/complete$/);
     if (completeMatch) {
@@ -277,7 +278,7 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
     // Fall back to base post method (which includes assessment endpoints)
     return basePost(url, data, config);
   };
-  api.put = function(url, data, config) {
+  api.put = function (url, data, config) {
     // Update Profile
     if (url === '/api/portal/profile') {
       const result = updatePortalProfile(data);
@@ -303,7 +304,7 @@ export const setupPortalMockApi = (api, originalGet, originalPost, originalPut, 
     // Fall back to base put method
     return basePut(url, data, config);
   };
-  api.delete = function(url, config) {
+  api.delete = function (url, config) {
     // Delete Notification
     const deleteMatch = url.match(/^\/api\/portal\/notifications\/(\d+)$/);
     if (deleteMatch) {

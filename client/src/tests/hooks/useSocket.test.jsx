@@ -1,8 +1,9 @@
+// TODO: i18n - processed
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSocket } from '@/contexts/SocketContext';
 // Mock socket.io-client
-const mockSocket = {
+import { useTranslation } from "react-i18next";const mockSocket = {
   on: vi.fn(),
   off: vi.fn(),
   emit: vi.fn(),
@@ -23,11 +24,11 @@ vi.mock('@/hooks/useAuth', () => ({
 // Create wrapper component for SocketProvider
 const createWrapper = () => {
   const { SocketProvider } = require('@/contexts/SocketContext');
-  return ({ children }) => (
-    <SocketProvider>
+  return ({ children }) =>
+  <SocketProvider>
       {children}
-    </SocketProvider>
-  );
+    </SocketProvider>;
+
 };
 describe('useSocket', () => {
   beforeEach(() => {
@@ -93,8 +94,8 @@ describe('useSocket', () => {
       result.current.sendMessage('test_room', 'Hello world', callback);
     });
     expect(mockSocket.emit).toHaveBeenCalledWith(
-      'send_message', 
-      { room: 'test_room', message: 'Hello world' }, 
+      'send_message',
+      { room: 'test_room', message: 'Hello world' },
       callback
     );
   });

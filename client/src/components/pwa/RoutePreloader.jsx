@@ -1,17 +1,18 @@
+// TODO: i18n - processed
 import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { resourcePreloader, codeSplitter } from '../../utils/pwaOptimizations';
 /**
  * Route Preloader Component
  * Preloads routes and their dependencies for faster navigation
- */
-export function RoutePreloader({ 
+ */import { useTranslation } from "react-i18next";
+export function RoutePreloader({
   routes = [],
   preloadOnHover = true,
   preloadOnVisible = true,
   preloadDelay = 100,
-  children 
-}) {
+  children
+}) {const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const hoverTimerRef = useRef(null);
@@ -26,7 +27,7 @@ export function RoutePreloader({
     }
     try {
       // Find route configuration
-      const route = routes.find(r => r.path === routePath);
+      const route = routes.find((r) => r.path === routePath);
       if (!route) return;
       // Preload route component
       if (route.component) {
@@ -37,8 +38,8 @@ export function RoutePreloader({
       // Preload API endpoints
       if (route.api) {
         await Promise.allSettled(
-          route.api.map(endpoint => 
-            fetch(endpoint).catch(() => {}) // Ignore errors for preloading
+          route.api.map((endpoint) =>
+          fetch(endpoint).catch(() => {}) // Ignore errors for preloading
           )
         );
       }
@@ -92,14 +93,14 @@ export function RoutePreloader({
 /**
  * Link component with built-in preloading
  */
-export function PreloadLink({ 
-  to, 
-  children, 
+export function PreloadLink({
+  to,
+  children,
   preloadOnHover = true,
   preloadOnVisible = false,
   className = '',
-  ...props 
-}) {
+  ...props
+}) {const { t } = useTranslation();
   const navigate = useNavigate();
   const linkRef = useRef(null);
   const hoverTimerRef = useRef(null);
@@ -161,28 +162,28 @@ export function PreloadLink({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </a>
-  );
+    </a>);
+
 }
 /**
  * Navigation component with smart preloading
  */
-export function SmartNavigation({ 
-  routes, 
+export function SmartNavigation({
+  routes,
   currentPath,
   onNavigate,
-  className = '' 
-}) {
+  className = ''
+}) {const { t } = useTranslation();
   const preloadAdjacentRoutes = () => {
-    const currentIndex = routes.findIndex(route => route.path === currentPath);
+    const currentIndex = routes.findIndex((route) => route.path === currentPath);
     // Preload previous and next routes
     const adjacentIndices = [currentIndex - 1, currentIndex + 1].filter(
-      index => index >= 0 && index < routes.length
+      (index) => index >= 0 && index < routes.length
     );
-    adjacentIndices.forEach(index => {
+    adjacentIndices.forEach((index) => {
       const route = routes[index];
       setTimeout(() => {
         resourcePreloader.preloadRoute(route.path);
@@ -195,35 +196,35 @@ export function SmartNavigation({
   return (
     <nav className={className}>
       <RoutePreloader routes={routes}>
-        {routes.map((route) => (
-          <PreloadLink
-            key={route.path}
-            to={route.path}
-            className={`
+        {routes.map((route) =>
+        <PreloadLink
+          key={route.path}
+          to={route.path}
+          className={`
               px-4 py-2 rounded-md transition-colors
-              ${currentPath === route.path 
-                ? 'bg-blue-600 text-white' 
-                : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-              }
-            `}
-            onClick={() => onNavigate?.(route.path)}
-          >
+              ${currentPath === route.path ?
+          'bg-blue-600 text-white' :
+          'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}
+            `
+          }
+          onClick={() => onNavigate?.(route.path)}>
+
             {route.label}
           </PreloadLink>
-        ))}
+        )}
       </RoutePreloader>
-    </nav>
-  );
+    </nav>);
+
 }
 /**
  * Route transition component with preloading
  */
-export function RouteTransition({ 
-  children, 
+export function RouteTransition({
+  children,
   isLoading = false,
   route,
-  onRouteChange 
-}) {
+  onRouteChange
+}) {const { t } = useTranslation();
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   useEffect(() => {
     if (route) {
@@ -242,23 +243,23 @@ export function RouteTransition({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
   return (
     <div className="animate-in fade-in duration-200">
       {children}
-    </div>
-  );
+    </div>);
+
 }
 /**
  * Prefetch on scroll component
  */
-export function PrefetchOnScroll({ 
+export function PrefetchOnScroll({
   routes = [],
   threshold = 0.8,
-  enabled = true 
-}) {
+  enabled = true
+}) {const { t } = useTranslation();
   const hasTriggered = useRef(false);
   useEffect(() => {
     if (!enabled || hasTriggered.current) return;

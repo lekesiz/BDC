@@ -1,8 +1,9 @@
+// TODO: i18n - processed
 import React, { useState, useRef, useCallback, useEffect, memo } from 'react';
 import { useVirtualScroll } from '@/utils/reactOptimizations';
 /**
  * Virtual list component for efficiently rendering large lists
- */
+ */import { useTranslation } from "react-i18next";
 export const VirtualList = memo(({
   items,
   itemHeight,
@@ -72,7 +73,7 @@ export const VirtualList = memo(({
     if (element && !itemHeight) {
       const height = element.getBoundingClientRect().height;
       if (height !== dynamicHeights[index]) {
-        setDynamicHeights(prev => ({
+        setDynamicHeights((prev) => ({
           ...prev,
           [index]: height
         }));
@@ -84,8 +85,8 @@ export const VirtualList = memo(({
     return (
       <div className={className} style={{ height }} {...props}>
         {emptyComponent}
-      </div>
-    );
+      </div>);
+
   }
   return (
     <div
@@ -93,8 +94,8 @@ export const VirtualList = memo(({
       className={`overflow-auto ${className}`}
       style={{ height }}
       onScroll={handleScroll}
-      {...props}
-    >
+      {...props}>
+
       <div style={{ height: totalHeight, position: 'relative' }}>
         {visibleItems.map((item, relativeIndex) => {
           const index = startIndex + relativeIndex;
@@ -110,15 +111,15 @@ export const VirtualList = memo(({
                 right: 0,
                 height: itemHeight || 'auto'
               }}
-              ref={(el) => measureItem(index, el)}
-            >
+              ref={(el) => measureItem(index, el)}>
+
               {renderItem(item, index)}
-            </div>
-          );
+            </div>);
+
         })}
       </div>
-    </div>
-  );
+    </div>);
+
 });
 VirtualList.displayName = 'VirtualList';
 /**
@@ -183,7 +184,7 @@ export const DynamicVirtualList = memo(({
     if (element) {
       const height = element.getBoundingClientRect().height;
       if (height !== itemHeights[index]) {
-        setItemHeights(prev => ({
+        setItemHeights((prev) => ({
           ...prev,
           [index]: height
         }));
@@ -194,7 +195,7 @@ export const DynamicVirtualList = memo(({
   const handleScroll = useCallback((e) => {
     scrollPositionRef.current = e.target.scrollTop;
     // Force re-render to update visible range
-    setItemHeights(prev => ({ ...prev }));
+    setItemHeights((prev) => ({ ...prev }));
   }, []);
   const visibleItems = items.slice(
     visibleRange.startIndex,
@@ -206,8 +207,8 @@ export const DynamicVirtualList = memo(({
       className={`overflow-auto ${className}`}
       style={{ height }}
       onScroll={handleScroll}
-      {...props}
-    >
+      {...props}>
+
       <div style={{ height: totalHeight, position: 'relative' }}>
         {visibleItems.map((item, relativeIndex) => {
           const index = visibleRange.startIndex + relativeIndex;
@@ -222,15 +223,15 @@ export const DynamicVirtualList = memo(({
                 left: 0,
                 right: 0
               }}
-              ref={(el) => measureItem(index, el)}
-            >
+              ref={(el) => measureItem(index, el)}>
+
               {renderItem(item, index)}
-            </div>
-          );
+            </div>);
+
         })}
       </div>
-    </div>
-  );
+    </div>);
+
 });
 DynamicVirtualList.displayName = 'DynamicVirtualList';
 /**
@@ -268,7 +269,7 @@ export const VirtualGrid = memo(({
   }, [scrollTop, height, itemHeight, gap, overscan, rows, columns, items.length]);
   // Handle container resize
   useEffect(() => {
-    const resizeObserver = new ResizeObserver(entries => {
+    const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         setContainerWidth(entry.contentRect.width);
       }
@@ -292,8 +293,8 @@ export const VirtualGrid = memo(({
       className={`overflow-auto ${className}`}
       style={{ height }}
       onScroll={handleScroll}
-      {...props}
-    >
+      {...props}>
+
       <div style={{ height: totalHeight, position: 'relative' }}>
         {visibleItems.map((item, relativeIndex) => {
           const index = visibleRange.startIndex + relativeIndex;
@@ -309,14 +310,14 @@ export const VirtualGrid = memo(({
                 left: col * (itemWidth + gap),
                 width: itemWidth,
                 height: itemHeight
-              }}
-            >
+              }}>
+
               {renderItem(item, index)}
-            </div>
-          );
+            </div>);
+
         })}
       </div>
-    </div>
-  );
+    </div>);
+
 });
 VirtualGrid.displayName = 'VirtualGrid';

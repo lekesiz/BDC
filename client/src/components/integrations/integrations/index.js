@@ -1,4 +1,5 @@
-export { default as GoogleCalendarIntegration } from './GoogleCalendarIntegration';
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next";export { default as GoogleCalendarIntegration } from './GoogleCalendarIntegration';
 export { default as MicrosoftTeamsIntegration } from './MicrosoftTeamsIntegration';
 export { default as SlackIntegration } from './SlackIntegration';
 export { default as ZoomIntegration } from './ZoomIntegration';

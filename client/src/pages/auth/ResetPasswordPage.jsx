@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -10,18 +11,18 @@ import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import api from '@/lib/api';
 // Validation schema
-const resetPasswordSchema = z.object({
+import { useTranslation } from "react-i18next";const resetPasswordSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  confirm_password: z.string(),
-})
-.refine(data => data.password === data.confirm_password, {
+  confirm_password: z.string()
+}).
+refine((data) => data.password === data.confirm_password, {
   message: "Passwords don't match",
-  path: ['confirm_password'],
+  path: ['confirm_password']
 });
 /**
  * Reset Password page component
  */
-const ResetPasswordPage = () => {
+const ResetPasswordPage = () => {const { t } = useTranslation();
   const { addToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,16 +36,16 @@ const ResetPasswordPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   // React Hook Form with Zod validation
-  const { 
-    register, 
-    handleSubmit, 
+  const {
+    register,
+    handleSubmit,
     formState: { errors },
     reset
   } = useForm({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       password: '',
-      confirm_password: '',
+      confirm_password: ''
     }
   });
   // Verify token on mount
@@ -57,7 +58,7 @@ const ResetPasswordPage = () => {
           addToast({
             type: 'error',
             title: 'Invalid token',
-            message: 'The password reset link is invalid or has expired.',
+            message: 'The password reset link is invalid or has expired.'
           });
           return;
         }
@@ -71,7 +72,7 @@ const ResetPasswordPage = () => {
         addToast({
           type: 'error',
           title: 'Invalid token',
-          message: 'The password reset link is invalid or has expired.',
+          message: 'The password reset link is invalid or has expired.'
         });
       } finally {
         setIsTokenChecking(false);
@@ -86,13 +87,13 @@ const ResetPasswordPage = () => {
       // Call the reset password API
       await api.post('/api/auth/reset-password', {
         token,
-        password: data.password,
+        password: data.password
       });
       // Show success message
       addToast({
         type: 'success',
         title: 'Password reset successful',
-        message: 'Your password has been reset successfully.',
+        message: 'Your password has been reset successfully.'
       });
       // Update UI state
       setIsResetComplete(true);
@@ -103,7 +104,7 @@ const ResetPasswordPage = () => {
       addToast({
         type: 'error',
         title: 'Password reset failed',
-        message: err.response?.data?.message || 'Failed to reset password. Please try again.',
+        message: err.response?.data?.message || 'Failed to reset password. Please try again.'
       });
     } finally {
       setIsLoading(false);
@@ -119,10 +120,10 @@ const ResetPasswordPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Verifying your reset link...</p>
+          <p className="mt-4 text-gray-600">{t("pages.verifying_your_reset_link")}</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
   // Show error for invalid token
   if (!isTokenValid) {
@@ -148,8 +149,8 @@ const ResetPasswordPage = () => {
             </CardContent>
             <CardFooter>
               <Link to="/forgot-password" className="w-full">
-                <Button className="w-full">
-                  Request new reset link
+                <Button className="w-full">{t("pages.request_new_reset_link")}
+
                 </Button>
               </Link>
             </CardFooter>
@@ -157,14 +158,14 @@ const ResetPasswordPage = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               <Link to="/login" className="font-medium text-primary hover:text-primary-dark inline-flex items-center">
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Return to login
+                <ArrowLeft className="h-4 w-4 mr-1" />{t("pages.return_to_login")}
+
               </Link>
             </p>
           </div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -175,106 +176,106 @@ const ResetPasswordPage = () => {
               <span className="text-white font-bold text-2xl">B</span>
             </div>
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Reset your password</h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">{t("pages.reset_your_password")}</h2>
           <p className="mt-2 text-sm text-gray-600">
             <Link to="/login" className="font-medium text-primary hover:text-primary-dark inline-flex items-center">
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Back to login
+              <ArrowLeft className="h-4 w-4 mr-1" />{t("pages.back_to_login")}
+
             </Link>
           </p>
         </div>
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Create new password</CardTitle>
-            <CardDescription>
-              Enter your new password below to reset your account.
+            <CardTitle className="text-xl">{t("pages.create_new_password")}</CardTitle>
+            <CardDescription>{t("pages.enter_your_new_password_below_to_reset_your_accoun")}
+
             </CardDescription>
           </CardHeader>
-          {isResetComplete ? (
-            <CardContent className="space-y-4">
+          {isResetComplete ?
+          <CardContent className="space-y-4">
               <div className="bg-green-50 p-4 rounded-md border border-green-100 flex items-start">
                 <div className="flex-shrink-0">
                   <Check className="h-5 w-5 text-green-500" />
                 </div>
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-green-800">Success!</h3>
-                  <p className="mt-1 text-sm text-green-700">
-                    Your password has been reset successfully. You can now log in with your new password.
-                  </p>
+                  <p className="mt-1 text-sm text-green-700">{t("pages.your_password_has_been_reset_successfully_you_can_")}
+
+                </p>
                 </div>
               </div>
               <Button
-                className="w-full mt-4"
-                onClick={handleLoginClick}
-              >
-                Go to login
-              </Button>
-            </CardContent>
-          ) : (
-            <form onSubmit={handleSubmit(onSubmit)}>
+              className="w-full mt-4"
+              onClick={handleLoginClick}>{t("pages.go_to_login")}
+
+
+            </Button>
+            </CardContent> :
+
+          <form onSubmit={handleSubmit(onSubmit)}>
               <CardContent className="space-y-4">
                 <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  label="New Password"
-                  placeholder="••••••••"
-                  leftIcon={<Lock className="h-4 w-4 text-gray-400" />}
-                  rightIcon={
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-gray-400 hover:text-gray-500"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                label="New Password"
+                placeholder="••••••••"
+                leftIcon={<Lock className="h-4 w-4 text-gray-400" />}
+                rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-gray-400 hover:text-gray-500">
+
+                      {showPassword ?
+                  <EyeOff className="h-4 w-4" /> :
+
+                  <Eye className="h-4 w-4" />
                   }
-                  error={errors.password?.message}
-                  disabled={isLoading}
-                  {...register('password')}
-                />
+                    </button>
+                }
+                error={errors.password?.message}
+                disabled={isLoading}
+                {...register('password')} />
+
                 <Input
-                  id="confirm_password"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  label="Confirm Password"
-                  placeholder="••••••••"
-                  leftIcon={<Lock className="h-4 w-4 text-gray-400" />}
-                  rightIcon={
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="text-gray-400 hover:text-gray-500"
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
+                id="confirm_password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                label="Confirm Password"
+                placeholder="••••••••"
+                leftIcon={<Lock className="h-4 w-4 text-gray-400" />}
+                rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="text-gray-400 hover:text-gray-500">
+
+                      {showConfirmPassword ?
+                  <EyeOff className="h-4 w-4" /> :
+
+                  <Eye className="h-4 w-4" />
                   }
-                  error={errors.confirm_password?.message}
-                  disabled={isLoading}
-                  {...register('confirm_password')}
-                />
+                    </button>
+                }
+                error={errors.confirm_password?.message}
+                disabled={isLoading}
+                {...register('confirm_password')} />
+
               </CardContent>
               <CardFooter>
                 <Button
-                  type="submit"
-                  className="w-full"
-                  isLoading={isLoading}
-                  disabled={isLoading}
-                >
-                  Reset password
-                </Button>
+                type="submit"
+                className="w-full"
+                isLoading={isLoading}
+                disabled={isLoading}>{t("pages.reset_password")}
+
+
+              </Button>
               </CardFooter>
             </form>
-          )}
+          }
         </Card>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export default ResetPasswordPage;

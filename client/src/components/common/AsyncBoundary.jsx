@@ -1,10 +1,11 @@
+// TODO: i18n - processed
 import React from 'react';
 import ErrorBoundary from './ErrorBoundary';
 import { DataState } from './LoadingStates';
 /**
  * Combined component that handles both error boundaries and loading states
  * Simplifies the pattern of wrapping components with both error and loading handling
- */
+ */import { useTranslation } from "react-i18next";
 const AsyncBoundary = ({
   children,
   loading = false,
@@ -24,27 +25,27 @@ const AsyncBoundary = ({
   errorTitle = "Something went wrong",
   errorMessage = "An unexpected error occurred. Please try again.",
   ...props
-}) => {
+}) => {const { t } = useTranslation();
   return (
     <ErrorBoundary
       onError={onError}
       showDetails={showErrorDetails}
       errorTitle={errorTitle}
       errorMessage={errorMessage}
-      {...errorBoundaryProps}
-    >
+      {...errorBoundaryProps}>
+
       <DataState
         loading={loading}
         error={error}
         data={data}
         loadingComponent={loadingComponent}
         errorComponent={errorComponent}
-        emptyComponent={emptyComponent}
-      >
+        emptyComponent={emptyComponent}>
+
         {children}
       </DataState>
-    </ErrorBoundary>
-  );
+    </ErrorBoundary>);
+
 };
 /**
  * Hook to manage async boundary state
@@ -56,13 +57,13 @@ export const useAsyncBoundary = () => {
     data: null
   });
   const setLoading = (loading) => {
-    setState(prev => ({ ...prev, loading }));
+    setState((prev) => ({ ...prev, loading }));
   };
   const setError = (error) => {
-    setState(prev => ({ ...prev, error, loading: false }));
+    setState((prev) => ({ ...prev, error, loading: false }));
   };
   const setData = (data) => {
-    setState(prev => ({ ...prev, data, loading: false, error: null }));
+    setState((prev) => ({ ...prev, data, loading: false, error: null }));
   };
   const reset = () => {
     setState({ loading: false, error: null, data: null });
@@ -79,10 +80,10 @@ export const useAsyncBoundary = () => {
  * HOC to wrap any component with async boundary
  */
 export const withAsyncBoundary = (Component, boundaryProps = {}) => {
-  return (props) => (
-    <AsyncBoundary {...boundaryProps}>
+  return (props) =>
+  <AsyncBoundary {...boundaryProps}>
       <Component {...props} />
-    </AsyncBoundary>
-  );
+    </AsyncBoundary>;
+
 };
 export default AsyncBoundary;

@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
@@ -19,9 +20,9 @@ import {
   AlertCircle,
   ThumbsUp,
   ThumbsDown,
-  Edit
-} from 'lucide-react';
-const AIAutomatedFeedbackPage = () => {
+  Edit } from
+'lucide-react';import { useTranslation } from "react-i18next";
+const AIAutomatedFeedbackPage = () => {const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -103,7 +104,7 @@ const AIAutomatedFeedbackPage = () => {
   };
   const handleApproveFeedback = async (feedbackId) => {
     try {
-      const feedbackToApprove = editingFeedback || feedbacks.find(f => f.id === feedbackId);
+      const feedbackToApprove = editingFeedback || feedbacks.find((f) => f.id === feedbackId);
       const res = await fetch(`/api/ai/automated-feedback/${feedbackId}/approve`, {
         method: 'POST',
         headers: {
@@ -131,7 +132,7 @@ const AIAutomatedFeedbackPage = () => {
     }
   };
   const handleRejectFeedback = async (feedbackId) => {
-    if (!confirm('Are you sure you want to reject this feedback?')) return;
+    if (!confirm(t("pages.are_you_sure_you_want_to_reject_this_feedback"))) return;
     try {
       const res = await fetch(`/api/ai/automated-feedback/${feedbackId}/reject`, {
         method: 'POST',
@@ -165,7 +166,7 @@ const AIAutomatedFeedbackPage = () => {
       if (!res.ok) throw new Error('Failed to regenerate feedback');
       const data = await res.json();
       // Update the feedback in the list
-      setFeedbacks(feedbacks.map(f => f.id === feedbackId ? data : f));
+      setFeedbacks(feedbacks.map((f) => f.id === feedbackId ? data : f));
       setSelectedFeedback(data);
       toast({
         title: 'Success',
@@ -203,63 +204,63 @@ const AIAutomatedFeedbackPage = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>);
+
   }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Bot className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold text-gray-900">AI Automated Feedback</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("pages.ai_automated_feedback")}</h1>
         </div>
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
-            onClick={() => setShowSettings(!showSettings)}
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            Settings
+            onClick={() => setShowSettings(!showSettings)}>
+
+            <Settings className="h-4 w-4 mr-2" />{t("components.settings")}
+
           </Button>
         </div>
       </div>
       {/* Settings Panel */}
-      {showSettings && (
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Feedback Generation Settings</h2>
+      {showSettings &&
+      <Card className="p-6">
+          <h2 className="text-lg font-semibold mb-4">{t("pages.feedback_generation_settings")}</h2>
           <div className="space-y-4">
             <label className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Auto-generate feedback</p>
-                <p className="text-sm text-gray-600">
-                  Automatically generate feedback for test submissions
-                </p>
+                <p className="font-medium">{t("pages.autogenerate_feedback")}</p>
+                <p className="text-sm text-gray-600">{t("pages.automatically_generate_feedback_for_test_submissio")}
+
+              </p>
               </div>
               <Switch
-                checked={feedbackSettings.auto_generate}
-                onCheckedChange={(checked) => 
-                  setFeedbackSettings({ ...feedbackSettings, auto_generate: checked })
-                }
-              />
+              checked={feedbackSettings.auto_generate}
+              onCheckedChange={(checked) =>
+              setFeedbackSettings({ ...feedbackSettings, auto_generate: checked })
+              } />
+
             </label>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Auto-approval threshold
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t("pages.autoapproval_threshold")}
+
+            </label>
               <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={feedbackSettings.auto_approve_threshold}
-                onChange={(e) => 
-                  setFeedbackSettings({ 
-                    ...feedbackSettings, 
-                    auto_approve_threshold: parseFloat(e.target.value) 
-                  })
-                }
-                className="w-full"
-              />
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={feedbackSettings.auto_approve_threshold}
+              onChange={(e) =>
+              setFeedbackSettings({
+                ...feedbackSettings,
+                auto_approve_threshold: parseFloat(e.target.value)
+              })
+              }
+              className="w-full" />
+
               <div className="flex justify-between text-sm text-gray-600">
                 <span>0%</span>
                 <span>Current: {(feedbackSettings.auto_approve_threshold * 100).toFixed(0)}%</span>
@@ -268,93 +269,93 @@ const AIAutomatedFeedbackPage = () => {
             </div>
             <label className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Include improvement suggestions</p>
-                <p className="text-sm text-gray-600">
-                  Add personalized suggestions in feedback
-                </p>
+                <p className="font-medium">{t("pages.include_improvement_suggestions")}</p>
+                <p className="text-sm text-gray-600">{t("pages.add_personalized_suggestions_in_feedback")}
+
+              </p>
               </div>
               <Switch
-                checked={feedbackSettings.include_suggestions}
-                onCheckedChange={(checked) => 
-                  setFeedbackSettings({ ...feedbackSettings, include_suggestions: checked })
-                }
-              />
+              checked={feedbackSettings.include_suggestions}
+              onCheckedChange={(checked) =>
+              setFeedbackSettings({ ...feedbackSettings, include_suggestions: checked })
+              } />
+
             </label>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Feedback tone
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t("pages.feedback_tone")}
+
+            </label>
               <select
-                value={feedbackSettings.tone}
-                onChange={(e) => 
-                  setFeedbackSettings({ ...feedbackSettings, tone: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              >
-                <option value="professional">Professional</option>
-                <option value="encouraging">Encouraging</option>
-                <option value="constructive">Constructive</option>
-                <option value="friendly">Friendly</option>
+              value={feedbackSettings.tone}
+              onChange={(e) =>
+              setFeedbackSettings({ ...feedbackSettings, tone: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-md">
+
+                <option value="professional">{t("components.professional")}</option>
+                <option value="encouraging">{t("pages.encouraging")}</option>
+                <option value="constructive">{t("pages.constructive")}</option>
+                <option value="friendly">{t("pages.friendly")}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Maximum length (words)
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t("pages.maximum_length_words")}
+
+            </label>
               <input
-                type="number"
-                value={feedbackSettings.max_length}
-                onChange={(e) => 
-                  setFeedbackSettings({ ...feedbackSettings, max_length: parseInt(e.target.value) })
-                }
-                min="100"
-                max="1000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
+              type="number"
+              value={feedbackSettings.max_length}
+              onChange={(e) =>
+              setFeedbackSettings({ ...feedbackSettings, max_length: parseInt(e.target.value) })
+              }
+              min="100"
+              max="1000"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+
             </div>
             <div className="flex justify-end">
-              <Button onClick={handleSaveSettings}>
-                Save Settings
-              </Button>
+              <Button onClick={handleSaveSettings}>{t("pages.save_settings")}
+
+            </Button>
             </div>
           </div>
         </Card>
-      )}
+      }
       {/* Filter Tabs */}
       <div className="flex gap-2">
-        {['pending', 'approved', 'rejected', 'all'].map((status) => (
-          <Button
-            key={status}
-            variant={filter === status ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter(status)}
-          >
+        {['pending', 'approved', 'rejected', 'all'].map((status) =>
+        <Button
+          key={status}
+          variant={filter === status ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setFilter(status)}>
+
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </Button>
-        ))}
+        )}
       </div>
       {/* Feedback List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Feedback Queue</h2>
-          {feedbacks.length === 0 ? (
-            <div className="text-center py-8">
+          <h2 className="text-lg font-semibold mb-4">{t("pages.feedback_queue")}</h2>
+          {feedbacks.length === 0 ?
+          <div className="text-center py-8">
               <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No feedbacks to review</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {feedbacks.map((feedback) => (
-                <div
-                  key={feedback.id}
-                  className={`border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow ${
-                    selectedFeedback?.id === feedback.id ? 'border-primary' : ''
-                  }`}
-                  onClick={() => {
-                    setSelectedFeedback(feedback);
-                    setEditingFeedback(null);
-                  }}
-                >
+              <p className="text-gray-500">{t("pages.no_feedbacks_to_review")}</p>
+            </div> :
+
+          <div className="space-y-4">
+              {feedbacks.map((feedback) =>
+            <div
+              key={feedback.id}
+              className={`border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow ${
+              selectedFeedback?.id === feedback.id ? 'border-primary' : ''}`
+              }
+              onClick={() => {
+                setSelectedFeedback(feedback);
+                setEditingFeedback(null);
+              }}>
+
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h3 className="font-medium text-gray-900">
@@ -380,106 +381,106 @@ const AIAutomatedFeedbackPage = () => {
                       </span>
                     </div>
                   </div>
-                  {feedback.status === 'pending' && (
-                    <div className="flex gap-2 mt-3">
+                  {feedback.status === 'pending' &&
+              <div className="flex gap-2 mt-3">
                       <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleApproveFeedback(feedback.id);
-                        }}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                        Approve
-                      </Button>
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleApproveFeedback(feedback.id);
+                  }}>
+
+                        <CheckCircle className="h-4 w-4 mr-1" />{t("pages.approve")}
+
+                </Button>
                       <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRejectFeedback(feedback.id);
-                        }}
-                      >
-                        <XCircle className="h-4 w-4 mr-1" />
-                        Reject
-                      </Button>
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRejectFeedback(feedback.id);
+                  }}>
+
+                        <XCircle className="h-4 w-4 mr-1" />{t("pages.reject")}
+
+                </Button>
                     </div>
-                  )}
+              }
                 </div>
-              ))}
+            )}
             </div>
-          )}
+          }
         </Card>
         {/* Selected Feedback Details */}
-        {selectedFeedback && (
-          <Card className="p-6">
+        {selectedFeedback &&
+        <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Feedback Details</h2>
+              <h2 className="text-lg font-semibold">{t("pages.feedback_details")}</h2>
               <div className="flex gap-2">
-                {selectedFeedback.status === 'pending' && hasRole(['super_admin', 'tenant_admin', 'trainer']) && (
-                  <>
+                {selectedFeedback.status === 'pending' && hasRole(['super_admin', 'tenant_admin', 'trainer']) &&
+              <>
                     <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingFeedback({ ...selectedFeedback })}
-                    >
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditingFeedback({ ...selectedFeedback })}>
+
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleRegenerateFeedback(selectedFeedback.id)}
-                    >
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleRegenerateFeedback(selectedFeedback.id)}>
+
                       <RefreshCw className="h-4 w-4" />
                     </Button>
                   </>
-                )}
+              }
               </div>
             </div>
             <div className="space-y-4">
               <div>
-                <p className="text-sm font-medium text-gray-700">Student</p>
+                <p className="text-sm font-medium text-gray-700">{t("components.student")}</p>
                 <p className="text-gray-900">{selectedFeedback.beneficiary_name}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-700">Test</p>
+                <p className="text-sm font-medium text-gray-700">{t("components.test")}</p>
                 <p className="text-gray-900">{selectedFeedback.test_title}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-700">Score</p>
+                <p className="text-sm font-medium text-gray-700">{t("components.score")}</p>
                 <p className="text-gray-900">{selectedFeedback.score}%</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">Generated Feedback</p>
-                {editingFeedback ? (
-                  <Textarea
-                    value={editingFeedback.content}
-                    onChange={(e) => 
-                      setEditingFeedback({ ...editingFeedback, content: e.target.value })
-                    }
-                    rows={10}
-                    className="w-full"
-                  />
-                ) : (
-                  <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">{t("pages.generated_feedback")}</p>
+                {editingFeedback ?
+              <Textarea
+                value={editingFeedback.content}
+                onChange={(e) =>
+                setEditingFeedback({ ...editingFeedback, content: e.target.value })
+                }
+                rows={10}
+                className="w-full" /> :
+
+
+              <div className="bg-gray-50 rounded-lg p-4">
                     <p className="whitespace-pre-wrap">{selectedFeedback.content}</p>
                   </div>
-                )}
+              }
               </div>
-              {selectedFeedback.suggestions && selectedFeedback.suggestions.length > 0 && (
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Improvement Suggestions</p>
+              {selectedFeedback.suggestions && selectedFeedback.suggestions.length > 0 &&
+            <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">{t("components.improvement_suggestions")}</p>
                   <ul className="list-disc list-inside space-y-1">
-                    {selectedFeedback.suggestions.map((suggestion, index) => (
-                      <li key={index} className="text-sm text-gray-600">
+                    {selectedFeedback.suggestions.map((suggestion, index) =>
+                <li key={index} className="text-sm text-gray-600">
                         {suggestion}
                       </li>
-                    ))}
+                )}
                   </ul>
                 </div>
-              )}
+            }
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">AI Analysis</p>
+                <p className="text-sm font-medium text-gray-700 mb-2">{t("pages.ai_analysis")}</p>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span>Confidence Score:</span>
@@ -492,31 +493,31 @@ const AIAutomatedFeedbackPage = () => {
                     <Badge variant="secondary">{selectedFeedback.sentiment}</Badge>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span>Areas Covered:</span>
+                    <span>{t("pages.areas_covered")}</span>
                     <span>{selectedFeedback.areas_covered?.length || 0}</span>
                   </div>
                 </div>
               </div>
-              {editingFeedback && (
-                <div className="flex gap-2 pt-4">
+              {editingFeedback &&
+            <div className="flex gap-2 pt-4">
                   <Button
-                    onClick={() => handleApproveFeedback(selectedFeedback.id)}
-                  >
-                    Save & Approve
-                  </Button>
+                onClick={() => handleApproveFeedback(selectedFeedback.id)}>{t("pages.save_approve")}
+
+
+              </Button>
                   <Button
-                    variant="outline"
-                    onClick={() => setEditingFeedback(null)}
-                  >
-                    Cancel
-                  </Button>
+                variant="outline"
+                onClick={() => setEditingFeedback(null)}>{t("components.cancel")}
+
+
+              </Button>
                 </div>
-              )}
+            }
             </div>
           </Card>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export default AIAutomatedFeedbackPage;

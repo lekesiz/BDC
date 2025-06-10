@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -10,31 +11,31 @@ import { cn } from '@/lib/utils';
  * @param {object} props.labelProps - Props for the label element
  * @param {number} props.rows - Number of visible text lines
  * @returns {JSX.Element} Textarea component
- */
-const Textarea = React.forwardRef(({ 
-  className, 
+ */import { useTranslation } from "react-i18next";
+const Textarea = React.forwardRef(({
+  className,
   label,
   error,
   labelProps,
   rows = 3,
-  ...props 
+  ...props
 }, ref) => {
   const id = props.id || props.name || React.useId();
   return (
     <div className="w-full space-y-2">
-      {label && (
-        <label 
-          htmlFor={id}
-          className={cn(
-            "block text-sm font-medium text-gray-700",
-            error && "text-red-500",
-            labelProps?.className
-          )}
-          {...labelProps}
-        >
+      {label &&
+      <label
+        htmlFor={id}
+        className={cn(
+          "block text-sm font-medium text-gray-700",
+          error && "text-red-500",
+          labelProps?.className
+        )}
+        {...labelProps}>
+
           {label}
         </label>
-      )}
+      }
       <textarea
         id={id}
         rows={rows}
@@ -47,13 +48,13 @@ const Textarea = React.forwardRef(({
           className
         )}
         ref={ref}
-        {...props}
-      />
-      {error && (
-        <p className="text-sm text-red-500 mt-1">{error}</p>
-      )}
-    </div>
-  );
+        {...props} />
+
+      {error &&
+      <p className="text-sm text-red-500 mt-1">{error}</p>
+      }
+    </div>);
+
 });
 Textarea.displayName = "Textarea";
 export { Textarea };

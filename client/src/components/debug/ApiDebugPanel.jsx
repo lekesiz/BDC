@@ -1,10 +1,11 @@
+// TODO: i18n - processed
 import React, { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-const ApiDebugPanel = () => {
+import { Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';import { useTranslation } from "react-i18next";
+const ApiDebugPanel = () => {const { t } = useTranslation();
   const [tests, setTests] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [config, setConfig] = useState({});
@@ -23,42 +24,42 @@ const ApiDebugPanel = () => {
     setIsRunning(true);
     setTests([]);
     const testCases = [
-      {
-        name: 'Basic Connectivity',
-        endpoint: '/api/health',
-        method: 'GET',
-        auth: false
-      },
-      {
-        name: 'Auth Debug',
-        endpoint: '/api/auth/debug',
-        method: 'GET',
-        auth: false
-      },
-      {
-        name: 'Login Test',
-        endpoint: '/api/auth/login',
-        method: 'POST',
-        auth: false,
-        data: {
-          email: 'admin@bdc.com',
-          password: 'admin123',
-          remember: true
-        }
-      },
-      {
-        name: 'Get Current User',
-        endpoint: '/api/users/me',
-        method: 'GET',
-        auth: true
-      },
-      {
-        name: 'Get Beneficiaries',
-        endpoint: '/api/beneficiaries',
-        method: 'GET',
-        auth: true
+    {
+      name: 'Basic Connectivity',
+      endpoint: '/api/health',
+      method: 'GET',
+      auth: false
+    },
+    {
+      name: 'Auth Debug',
+      endpoint: '/api/auth/debug',
+      method: 'GET',
+      auth: false
+    },
+    {
+      name: 'Login Test',
+      endpoint: '/api/auth/login',
+      method: 'POST',
+      auth: false,
+      data: {
+        email: 'admin@bdc.com',
+        password: 'admin123',
+        remember: true
       }
-    ];
+    },
+    {
+      name: 'Get Current User',
+      endpoint: '/api/users/me',
+      method: 'GET',
+      auth: true
+    },
+    {
+      name: 'Get Beneficiaries',
+      endpoint: '/api/beneficiaries',
+      method: 'GET',
+      auth: true
+    }];
+
     let token = null;
     for (const test of testCases) {
       const startTime = Date.now();
@@ -95,8 +96,8 @@ const ApiDebugPanel = () => {
         result.time = Date.now() - startTime;
         result.response = error.response?.data;
       }
-      setTests(prev => [...prev, result]);
-      await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between tests
+      setTests((prev) => [...prev, result]);
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay between tests
     }
     setIsRunning(false);
   };
@@ -119,34 +120,34 @@ const ApiDebugPanel = () => {
     <div className="p-4 space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>API Debug Panel</CardTitle>
+          <CardTitle>{t("components.api_debug_panel")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>Base URL:</div>
+              <div>{t("components.base_url")}</div>
               <div className="font-mono">{config.baseURL}</div>
-              <div>Environment:</div>
+              <div>{t("components.environment")}</div>
               <div className="font-mono">{config.env}</div>
-              <div>Mock API:</div>
+              <div>{t("components.mock_api")}</div>
               <div className="font-mono">{config.mockApi || 'false'}</div>
-              <div>API URL:</div>
+              <div>{t("components.api_url")}</div>
               <div className="font-mono">{config.apiUrl}</div>
-              <div>With Credentials:</div>
+              <div>{t("components.with_credentials")}</div>
               <div className="font-mono">{String(config.withCredentials)}</div>
             </div>
-            <Button 
-              onClick={runTests} 
+            <Button
+              onClick={runTests}
               disabled={isRunning}
-              className="w-full"
-            >
+              className="w-full">
+
               {isRunning && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isRunning ? 'Running Tests...' : 'Run Connection Tests'}
             </Button>
-            {tests.length > 0 && (
-              <div className="space-y-2">
-                {tests.map((test, index) => (
-                  <Card key={index} className="p-3">
+            {tests.length > 0 &&
+            <div className="space-y-2">
+                {tests.map((test, index) =>
+              <Card key={index} className="p-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {getStatusIcon(test.status)}
@@ -160,29 +161,29 @@ const ApiDebugPanel = () => {
                         <span className="text-sm text-gray-500">{test.time}ms</span>
                       </div>
                     </div>
-                    {test.error && (
-                      <div className="mt-2 text-sm text-red-600">
+                    {test.error &&
+                <div className="mt-2 text-sm text-red-600">
                         Error: {test.error}
                       </div>
-                    )}
-                    {test.response && (
-                      <details className="mt-2">
-                        <summary className="cursor-pointer text-sm text-gray-600">
-                          Response Data
-                        </summary>
+                }
+                    {test.response &&
+                <details className="mt-2">
+                        <summary className="cursor-pointer text-sm text-gray-600">{t("components.response_data")}
+
+                  </summary>
                         <pre className="mt-1 text-xs bg-gray-100 p-2 rounded overflow-auto">
                           {JSON.stringify(test.response, null, 2)}
                         </pre>
                       </details>
-                    )}
+                }
                   </Card>
-                ))}
+              )}
               </div>
-            )}
+            }
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 export default ApiDebugPanel;

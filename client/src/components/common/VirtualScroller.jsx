@@ -1,4 +1,5 @@
-import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+// TODO: i18n - processed
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';import { useTranslation } from "react-i18next";
 const VirtualScroller = ({
   items,
   itemHeight,
@@ -9,7 +10,7 @@ const VirtualScroller = ({
   getItemHeight,
   estimatedItemHeight = 50,
   onScroll
-}) => {
+}) => {const { t } = useTranslation();
   const [scrollTop, setScrollTop] = useState(0);
   const scrollElementRef = useRef(null);
   const isVariableHeight = typeof getItemHeight === 'function';
@@ -30,8 +31,8 @@ const VirtualScroller = ({
   }, [items, isVariableHeight, getItemHeight, estimatedItemHeight]);
   const totalHeight = useMemo(() => {
     if (isVariableHeight && itemPositions) {
-      return itemPositions[itemPositions.length - 1]?.offset + 
-             itemPositions[itemPositions.length - 1]?.height || 0;
+      return itemPositions[itemPositions.length - 1]?.offset +
+      itemPositions[itemPositions.length - 1]?.height || 0;
     }
     return items.length * itemHeight;
   }, [items.length, itemHeight, isVariableHeight, itemPositions]);
@@ -48,9 +49,9 @@ const VirtualScroller = ({
     return itemHeight;
   }, [isVariableHeight, itemPositions, itemHeight, estimatedItemHeight]);
   const visibleRange = useMemo(() => {
-    const startIndex = isVariableHeight
-      ? itemPositions?.findIndex(item => item.offset + item.height > scrollTop) || 0
-      : Math.floor(scrollTop / itemHeight);
+    const startIndex = isVariableHeight ?
+    itemPositions?.findIndex((item) => item.offset + item.height > scrollTop) || 0 :
+    Math.floor(scrollTop / itemHeight);
     let endIndex = startIndex;
     let accumulatedHeight = 0;
     if (isVariableHeight && itemPositions) {
@@ -94,30 +95,30 @@ const VirtualScroller = ({
     <div
       ref={scrollElementRef}
       className={`overflow-auto ${className}`}
-      style={{ height }}
-    >
+      style={{ height }}>
+
       <div
         style={{
           height: totalHeight,
           position: 'relative'
-        }}
-      >
-        {visibleItems.map(({ index, item, offset, height: itemHeightValue }) => (
-          <div
-            key={index}
-            style={{
-              position: 'absolute',
-              top: offset,
-              left: 0,
-              right: 0,
-              height: itemHeightValue
-            }}
-          >
+        }}>
+
+        {visibleItems.map(({ index, item, offset, height: itemHeightValue }) =>
+        <div
+          key={index}
+          style={{
+            position: 'absolute',
+            top: offset,
+            left: 0,
+            right: 0,
+            height: itemHeightValue
+          }}>
+
             {renderItem(item, index)}
           </div>
-        ))}
+        )}
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export default React.memo(VirtualScroller);

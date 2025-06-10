@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render, waitFor } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { BrowserRouter } from 'react-router-dom';
@@ -5,7 +6,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import DashboardPage from '../../pages/dashboard/DashboardPage';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../lib/api';
-import { API_ENDPOINTS } from '../../lib/constants';
+import { API_ENDPOINTS } from '../../lib/constants';import { useTranslation } from "react-i18next";
 vi.mock('../../hooks/useAuth');
 vi.mock('../../lib/api', () => ({
   default: {
@@ -127,7 +128,7 @@ describe('DashboardPage Accessibility', () => {
     for (const table of tables) {
       expect(table).toHaveAttribute('role', 'table');
       const headers = table.querySelectorAll('th');
-      headers.forEach(header => {
+      headers.forEach((header) => {
         expect(header).toHaveAttribute('scope');
       });
     }
@@ -147,7 +148,7 @@ describe('DashboardPage Accessibility', () => {
     if (charts.length === 0) {
       return;
     }
-    charts.forEach(chart => {
+    charts.forEach((chart) => {
       expect(chart).toHaveAttribute('aria-label');
       expect(chart.getAttribute('aria-label')).not.toBe('');
     });
@@ -167,7 +168,7 @@ describe('DashboardPage Accessibility', () => {
     if (interactiveElements.length === 0) {
       return;
     }
-    interactiveElements.forEach(element => {
+    interactiveElements.forEach((element) => {
       // Only test if the element has a tabindex attribute
       if (element.hasAttribute('tabindex')) {
         expect(parseInt(element.getAttribute('tabindex'))).toBeGreaterThanOrEqual(-1);
@@ -189,7 +190,7 @@ describe('DashboardPage Accessibility', () => {
     if (iconButtons.length === 0) {
       return;
     }
-    iconButtons.forEach(icon => {
+    iconButtons.forEach((icon) => {
       const button = icon.closest('button');
       if (button) {
         // Only test buttons that should have an aria-label

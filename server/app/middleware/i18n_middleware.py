@@ -1,13 +1,16 @@
 """Internationalization middleware for automatic language detection and content localization."""
 
 import logging
-from flask import request, g, current_app, session
+import json
+from functools import wraps
+from typing import Dict, Any, Optional, Callable
+from flask import request, g, current_app, session, jsonify
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from werkzeug.exceptions import BadRequest
 
 from app.models.user import User
 from app.models.i18n import UserLanguagePreference
-from app.services.i18n import LanguageDetectionService
+from app.services.i18n import LanguageDetectionService, TranslationService
 from app.extensions import db
 
 logger = logging.getLogger(__name__)
@@ -398,3 +401,72 @@ class RTLSupportMiddleware:
 i18n_middleware = I18nMiddleware()
 content_localization_middleware = ContentLocalizationMiddleware()
 rtl_support_middleware = RTLSupportMiddleware()
+
+
+def i18n_response(f: Callable) -> Callable:
+    """Decorator to ensure response messages are internationalized."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            result = f(*args, **kwargs)
+            
+            # If result is a tuple (response, status_code)
+            if isinstance(result, tuple) and len(result) == 2:
+                response_data, status_code = result
+                
+                # If response_data is a dict, translate messages
+                if isinstance(response_data, dict):
+                    response_data = _translate_response_messages(response_data)
+                
+                return jsonify(response_data), status_code
+            
+            # If result is just data
+            elif isinstance(result, dict):
+                return jsonify(_translate_response_messages(result))
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error in i18n_response decorator: {e}")
+            return result
+    
+    return decorated_function
+
+
+def _translate_response_messages(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Translate response messages marked with $t: prefix."""
+    if not hasattr(g, 'user_language'):
+        return data
+    
+    translation_service = TranslationService()
+    locale = getattr(g, 'user_language', 'en')
+    
+    def translate_value(value: Any, key: str = None) -> Any:
+        """Recursively translate values in the data structure."""
+        if isinstance(value, str):
+            if value.startswith('$t:'):
+                # This is a translation key
+                translation_key = value[3:]  # Remove '$t:' prefix
+                result = translation_service.translate(translation_key, locale)
+                return result.text if result else value
+            # Special handling for known error fields
+            elif key in ['message', 'error', 'description'] and not value.startswith('$t:'):
+                # Try to find a matching translation key
+                from app.utils.i18n_helpers import _find_validation_error_key
+                translation_key = _find_validation_error_key(value)
+                if translation_key:
+                    result = translation_service.translate(translation_key, locale)
+                    return result.text if result else value
+            return value
+        elif isinstance(value, dict):
+            # Special handling for validation errors
+            if key == 'errors':
+                from app.utils.i18n_helpers import translate_validation_errors
+                return translate_validation_errors(value)
+            return {k: translate_value(v, k) for k, v in value.items()}
+        elif isinstance(value, list):
+            return [translate_value(item, key) for item in value]
+        else:
+            return value
+    
+    return translate_value(data)

@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -8,14 +9,14 @@ import { cn } from '@/lib/utils';
  * @param {number} props.max - Maximum value (default: 100)
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Progress component
- */
-export const Progress = React.forwardRef(({ 
+ */import { useTranslation } from "react-i18next";
+export const Progress = React.forwardRef(({
   value = 0,
   max = 100,
   className,
-  ...props 
+  ...props
 }, ref) => {
-  const percentage = Math.min(Math.max(0, (value / max) * 100), 100);
+  const percentage = Math.min(Math.max(0, value / max * 100), 100);
   return (
     <div
       ref={ref}
@@ -27,13 +28,13 @@ export const Progress = React.forwardRef(({
         "relative w-full overflow-hidden rounded-full bg-secondary h-2",
         className
       )}
-      {...props}
-    >
+      {...props}>
+
       <div
         className="h-full w-full flex-1 bg-primary transition-all"
-        style={{ width: `${percentage}%` }}
-      />
-    </div>
-  );
+        style={{ width: `${percentage}%` }} />
+
+    </div>);
+
 });
 Progress.displayName = "Progress";

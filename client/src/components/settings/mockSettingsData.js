@@ -1,4 +1,5 @@
-// Mock Settings Data
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // Mock Settings Data
 export const generateSettingsData = (userRole) => {
   const baseSettings = {
     profile: {
@@ -56,37 +57,37 @@ export const generateSettingsData = (userRole) => {
       twoFactorEnabled: false,
       lastPasswordChange: "2023-12-01",
       activeSessions: [
-        {
-          id: 1,
-          device: "Chrome on Windows",
-          location: "Paris, France",
-          lastActive: new Date().toISOString(),
-          current: true
-        },
-        {
-          id: 2,
-          device: "Mobile App - iOS",
-          location: "Lyon, France",
-          lastActive: new Date(Date.now() - 86400000).toISOString(),
-          current: false
-        }
-      ],
+      {
+        id: 1,
+        device: "Chrome on Windows",
+        location: "Paris, France",
+        lastActive: new Date().toISOString(),
+        current: true
+      },
+      {
+        id: 2,
+        device: "Mobile App - iOS",
+        location: "Lyon, France",
+        lastActive: new Date(Date.now() - 86400000).toISOString(),
+        current: false
+      }],
+
       loginHistory: [
-        {
-          id: 1,
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-          device: "Chrome on Windows",
-          location: "Paris, France",
-          status: "success"
-        },
-        {
-          id: 2,
-          timestamp: new Date(Date.now() - 172800000).toISOString(),
-          device: "Firefox on Mac",
-          location: "London, UK",
-          status: "success"
-        }
-      ]
+      {
+        id: 1,
+        timestamp: new Date(Date.now() - 3600000).toISOString(),
+        device: "Chrome on Windows",
+        location: "Paris, France",
+        status: "success"
+      },
+      {
+        id: 2,
+        timestamp: new Date(Date.now() - 172800000).toISOString(),
+        device: "Firefox on Mac",
+        location: "London, UK",
+        status: "success"
+      }]
+
     },
     appearance: {
       theme: "light",
@@ -159,21 +160,21 @@ export const generateSettingsData = (userRole) => {
           expiryDate: "12/25"
         },
         invoices: [
-          {
-            id: 1,
-            date: "2024-01-15",
-            amount: 499,
-            status: "paid",
-            downloadUrl: "/api/invoices/2024-01-15.pdf"
-          },
-          {
-            id: 2,
-            date: "2023-12-15",
-            amount: 499,
-            status: "paid",
-            downloadUrl: "/api/invoices/2023-12-15.pdf"
-          }
-        ],
+        {
+          id: 1,
+          date: "2024-01-15",
+          amount: 499,
+          status: "paid",
+          downloadUrl: "/api/invoices/2024-01-15.pdf"
+        },
+        {
+          id: 2,
+          date: "2023-12-15",
+          amount: 499,
+          status: "paid",
+          downloadUrl: "/api/invoices/2023-12-15.pdf"
+        }],
+
         usage: {
           users: { current: 234, limit: 500 },
           storage: { current: 45.2, limit: 100, unit: "GB" },
@@ -193,9 +194,9 @@ export const generateSettingsData = (userRole) => {
           preventReuse: 5
         },
         ipWhitelist: [
-          "192.168.1.0/24",
-          "10.0.0.0/16"
-        ],
+        "192.168.1.0/24",
+        "10.0.0.0/16"],
+
         ssoConfig: {
           enabled: true,
           provider: "SAML",
@@ -248,9 +249,9 @@ export const generateSettingsData = (userRole) => {
         },
         specializations: ["JavaScript", "React", "Node.js", "Python"],
         certifications: [
-          { name: "AWS Certified Developer", issueDate: "2023-03-15", expiryDate: "2026-03-15" },
-          { name: "Google Cloud Professional", issueDate: "2023-06-20", expiryDate: "2025-06-20" }
-        ],
+        { name: "AWS Certified Developer", issueDate: "2023-03-15", expiryDate: "2026-03-15" },
+        { name: "Google Cloud Professional", issueDate: "2023-06-20", expiryDate: "2025-06-20" }],
+
         preferredClassSize: 20,
         teachingStyle: "interactive",
         bio: "10+ years of experience in web development and teaching",
@@ -276,10 +277,10 @@ export const generateSettingsData = (userRole) => {
         allowResubmissions: true,
         maxResubmissions: 2,
         rubricTemplates: [
-          { id: 1, name: "Standard Assignment", criteria: 5 },
-          { id: 2, name: "Project Evaluation", criteria: 8 },
-          { id: 3, name: "Presentation", criteria: 6 }
-        ]
+        { id: 1, name: "Standard Assignment", criteria: 5 },
+        { id: 2, name: "Project Evaluation", criteria: 8 },
+        { id: 3, name: "Presentation", criteria: 6 }]
+
       }
     };
   }
@@ -296,10 +297,10 @@ export const generateSettingsData = (userRole) => {
           downloadForOffline: true
         },
         goals: [
-          { id: 1, title: "Complete JavaScript course", deadline: "2024-03-01", progress: 65 },
-          { id: 2, title: "Learn React", deadline: "2024-04-15", progress: 30 },
-          { id: 3, title: "Build portfolio project", deadline: "2024-05-01", progress: 10 }
-        ],
+        { id: 1, title: "Complete JavaScript course", deadline: "2024-03-01", progress: 65 },
+        { id: 2, title: "Learn React", deadline: "2024-04-15", progress: 30 },
+        { id: 3, title: "Build portfolio project", deadline: "2024-05-01", progress: 10 }],
+
         studySchedule: {
           monday: { start: "18:00", end: "20:00" },
           tuesday: { start: "18:00", end: "20:00" },
@@ -314,14 +315,14 @@ export const generateSettingsData = (userRole) => {
       },
       achievements: {
         badges: [
-          { id: 1, name: "Fast Learner", earnedDate: "2023-10-15", description: "Complete 5 courses in 30 days" },
-          { id: 2, name: "Perfect Score", earnedDate: "2023-11-20", description: "Score 100% on an assessment" },
-          { id: 3, name: "Consistent Learner", earnedDate: "2023-12-01", description: "Study for 30 consecutive days" }
-        ],
+        { id: 1, name: "Fast Learner", earnedDate: "2023-10-15", description: "Complete 5 courses in 30 days" },
+        { id: 2, name: "Perfect Score", earnedDate: "2023-11-20", description: "Score 100% on an assessment" },
+        { id: 3, name: "Consistent Learner", earnedDate: "2023-12-01", description: "Study for 30 consecutive days" }],
+
         certificates: [
-          { id: 1, courseName: "HTML & CSS Fundamentals", issueDate: "2023-09-15", verificationCode: "CERT-2023-HTML-001" },
-          { id: 2, courseName: "JavaScript Basics", issueDate: "2023-11-01", verificationCode: "CERT-2023-JS-045" }
-        ],
+        { id: 1, courseName: "HTML & CSS Fundamentals", issueDate: "2023-09-15", verificationCode: "CERT-2023-HTML-001" },
+        { id: 2, courseName: "JavaScript Basics", issueDate: "2023-11-01", verificationCode: "CERT-2023-JS-045" }],
+
         points: 2450,
         rank: 15,
         totalStudents: 234
@@ -332,11 +333,11 @@ export const generateSettingsData = (userRole) => {
         startDate: "2023-06-15",
         endDate: "2024-06-15",
         features: [
-          "Unlimited course access",
-          "Offline downloads",
-          "Priority support",
-          "Certificates of completion"
-        ],
+        "Unlimited course access",
+        "Offline downloads",
+        "Priority support",
+        "Certificates of completion"],
+
         autoRenew: true,
         nextBillingAmount: 29.99,
         currency: "EUR"
@@ -349,66 +350,66 @@ export const generateSettingsData = (userRole) => {
 export const generateSettingsOptions = () => {
   return {
     languages: [
-      { code: "en", name: "English" },
-      { code: "fr", name: "Français" },
-      { code: "es", name: "Español" },
-      { code: "de", name: "Deutsch" },
-      { code: "it", name: "Italiano" }
-    ],
+    { code: "en", name: "English" },
+    { code: "fr", name: "Français" },
+    { code: "es", name: "Español" },
+    { code: "de", name: "Deutsch" },
+    { code: "it", name: "Italiano" }],
+
     timezones: [
-      { value: "Europe/Paris", label: "Paris (GMT+1)" },
-      { value: "Europe/London", label: "London (GMT)" },
-      { value: "America/New_York", label: "New York (GMT-5)" },
-      { value: "America/Los_Angeles", label: "Los Angeles (GMT-8)" },
-      { value: "Asia/Tokyo", label: "Tokyo (GMT+9)" }
-    ],
+    { value: "Europe/Paris", label: "Paris (GMT+1)" },
+    { value: "Europe/London", label: "London (GMT)" },
+    { value: "America/New_York", label: "New York (GMT-5)" },
+    { value: "America/Los_Angeles", label: "Los Angeles (GMT-8)" },
+    { value: "Asia/Tokyo", label: "Tokyo (GMT+9)" }],
+
     themes: [
-      { value: "light", label: "Light" },
-      { value: "dark", label: "Dark" },
-      { value: "auto", label: "Auto (System)" }
-    ],
+    { value: "light", label: "Light" },
+    { value: "dark", label: "Dark" },
+    { value: "auto", label: "Auto (System)" }],
+
     fontSizes: [
-      { value: "small", label: "Small" },
-      { value: "medium", label: "Medium" },
-      { value: "large", label: "Large" }
-    ],
+    { value: "small", label: "Small" },
+    { value: "medium", label: "Medium" },
+    { value: "large", label: "Large" }],
+
     gradingScales: [
-      { value: "percentage", label: "Percentage (0-100%)" },
-      { value: "letter", label: "Letter Grade (A-F)" },
-      { value: "points", label: "Points" },
-      { value: "passfail", label: "Pass/Fail" }
-    ],
+    { value: "percentage", label: "Percentage (0-100%)" },
+    { value: "letter", label: "Letter Grade (A-F)" },
+    { value: "points", label: "Points" },
+    { value: "passfail", label: "Pass/Fail" }],
+
     learningStyles: [
-      { value: "visual", label: "Visual" },
-      { value: "auditory", label: "Auditory" },
-      { value: "reading", label: "Reading/Writing" },
-      { value: "kinesthetic", label: "Kinesthetic" }
-    ],
+    { value: "visual", label: "Visual" },
+    { value: "auditory", label: "Auditory" },
+    { value: "reading", label: "Reading/Writing" },
+    { value: "kinesthetic", label: "Kinesthetic" }],
+
     playbackSpeeds: [
-      { value: 0.5, label: "0.5x" },
-      { value: 0.75, label: "0.75x" },
-      { value: 1.0, label: "1x (Normal)" },
-      { value: 1.25, label: "1.25x" },
-      { value: 1.5, label: "1.5x" },
-      { value: 2.0, label: "2x" }
-    ]
+    { value: 0.5, label: "0.5x" },
+    { value: 0.75, label: "0.75x" },
+    { value: 1.0, label: "1x (Normal)" },
+    { value: 1.25, label: "1.25x" },
+    { value: 1.5, label: "1.5x" },
+    { value: 2.0, label: "2x" }]
+
   };
 };
 // Generate data export options
 export const generateDataExportOptions = () => {
   return {
     formats: [
-      { value: "json", label: "JSON", icon: "file-code" },
-      { value: "csv", label: "CSV", icon: "file-csv" },
-      { value: "pdf", label: "PDF", icon: "file-pdf" },
-      { value: "xlsx", label: "Excel", icon: "file-excel" }
-    ],
+    { value: "json", label: "JSON", icon: "file-code" },
+    { value: "csv", label: "CSV", icon: "file-csv" },
+    { value: "pdf", label: "PDF", icon: "file-pdf" },
+    { value: "xlsx", label: "Excel", icon: "file-excel" }],
+
     dataTypes: [
-      { value: "profile", label: "Profile Information" },
-      { value: "courses", label: "Course Progress" },
-      { value: "certificates", label: "Certificates" },
-      { value: "grades", label: "Grades & Assessments" },
-      { value: "all", label: "All Data" }
-    ]
+    { value: "profile", label: "Profile Information" },
+    { value: "courses", label: "Course Progress" },
+    { value: "certificates", label: "Certificates" },
+    { value: "grades", label: "Grades & Assessments" },
+    { value: "all", label: "All Data" }]
+
   };
 };

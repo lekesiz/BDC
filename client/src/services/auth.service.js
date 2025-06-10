@@ -1,10 +1,11 @@
+// TODO: i18n - processed
 import api from './api';
 /**
  * Log in a user
  * @param {string} email - User email
  * @param {string} password - User password
  * @returns {Promise<Object>} User data and token
- */
+ */import { useTranslation } from "react-i18next";
 export const login = async (email, password) => {
   try {
     const response = await api.post('/api/auth/login', { email, password });
@@ -86,9 +87,9 @@ export const resetPassword = async (token, password) => {
  */
 export const changePassword = async (currentPassword, newPassword) => {
   try {
-    const response = await api.post('/api/auth/change-password', { 
-      currentPassword, 
-      newPassword 
+    const response = await api.post('/api/auth/change-password', {
+      currentPassword,
+      newPassword
     });
     return response.data;
   } catch (error) {

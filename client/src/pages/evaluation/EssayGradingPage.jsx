@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -15,9 +16,9 @@ import {
   Clock,
   FileText,
   Award,
-  MessageSquare
-} from 'lucide-react';
-const EssayGradingPage = () => {
+  MessageSquare } from
+'lucide-react';import { useTranslation } from "react-i18next";
+const EssayGradingPage = () => {const { t } = useTranslation();
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -65,7 +66,7 @@ const EssayGradingPage = () => {
       // Initialize feedback and scores
       const initialFeedback = {};
       const initialScores = {};
-      data.forEach(submission => {
+      data.forEach((submission) => {
         initialFeedback[submission.id] = submission.feedback || '';
         initialScores[submission.id] = submission.score || 0;
       });
@@ -102,10 +103,10 @@ const EssayGradingPage = () => {
         description: 'Grade saved successfully'
       });
       // Update submission status
-      const updatedSubmissions = submissions.map(sub => 
-        sub.id === submissionId 
-          ? { ...sub, graded: true, score: scores[submissionId], feedback: feedback[submissionId] }
-          : sub
+      const updatedSubmissions = submissions.map((sub) =>
+      sub.id === submissionId ?
+      { ...sub, graded: true, score: scores[submissionId], feedback: feedback[submissionId] } :
+      sub
       );
       setSubmissions(updatedSubmissions);
     } catch (error) {
@@ -133,27 +134,27 @@ const EssayGradingPage = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>);
+
   }
   if (submissions.length === 0) {
     return (
       <div className="text-center py-12">
         <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <p className="text-gray-500">No essay submissions to grade</p>
+        <p className="text-gray-500">{t("pages.no_essay_submissions_to_grade")}</p>
         <Button
           variant="outline"
           className="mt-4"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Go Back
+          onClick={() => navigate(-1)}>
+
+          <ArrowLeft className="h-4 w-4 mr-2" />{t("components.go_back")}
+
         </Button>
-      </div>
-    );
+      </div>);
+
   }
   const currentSub = submissions[currentSubmission];
-  const gradedCount = submissions.filter(s => s.graded).length;
+  const gradedCount = submissions.filter((s) => s.graded).length;
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -161,12 +162,12 @@ const EssayGradingPage = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            onClick={() => navigate(-1)}>
+
+            <ArrowLeft className="h-4 w-4 mr-2" />{t("components.back")}
+
           </Button>
-          <h1 className="text-2xl font-bold text-gray-900">Essay Grading</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("pages.essay_grading")}</h1>
           <Badge variant="outline">
             {gradedCount} of {submissions.length} graded
           </Badge>
@@ -176,8 +177,8 @@ const EssayGradingPage = () => {
       <div className="bg-gray-200 rounded-full h-2">
         <div
           className="bg-primary h-2 rounded-full transition-all"
-          style={{ width: `${(gradedCount / submissions.length) * 100}%` }}
-        />
+          style={{ width: `${gradedCount / submissions.length * 100}%` }} />
+
       </div>
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -185,19 +186,19 @@ const EssayGradingPage = () => {
         <div className="lg:col-span-2">
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">
-                Submission {currentSubmission + 1} of {submissions.length}
+              <h2 className="text-lg font-semibold">{t("pages.submission")}
+                {currentSubmission + 1} of {submissions.length}
               </h2>
-              {currentSub.graded && (
-                <Badge variant="success">
-                  <CheckCircle className="h-4 w-4 mr-1" />
-                  Graded
-                </Badge>
-              )}
+              {currentSub.graded &&
+              <Badge variant="success">
+                  <CheckCircle className="h-4 w-4 mr-1" />{t("pages.graded")}
+
+              </Badge>
+              }
             </div>
             <div className="space-y-4">
               <div>
-                <h3 className="font-medium text-gray-900 mb-2">Student Information</h3>
+                <h3 className="font-medium text-gray-900 mb-2">{t("pages.student_information")}</h3>
                 <p className="text-sm text-gray-600">
                   Name: {currentSub.student_name}
                 </p>
@@ -209,20 +210,20 @@ const EssayGradingPage = () => {
                 </p>
               </div>
               <div>
-                <h3 className="font-medium text-gray-900 mb-2">Essay Question</h3>
+                <h3 className="font-medium text-gray-900 mb-2">{t("pages.essay_question")}</h3>
                 <p className="text-gray-700 bg-gray-50 p-3 rounded">
                   {currentSub.question}
                 </p>
               </div>
               <div>
-                <h3 className="font-medium text-gray-900 mb-2">Student Answer</h3>
+                <h3 className="font-medium text-gray-900 mb-2">{t("pages.student_answer")}</h3>
                 <div className="bg-gray-50 p-4 rounded whitespace-pre-wrap">
                   {currentSub.answer}
                 </div>
               </div>
               <div>
-                <p className="text-sm text-gray-500">
-                  Word count: {currentSub.answer.split(/\s+/).length} words
+                <p className="text-sm text-gray-500">{t("pages.word_count")}
+                  {currentSub.answer.split(/\s+/).length} words
                 </p>
               </div>
             </div>
@@ -231,11 +232,11 @@ const EssayGradingPage = () => {
         {/* Grading Panel */}
         <div>
           <Card className="p-6 sticky top-6">
-            <h2 className="text-lg font-semibold mb-4">Grading</h2>
+            <h2 className="text-lg font-semibold mb-4">{t("pages.grading")}</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Score ({currentSub.max_score} points max)
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t("pages.score_")}
+                  {currentSub.max_score}{t("pages.points_max")}
                 </label>
                 <Input
                   type="number"
@@ -246,12 +247,12 @@ const EssayGradingPage = () => {
                   })}
                   min="0"
                   max={currentSub.max_score}
-                  className="w-32"
-                />
+                  className="w-32" />
+
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Feedback
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t("pages.feedback")}
+
                 </label>
                 <Textarea
                   value={feedback[currentSub.id] || ''}
@@ -260,59 +261,59 @@ const EssayGradingPage = () => {
                     [currentSub.id]: e.target.value
                   })}
                   rows={6}
-                  placeholder="Provide feedback for the student..."
-                />
+                  placeholder="Provide feedback for the student..." />
+
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Grading Rubric</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">{t("pages.grading_rubric")}</h3>
                 <div className="text-sm text-gray-600 space-y-1 bg-gray-50 p-3 rounded">
-                  <p>• Content accuracy and relevance</p>
-                  <p>• Writing clarity and structure</p>
-                  <p>• Critical thinking demonstrated</p>
+                  <p>{t("pages._content_accuracy_and_relevance")}</p>
+                  <p>{t("pages._writing_clarity_and_structure")}</p>
+                  <p>{t("pages._critical_thinking_demonstrated")}</p>
                   <p>• Use of examples and evidence</p>
-                  <p>• Grammar and spelling</p>
+                  <p>{t("pages._grammar_and_spelling")}</p>
                 </div>
               </div>
               <Button
                 onClick={() => handleSaveGrade(currentSub.id)}
                 disabled={saving}
-                className="w-full"
-              >
-                {saving ? (
-                  <>
+                className="w-full">
+
+                {saving ?
+                <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Grade
-                  </>
-                )}
+                  </> :
+
+                <>
+                    <Save className="h-4 w-4 mr-2" />{t("pages.save_grade")}
+
+                </>
+                }
               </Button>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   onClick={handlePrevious}
                   disabled={currentSubmission === 0}
-                  className="flex-1"
-                >
-                  Previous
+                  className="flex-1">{t("components.previous")}
+
+
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleNext}
                   disabled={currentSubmission === submissions.length - 1}
-                  className="flex-1"
-                >
-                  Next
+                  className="flex-1">{t("components.next")}
+
+
                 </Button>
               </div>
             </div>
           </Card>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export default EssayGradingPage;

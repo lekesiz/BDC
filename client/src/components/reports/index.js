@@ -1,4 +1,5 @@
-export { default as ReportBuilder } from './ReportBuilder';
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next";export { default as ReportBuilder } from './ReportBuilder';
 export { default as ReportWidget } from './ReportWidget';
 export { default as ReportSection } from './ReportSection';
 export { default as ReportPreview } from './ReportPreview';

@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -6,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/toast';
 import api from '@/lib/api';
 // Mock the modules
-vi.mock('@/hooks/useAuth');
+import { useTranslation } from "react-i18next";vi.mock('@/hooks/useAuth');
 vi.mock('@/components/ui/toast');
 vi.mock('@/lib/api');
 // Mock router
@@ -15,7 +16,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useParams: () => ({ id: '123' }),
-    useNavigate: () => mockNavigate,
+    useNavigate: () => mockNavigate
   };
 });
 // Mock navigate function
@@ -42,99 +43,99 @@ const mockBeneficiary = {
   session_count: 2,
   trainer_count: 2,
   notes: [
-    {
-      id: '1',
-      title: 'Test Note',
-      content: 'This is a test note',
-      created_at: '2023-01-02T00:00:00Z',
-      created_by_name: 'Test User'
-    }
-  ],
+  {
+    id: '1',
+    title: 'Test Note',
+    content: 'This is a test note',
+    created_at: '2023-01-02T00:00:00Z',
+    created_by_name: 'Test User'
+  }],
+
   recent_activities: [
-    {
-      description: 'Completed an evaluation',
-      timestamp: '2023-01-03T00:00:00Z',
-      icon: 'PieChart'
-    }
-  ]
+  {
+    description: 'Completed an evaluation',
+    timestamp: '2023-01-03T00:00:00Z',
+    icon: 'PieChart'
+  }]
+
 };
 const mockEvaluations = {
   evaluations: [
-    {
-      id: '1',
-      title: 'Initial Assessment',
-      description: 'First evaluation for beneficiary',
-      status: 'completed',
-      evaluation_date: '2023-01-05T00:00:00Z',
-      evaluator_name: 'Test Evaluator',
-      score: 85,
-      max_score: 100,
-      percentage_score: 85,
-      time_taken: '45 minutes'
-    }
-  ]
+  {
+    id: '1',
+    title: 'Initial Assessment',
+    description: 'First evaluation for beneficiary',
+    status: 'completed',
+    evaluation_date: '2023-01-05T00:00:00Z',
+    evaluator_name: 'Test Evaluator',
+    score: 85,
+    max_score: 100,
+    percentage_score: 85,
+    time_taken: '45 minutes'
+  }]
+
 };
 const mockSessions = {
   sessions: [
-    {
-      id: '1',
-      title: 'Introduction Session',
-      description: 'Initial meeting and overview',
-      status: 'completed',
-      scheduled_at: '2023-01-10T00:00:00Z',
-      duration: 60,
-      trainer_name: 'Test Trainer',
-      location: 'Online'
-    }
-  ]
-};
-const mockTrainers = [
   {
     id: '1',
-    first_name: 'Jane',
-    last_name: 'Smith',
-    email: 'jane@example.com',
-    profile_picture: null,
-    assigned_date: '2023-01-15T00:00:00Z',
-    session_count: 2
-  }
-];
+    title: 'Introduction Session',
+    description: 'Initial meeting and overview',
+    status: 'completed',
+    scheduled_at: '2023-01-10T00:00:00Z',
+    duration: 60,
+    trainer_name: 'Test Trainer',
+    location: 'Online'
+  }]
+
+};
+const mockTrainers = [
+{
+  id: '1',
+  first_name: 'Jane',
+  last_name: 'Smith',
+  email: 'jane@example.com',
+  profile_picture: null,
+  assigned_date: '2023-01-15T00:00:00Z',
+  session_count: 2
+}];
+
 const mockProgress = {
   overall_percentage: 65,
   completed_evaluations: 3,
   average_score: 78,
   improvement_rate: 12,
   skills: [
-    {
-      id: '1',
-      name: 'Communication',
-      proficiency_level: 'Intermediate',
-      progress_percentage: 70,
-      last_evaluated_at: '2023-01-20T00:00:00Z'
-    }
-  ],
+  {
+    id: '1',
+    name: 'Communication',
+    proficiency_level: 'Intermediate',
+    progress_percentage: 70,
+    last_evaluated_at: '2023-01-20T00:00:00Z'
+  }],
+
   growth_areas: [
-    {
-      title: 'Technical Skills',
-      description: 'Needs improvement in technical knowledge'
-    }
-  ]
+  {
+    title: 'Technical Skills',
+    description: 'Needs improvement in technical knowledge'
+  }]
+
 };
 const mockDocuments = {
   documents: [
-    {
-      id: '1',
-      name: 'Evaluation Report',
-      description: 'Detailed assessment results',
-      type: 'evaluation_report',
-      created_at: '2023-01-25T00:00:00Z',
-      size_formatted: '1.2 MB',
-      file_type: 'pdf',
-      uploaded_by_name: 'Test Uploader',
-      view_url: '/documents/1/view',
-      download_url: '/documents/1/download'
-    }
-  ]
+  {
+    id: '1',
+    name: 'Evaluation Report',
+    description: 'Detailed assessment results',
+    type: 'evaluation_report',
+    created_at: '2023-01-25T00:00:00Z',
+    size_formatted: '1.2 MB',
+    file_type: 'pdf',
+    uploaded_by_name: 'Test Uploader',
+    view_url: '/documents/1/view',
+    download_url: '/documents/1/download'
+  }]
+
 };
 // Mock Auth hook
 const mockHasRole = vi.fn();

@@ -1,19 +1,20 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Bell, 
-  CheckCheck, 
-  Calendar, 
-  FileText, 
-  MessageSquare, 
-  User, 
+import {
+  Bell,
+  CheckCheck,
+  Calendar,
+  FileText,
+  MessageSquare,
+  User,
   AlertCircle,
   Activity,
   Check,
   MoreHorizontal,
   ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+  ChevronRight } from
+'lucide-react';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,8 +24,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 /**
  * NotificationsPage displays user notifications with filtering and management options
- */
-const NotificationsPage = () => {
+ */import { useTranslation } from "react-i18next";
+const NotificationsPage = () => {const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -37,13 +38,13 @@ const NotificationsPage = () => {
   const itemsPerPage = 10;
   // Filter options
   const filters = [
-    { id: 'all', label: 'All', icon: Bell },
-    { id: 'unread', label: 'Unread', icon: AlertCircle },
-    { id: 'appointments', label: 'Appointments', icon: Calendar },
-    { id: 'documents', label: 'Documents', icon: FileText },
-    { id: 'messages', label: 'Messages', icon: MessageSquare },
-    { id: 'system', label: 'System', icon: Activity },
-  ];
+  { id: 'all', label: 'All', icon: Bell },
+  { id: 'unread', label: 'Unread', icon: AlertCircle },
+  { id: 'appointments', label: 'Appointments', icon: Calendar },
+  { id: 'documents', label: 'Documents', icon: FileText },
+  { id: 'messages', label: 'Messages', icon: MessageSquare },
+  { id: 'system', label: 'System', icon: Activity }];
+
   // Fetch notifications
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -64,7 +65,7 @@ const NotificationsPage = () => {
         toast({
           title: 'Error',
           description: 'Failed to load notifications',
-          type: 'error',
+          type: 'error'
         });
       } finally {
         setIsLoading(false);
@@ -94,19 +95,19 @@ const NotificationsPage = () => {
     try {
       await api.post(`/api/notifications/${notificationId}/mark-read`);
       // Update notification in the list
-      setNotifications(prev => 
-        prev.map(notif => 
-          notif.id === notificationId 
-            ? { ...notif, is_read: true } 
-            : notif
-        )
+      setNotifications((prev) =>
+      prev.map((notif) =>
+      notif.id === notificationId ?
+      { ...notif, is_read: true } :
+      notif
+      )
       );
     } catch (error) {
       console.error('Error marking notification as read:', error);
       toast({
         title: 'Error',
         description: 'Failed to mark notification as read',
-        type: 'error',
+        type: 'error'
       });
     }
   };
@@ -115,20 +116,20 @@ const NotificationsPage = () => {
     try {
       await api.post('/api/notifications/mark-all-read');
       // Update all notifications in the list
-      setNotifications(prev => 
-        prev.map(notif => ({ ...notif, is_read: true }))
+      setNotifications((prev) =>
+      prev.map((notif) => ({ ...notif, is_read: true }))
       );
       toast({
         title: 'Success',
         description: 'All notifications marked as read',
-        type: 'success',
+        type: 'success'
       });
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       toast({
         title: 'Error',
         description: 'Failed to mark all notifications as read',
-        type: 'error',
+        type: 'error'
       });
     }
   };
@@ -158,58 +159,58 @@ const NotificationsPage = () => {
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Notifications</h1>
+        <h1 className="text-2xl font-bold">{t("components.notifications")}</h1>
         <Button
           variant="outline"
           onClick={markAllAsRead}
-          className="flex items-center"
-        >
-          <CheckCheck className="w-4 h-4 mr-2" />
-          Mark All as Read
+          className="flex items-center">
+
+          <CheckCheck className="w-4 h-4 mr-2" />{t("pages.mark_all_as_read")}
+
         </Button>
       </div>
       {/* Filters */}
       <div className="flex overflow-x-auto mb-6 pb-2">
-        {filters.map(filter => (
-          <Button
-            key={filter.id}
-            variant={activeFilter === filter.id ? 'default' : 'outline'}
-            className="mr-2 flex items-center whitespace-nowrap"
-            onClick={() => {
-              setActiveFilter(filter.id);
-              setCurrentPage(1);
-            }}
-          >
+        {filters.map((filter) =>
+        <Button
+          key={filter.id}
+          variant={activeFilter === filter.id ? 'default' : 'outline'}
+          className="mr-2 flex items-center whitespace-nowrap"
+          onClick={() => {
+            setActiveFilter(filter.id);
+            setCurrentPage(1);
+          }}>
+
             <filter.icon className="w-4 h-4 mr-2" />
             {filter.label}
-            {filter.id === 'unread' && (
-              <span className="ml-2 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {notifications.filter(n => !n.is_read).length}
+            {filter.id === 'unread' &&
+          <span className="ml-2 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {notifications.filter((n) => !n.is_read).length}
               </span>
-            )}
+          }
           </Button>
-        ))}
+        )}
       </div>
       {/* Notifications List */}
       <Card className="divide-y">
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
+        {isLoading ?
+        <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
-        ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center text-gray-500">
+          </div> :
+        notifications.length === 0 ?
+        <div className="flex flex-col items-center justify-center py-12 text-center text-gray-500">
             <Bell className="w-12 h-12 text-gray-300 mb-3" />
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No notifications</h3>
-            <p>You're all caught up!</p>
-          </div>
-        ) : (
-          <>
-            {notifications.map(notification => (
-              <div 
-                key={notification.id}
-                className={`flex p-4 cursor-pointer hover:bg-gray-50 ${!notification.is_read ? 'bg-blue-50' : ''}`}
-                onClick={() => handleNotificationClick(notification)}
-              >
+            <h3 className="text-lg font-medium text-gray-900 mb-1">{t("components.no_notifications")}</h3>
+            <p>{t("pages.youre_all_caught_up")}</p>
+          </div> :
+
+        <>
+            {notifications.map((notification) =>
+          <div
+            key={notification.id}
+            className={`flex p-4 cursor-pointer hover:bg-gray-50 ${!notification.is_read ? 'bg-blue-50' : ''}`}
+            onClick={() => handleNotificationClick(notification)}>
+
                 <div className="flex-shrink-0 mr-4">
                   <div className={`p-2 rounded-full ${!notification.is_read ? 'bg-blue-100' : 'bg-gray-100'}`}>
                     {getNotificationIcon(notification)}
@@ -228,50 +229,50 @@ const NotificationsPage = () => {
                     <div className="ml-4 flex-shrink-0 flex flex-col items-end">
                       <span className="text-xs text-gray-500">
                         {formatDistanceToNow(new Date(notification.created_at), {
-                          addSuffix: true,
-                          locale: tr
-                        })}
+                      addSuffix: true,
+                      locale: tr
+                    })}
                       </span>
-                      {!notification.is_read && (
-                        <span className="mt-1 bg-primary w-2 h-2 rounded-full"></span>
-                      )}
+                      {!notification.is_read &&
+                  <span className="mt-1 bg-primary w-2 h-2 rounded-full"></span>
+                  }
                     </div>
                   </div>
-                  {notification.action_text && (
-                    <div className="mt-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleNotificationClick(notification);
-                        }}
-                      >
+                  {notification.action_text &&
+              <div className="mt-2">
+                      <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNotificationClick(notification);
+                  }}>
+
                         {notification.action_text}
                       </Button>
                     </div>
-                  )}
+              }
                 </div>
                 <div className="ml-2">
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-400 hover:text-gray-500"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // In a real app, this would show a dropdown menu
-                    }}
-                  >
+                variant="ghost"
+                size="icon"
+                className="text-gray-400 hover:text-gray-500"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // In a real app, this would show a dropdown menu
+                }}>
+
                     <MoreHorizontal className="h-5 w-5" />
                   </Button>
                 </div>
               </div>
-            ))}
+          )}
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-between items-center p-4">
-                <div className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
+            {totalPages > 1 &&
+          <div className="flex justify-between items-center p-4">
+                <div className="text-sm text-gray-700">{t("components.showing")}
+              <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
                   <span className="font-medium">
                     {Math.min(currentPage * itemsPerPage, (currentPage - 1) * itemsPerPage + notifications.length)}
                   </span> of{' '}
@@ -279,26 +280,26 @@ const NotificationsPage = () => {
                 </div>
                 <div className="flex space-x-2">
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={goToPreviousPage}
-                    disabled={currentPage === 1}
-                  >
+                variant="outline"
+                size="sm"
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}>
+
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={goToNextPage}
-                    disabled={currentPage === totalPages}
-                  >
+                variant="outline"
+                size="sm"
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}>
+
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
-            )}
+          }
           </>
-        )}
+        }
       </Card>
       <div className="mt-6 bg-blue-50 p-4 rounded-lg">
         <div className="flex">
@@ -306,39 +307,39 @@ const NotificationsPage = () => {
             <Info className="h-5 w-5 text-blue-400" />
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800">Notification Settings</h3>
+            <h3 className="text-sm font-medium text-blue-800">{t("components.notification_settings")}</h3>
             <div className="mt-2 text-sm text-blue-700">
               <p>
                 You can customize your notification preferences in the{' '}
-                <Button 
-                  variant="link" 
+                <Button
+                  variant="link"
                   className="p-0 h-auto text-blue-600 font-medium"
-                  onClick={() => navigate('/settings/notifications')}
-                >
-                  Settings
-                </Button>{' '}
-                page.
+                  onClick={() => navigate('/settings/notifications')}>{t("components.settings")}
+
+
+                </Button>{' '}{t("pages.page")}
+
               </p>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 // Info icon component
-const Info = ({ className }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-    className={className}
-  >
+const Info = ({ className }) =>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+  className={className}>
+
     <path
-      fillRule="evenodd"
-      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-      clipRule="evenodd"
-    />
-  </svg>
-);
+    fillRule="evenodd"
+    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+    clipRule="evenodd" />
+
+  </svg>;
+
 export default NotificationsPage;

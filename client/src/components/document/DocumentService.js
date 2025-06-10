@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * DocumentService - Handles document operations (upload, download, processing)
  */
@@ -5,7 +6,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 /**
  * Supported document types and their corresponding mime types
- */
+ */import { useTranslation } from "react-i18next";
 export const SUPPORTED_DOCUMENT_TYPES = {
   // PDF documents
   pdf: {
@@ -17,12 +18,12 @@ export const SUPPORTED_DOCUMENT_TYPES = {
   // Images
   image: {
     mimeTypes: [
-      'image/jpeg', 
-      'image/png', 
-      'image/gif', 
-      'image/svg+xml', 
-      'image/webp'
-    ],
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/svg+xml',
+    'image/webp'],
+
     maxSize: 20 * 1024 * 1024, // 20MB
     preview: true,
     extensions: ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp']
@@ -30,13 +31,13 @@ export const SUPPORTED_DOCUMENT_TYPES = {
   // Microsoft Office documents
   office: {
     mimeTypes: [
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-powerpoint',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-    ],
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation'],
+
     maxSize: 25 * 1024 * 1024, // 25MB
     preview: true,
     extensions: ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx']
@@ -51,11 +52,11 @@ export const SUPPORTED_DOCUMENT_TYPES = {
   // Archives
   archive: {
     mimeTypes: [
-      'application/zip', 
-      'application/x-rar-compressed', 
-      'application/x-7z-compressed',
-      'application/gzip'
-    ],
+    'application/zip',
+    'application/x-rar-compressed',
+    'application/x-7z-compressed',
+    'application/gzip'],
+
     maxSize: 100 * 1024 * 1024, // 100MB
     preview: false,
     extensions: ['.zip', '.rar', '.7z', '.gz', '.tar.gz']
@@ -91,8 +92,8 @@ export const getDocumentType = (filename, mimeType) => {
  */
 export const isPreviewSupported = (filename, mimeType) => {
   const documentType = getDocumentType(filename, mimeType);
-  return documentType !== 'unknown' && 
-         SUPPORTED_DOCUMENT_TYPES[documentType]?.preview === true;
+  return documentType !== 'unknown' &&
+  SUPPORTED_DOCUMENT_TYPES[documentType]?.preview === true;
 };
 /**
  * Formats bytes to human-readable size
@@ -162,7 +163,7 @@ export const uploadDocument = async (file, metadata = {}, onProgress = null) => 
       },
       onUploadProgress: (event) => {
         if (onProgress) {
-          const percentCompleted = Math.round((event.loaded * 100) / event.total);
+          const percentCompleted = Math.round(event.loaded * 100 / event.total);
           onProgress(percentCompleted);
         }
       }
@@ -190,7 +191,7 @@ export const downloadDocument = async (documentId, filename = null, onProgress =
       responseType: 'blob',
       onDownloadProgress: (progressEvent) => {
         if (onProgress) {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          const percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total);
           onProgress(percentCompleted);
         }
       }

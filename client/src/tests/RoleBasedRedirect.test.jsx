@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
@@ -10,7 +11,7 @@ vi.mock('@/pages/dashboard/DashboardPageEnhanced', () => ({
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: vi.fn()
 }));
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';import { useTranslation } from "react-i18next";
 describe('RoleBasedRedirect', () => {
   it('redirects students to /portal', () => {
     // Set up the mock to return student role

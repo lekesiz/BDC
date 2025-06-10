@@ -1,21 +1,22 @@
+// TODO: i18n - processed
 import { render, screen, fireEvent, waitFor } from '../../../test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DocumentUploader from '../../../components/document/DocumentUploader';
 import DocumentService from '../../../components/document/DocumentService';
 import { act } from '@testing-library/react';
 // Mock dependencies
-vi.mock('react-dropzone', () => {
+import { useTranslation } from "react-i18next";vi.mock('react-dropzone', () => {
   return {
     useDropzone: (options) => {
       // Store the onDrop handler for direct testing
       global.mockDropzoneOnDrop = options.onDrop;
       return {
-        getRootProps: () => ({ 
-          role: 'presentation', 
+        getRootProps: () => ({
+          role: 'presentation',
           onClick: vi.fn(),
           className: options.disabled ? 'opacity-50 pointer-events-none' : ''
         }),
-        getInputProps: () => ({ 
+        getInputProps: () => ({
           type: 'file',
           multiple: options.multiple
         }),
@@ -75,9 +76,9 @@ describe('DocumentUploader Component', () => {
         setTimeout(() => progressCb(100), 20);
       }
       // Return successful upload for valid files
-      return Promise.resolve({ 
-        id: '123', 
-        name: file.name, 
+      return Promise.resolve({
+        id: '123',
+        name: file.name,
         url: `https://example.com/${file.name}`,
         size: file.size
       });
@@ -143,13 +144,13 @@ describe('DocumentUploader Component', () => {
     DocumentService.uploadDocument.mockImplementation((file, metadata, progressCb) => {
       // Set immediate progress to prevent race conditions
       if (progressCb) progressCb(50);
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         // This needs to be slow enough to detect
         setTimeout(() => {
           if (progressCb) progressCb(100);
-          resolve({ 
-            id: '123', 
-            name: file.name, 
+          resolve({
+            id: '123',
+            name: file.name,
             url: `https://example.com/${file.name}`,
             size: file.size
           });
@@ -178,12 +179,12 @@ describe('DocumentUploader Component', () => {
   it('respects maximum file count', async () => {
     // Create more files than allowed
     const files = [
-      createTestFile('file1.pdf', 'application/pdf', 1024),
-      createTestFile('file2.pdf', 'application/pdf', 1024),
-      createTestFile('file3.pdf', 'application/pdf', 1024),
-      createTestFile('file4.pdf', 'application/pdf', 1024),
-      createTestFile('file5.pdf', 'application/pdf', 1024),
-      createTestFile('file6.pdf', 'application/pdf', 1024) // One more than default maxFiles
+    createTestFile('file1.pdf', 'application/pdf', 1024),
+    createTestFile('file2.pdf', 'application/pdf', 1024),
+    createTestFile('file3.pdf', 'application/pdf', 1024),
+    createTestFile('file4.pdf', 'application/pdf', 1024),
+    createTestFile('file5.pdf', 'application/pdf', 1024),
+    createTestFile('file6.pdf', 'application/pdf', 1024) // One more than default maxFiles
     ];
     render(<DocumentUploader maxFiles={5} />);
     // Directly call the onDrop handler with our test files
@@ -202,9 +203,9 @@ describe('DocumentUploader Component', () => {
     render(<DocumentUploader onUploadError={mockUploadError} />);
     // Directly call the onDrop handler with rejected files
     await act(async () => {
-      global.mockDropzoneOnDrop([], [{ 
-        file: largeFile, 
-        errors: [{ message: 'File is too large' }] 
+      global.mockDropzoneOnDrop([], [{
+        file: largeFile,
+        errors: [{ message: 'File is too large' }]
       }]);
     });
     // This should directly trigger the onUploadError callback with rejection errors
@@ -217,7 +218,7 @@ describe('DocumentUploader Component', () => {
     let progressCallback;
     DocumentService.uploadDocument.mockImplementation((file, metadata, onProgress) => {
       progressCallback = onProgress;
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => resolve({ id: '123', name: file.name }), 50);
       });
     });
@@ -249,7 +250,7 @@ describe('DocumentUploader Component', () => {
     });
   });
   it('passes metadata to upload function', async () => {
-    const metadata = { 
+    const metadata = {
       category: 'invoice',
       userId: 123
     };

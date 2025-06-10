@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 /**
@@ -37,27 +38,27 @@ const LanguageExample = () => {
       <div>
         <h2 className="text-lg font-semibold mb-2">{t('auth.loginTitle')}</h2>
         <form className="space-y-2 max-w-sm">
-          <input 
-            type="email" 
+          <input
+            type="email"
             placeholder={t('auth.email')}
-            className="w-full px-3 py-2 border rounded"
-          />
-          <input 
-            type="password" 
+            className="w-full px-3 py-2 border rounded" />
+
+          <input
+            type="password"
             placeholder={t('auth.password')}
-            className="w-full px-3 py-2 border rounded"
-          />
+            className="w-full px-3 py-2 border rounded" />
+
           <button className="w-full px-3 py-2 bg-blue-500 text-white rounded">
             {t('auth.signIn')}
           </button>
         </form>
       </div>
       <div>
-        <p className="text-sm text-gray-600">
-          Current language: {i18n.language}
+        <p className="text-sm text-gray-600">{t("components.current_language")}
+          {i18n.language}
         </p>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export default LanguageExample;

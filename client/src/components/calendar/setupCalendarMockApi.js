@@ -1,9 +1,10 @@
-import { 
-  generateCalendarData, 
-  generateAvailableSlots, 
+// TODO: i18n - processed
+import {
+  generateCalendarData,
+  generateAvailableSlots,
   generateAppointmentTypes,
-  generateTeachingSchedule 
-} from './mockCalendarData';
+  generateTeachingSchedule } from
+'./mockCalendarData';import { useTranslation } from "react-i18next";
 export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -12,7 +13,7 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     delete: originalDelete || api.delete.bind(api)
   };
   // Calendar events endpoint
-  api.get = function(url, ...args) {
+  api.get = function (url, ...args) {
     if (url === '/api/calendar/events' || url.startsWith('/api/calendar/events?')) {
       try {
         const userRole = localStorage.getItem('userRole') || 'student';
@@ -69,42 +70,42 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
             created_at: new Date().toISOString()
           },
           slots: [
-            {
-              id: 1,
-              day_of_week: 1, // Monday
-              start_time: '09:00',
-              end_time: '12:00',
-              is_available: true
-            },
-            {
-              id: 2,
-              day_of_week: 1, // Monday
-              start_time: '14:00',
-              end_time: '17:00',
-              is_available: true
-            },
-            {
-              id: 3,
-              day_of_week: 3, // Wednesday
-              start_time: '09:00',
-              end_time: '12:00',
-              is_available: true
-            },
-            {
-              id: 4,
-              day_of_week: 3, // Wednesday
-              start_time: '14:00',
-              end_time: '17:00',
-              is_available: true
-            },
-            {
-              id: 5,
-              day_of_week: 5, // Friday
-              start_time: '09:00',
-              end_time: '12:00',
-              is_available: true
-            }
-          ]
+          {
+            id: 1,
+            day_of_week: 1, // Monday
+            start_time: '09:00',
+            end_time: '12:00',
+            is_available: true
+          },
+          {
+            id: 2,
+            day_of_week: 1, // Monday
+            start_time: '14:00',
+            end_time: '17:00',
+            is_available: true
+          },
+          {
+            id: 3,
+            day_of_week: 3, // Wednesday
+            start_time: '09:00',
+            end_time: '12:00',
+            is_available: true
+          },
+          {
+            id: 4,
+            day_of_week: 3, // Wednesday
+            start_time: '14:00',
+            end_time: '17:00',
+            is_available: true
+          },
+          {
+            id: 5,
+            day_of_week: 5, // Friday
+            start_time: '09:00',
+            end_time: '12:00',
+            is_available: true
+          }]
+
         }
       });
     }
@@ -133,7 +134,7 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
       const eventId = parseInt(url.split('/').pop());
       const userRole = localStorage.getItem('userRole') || 'student';
       const calendarData = generateCalendarData(userRole);
-      const event = calendarData.events.find(e => e.id === eventId);
+      const event = calendarData.events.find((e) => e.id === eventId);
       if (event) {
         return Promise.resolve({
           status: 200,
@@ -155,7 +156,7 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     return originalFunctions.get.call(this, url, ...args);
   };
   // Create appointment endpoint
-  api.post = function(url, data, ...args) {
+  api.post = function (url, data, ...args) {
     if (url === '/api/calendar/appointments') {
       const newAppointment = {
         id: Date.now(),
@@ -183,7 +184,7 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     return originalFunctions.post.call(this, url, data, ...args);
   };
   // Update appointment endpoint
-  api.put = function(url, data, ...args) {
+  api.put = function (url, data, ...args) {
     if (url.match(/^\/api\/calendar\/appointments\/\d+$/)) {
       const appointmentId = parseInt(url.split('/').pop());
       const updatedAppointment = {
@@ -200,7 +201,7 @@ export const setupCalendarMockApi = (api, originalGet, originalPost, originalPut
     return originalFunctions.put.call(this, url, data, ...args);
   };
   // Delete appointment endpoint
-  api.delete = function(url, ...args) {
+  api.delete = function (url, ...args) {
     if (url.match(/^\/api\/calendar\/appointments\/\d+$/)) {
       return Promise.resolve({
         status: 200,

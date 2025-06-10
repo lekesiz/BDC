@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -13,16 +14,16 @@ import { cn } from '@/lib/utils';
  * @param {string} props.className - Additional CSS classes
  * @param {React.ReactNode} props.children - Avatar content (used for custom fallback)
  * @returns {JSX.Element} Avatar component
- */
-const Avatar = ({ 
-  src, 
-  alt = "", 
-  initials, 
-  size = "md", 
-  shape = "circle", 
+ */import { useTranslation } from "react-i18next";
+const Avatar = ({
+  src,
+  alt = "",
+  initials,
+  size = "md",
+  shape = "circle",
   className,
-  ...props 
-}) => {
+  ...props
+}) => {const { t } = useTranslation();
   const [imageError, setImageError] = React.useState(false);
   const sizeClasses = {
     sm: "h-8 w-8 text-xs",
@@ -38,29 +39,29 @@ const Avatar = ({
     setImageError(true);
   };
   return (
-    <div 
+    <div
       className={cn(
         "relative inline-flex items-center justify-center overflow-hidden bg-muted",
         sizeClasses[size],
         shapeClasses[shape],
         className
       )}
-      {...props}
-    >
-      {src && !imageError ? (
-        <img
-          src={src}
-          alt={alt}
-          className="h-full w-full object-cover"
-          onError={handleError}
-        />
-      ) : (
-        <span className="font-medium text-muted-foreground">
-          {initials || alt.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+      {...props}>
+
+      {src && !imageError ?
+      <img
+        src={src}
+        alt={alt}
+        className="h-full w-full object-cover"
+        onError={handleError} /> :
+
+
+      <span className="font-medium text-muted-foreground">
+          {initials || alt.split(' ').map((n) => n[0]).join('').toUpperCase().substring(0, 2)}
         </span>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 /**
  * Avatar group component to display multiple avatars with overlap
@@ -71,36 +72,36 @@ const Avatar = ({
  * @param {React.ReactNode} props.children - Avatar components
  * @returns {JSX.Element} AvatarGroup component
  */
-const AvatarGroup = ({ 
-  max = 3, 
-  className, 
-  children, 
-  ...props 
-}) => {
+const AvatarGroup = ({
+  max = 3,
+  className,
+  children,
+  ...props
+}) => {const { t } = useTranslation();
   const childrenArray = React.Children.toArray(children);
   const showCount = max > 0 && childrenArray.length > max;
   const visibleAvatars = showCount ? childrenArray.slice(0, max) : childrenArray;
   const remainingAvatars = showCount ? childrenArray.length - max : 0;
   return (
-    <div 
-      className={cn("flex -space-x-2", className)} 
-      {...props}
-    >
-      {visibleAvatars.map((child, index) => (
-        <div key={index} className="relative inline-block border-2 border-background">
+    <div
+      className={cn("flex -space-x-2", className)}
+      {...props}>
+
+      {visibleAvatars.map((child, index) =>
+      <div key={index} className="relative inline-block border-2 border-background">
           {child}
         </div>
-      ))}
-      {showCount && (
-        <div 
-          className={cn(
-            "relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-medium border-2 border-background",
-          )}
-        >
+      )}
+      {showCount &&
+      <div
+        className={cn(
+          "relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-medium border-2 border-background"
+        )}>
+
           +{remainingAvatars}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 export { Avatar, AvatarGroup };

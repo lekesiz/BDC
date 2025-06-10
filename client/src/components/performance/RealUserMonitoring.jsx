@@ -1,9 +1,10 @@
+// TODO: i18n - processed
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 /**
  * Real User Monitoring (RUM) Component
  * Tracks actual user performance metrics and sends to analytics
- */
+ */import { useTranslation } from "react-i18next";
 class PerformanceTracker {
   constructor() {
     this.metrics = {
@@ -48,9 +49,9 @@ class PerformanceTracker {
         // Network timings
         dns: navigation.domainLookupEnd - navigation.domainLookupStart,
         tcp: navigation.connectEnd - navigation.connectStart,
-        ssl: navigation.secureConnectionStart > 0 
-          ? navigation.connectEnd - navigation.secureConnectionStart 
-          : 0,
+        ssl: navigation.secureConnectionStart > 0 ?
+        navigation.connectEnd - navigation.secureConnectionStart :
+        0,
         ttfb: navigation.responseStart - navigation.requestStart,
         download: navigation.responseEnd - navigation.responseStart,
         // Document processing
@@ -69,7 +70,7 @@ class PerformanceTracker {
         protocol: navigation.nextHopProtocol,
         transferSize: navigation.transferSize || 0,
         encodedBodySize: navigation.encodedBodySize || 0,
-        decodedBodySize: navigation.decodedBodySize || 0,
+        decodedBodySize: navigation.decodedBodySize || 0
       };
     }
   }
@@ -79,8 +80,8 @@ class PerformanceTracker {
       // Observe long tasks
       const longTaskObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          this.metrics.customMetrics.longTasks = 
-            (this.metrics.customMetrics.longTasks || 0) + 1;
+          this.metrics.customMetrics.longTasks =
+          (this.metrics.customMetrics.longTasks || 0) + 1;
           // Track tasks longer than 100ms
           if (entry.duration > 100) {
             console.warn('Long task detected:', {
@@ -95,8 +96,8 @@ class PerformanceTracker {
       const layoutShiftObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           if (!entry.hadRecentInput) {
-            this.metrics.customMetrics.cls = 
-              (this.metrics.customMetrics.cls || 0) + entry.value;
+            this.metrics.customMetrics.cls =
+            (this.metrics.customMetrics.cls || 0) + entry.value;
           }
         }
       });
@@ -125,7 +126,7 @@ class PerformanceTracker {
   getLargestContentfulPaint() {
     const entries = performance.getEntriesByType('largest-contentful-paint');
     const lastEntry = entries[entries.length - 1];
-    return lastEntry ? (lastEntry.renderTime || lastEntry.loadTime) : 0;
+    return lastEntry ? lastEntry.renderTime || lastEntry.loadTime : 0;
   }
   getFirstInputDelay() {
     // This will be captured by the PerformanceObserver
@@ -165,8 +166,8 @@ class PerformanceTracker {
         hiddenCount++;
       } else if (hiddenTime) {
         const hiddenDuration = Date.now() - hiddenTime;
-        this.metrics.customMetrics.totalHiddenTime = 
-          (this.metrics.customMetrics.totalHiddenTime || 0) + hiddenDuration;
+        this.metrics.customMetrics.totalHiddenTime =
+        (this.metrics.customMetrics.totalHiddenTime || 0) + hiddenDuration;
         this.metrics.customMetrics.hiddenCount = hiddenCount;
       }
     });
@@ -186,9 +187,9 @@ class PerformanceTracker {
           headers: { 'Content-Type': 'application/json' },
           keepalive: true
         }).catch(() => {
+
           // Silently fail
-        });
-      }
+        });}
     };
     // Send on page unload
     window.addEventListener('pagehide', sendMetrics);
@@ -216,7 +217,7 @@ class PerformanceTracker {
         referrer: document.referrer,
         screenResolution: `${screen.width}x${screen.height}`,
         viewport: `${window.innerWidth}x${window.innerHeight}`,
-        colorDepth: screen.colorDepth,
+        colorDepth: screen.colorDepth
       }
     };
   }
@@ -273,7 +274,7 @@ class PerformanceTracker {
     const resources = performance.getEntriesByType('resource');
     // Group resources by type
     const resourcesByType = {};
-    resources.forEach(resource => {
+    resources.forEach((resource) => {
       const type = this.getResourceType(resource.name);
       if (!resourcesByType[type]) {
         resourcesByType[type] = {

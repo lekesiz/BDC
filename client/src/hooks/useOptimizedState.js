@@ -1,17 +1,18 @@
+// TODO: i18n - processed
 import { useState, useCallback, useRef, useMemo } from 'react';
 
 /**
  * Optimized state hook that prevents unnecessary re-renders
  * Only updates when value actually changes
- */
+ */import { useTranslation } from "react-i18next";
 export const useOptimizedState = (initialValue) => {
   const [value, setValue] = useState(initialValue);
   const valueRef = useRef(value);
 
   const setOptimizedValue = useCallback((newValue) => {
-    const resolvedValue = typeof newValue === 'function' 
-      ? newValue(valueRef.current) 
-      : newValue;
+    const resolvedValue = typeof newValue === 'function' ?
+    newValue(valueRef.current) :
+    newValue;
 
     // Only update if value actually changed
     if (resolvedValue !== valueRef.current) {
@@ -39,13 +40,13 @@ export const useOptimizedObjectState = (initialValue = {}) => {
   const valueRef = useRef(value);
 
   const setOptimizedValue = useCallback((newValue) => {
-    const resolvedValue = typeof newValue === 'function' 
-      ? newValue(valueRef.current) 
-      : newValue;
+    const resolvedValue = typeof newValue === 'function' ?
+    newValue(valueRef.current) :
+    newValue;
 
     // Deep comparison for objects
     const hasChanged = JSON.stringify(resolvedValue) !== JSON.stringify(valueRef.current);
-    
+
     if (hasChanged) {
       valueRef.current = resolvedValue;
       setValue(resolvedValue);
@@ -54,14 +55,14 @@ export const useOptimizedObjectState = (initialValue = {}) => {
 
   // Memoized update functions
   const updateField = useCallback((field, value) => {
-    setOptimizedValue(prev => ({
+    setOptimizedValue((prev) => ({
       ...prev,
       [field]: value
     }));
   }, [setOptimizedValue]);
 
   const updateFields = useCallback((updates) => {
-    setOptimizedValue(prev => ({
+    setOptimizedValue((prev) => ({
       ...prev,
       ...updates
     }));
@@ -83,16 +84,16 @@ export const useOptimizedArrayState = (initialValue = []) => {
 
   // Memoized operations
   const add = useCallback((item) => {
-    setItems(prev => [...prev, item]);
+    setItems((prev) => [...prev, item]);
   }, []);
 
   const remove = useCallback((predicate) => {
-    setItems(prev => prev.filter(item => !predicate(item)));
+    setItems((prev) => prev.filter((item) => !predicate(item)));
   }, []);
 
   const update = useCallback((predicate, updates) => {
-    setItems(prev => prev.map(item => 
-      predicate(item) ? { ...item, ...updates } : item
+    setItems((prev) => prev.map((item) =>
+    predicate(item) ? { ...item, ...updates } : item
     ));
   }, []);
 

@@ -1,9 +1,10 @@
-import { 
-  generateAnalyticsData, 
+// TODO: i18n - processed
+import {
+  generateAnalyticsData,
   generateAnalyticsReports,
   generateAnalyticsFilters,
-  generateRealTimeAnalytics 
-} from './mockAnalyticsData';
+  generateRealTimeAnalytics } from
+'./mockAnalyticsData';import { useTranslation } from "react-i18next";
 export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -12,7 +13,7 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     delete: originalDelete || api.delete.bind(api)
   };
   // Analytics endpoints
-  api.get = function(url, ...args) {
+  api.get = function (url, ...args) {
     // General analytics endpoint
     if (url === '/api/analytics' || url === '/api/analytics/overview') {
       const userRole = localStorage.getItem('userRole') || 'student';
@@ -139,13 +140,13 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
         data: {
           labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
           values: [
-            Math.floor(Math.random() * 100) + 50,
-            Math.floor(Math.random() * 100) + 60,
-            Math.floor(Math.random() * 100) + 70,
-            Math.floor(Math.random() * 100) + 80,
-            Math.floor(Math.random() * 100) + 90,
-            Math.floor(Math.random() * 100) + 100
-          ]
+          Math.floor(Math.random() * 100) + 50,
+          Math.floor(Math.random() * 100) + 60,
+          Math.floor(Math.random() * 100) + 70,
+          Math.floor(Math.random() * 100) + 80,
+          Math.floor(Math.random() * 100) + 90,
+          Math.floor(Math.random() * 100) + 100]
+
         }
       };
       return Promise.resolve({
@@ -170,7 +171,7 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     return originalFunctions.get.call(api, url, ...args);
   };
   // Analytics POST endpoints
-  api.post = function(url, data, ...args) {
+  api.post = function (url, data, ...args) {
     // Generate analytics report
     if (url === '/api/analytics/reports/generate') {
       const report = {
@@ -232,7 +233,7 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     return originalFunctions.post.call(api, url, data, ...args);
   };
   // Analytics PUT endpoints
-  api.put = function(url, data, ...args) {
+  api.put = function (url, data, ...args) {
     // Update dashboard
     if (url.match(/^\/api\/analytics\/dashboards\/\d+$/)) {
       const dashboardId = parseInt(url.split('/').pop());
@@ -270,7 +271,7 @@ export const setupAnalyticsMockApi = (api, originalGet, originalPost, originalPu
     return originalFunctions.put.call(api, url, data, ...args);
   };
   // Analytics DELETE endpoints
-  api.delete = function(url, ...args) {
+  api.delete = function (url, ...args) {
     // Delete dashboard
     if (url.match(/^\/api\/analytics\/dashboards\/\d+$/)) {
       const dashboardId = parseInt(url.split('/').pop());

@@ -1,14 +1,15 @@
+// TODO: i18n - processed
 import { motion } from 'framer-motion';
 import { Select } from '@/components/ui/select';
-import { useState } from 'react';
-export const AnimatedSelect = ({ 
-  error, 
-  className, 
-  onFocus, 
+import { useState } from 'react';import { useTranslation } from "react-i18next";
+export const AnimatedSelect = ({
+  error,
+  className,
+  onFocus,
   onBlur,
   children,
-  ...props 
-}) => {
+  ...props
+}) => {const { t } = useTranslation();
   const [isFocused, setIsFocused] = useState(false);
   const handleFocus = (e) => {
     setIsFocused(true);
@@ -21,28 +22,28 @@ export const AnimatedSelect = ({
   return (
     <motion.div
       animate={{
-        scale: isFocused ? 1.01 : 1,
+        scale: isFocused ? 1.01 : 1
       }}
-      transition={{ duration: 0.2 }}
-    >
+      transition={{ duration: 0.2 }}>
+
       <Select
         className={`${error ? 'border-red-500' : ''} ${className || ''}`}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        {...props}
-      >
+        {...props}>
+
         {children}
       </Select>
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.15 }}
-          className="text-red-500 text-xs mt-1"
-        >
+      {error &&
+      <motion.div
+        initial={{ opacity: 0, y: -5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.15 }}
+        className="text-red-500 text-xs mt-1">
+
           {error}
         </motion.div>
-      )}
-    </motion.div>
-  );
+      }
+    </motion.div>);
+
 };

@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, Clock, CheckCircle, AlertCircle, Play } from 'lucide-react';
@@ -10,8 +11,8 @@ import { useToast } from '@/components/ui/toast';
 import { formatDate } from '@/lib/utils';
 /**
  * MyEvaluationsPage displays evaluations for student users
- */
-const MyEvaluationsPage = () => {
+ */import { useTranslation } from "react-i18next";
+const MyEvaluationsPage = () => {const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [evaluations, setEvaluations] = useState([]);
@@ -29,7 +30,7 @@ const MyEvaluationsPage = () => {
         toast({
           title: 'Error',
           description: 'Failed to load your evaluations',
-          type: 'error',
+          type: 'error'
         });
       } finally {
         setIsLoading(false);
@@ -77,25 +78,25 @@ const MyEvaluationsPage = () => {
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">My Evaluations</h1>
-        <p className="text-gray-600 mt-1">View and take your assigned evaluations</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t("pages.my_evaluations")}</h1>
+        <p className="text-gray-600 mt-1">{t("pages.view_and_take_your_assigned_evaluations")}</p>
       </div>
-      {evaluations.length === 0 ? (
-        <Card className="p-8 text-center">
+      {evaluations.length === 0 ?
+      <Card className="p-8 text-center">
           <ClipboardList className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Evaluations Assigned</h3>
-          <p className="text-gray-500">You don't have any evaluations assigned to you yet.</p>
-        </Card>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {evaluations.map((evaluation) => (
-            <Card key={evaluation.id} className="hover:shadow-lg transition-shadow">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{t("pages.no_evaluations_assigned")}</h3>
+          <p className="text-gray-500">{t("pages.you_dont_have_any_evaluations_assigned_to_you_yet")}</p>
+        </Card> :
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {evaluations.map((evaluation) =>
+        <Card key={evaluation.id} className="hover:shadow-lg transition-shadow">
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="text-lg font-medium text-gray-900">
@@ -112,59 +113,59 @@ const MyEvaluationsPage = () => {
                   {evaluation.description}
                 </p>
                 <div className="space-y-2 text-sm text-gray-500">
-                  {evaluation.time_limit && (
-                    <div className="flex items-center gap-2">
+                  {evaluation.time_limit &&
+              <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4" />
-                      <span>Time limit: {evaluation.time_limit} minutes</span>
+                      <span>{t("pages.time_limit")}{evaluation.time_limit} minutes</span>
                     </div>
-                  )}
-                  {evaluation.passing_score && (
-                    <div className="flex items-center gap-2">
+              }
+                  {evaluation.passing_score &&
+              <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" />
-                      <span>Passing score: {evaluation.passing_score}%</span>
+                      <span>{t("pages.passing_score")}{evaluation.passing_score}%</span>
                     </div>
-                  )}
-                  {evaluation.due_date && (
-                    <div className="flex items-center gap-2">
+              }
+                  {evaluation.due_date &&
+              <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
                       <span>Due: {formatDate(evaluation.due_date)}</span>
                     </div>
-                  )}
+              }
                 </div>
                 <div className="mt-6">
-                  {evaluation.status === 'completed' && evaluation.latest_session_id ? (
-                    <Button
-                      onClick={() => handleViewResults(evaluation.latest_session_id)}
-                      className="w-full"
-                      variant="outline"
-                    >
-                      View Results
-                    </Button>
-                  ) : evaluation.status === 'in_progress' ? (
-                    <Button
-                      onClick={() => handleStartEvaluation(evaluation.id)}
-                      className="w-full"
-                      variant="secondary"
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      Continue
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => handleStartEvaluation(evaluation.id)}
-                      className="w-full"
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      Start Evaluation
-                    </Button>
-                  )}
+                  {evaluation.status === 'completed' && evaluation.latest_session_id ?
+              <Button
+                onClick={() => handleViewResults(evaluation.latest_session_id)}
+                className="w-full"
+                variant="outline">{t("pages.view_results")}
+
+
+              </Button> :
+              evaluation.status === 'in_progress' ?
+              <Button
+                onClick={() => handleStartEvaluation(evaluation.id)}
+                className="w-full"
+                variant="secondary">
+
+                      <Play className="h-4 w-4 mr-2" />{t("pages.continue")}
+
+              </Button> :
+
+              <Button
+                onClick={() => handleStartEvaluation(evaluation.id)}
+                className="w-full">
+
+                      <Play className="h-4 w-4 mr-2" />{t("pages.start_evaluation")}
+
+              </Button>
+              }
                 </div>
               </div>
             </Card>
-          ))}
+        )}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 export default MyEvaluationsPage;

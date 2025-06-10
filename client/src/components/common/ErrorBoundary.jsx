@@ -1,6 +1,10 @@
+// TODO: i18n - processed
 import React, { Component } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from "react-i18next";
+import { withTranslation } from 'react-i18next';
+
 /**
  * Enhanced Error Boundary component that catches JavaScript errors in child components
  */
@@ -41,13 +45,14 @@ class ErrorBoundary extends Component {
   };
   render() {
     const { hasError, error, errorInfo, errorCount } = this.state;
-    const { 
-      children, 
-      fallback, 
+    const {
+      children,
+      fallback,
       showDetails = process.env.NODE_ENV === 'development',
-      resetButtonText = "Try Again",
-      errorTitle = "Something went wrong",
-      errorMessage = "An unexpected error occurred. Please try refreshing the page."
+      resetButtonText,
+      errorTitle,
+      errorMessage,
+      t
     } = this.props;
     if (hasError) {
       // Custom fallback component
@@ -63,52 +68,52 @@ class ErrorBoundary extends Component {
                 <AlertTriangle className="w-6 h-6 text-red-600" />
               </div>
               <h2 className="mt-4 text-xl font-semibold text-gray-900 text-center">
-                {errorTitle}
+                {errorTitle || t("components.error_boundary.something_went_wrong")}
               </h2>
               <p className="mt-2 text-sm text-gray-600 text-center">
-                {errorMessage}
+                {errorMessage || t("components.error_boundary.unexpected_error")}
               </p>
-              {errorCount > 1 && (
-                <p className="mt-2 text-xs text-gray-500 text-center">
-                  This error has occurred {errorCount} times
+              {errorCount > 1 &&
+              <p className="mt-2 text-xs text-gray-500 text-center">
+                  {t("components.error_boundary.error_occurred_times", { count: errorCount })}
                 </p>
-              )}
-              {showDetails && error && (
-                <details className="mt-4">
+              }
+              {showDetails && error &&
+              <details className="mt-4">
                   <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
-                    Error Details
+                    {t("components.error_boundary.error_details")}
                   </summary>
                   <div className="mt-2 p-3 bg-gray-50 rounded text-xs text-gray-700 font-mono overflow-auto">
                     <p className="font-semibold">{error.toString()}</p>
-                    {errorInfo && (
-                      <pre className="mt-2 whitespace-pre-wrap">
+                    {errorInfo &&
+                  <pre className="mt-2 whitespace-pre-wrap">
                         {errorInfo.componentStack}
                       </pre>
-                    )}
+                  }
                   </div>
                 </details>
-              )}
+              }
               <div className="mt-6 flex gap-3">
                 <Button
                   onClick={this.handleReset}
                   className="flex-1"
-                  variant="primary"
-                >
+                  variant="primary">
+
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  {resetButtonText}
+                  {resetButtonText || t("components.error_boundary.try_again")}
                 </Button>
                 <Button
                   onClick={() => window.location.href = '/'}
                   className="flex-1"
-                  variant="outline"
-                >
-                  Go to Home
+                  variant="outline">
+
+                  {t("components.error_boundary.go_home")}
                 </Button>
               </div>
             </div>
           </div>
-        </div>
-      );
+        </div>);
+
     }
     return children;
   }
@@ -117,11 +122,11 @@ class ErrorBoundary extends Component {
  * HOC to wrap any component with error boundary
  */
 export const withErrorBoundary = (Component, errorBoundaryProps = {}) => {
-  return (props) => (
-    <ErrorBoundary {...errorBoundaryProps}>
+  return (props) =>
+  <ErrorBoundary {...errorBoundaryProps}>
       <Component {...props} />
-    </ErrorBoundary>
-  );
+    </ErrorBoundary>;
+
 };
 /**
  * Hook for error handling in functional components
@@ -142,12 +147,12 @@ export const useErrorHandler = () => {
 /**
  * Generic error display component
  */
-export const ErrorDisplay = ({ 
-  error, 
-  onRetry, 
-  title = "Error", 
-  showDetails = process.env.NODE_ENV === 'development' 
-}) => {
+export const ErrorDisplay = ({
+  error,
+  onRetry,
+  title,
+  showDetails = process.env.NODE_ENV === 'development'
+}) => {const { t } = useTranslation();
   return (
     <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded">
       <div className="flex items-start">
@@ -155,31 +160,31 @@ export const ErrorDisplay = ({
           <AlertTriangle className="h-5 w-5 text-red-400" />
         </div>
         <div className="ml-3 flex-1">
-          <h3 className="text-sm font-medium text-red-800">{title}</h3>
+          <h3 className="text-sm font-medium text-red-800">{title || t("components.error_boundary.error")}</h3>
           <div className="mt-2 text-sm text-red-700">
-            <p>{error?.message || "An unexpected error occurred"}</p>
+            <p>{error?.message || t("components.error_boundary.unexpected_error")}</p>
           </div>
-          {showDetails && error?.stack && (
-            <details className="mt-2">
-              <summary className="cursor-pointer text-xs text-red-600">
-                Show error details
-              </summary>
+          {showDetails && error?.stack &&
+          <details className="mt-2">
+              <summary className="cursor-pointer text-xs text-red-600">{t("components.show_error_details")}
+
+            </summary>
               <pre className="mt-1 text-xs text-red-600 overflow-auto p-2 bg-red-100 rounded">
                 {error.stack}
               </pre>
             </details>
-          )}
-          {onRetry && (
-            <button
-              onClick={onRetry}
-              className="mt-3 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            >
-              Try again
-            </button>
-          )}
+          }
+          {onRetry &&
+          <button
+            onClick={onRetry}
+            className="mt-3 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">{t("components.try_again")}
+
+
+          </button>
+          }
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
-export default ErrorBoundary;
+export default withTranslation()(ErrorBoundary);

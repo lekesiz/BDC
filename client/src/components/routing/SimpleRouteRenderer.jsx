@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * Simplified route renderer for testing clean architecture
  * Uses only confirmed existing components
@@ -19,7 +20,7 @@ import ResetPasswordPage from '../../pages/auth/ResetPasswordPage';
 import SimpleLoginPage from '../../pages/auth/SimpleLoginPage';
 // Test pages - removed for production build
 // Lazy load confirmed components
-const DashboardPageEnhanced = lazy(() => import('../../pages/dashboard/DashboardPageEnhanced'));
+import { useTranslation } from "react-i18next";const DashboardPageEnhanced = lazy(() => import('../../pages/dashboard/DashboardPageEnhanced'));
 const SettingsPage = lazy(() => import('../../pages/settings/SettingsPage'));
 const ProfilePage = lazy(() => import('../../pages/profile/ProfilePage'));
 const UsersPage = lazy(() => import('../../pages/users/UsersPage'));
@@ -64,14 +65,14 @@ const AIRecommendationsPage = lazy(() => import('../../pages/ai/AIRecommendation
 /**
  * Simple route renderer for testing
  */
-const SimpleRouteRenderer = () => {
+const SimpleRouteRenderer = () => {const { t } = useTranslation();
   const { isLoading } = useAuth();
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="lg" text="Loading application..." />
-      </div>
-    );
+      </div>);
+
   }
   return (
     <Routes>
@@ -86,493 +87,493 @@ const SimpleRouteRenderer = () => {
       <Route
         path="/"
         element={
-          <ProtectedRoute>
+        <ProtectedRoute>
             <Suspense fallback={<LoadingSpinner />}>
               <DashboardLayout />
             </Suspense>
           </ProtectedRoute>
-        }
-      >
+        }>
+
         {/* Dashboard root with role-based redirection */}
         <Route index element={<RoleBasedRedirect />} />
         <Route path="dashboard" element={<Navigate to="/" replace />} />
         {/* Basic routes for testing */}
-        <Route 
-          path="profile" 
+        <Route
+          path="profile"
           element={
-            <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner />}>
               <ProfilePage />
             </Suspense>
-          } 
-        />
-        <Route 
-          path="settings" 
+          } />
+
+        <Route
+          path="settings"
           element={
-            <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={<LoadingSpinner />}>
               <SettingsPage />
             </Suspense>
-          } 
-        />
+          } />
+
         {/* User Management Routes */}
-        <Route 
-          path="users" 
+        <Route
+          path="users"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <UsersPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="users/create" 
+          } />
+
+        <Route
+          path="users/create"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <UserFormPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="users/:id" 
+          } />
+
+        <Route
+          path="users/:id"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <UserDetailPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="users/:id/edit" 
+          } />
+
+        <Route
+          path="users/:id/edit"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <UserFormPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="portal" 
+          } />
+
+        <Route
+          path="portal"
           element={
-            <StudentRoute>
+          <StudentRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <PortalDashboardV3 />
               </Suspense>
             </StudentRoute>
-          } 
-        />
+          } />
+
         {/* Beneficiaries Management Routes */}
-        <Route 
-          path="beneficiaries" 
+        <Route
+          path="beneficiaries"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <BeneficiariesPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="beneficiaries/new" 
+          } />
+
+        <Route
+          path="beneficiaries/new"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <BeneficiaryFormPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="beneficiaries/:id" 
+          } />
+
+        <Route
+          path="beneficiaries/:id"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <BeneficiaryDetailPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="beneficiaries/:id/edit" 
+          } />
+
+        <Route
+          path="beneficiaries/:id/edit"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <BeneficiaryFormPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="beneficiaries/:id/progress" 
+          } />
+
+        <Route
+          path="beneficiaries/:id/progress"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <ProgressTrackingPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
+          } />
+
         {/* Evaluations Routes */}
-        <Route 
-          path="evaluations" 
+        <Route
+          path="evaluations"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <EvaluationsPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="evaluations/create" 
+          } />
+
+        <Route
+          path="evaluations/create"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <TestCreationPageSimple />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="evaluations/:id" 
+          } />
+
+        <Route
+          path="evaluations/:id"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <TrainerEvaluationDetailPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="my-evaluations" 
+          } />
+
+        <Route
+          path="my-evaluations"
           element={
-            <StudentRoute>
+          <StudentRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <MyEvaluationsPage />
               </Suspense>
             </StudentRoute>
-          } 
-        />
+          } />
+
         {/* Test Routes */}
         <Route path="tests" element={<Navigate to="/evaluations" replace />} />
-        <Route 
-          path="tests/create" 
+        <Route
+          path="tests/create"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <TestCreationPageSimple />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
+          } />
+
         {/* Documents Routes */}
-        <Route 
-          path="documents" 
+        <Route
+          path="documents"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <DocumentsPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="my-documents" 
+          } />
+
+        <Route
+          path="my-documents"
           element={
-            <StudentRoute>
+          <StudentRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <MyDocumentsPage />
               </Suspense>
             </StudentRoute>
-          } 
-        />
+          } />
+
         {/* Calendar & Communication */}
-        <Route 
-          path="calendar" 
+        <Route
+          path="calendar"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <CalendarPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="calendar/google-integration" 
+          } />
+
+        <Route
+          path="calendar/google-integration"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <GoogleCalendarIntegrationV2Page />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
+          } />
+
         {/* Appointment Routes */}
         <Route path="appointments" element={<Navigate to="/calendar" replace />} />
-        <Route 
-          path="appointments/new" 
+        <Route
+          path="appointments/new"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <AppointmentCreationPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="messaging" 
+          } />
+
+        <Route
+          path="messaging"
           element={
-            <EnhancedProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer', 'student']}>
+          <EnhancedProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer', 'student']}>
               <Suspense fallback={<LoadingSpinner />}>
                 <MessagingPage />
               </Suspense>
             </EnhancedProtectedRoute>
-          } 
-        />
-        <Route 
-          path="notifications" 
+          } />
+
+        <Route
+          path="notifications"
           element={
-            <EnhancedProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer', 'student']}>
+          <EnhancedProtectedRoute requiredRole={['super_admin', 'tenant_admin', 'trainer', 'student']}>
               <Suspense fallback={<LoadingSpinner />}>
                 <NotificationsPage />
               </Suspense>
             </EnhancedProtectedRoute>
-          } 
-        />
+          } />
+
         {/* Programs & Analytics */}
-        <Route 
-          path="programs" 
+        <Route
+          path="programs"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <ProgramsListPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="programs/new" 
+          } />
+
+        <Route
+          path="programs/new"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <ProgramFormPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="programs/:id" 
+          } />
+
+        <Route
+          path="programs/:id"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <ProgramDetailPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="programs/:id/edit" 
+          } />
+
+        <Route
+          path="programs/:id/edit"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <ProgramFormPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="analytics" 
+          } />
+
+        <Route
+          path="analytics"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <AnalyticsDashboardPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
-        <Route 
-          path="reports" 
+          } />
+
+        <Route
+          path="reports"
           element={
-            <ManagementRoute>
+          <ManagementRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <ReportsDashboardPage />
               </Suspense>
             </ManagementRoute>
-          } 
-        />
+          } />
+
         {/* AI Routes */}
-        <Route 
-          path="ai/insights" 
+        <Route
+          path="ai/insights"
           element={
-            <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
+          <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
               <Suspense fallback={<LoadingSpinner />}>
                 <AIInsightsPage />
               </Suspense>
             </EnhancedProtectedRoute>
-          } 
-        />
-        <Route 
-          path="ai/content" 
+          } />
+
+        <Route
+          path="ai/content"
           element={
-            <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
+          <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
               <Suspense fallback={<LoadingSpinner />}>
                 <AIContentGenerationPage />
               </Suspense>
             </EnhancedProtectedRoute>
-          } 
-        />
-        <Route 
-          path="ai/chatbot" 
+          } />
+
+        <Route
+          path="ai/chatbot"
           element={
-            <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
+          <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
               <Suspense fallback={<LoadingSpinner />}>
                 <AIChatbotPage />
               </Suspense>
             </EnhancedProtectedRoute>
-          } 
-        />
-        <Route 
-          path="ai/recommendations" 
+          } />
+
+        <Route
+          path="ai/recommendations"
           element={
-            <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
+          <EnhancedProtectedRoute access={ROUTE_ACCESS.AI_ACCESS}>
               <Suspense fallback={<LoadingSpinner />}>
                 <AIRecommendationsPage />
               </Suspense>
             </EnhancedProtectedRoute>
-          } 
-        />
+          } />
+
         {/* Admin Routes */}
-        <Route 
-          path="admin/tenants" 
+        <Route
+          path="admin/tenants"
           element={
-            <EnhancedProtectedRoute requiredRole={['super_admin']}>
+          <EnhancedProtectedRoute requiredRole={['super_admin']}>
               <Suspense fallback={<LoadingSpinner />}>
                 <TenantsPage />
               </Suspense>
             </EnhancedProtectedRoute>
-          } 
-        />
+          } />
+
         {/* Integration Routes */}
-        <Route 
-          path="integrations/wedof" 
+        <Route
+          path="integrations/wedof"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <WedofIntegrationPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="integrations/google-calendar" 
+          } />
+
+        <Route
+          path="integrations/google-calendar"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <GoogleCalendarIntegrationV2Page />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="integrations/email" 
+          } />
+
+        <Route
+          path="integrations/email"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <EmailIntegrationPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="integrations/sms" 
+          } />
+
+        <Route
+          path="integrations/sms"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <SMSIntegrationPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="integrations/payment" 
+          } />
+
+        <Route
+          path="integrations/payment"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <PaymentIntegrationPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="integrations/webhooks" 
+          } />
+
+        <Route
+          path="integrations/webhooks"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <WebhooksPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="integrations/zapier" 
+          } />
+
+        <Route
+          path="integrations/zapier"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <ZapierIntegrationPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
-        <Route 
-          path="integrations/pennylane" 
+          } />
+
+        <Route
+          path="integrations/pennylane"
           element={
-            <AdminRoute>
+          <AdminRoute>
               <Suspense fallback={<LoadingSpinner />}>
                 <PennylaneIntegrationPage />
               </Suspense>
             </AdminRoute>
-          } 
-        />
+          } />
+
       </Route>
       {/* Error routes */}
-      <Route 
-        path="/unauthorized" 
+      <Route
+        path="/unauthorized"
         element={
-          <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center min-h-screen">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
-              <p className="text-gray-600 mb-4">You don't have permission to access this page.</p>
-              <button 
-                onClick={() => window.history.back()}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Go Back
-              </button>
+              <h1 className="text-2xl font-bold text-red-600 mb-4">{t("components.access_denied")}</h1>
+              <p className="text-gray-600 mb-4">{t("components.you_dont_have_permission_to_access_this_page")}</p>
+              <button
+              onClick={() => window.history.back()}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">{t("components.go_back")}
+
+
+            </button>
             </div>
           </div>
-        } 
-      />
-      <Route 
-        path="*" 
+        } />
+
+      <Route
+        path="*"
         element={
-          <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center min-h-screen">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-800 mb-4">Page Not Found</h1>
-              <p className="text-gray-600 mb-4">The page you're looking for doesn't exist.</p>
-              <button 
-                onClick={() => window.location.href = '/'}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Go Home
-              </button>
+              <h1 className="text-2xl font-bold text-gray-800 mb-4">{t("components.page_not_found")}</h1>
+              <p className="text-gray-600 mb-4">{t("components.the_page_youre_looking_for_doesnt_exist")}</p>
+              <button
+              onClick={() => window.location.href = '/'}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">{t("components.go_home")}
+
+
+            </button>
             </div>
           </div>
-        } 
-      />
-    </Routes>
-  );
+        } />
+
+    </Routes>);
+
 };
 export default SimpleRouteRenderer;

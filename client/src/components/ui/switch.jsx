@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -8,12 +9,12 @@ import { cn } from '@/lib/utils';
  * @param {function} props.onCheckedChange - Callback when checked state changes
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Switch component
- */
-export const Switch = React.forwardRef(({ 
+ */import { useTranslation } from "react-i18next";
+export const Switch = React.forwardRef(({
   checked = false,
   onCheckedChange,
   className,
-  ...props 
+  ...props
 }, ref) => {
   return (
     <button
@@ -29,15 +30,15 @@ export const Switch = React.forwardRef(({
         checked ? "bg-primary" : "bg-input",
         className
       )}
-      {...props}
-    >
+      {...props}>
+
       <span
         className={cn(
           "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform",
           checked ? "translate-x-5" : "translate-x-0"
-        )}
-      />
-    </button>
-  );
+        )} />
+
+    </button>);
+
 });
 Switch.displayName = "Switch";

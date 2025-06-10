@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React, { useState } from 'react';
 import BaseIntegration from '../BaseIntegration';
 import { Card } from '../../ui/card';
@@ -16,9 +17,9 @@ import {
   Globe,
   Shield,
   Zap,
-  BarChart3
-} from 'lucide-react';
-const TwilioIntegration = ({ integration, onBack }) => {
+  BarChart3 } from
+'lucide-react';import { useTranslation } from "react-i18next";
+const TwilioIntegration = ({ integration, onBack }) => {const { t } = useTranslation();
   const [accountInfo, setAccountInfo] = useState({
     accountSid: 'AC1234567890abcdef',
     phoneNumbers: ['+33123456789', '+33987654321'],
@@ -37,11 +38,11 @@ const TwilioIntegration = ({ integration, onBack }) => {
     urgentBypassQuietHours: true
   });
   const [messageTemplates, setMessageTemplates] = useState([
-    { id: '1', name: 'Appointment Reminder', type: 'sms', usage: 1234, lastUsed: '2 hours ago' },
-    { id: '2', name: 'Assignment Due', type: 'sms', usage: 567, lastUsed: '1 day ago' },
-    { id: '3', name: 'Welcome Message', type: 'whatsapp', usage: 234, lastUsed: '3 days ago' },
-    { id: '4', name: 'Course Completion', type: 'sms', usage: 456, lastUsed: '1 week ago' }
-  ]);
+  { id: '1', name: 'Appointment Reminder', type: 'sms', usage: 1234, lastUsed: '2 hours ago' },
+  { id: '2', name: 'Assignment Due', type: 'sms', usage: 567, lastUsed: '1 day ago' },
+  { id: '3', name: 'Welcome Message', type: 'whatsapp', usage: 234, lastUsed: '3 days ago' },
+  { id: '4', name: 'Course Completion', type: 'sms', usage: 456, lastUsed: '1 week ago' }]
+  );
   const [notificationTypes, setNotificationTypes] = useState({
     appointmentReminders: true,
     assignmentDeadlines: true,
@@ -51,77 +52,77 @@ const TwilioIntegration = ({ integration, onBack }) => {
     marketingMessages: false
   });
   const configFields = [
-    {
-      name: 'accountSid',
-      label: 'Account SID',
-      type: 'text',
-      placeholder: 'Your Twilio Account SID',
-      required: true,
-      description: 'Found in your Twilio Console'
-    },
-    {
-      name: 'authToken',
-      label: 'Auth Token',
-      type: 'password',
-      placeholder: 'Your Twilio Auth Token',
-      required: true,
-      description: 'Keep this secure'
-    },
-    {
-      name: 'phoneNumber',
-      label: 'Default Phone Number',
-      type: 'text',
-      placeholder: '+33123456789',
-      required: true,
-      description: 'Your Twilio phone number'
-    },
-    {
-      name: 'messagingServiceSid',
-      label: 'Messaging Service SID',
-      type: 'text',
-      placeholder: 'MG1234567890abcdef (optional)',
-      required: false,
-      description: 'For advanced messaging features'
-    },
-    {
-      name: 'enableStatusCallbacks',
-      label: 'Enable delivery status callbacks',
-      type: 'checkbox',
-      description: 'Track message delivery status'
-    }
-  ];
+  {
+    name: 'accountSid',
+    label: 'Account SID',
+    type: 'text',
+    placeholder: 'Your Twilio Account SID',
+    required: true,
+    description: 'Found in your Twilio Console'
+  },
+  {
+    name: 'authToken',
+    label: 'Auth Token',
+    type: 'password',
+    placeholder: 'Your Twilio Auth Token',
+    required: true,
+    description: 'Keep this secure'
+  },
+  {
+    name: 'phoneNumber',
+    label: 'Default Phone Number',
+    type: 'text',
+    placeholder: '+33123456789',
+    required: true,
+    description: 'Your Twilio phone number'
+  },
+  {
+    name: 'messagingServiceSid',
+    label: 'Messaging Service SID',
+    type: 'text',
+    placeholder: 'MG1234567890abcdef (optional)',
+    required: false,
+    description: 'For advanced messaging features'
+  },
+  {
+    name: 'enableStatusCallbacks',
+    label: 'Enable delivery status callbacks',
+    type: 'checkbox',
+    description: 'Track message delivery status'
+  }];
+
   const webhookEvents = [
-    'message.sent',
-    'message.delivered',
-    'message.failed',
-    'message.received',
-    'call.initiated',
-    'call.completed'
-  ];
+  'message.sent',
+  'message.delivered',
+  'message.failed',
+  'message.received',
+  'call.initiated',
+  'call.completed'];
+
   const apiEndpoints = [
-    {
-      method: 'POST',
-      path: '/api/integrations/twilio/messages/send',
-      description: 'Send an SMS or WhatsApp message'
-    },
-    {
-      method: 'GET',
-      path: '/api/integrations/twilio/messages',
-      description: 'List sent messages'
-    },
-    {
-      method: 'POST',
-      path: '/api/integrations/twilio/messages/bulk',
-      description: 'Send bulk messages'
-    },
-    {
-      method: 'GET',
-      path: '/api/integrations/twilio/phone-numbers',
-      description: 'List available phone numbers'
-    }
-  ];
-  const customOverview = (
-    <>
+  {
+    method: 'POST',
+    path: '/api/integrations/twilio/messages/send',
+    description: 'Send an SMS or WhatsApp message'
+  },
+  {
+    method: 'GET',
+    path: '/api/integrations/twilio/messages',
+    description: 'List sent messages'
+  },
+  {
+    method: 'POST',
+    path: '/api/integrations/twilio/messages/bulk',
+    description: 'Send bulk messages'
+  },
+  {
+    method: 'GET',
+    path: '/api/integrations/twilio/phone-numbers',
+    description: 'List available phone numbers'
+  }];
+
+  const customOverview =
+  <>
       {/* Account Overview */}
       <Card>
         <div className="p-6">
@@ -131,12 +132,12 @@ const TwilioIntegration = ({ integration, onBack }) => {
                 <MessageSquare className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold">Twilio Account</h3>
+                <h3 className="text-lg font-semibold">{t("components.twilio_account")}</h3>
                 <p className="text-sm text-gray-500">SID: {accountInfo.accountSid}</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-600">Balance</p>
+              <p className="text-sm text-gray-600">{t("components.balance")}</p>
               <p className="text-xl font-bold">€{accountInfo.balance}</p>
             </div>
           </div>
@@ -144,39 +145,39 @@ const TwilioIntegration = ({ integration, onBack }) => {
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <MessageSquare className="w-5 h-5 mx-auto mb-2 text-gray-600" />
               <p className="text-2xl font-bold">{accountInfo.messagesThisMonth.toLocaleString()}</p>
-              <p className="text-sm text-gray-600">Messages</p>
+              <p className="text-sm text-gray-600">{t("components.messages")}</p>
             </div>
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <Phone className="w-5 h-5 mx-auto mb-2 text-gray-600" />
               <p className="text-2xl font-bold">{accountInfo.callsThisMonth}</p>
-              <p className="text-sm text-gray-600">Calls</p>
+              <p className="text-sm text-gray-600">{t("components.calls")}</p>
             </div>
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <TrendingUp className="w-5 h-5 mx-auto mb-2 text-gray-600" />
               <p className="text-2xl font-bold">98.5%</p>
-              <p className="text-sm text-gray-600">Delivery Rate</p>
+              <p className="text-sm text-gray-600">{t("components.delivery_rate")}</p>
             </div>
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <DollarSign className="w-5 h-5 mx-auto mb-2 text-gray-600" />
               <p className="text-2xl font-bold">€0.045</p>
-              <p className="text-sm text-gray-600">Avg Cost</p>
+              <p className="text-sm text-gray-600">{t("components.avg_cost")}</p>
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            <p className="text-sm text-gray-600">Phone Numbers:</p>
-            {accountInfo.phoneNumbers.map((number) => (
-              <Badge key={number} variant="secondary">
+            <p className="text-sm text-gray-600">{t("components.phone_numbers")}</p>
+            {accountInfo.phoneNumbers.map((number) =>
+          <Badge key={number} variant="secondary">
                 <Phone className="w-3 h-3 mr-1" />
                 {number}
               </Badge>
-            ))}
+          )}
           </div>
         </div>
       </Card>
       {/* Messaging Settings */}
       <Card>
         <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Messaging Configuration</h3>
+          <h3 className="text-lg font-semibold mb-4">{t("components.messaging_configuration")}</h3>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -186,50 +187,50 @@ const TwilioIntegration = ({ integration, onBack }) => {
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
-                    type="checkbox"
-                    checked={messagingSettings.enableSMS}
-                    onChange={() => setMessagingSettings({
-                      ...messagingSettings,
-                      enableSMS: !messagingSettings.enableSMS
-                    })}
-                    className="sr-only peer"
-                  />
+                  type="checkbox"
+                  checked={messagingSettings.enableSMS}
+                  onChange={() => setMessagingSettings({
+                    ...messagingSettings,
+                    enableSMS: !messagingSettings.enableSMS
+                  })}
+                  className="sr-only peer" />
+
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                 </label>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center">
                   <MessageSquare className="w-5 h-5 text-green-500 mr-2" />
-                  <span className="font-medium">WhatsApp</span>
+                  <span className="font-medium">{t("components.whatsapp")}</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
-                    type="checkbox"
-                    checked={messagingSettings.enableWhatsApp}
-                    onChange={() => setMessagingSettings({
-                      ...messagingSettings,
-                      enableWhatsApp: !messagingSettings.enableWhatsApp
-                    })}
-                    className="sr-only peer"
-                  />
+                  type="checkbox"
+                  checked={messagingSettings.enableWhatsApp}
+                  onChange={() => setMessagingSettings({
+                    ...messagingSettings,
+                    enableWhatsApp: !messagingSettings.enableWhatsApp
+                  })}
+                  className="sr-only peer" />
+
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                 </label>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-purple-500 mr-2" />
-                  <span className="font-medium">Voice</span>
+                  <span className="font-medium">{t("components.voice")}</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
-                    type="checkbox"
-                    checked={messagingSettings.enableVoice}
-                    onChange={() => setMessagingSettings({
-                      ...messagingSettings,
-                      enableVoice: !messagingSettings.enableVoice
-                    })}
-                    className="sr-only peer"
-                  />
+                  type="checkbox"
+                  checked={messagingSettings.enableVoice}
+                  onChange={() => setMessagingSettings({
+                    ...messagingSettings,
+                    enableVoice: !messagingSettings.enableVoice
+                  })}
+                  className="sr-only peer" />
+
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                 </label>
               </div>
@@ -237,48 +238,48 @@ const TwilioIntegration = ({ integration, onBack }) => {
             <div className="border rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="font-medium">Quiet Hours</p>
-                  <p className="text-sm text-gray-500">Prevent non-urgent messages during these hours</p>
+                  <p className="font-medium">{t("components.quiet_hours")}</p>
+                  <p className="text-sm text-gray-500">{t("components.prevent_nonurgent_messages_during_these_hours")}</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
-                    type="checkbox"
-                    checked={messagingSettings.quietHoursEnabled}
-                    onChange={() => setMessagingSettings({
-                      ...messagingSettings,
-                      quietHoursEnabled: !messagingSettings.quietHoursEnabled
-                    })}
-                    className="sr-only peer"
-                  />
+                  type="checkbox"
+                  checked={messagingSettings.quietHoursEnabled}
+                  onChange={() => setMessagingSettings({
+                    ...messagingSettings,
+                    quietHoursEnabled: !messagingSettings.quietHoursEnabled
+                  })}
+                  className="sr-only peer" />
+
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                 </label>
               </div>
-              {messagingSettings.quietHoursEnabled && (
-                <div className="flex items-center space-x-4">
+              {messagingSettings.quietHoursEnabled &&
+            <div className="flex items-center space-x-4">
                   <div className="flex items-center">
                     <Clock className="w-4 h-4 text-gray-400 mr-2" />
                     <input
-                      type="time"
-                      value={messagingSettings.quietHoursStart}
-                      onChange={(e) => setMessagingSettings({
-                        ...messagingSettings,
-                        quietHoursStart: e.target.value
-                      })}
-                      className="form-input rounded-md border-gray-300"
-                    />
+                  type="time"
+                  value={messagingSettings.quietHoursStart}
+                  onChange={(e) => setMessagingSettings({
+                    ...messagingSettings,
+                    quietHoursStart: e.target.value
+                  })}
+                  className="form-input rounded-md border-gray-300" />
+
                   </div>
                   <span className="text-gray-500">to</span>
                   <input
-                    type="time"
-                    value={messagingSettings.quietHoursEnd}
-                    onChange={(e) => setMessagingSettings({
-                      ...messagingSettings,
-                      quietHoursEnd: e.target.value
-                    })}
-                    className="form-input rounded-md border-gray-300"
-                  />
+                type="time"
+                value={messagingSettings.quietHoursEnd}
+                onChange={(e) => setMessagingSettings({
+                  ...messagingSettings,
+                  quietHoursEnd: e.target.value
+                })}
+                className="form-input rounded-md border-gray-300" />
+
                 </div>
-              )}
+            }
             </div>
           </div>
         </div>
@@ -286,10 +287,10 @@ const TwilioIntegration = ({ integration, onBack }) => {
       {/* Notification Types */}
       <Card>
         <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Notification Types</h3>
+          <h3 className="text-lg font-semibold mb-4">{t("components.notification_types")}</h3>
           <div className="space-y-3">
-            {Object.entries(notificationTypes).map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between py-2">
+            {Object.entries(notificationTypes).map(([key, value]) =>
+          <div key={key} className="flex items-center justify-between py-2">
                 <div>
                   <p className="font-medium capitalize">
                     {key.replace(/([A-Z])/g, ' $1').trim()}
@@ -305,18 +306,18 @@ const TwilioIntegration = ({ integration, onBack }) => {
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
-                    type="checkbox"
-                    checked={value}
-                    onChange={() => setNotificationTypes({
-                      ...notificationTypes,
-                      [key]: !value
-                    })}
-                    className="sr-only peer"
-                  />
+                type="checkbox"
+                checked={value}
+                onChange={() => setNotificationTypes({
+                  ...notificationTypes,
+                  [key]: !value
+                })}
+                className="sr-only peer" />
+
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                 </label>
               </div>
-            ))}
+          )}
           </div>
         </div>
       </Card>
@@ -324,67 +325,67 @@ const TwilioIntegration = ({ integration, onBack }) => {
       <Card>
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Message Templates</h3>
-            <Button variant="primary" size="sm">
-              Create Template
-            </Button>
+            <h3 className="text-lg font-semibold">{t("components.message_templates")}</h3>
+            <Button variant="primary" size="sm">{t("components.create_template")}
+
+          </Button>
           </div>
           <div className="space-y-3">
-            {messageTemplates.map((template) => (
-              <div key={template.id} className="flex items-center justify-between p-3 border rounded-lg">
+            {messageTemplates.map((template) =>
+          <div key={template.id} className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center">
                   <MessageSquare className="w-5 h-5 text-gray-400 mr-3" />
                   <div>
                     <p className="font-medium">{template.name}</p>
                     <p className="text-sm text-gray-500">
-                      {template.type.toUpperCase()} · Used {template.usage} times · {template.lastUsed}
+                      {template.type.toUpperCase()}{t("components._used")}{template.usage}{t("components.times_")}{template.lastUsed}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm">
-                    Edit
-                  </Button>
+                  <Button variant="ghost" size="sm">{t("components.edit")}
+
+              </Button>
                   <Button variant="ghost" size="sm">
                     <Send className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
-            ))}
+          )}
           </div>
         </div>
       </Card>
       {/* Quick Actions */}
       <Card>
         <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+          <h3 className="text-lg font-semibold mb-4">{t("archive-components.quick_actions")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button className="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
               <Send className="w-5 h-5 text-red-600 mr-3" />
               <div className="text-left">
-                <p className="font-medium">Send Message</p>
-                <p className="text-sm text-gray-500">Send SMS or WhatsApp</p>
+                <p className="font-medium">{t("components.send_message")}</p>
+                <p className="text-sm text-gray-500">{t("components.send_sms_or_whatsapp")}</p>
               </div>
             </button>
             <button className="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
               <Users className="w-5 h-5 text-blue-600 mr-3" />
               <div className="text-left">
-                <p className="font-medium">Bulk Messaging</p>
-                <p className="text-sm text-gray-500">Message multiple recipients</p>
+                <p className="font-medium">{t("components.bulk_messaging")}</p>
+                <p className="text-sm text-gray-500">{t("components.message_multiple_recipients")}</p>
               </div>
             </button>
             <button className="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
               <Zap className="w-5 h-5 text-yellow-600 mr-3" />
               <div className="text-left">
-                <p className="font-medium">Test Message</p>
-                <p className="text-sm text-gray-500">Send a test notification</p>
+                <p className="font-medium">{t("components.test_message")}</p>
+                <p className="text-sm text-gray-500">{t("components.send_a_test_notification")}</p>
               </div>
             </button>
             <button className="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
               <BarChart3 className="w-5 h-5 text-purple-600 mr-3" />
               <div className="text-left">
-                <p className="font-medium">Usage Report</p>
-                <p className="text-sm text-gray-500">View detailed analytics</p>
+                <p className="font-medium">{t("components.usage_report")}</p>
+                <p className="text-sm text-gray-500">{t("components.view_detailed_analytics")}</p>
               </div>
             </button>
           </div>
@@ -393,15 +394,15 @@ const TwilioIntegration = ({ integration, onBack }) => {
       {/* Recent Messages */}
       <Card>
         <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Recent Messages</h3>
+          <h3 className="text-lg font-semibold mb-4">{t("components.recent_messages")}</h3>
           <div className="space-y-3">
             {[
-              { to: '+33612345678', message: 'Reminder: Python class tomorrow at 10 AM', status: 'delivered', time: '5 minutes ago', type: 'sms' },
-              { to: '+33698765432', message: 'Your assignment has been graded', status: 'delivered', time: '30 minutes ago', type: 'whatsapp' },
-              { to: '+33745678901', message: 'Welcome to BDC Academy!', status: 'sent', time: '1 hour ago', type: 'sms' },
-              { to: '+33632145698', message: 'Payment reminder', status: 'failed', time: '2 hours ago', type: 'sms', error: 'Invalid number' }
-            ].map((msg, index) => (
-              <div key={index} className="flex items-start justify-between py-3 border-b">
+          { to: '+33612345678', message: 'Reminder: Python class tomorrow at 10 AM', status: 'delivered', time: '5 minutes ago', type: 'sms' },
+          { to: '+33698765432', message: 'Your assignment has been graded', status: 'delivered', time: '30 minutes ago', type: 'whatsapp' },
+          { to: '+33745678901', message: 'Welcome to BDC Academy!', status: 'sent', time: '1 hour ago', type: 'sms' },
+          { to: '+33632145698', message: 'Payment reminder', status: 'failed', time: '2 hours ago', type: 'sms', error: 'Invalid number' }].
+          map((msg, index) =>
+          <div key={index} className="flex items-start justify-between py-3 border-b">
                 <div>
                   <div className="flex items-center space-x-2 mb-1">
                     <p className="text-sm font-medium">{msg.to}</p>
@@ -410,36 +411,36 @@ const TwilioIntegration = ({ integration, onBack }) => {
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-600">{msg.message}</p>
-                  {msg.error && (
-                    <p className="text-xs text-red-600 mt-1">{msg.error}</p>
-                  )}
+                  {msg.error &&
+              <p className="text-xs text-red-600 mt-1">{msg.error}</p>
+              }
                 </div>
                 <div className="text-right">
                   <Badge variant={
-                    msg.status === 'delivered' ? 'success' :
-                    msg.status === 'sent' ? 'warning' : 'danger'
-                  } size="sm">
+              msg.status === 'delivered' ? 'success' :
+              msg.status === 'sent' ? 'warning' : 'danger'
+              } size="sm">
                     {msg.status}
                   </Badge>
                   <p className="text-xs text-gray-500 mt-1">{msg.time}</p>
                 </div>
               </div>
-            ))}
+          )}
           </div>
         </div>
       </Card>
-    </>
-  );
+    </>;
+
   return (
     <BaseIntegration
       integration={integration}
       onBack={onBack}
       configFields={configFields}
       webhookEvents={webhookEvents}
-      apiEndpoints={apiEndpoints}
-    >
+      apiEndpoints={apiEndpoints}>
+
       {customOverview}
-    </BaseIntegration>
-  );
+    </BaseIntegration>);
+
 };
 export default TwilioIntegration;

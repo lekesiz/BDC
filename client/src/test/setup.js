@@ -1,73 +1,89 @@
 import '@testing-library/jest-dom';
-import { afterEach, vi } from 'vitest';
-import { cleanup } from '@testing-library/react';
-// Cleanup after each test case (e.g. clearing jsdom)
-afterEach(() => {
-  cleanup();
-});
+import { vi } from 'vitest';
+
+// Mock i18n for tests
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key,
+    i18n: {
+      language: 'en',
+      changeLanguage: vi.fn(),
+      use: vi.fn(),
+      init: vi.fn(),
+    },
+  }),
+  initReactI18next: {
+    type: '3rdParty',
+    init: vi.fn(),
+  },
+  I18nextProvider: ({ children }) => children,
+}));
+
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: (query) => ({
+  value: vi.fn().mockImplementation(query => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => {},
-  }),
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
 });
+
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
   constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
+  observe() {
+    return null;
+  }
+  disconnect() {
+    return null;
+  }
+  unobserve() {
+    return null;
+  }
 };
+
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
-// Mock localStorage
-const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-};
-global.localStorage = localStorageMock;
-// Suppress console warnings for tests
-const originalWarn = console.warn;
-console.warn = (...args) => {
-  // Suppress React Router future flag warnings in tests
-  if (args[0]?.includes?.('React Router Future Flag Warning')) {
-    return;
+global.ResizeObserver = class ResizeObserver {
+  constructor() {}
+  observe() {
+    return null;
   }
-  originalWarn(...args);
+  disconnect() {
+    return null;
+  }
+  unobserve() {
+    return null;
+  }
 };
-// Set test environment
-import.meta.env.DEV = false;
-import.meta.env.VITE_USE_MOCK_API = 'false';
-// Mock the api module
-vi.mock('@/lib/api', () => ({
-  default: {
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn(),
-    patch: vi.fn(),
-    interceptors: {
-      request: { use: vi.fn() },
-      response: { use: vi.fn() }
-    },
-    defaults: {
-      headers: {
-        common: {}
-      }
+
+// Mock canvas for charts
+HTMLCanvasElement.prototype.getContext = vi.fn();
+
+// Mock scrollTo
+window.scrollTo = vi.fn();
+
+// Suppress console errors in tests
+const originalError = console.error;
+beforeAll(() => {
+  console.error = (...args) => {
+    if (
+      typeof args[0] === 'string' &&
+      (args[0].includes('Warning: ReactDOM.render') ||
+       args[0].includes('Warning: An update to') ||
+       args[0].includes('Warning: <PieChart />'))
+    ) {
+      return;
     }
-  }
-}));
+    originalError.call(console, ...args);
+  };
+});
+
+afterAll(() => {
+  console.error = originalError;
+});

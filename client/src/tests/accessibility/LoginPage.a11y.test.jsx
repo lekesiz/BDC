@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render as rtlRender, screen, act } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { BrowserRouter } from 'react-router-dom';
@@ -7,36 +8,36 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { ToastProvider } from '../../components/ui/toast';
 import { mockAuthContext } from '../../test/test-utils';
 // Mock framer-motion to avoid animation issues in tests
-vi.mock('framer-motion', () => {
+import { useTranslation } from "react-i18next";vi.mock('framer-motion', () => {
   const actual = require('../../test/__mocks__/framer-motion.js');
   return actual;
 });
 // Mock animated components
 vi.mock('../../components/animations', () => {
   return {
-    AnimatedButton: ({ children, isLoading, ...props }) => (
-      <button data-testid="animated-button" {...props}>{children}</button>
-    ),
-    AnimatedForm: ({ children, ...props }) => (
-      <form data-testid="animated-form" {...props}>{children}</form>
-    ),
-    AnimatedInput: ({ label, error, leftIcon, rightIcon, ...props }) => (
-      <div data-testid="animated-input">
+    AnimatedButton: ({ children, isLoading, ...props }) =>
+    <button data-testid="animated-button" {...props}>{children}</button>,
+
+    AnimatedForm: ({ children, ...props }) =>
+    <form data-testid="animated-form" {...props}>{children}</form>,
+
+    AnimatedInput: ({ label, error, leftIcon, rightIcon, ...props }) =>
+    <div data-testid="animated-input">
         <label htmlFor={props.id}>{label}</label>
         <input aria-label={label} {...props} />
         {error && <span role="alert">{error}</span>}
-      </div>
-    ),
-    AnimatedCheckbox: ({ label, ...props }) => (
-      <div data-testid="animated-checkbox">
-        <input 
-          type="checkbox" 
-          {...props} 
-          aria-label={label}
-        />
+      </div>,
+
+    AnimatedCheckbox: ({ label, ...props }) =>
+    <div data-testid="animated-checkbox">
+        <input
+        type="checkbox"
+        {...props}
+        aria-label={label} />
+
         <label htmlFor={props.id}>{label}</label>
       </div>
-    )
+
   };
 });
 // Mock hooks
@@ -74,15 +75,15 @@ vi.mock('react-router-dom', async () => {
 expect.extend(toHaveNoViolations);
 // Custom render function with auth context
 function render(ui, options) {
-  const wrapper = ({ children }) => (
-    <BrowserRouter>
+  const wrapper = ({ children }) =>
+  <BrowserRouter>
       <AuthContext.Provider value={mockAuthContext}>
         <ToastProvider>
           {children}
         </ToastProvider>
       </AuthContext.Provider>
-    </BrowserRouter>
-  );
+    </BrowserRouter>;
+
   return rtlRender(ui, { wrapper, ...options });
 }
 beforeEach(() => {
@@ -106,8 +107,8 @@ describe('LoginPage Accessibility', () => {
     expect(container.querySelectorAll('button').length).toBeGreaterThan(0);
     // Check for link to registration
     const links = container.querySelectorAll('a');
-    const registerLink = Array.from(links).find(link => 
-      link.textContent.includes('account') || link.textContent.includes('register')
+    const registerLink = Array.from(links).find((link) =>
+    link.textContent.includes('account') || link.textContent.includes('register')
     );
     expect(registerLink).toBeInTheDocument();
   });
@@ -118,8 +119,8 @@ describe('LoginPage Accessibility', () => {
     // Check that we have the expected inputs
     expect(inputs.length).toBeGreaterThanOrEqual(2);
     // Check that the labels exist
-    const emailInput = inputs.find(input => input.textContent.includes('Email'));
-    const passwordInput = inputs.find(input => input.textContent.includes('Password'));
+    const emailInput = inputs.find((input) => input.textContent.includes('Email'));
+    const passwordInput = inputs.find((input) => input.textContent.includes('Password'));
     expect(emailInput).toBeTruthy();
     expect(passwordInput).toBeTruthy();
   });
@@ -150,15 +151,15 @@ describe('LoginPage Accessibility', () => {
     const errorMessages = await findAllByRole('alert');
     expect(errorMessages.length).toBeGreaterThanOrEqual(1);
     // Check that one of them is about email being required
-    const emailError = errorMessages.find(el => 
-      el.textContent.toLowerCase().includes('email is required')
+    const emailError = errorMessages.find((el) =>
+    el.textContent.toLowerCase().includes('email is required')
     );
     expect(emailError).toBeTruthy();
   });
   it('validates form elements have proper attributes', () => {
     const { getAllByTestId } = render(<LoginPage />);
     const inputs = getAllByTestId('animated-input');
-    inputs.forEach(input => {
+    inputs.forEach((input) => {
       const inputElement = input.querySelector('input');
       const labelElement = input.querySelector('label');
       // Each input should have an aria-label
@@ -172,7 +173,7 @@ describe('LoginPage Accessibility', () => {
     const { container } = render(<LoginPage />);
     // Check for the account creation link
     const links = container.querySelectorAll('a');
-    const signUpLink = Array.from(links).find(link => link.textContent.includes('Sign up'));
+    const signUpLink = Array.from(links).find((link) => link.textContent.includes('Sign up'));
     expect(signUpLink).toBeInTheDocument();
     expect(signUpLink.getAttribute('href')).toBe('/register');
   });

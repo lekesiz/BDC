@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React, { useCallback, useEffect, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -43,7 +44,7 @@ import './RichTextEditor.css';
 // Utils
 import { htmlToMarkdown } from './utils/markdownConverter';
 // Register languages for syntax highlighting
-lowlight.registerLanguage('javascript', javascript);
+import { useTranslation } from "react-i18next";lowlight.registerLanguage('javascript', javascript);
 lowlight.registerLanguage('python', python);
 lowlight.registerLanguage('java', java);
 lowlight.registerLanguage('cpp', cpp);
@@ -65,78 +66,78 @@ const RichTextEditor = ({
   maxHeight = '600px',
   darkMode = false,
   onExport,
-  exportFormats = ['html', 'markdown'],
-}) => {
+  exportFormats = ['html', 'markdown']
+}) => {const { t } = useTranslation();
   const [isPreviewMode, setIsPreviewMode] = useState(showPreview);
   const [isFocused, setIsFocused] = useState(false);
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        heading: false,
-        bold: false,
-        italic: false,
-        strike: false,
-        bulletList: false,
-        orderedList: false,
-        history: false,
-        codeBlock: false,
-      }),
-      Bold,
-      Italic,
-      Underline,
-      Strike,
-      Heading.configure({
-        levels: [1, 2, 3, 4, 5, 6],
-      }),
-      BulletList,
-      OrderedList,
-      TaskList,
-      TaskItem.configure({
-        nested: true,
-      }),
-      CodeBlockLowlight.configure({
-        lowlight,
-        defaultLanguage: 'javascript',
-      }),
-      Image.configure({
-        inline: true,
-        allowBase64: true,
-        HTMLAttributes: {
-          class: 'rich-text-image',
-        },
-      }),
-      Table.configure({
-        resizable: true,
-      }),
-      TableRow,
-      TableHeader,
-      TableCell,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer',
-          class: 'rich-text-link',
-        },
-      }),
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-        alignments: ['left', 'center', 'right', 'justify'],
-      }),
-      History.configure({
-        depth: 100,
-      }),
-      Highlight.configure({
-        multicolor: true,
-      }),
-      TextStyle,
-      Color,
-      // Custom extensions
-      QuestionHint,
-      CorrectAnswer,
-      ExplanationBlock,
-      Mathematics,
-    ],
+    StarterKit.configure({
+      heading: false,
+      bold: false,
+      italic: false,
+      strike: false,
+      bulletList: false,
+      orderedList: false,
+      history: false,
+      codeBlock: false
+    }),
+    Bold,
+    Italic,
+    Underline,
+    Strike,
+    Heading.configure({
+      levels: [1, 2, 3, 4, 5, 6]
+    }),
+    BulletList,
+    OrderedList,
+    TaskList,
+    TaskItem.configure({
+      nested: true
+    }),
+    CodeBlockLowlight.configure({
+      lowlight,
+      defaultLanguage: 'javascript'
+    }),
+    Image.configure({
+      inline: true,
+      allowBase64: true,
+      HTMLAttributes: {
+        class: 'rich-text-image'
+      }
+    }),
+    Table.configure({
+      resizable: true
+    }),
+    TableRow,
+    TableHeader,
+    TableCell,
+    Link.configure({
+      openOnClick: false,
+      HTMLAttributes: {
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        class: 'rich-text-link'
+      }
+    }),
+    TextAlign.configure({
+      types: ['heading', 'paragraph'],
+      alignments: ['left', 'center', 'right', 'justify']
+    }),
+    History.configure({
+      depth: 100
+    }),
+    Highlight.configure({
+      multicolor: true
+    }),
+    TextStyle,
+    Color,
+    // Custom extensions
+    QuestionHint,
+    CorrectAnswer,
+    ExplanationBlock,
+    Mathematics],
+
     content,
     editable: editable && !isPreviewMode,
     onUpdate: ({ editor }) => {
@@ -144,16 +145,16 @@ const RichTextEditor = ({
         onChange({
           html: editor.getHTML(),
           text: editor.getText(),
-          json: editor.getJSON(),
+          json: editor.getJSON()
         });
       }
     },
     editorProps: {
       attributes: {
         class: `rich-text-editor-content ${darkMode ? 'dark' : ''} ${className}`,
-        style: `min-height: ${minHeight}; max-height: ${maxHeight}; height: ${height};`,
-      },
-    },
+        style: `min-height: ${minHeight}; max-height: ${maxHeight}; height: ${height};`
+      }
+    }
   });
   // Handle image upload
   const handleImageUpload = useCallback(
@@ -254,44 +255,44 @@ const RichTextEditor = ({
     return (
       <div className="rich-text-editor-loading">
         <div className="spinner" />
-      </div>
-    );
+      </div>);
+
   }
   return (
     <div
       className={`rich-text-editor ${darkMode ? 'dark' : ''} ${
-        isFocused ? 'focused' : ''
-      } ${className}`}
-    >
-      {showToolbar && !isPreviewMode && (
-        <EditorToolbar
-          editor={editor}
-          onImageUpload={handleImageUpload}
-          onTogglePreview={togglePreview}
-          onExport={handleExport}
-          exportFormats={exportFormats}
-          darkMode={darkMode}
-        />
-      )}
+      isFocused ? 'focused' : ''} ${
+      className}`}>
+
+      {showToolbar && !isPreviewMode &&
+      <EditorToolbar
+        editor={editor}
+        onImageUpload={handleImageUpload}
+        onTogglePreview={togglePreview}
+        onExport={handleExport}
+        exportFormats={exportFormats}
+        darkMode={darkMode} />
+
+      }
       <div className="rich-text-editor-wrapper">
         <EditorContent
           editor={editor}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-        />
-        {!content && !isFocused && editable && (
-          <div className="rich-text-editor-placeholder">{placeholder}</div>
-        )}
+          onBlur={() => setIsFocused(false)} />
+
+        {!content && !isFocused && editable &&
+        <div className="rich-text-editor-placeholder">{placeholder}</div>
+        }
       </div>
-      {isPreviewMode && (
-        <div className="rich-text-editor-preview-banner">
-          <span>Preview Mode</span>
-          <button onClick={togglePreview} className="preview-toggle-btn">
-            Exit Preview
-          </button>
+      {isPreviewMode &&
+      <div className="rich-text-editor-preview-banner">
+          <span>{t("components.preview_mode")}</span>
+          <button onClick={togglePreview} className="preview-toggle-btn">{t("components.exit_preview")}
+
+        </button>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 export default RichTextEditor;

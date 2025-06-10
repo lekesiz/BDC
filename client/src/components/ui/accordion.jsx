@@ -1,8 +1,9 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
  * Accordion context to manage accordion state
- */
+ */import { useTranslation } from "react-i18next";
 const AccordionContext = React.createContext(null);
 /**
  * Accordion container component that manages the active items
@@ -17,16 +18,16 @@ const AccordionContext = React.createContext(null);
  * @param {React.ReactNode} props.children - Accordion content
  * @returns {JSX.Element} Accordion component
  */
-const Accordion = ({ 
+const Accordion = ({
   defaultValue,
   value: controlledValue,
   onValueChange,
   collapsible = false,
   multiple = false,
-  className, 
-  children, 
-  ...props 
-}) => {
+  className,
+  children,
+  ...props
+}) => {const { t } = useTranslation();
   const getInitialValue = () => {
     if (multiple) {
       return defaultValue || [];
@@ -48,9 +49,9 @@ const Accordion = ({
       const currentValues = Array.isArray(activeValue) ? activeValue : [];
       if (currentValues.includes(itemValue)) {
         // If already selected, remove it (if collapsible) or keep it
-        return collapsible 
-          ? currentValues.filter(v => v !== itemValue) 
-          : currentValues;
+        return collapsible ?
+        currentValues.filter((v) => v !== itemValue) :
+        currentValues;
       } else {
         // If not selected, add it
         return [...currentValues, itemValue];
@@ -67,17 +68,17 @@ const Accordion = ({
     return activeValue === itemValue;
   };
   return (
-    <AccordionContext.Provider 
-      value={{ value: activeValue, onValueChange: handleValueChange, isItemActive }}
-    >
-      <div 
-        className={cn("space-y-1", className)} 
-        {...props}
-      >
+    <AccordionContext.Provider
+      value={{ value: activeValue, onValueChange: handleValueChange, isItemActive }}>
+
+      <div
+        className={cn("space-y-1", className)}
+        {...props}>
+
         {children}
       </div>
-    </AccordionContext.Provider>
-  );
+    </AccordionContext.Provider>);
+
 };
 /**
  * Accordion item component that contains a trigger and content
@@ -89,34 +90,34 @@ const Accordion = ({
  * @param {React.ReactNode} props.children - Item content (should be AccordionTrigger and AccordionContent)
  * @returns {JSX.Element} AccordionItem component
  */
-const AccordionItem = ({ 
+const AccordionItem = ({
   value,
   disabled = false,
-  className, 
-  children, 
-  ...props 
-}) => {
+  className,
+  children,
+  ...props
+}) => {const { t } = useTranslation();
   const itemContext = React.useMemo(() => ({ value, disabled }), [value, disabled]);
   const itemContextRef = React.useRef(itemContext);
   itemContextRef.current = itemContext;
   return (
-    <div 
+    <div
       data-state={itemContextRef.current.disabled ? "disabled" : "enabled"}
       className={cn(
         "border border-border rounded-md overflow-hidden",
         disabled && "opacity-50 cursor-not-allowed",
         className
-      )} 
-      {...props}
-    >
-      {React.Children.map(children, child => {
+      )}
+      {...props}>
+
+      {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, { itemContext: itemContextRef.current });
         }
         return child;
       })}
-    </div>
-  );
+    </div>);
+
 };
 /**
  * Accordion trigger component that toggles the visibility of content
@@ -127,12 +128,12 @@ const AccordionItem = ({
  * @param {React.ReactNode} props.children - Trigger content
  * @returns {JSX.Element} AccordionTrigger component
  */
-const AccordionTrigger = ({ 
+const AccordionTrigger = ({
   itemContext,
-  className, 
-  children, 
-  ...props 
-}) => {
+  className,
+  children,
+  ...props
+}) => {const { t } = useTranslation();
   const { value, disabled } = itemContext || {};
   const { isItemActive, onValueChange } = React.useContext(AccordionContext);
   const isActive = value ? isItemActive(value) : false;
@@ -153,8 +154,8 @@ const AccordionTrigger = ({
         className
       )}
       onClick={handleClick}
-      {...props}
-    >
+      {...props}>
+
       {children}
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -169,12 +170,12 @@ const AccordionTrigger = ({
         className={cn(
           "h-4 w-4 shrink-0 transition-transform duration-200",
           isActive && "rotate-180"
-        )}
-      >
+        )}>
+
         <polyline points="6 9 12 15 18 9"></polyline>
       </svg>
-    </button>
-  );
+    </button>);
+
 };
 /**
  * Accordion content component that is shown when its trigger is active
@@ -185,12 +186,12 @@ const AccordionTrigger = ({
  * @param {React.ReactNode} props.children - Content to display
  * @returns {JSX.Element|null} AccordionContent component or null if inactive
  */
-const AccordionContent = ({ 
+const AccordionContent = ({
   itemContext,
-  className, 
-  children, 
-  ...props 
-}) => {
+  className,
+  children,
+  ...props
+}) => {const { t } = useTranslation();
   const { value } = itemContext || {};
   const { isItemActive } = React.useContext(AccordionContext);
   const isActive = value ? isItemActive(value) : false;
@@ -202,12 +203,12 @@ const AccordionContent = ({
         "overflow-hidden text-sm transition-all",
         className
       )}
-      {...props}
-    >
+      {...props}>
+
       <div className="p-4 pt-0">
         {children}
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };

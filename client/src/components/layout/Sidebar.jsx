@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Home,
   FileText,
@@ -19,6 +20,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useBreakpoint, useTouchDevice } from '@/hooks/useMediaQuery';
 import { tapTargetClasses } from '@/utils/responsive';
 const Sidebar = ({ isOpen, toggleSidebar }) => {
+  const { t } = useTranslation();
   const location = useLocation();
   const { user } = useAuth();
   const { isMobile, isTablet } = useBreakpoint();
@@ -233,7 +235,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                       role="menuitem"
                     >
                       <Icon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
-                      <span className="flex-1">{item.title}</span>
+                      <span className="flex-1">
+                        {item.id.startsWith('portal-') 
+                          ? t(`components.navigation.${item.id.replace('portal-', '').replace('-', '_')}`)
+                          : t(`components.navigation.${item.id}`)
+                        }
+                      </span>
                       {isActive(item.path) && (
                         <ChevronRight className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                       )}

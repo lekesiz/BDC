@@ -1,28 +1,29 @@
+// TODO: i18n - processed
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
 // Mock the notification provider
-const mockNotificationContext = {
+import { useTranslation } from "react-i18next";const mockNotificationContext = {
   notifications: [
-    {
-      id: 1,
-      title: 'Test Notification',
-      message: 'This is a test notification',
-      type: 'info',
-      is_read: false,
-      created_at: '2025-05-22T10:00:00Z',
-      action_url: '/test'
-    },
-    {
-      id: 2,
-      title: 'Warning Notification',
-      message: 'This is a warning',
-      type: 'warning',
-      is_read: true,
-      created_at: '2025-05-22T09:00:00Z'
-    }
-  ],
+  {
+    id: 1,
+    title: 'Test Notification',
+    message: 'This is a test notification',
+    type: 'info',
+    is_read: false,
+    created_at: '2025-05-22T10:00:00Z',
+    action_url: '/test'
+  },
+  {
+    id: 2,
+    title: 'Warning Notification',
+    message: 'This is a warning',
+    type: 'warning',
+    is_read: true,
+    created_at: '2025-05-22T09:00:00Z'
+  }],
+
   unreadCount: 1,
   markAsRead: vi.fn(),
   deleteNotifications: vi.fn(),

@@ -1,0 +1,109 @@
+{
+  "timestamp": "2025-06-05T21:26:54.436Z",
+  "languages": {
+    "en": {
+      "totalKeys": 32480,
+      "translated": 32480,
+      "untranslated": 0,
+      "coverage": 100,
+      "frontend": {
+        "keys": 15432,
+        "translated": 15432
+      },
+      "backend": {
+        "keys": 17048,
+        "translated": 17048
+      }
+    },
+    "tr": {
+      "totalKeys": 32480,
+      "translated": 137,
+      "untranslated": 32343,
+      "coverage": 0,
+      "frontend": {
+        "keys": 15432,
+        "translated": 66
+      },
+      "backend": {
+        "keys": 17048,
+        "translated": 71
+      }
+    },
+    "ar": {
+      "totalKeys": 32480,
+      "translated": 137,
+      "untranslated": 32343,
+      "coverage": 0,
+      "frontend": {
+        "keys": 15432,
+        "translated": 66
+      },
+      "backend": {
+        "keys": 17048,
+        "translated": 71
+      }
+    },
+    "es": {
+      "totalKeys": 32480,
+      "translated": 137,
+      "untranslated": 32343,
+      "coverage": 0,
+      "frontend": {
+        "keys": 15432,
+        "translated": 66
+      },
+      "backend": {
+        "keys": 17048,
+        "translated": 71
+      }
+    },
+    "fr": {
+      "totalKeys": 32480,
+      "translated": 137,
+      "untranslated": 32343,
+      "coverage": 0,
+      "frontend": {
+        "keys": 15432,
+        "translated": 66
+      },
+      "backend": {
+        "keys": 17048,
+        "translated": 71
+      }
+    },
+    "de": {
+      "totalKeys": 32480,
+      "translated": 137,
+      "untranslated": 32343,
+      "coverage": 0,
+      "frontend": {
+        "keys": 15432,
+        "translated": 66
+      },
+      "backend": {
+        "keys": 17048,
+        "translated": 71
+      }
+    },
+    "ru": {
+      "totalKeys": 32480,
+      "translated": 137,
+      "untranslated": 32343,
+      "coverage": 0,
+      "frontend": {
+        "keys": 15432,
+        "translated": 66
+      },
+      "backend": {
+        "keys": 17048,
+        "translated": 71
+      }
+    }
+  },
+  "overall": {
+    "totalKeys": 227360,
+    "translated": 33302,
+    "missing": 194058,
+    "coverage": 15
+  }
+}

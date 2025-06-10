@@ -1,7 +1,8 @@
+// TODO: i18n - processed
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
 import { useAuth } from '../hooks/useAuth';
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';import { useTranslation } from "react-i18next";
 const SocketContext = createContext();
 export const useSocket = () => {
   const context = useContext(SocketContext);
@@ -10,7 +11,7 @@ export const useSocket = () => {
   }
   return context;
 };
-export const SocketProvider = ({ children }) => {
+export const SocketProvider = ({ children }) => {const { t } = useTranslation();
   const { user, isAuthenticated } = useAuth();
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
@@ -58,9 +59,9 @@ export const SocketProvider = ({ children }) => {
         }
       });
       newSocket.on('message', (data) => {
+
         // Handle chat messages
-      });
-      // Program real-time events
+      }); // Program real-time events
       newSocket.on('program_created', (data) => {
         toast.success(`New program created: ${data.program?.name}`);
         // Trigger program list refresh
@@ -99,7 +100,7 @@ export const SocketProvider = ({ children }) => {
   // Emit event helper
   const emit = (event, data, callback) => {
     if (socketRef.current && connected) {
-        if (callback) {
+      if (callback) {
         socketRef.current.emit(event, data, callback);
       } else {
         socketRef.current.emit(event, data);
@@ -159,6 +160,6 @@ export const SocketProvider = ({ children }) => {
   return (
     <SocketContext.Provider value={value}>
       {children}
-    </SocketContext.Provider>
-  );
+    </SocketContext.Provider>);
+
 };

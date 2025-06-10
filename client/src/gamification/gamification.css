@@ -1,0 +1,408 @@
+/* Gamification CSS Styles */
+
+/* Badge Animations */
+@keyframes badge-pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  50% { 
+    transform: scale(1.05); 
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@keyframes badge-sparkle {
+  0%, 100% { 
+    filter: brightness(1) saturate(1); 
+    transform: scale(1);
+  }
+  25% { 
+    filter: brightness(1.2) saturate(1.3); 
+    transform: scale(1.02);
+  }
+  50% { 
+    filter: brightness(1.4) saturate(1.5); 
+    transform: scale(1.05);
+  }
+  75% { 
+    filter: brightness(1.2) saturate(1.3); 
+    transform: scale(1.02);
+  }
+}
+
+@keyframes badge-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* Badge Components */
+.badge-common {
+  background: linear-gradient(135deg, #9CA3AF, #6B7280);
+  border: 2px solid #4B5563;
+  color: white;
+}
+
+.badge-uncommon {
+  background: linear-gradient(135deg, #10B981, #059669);
+  border: 2px solid #047857;
+  color: white;
+}
+
+.badge-rare {
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  border: 2px solid #1E40AF;
+  color: white;
+}
+
+.badge-epic {
+  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  border: 2px solid #6D28D9;
+  color: white;
+  animation: badge-pulse 3s infinite;
+}
+
+.badge-legendary {
+  background: linear-gradient(135deg, #F59E0B, #D97706, #EF4444);
+  border: 3px solid #DC2626;
+  color: white;
+  animation: badge-sparkle 2s infinite, badge-glow 3s infinite;
+  position: relative;
+}
+
+.badge-legendary::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #F59E0B, #EF4444, #F59E0B, #EF4444);
+  border-radius: inherit;
+  z-index: -1;
+  filter: blur(8px);
+  opacity: 0.7;
+}
+
+/* XP Progress Bar Styles */
+.xp-progress-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.xp-progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: xp-shimmer 2s infinite;
+}
+
+@keyframes xp-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Level Display Styles */
+.level-circle {
+  position: relative;
+}
+
+.level-circle::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent, currentColor, transparent);
+  z-index: -1;
+  animation: level-rotate 3s linear infinite;
+}
+
+@keyframes level-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Achievement Card Hover Effects */
+.achievement-card {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.achievement-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.achievement-card:hover::before {
+  left: 100%;
+}
+
+.achievement-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Leaderboard Rank Styles */
+.rank-1 {
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  border: 2px solid #F59E0B;
+  color: #92400E;
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+  border: 2px solid #9CA3AF;
+  color: #374151;
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, #FED7AA, #FDBA74);
+  border: 2px solid #EA580C;
+  color: #9A3412;
+}
+
+/* Social Feed Animation */
+.social-feed-item {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Progress Ring Animation */
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+  transition: stroke-dasharray 0.5s ease-in-out;
+}
+
+/* Milestone Celebration */
+.milestone-celebration {
+  animation: milestone-bounce 0.6s ease-in-out;
+}
+
+@keyframes milestone-bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -10px, 0);
+  }
+  70% {
+    transform: translate3d(0, -5px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Gamification Theme Colors */
+:root {
+  --gamification-primary: #3B82F6;
+  --gamification-secondary: #8B5CF6;
+  --gamification-success: #10B981;
+  --gamification-warning: #F59E0B;
+  --gamification-danger: #EF4444;
+  --gamification-info: #06B6D4;
+  
+  /* XP Colors */
+  --xp-bronze: #CD7F32;
+  --xp-silver: #C0C0C0;
+  --xp-gold: #FFD700;
+  --xp-platinum: #E5E4E2;
+  --xp-diamond: #B9F2FF;
+  
+  /* Level Colors */
+  --level-beginner: #10B981;
+  --level-intermediate: #3B82F6;
+  --level-advanced: #8B5CF6;
+  --level-expert: #EF4444;
+  --level-master: #F59E0B;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+  .gamification-dashboard {
+    padding: 1rem;
+  }
+  
+  .badge-showcase {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .leaderboard-entry {
+    padding: 0.75rem;
+  }
+  
+  .achievement-card {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .badge-showcase {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .level-display {
+    text-align: center;
+  }
+  
+  .xp-breakdown {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .achievement-card {
+    background-color: #1F2937;
+    border-color: #374151;
+  }
+  
+  .badge-common {
+    background: linear-gradient(135deg, #6B7280, #4B5563);
+  }
+  
+  .social-feed-item {
+    background-color: #1F2937;
+    border-color: #374151;
+  }
+  
+  .skeleton {
+    background: linear-gradient(90deg, #374151 25%, #4B5563 50%, #374151 75%);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .gamification-dashboard {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .badge-legendary,
+  .badge-epic {
+    animation: none !important;
+  }
+  
+  .social-feed,
+  .leaderboard-widget {
+    break-inside: avoid;
+  }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  .badge-legendary,
+  .badge-epic,
+  .xp-progress-bar::before,
+  .level-circle::after,
+  .achievement-card::before,
+  .social-feed-item,
+  .milestone-celebration {
+    animation: none !important;
+  }
+  
+  .achievement-card:hover {
+    transform: none;
+  }
+}
+
+/* Focus Styles */
+.gamification-button:focus,
+.badge-item:focus,
+.achievement-card:focus {
+  outline: 2px solid var(--gamification-primary);
+  outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .badge-common,
+  .badge-uncommon,
+  .badge-rare,
+  .badge-epic,
+  .badge-legendary {
+    border-width: 3px;
+  }
+  
+  .achievement-card {
+    border-width: 2px;
+  }
+  
+  .progress-bar {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Utility Classes */
+.text-gradient {
+  background: linear-gradient(135deg, var(--gamification-primary), var(--gamification-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glow-effect {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.hover-lift {
+  transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}

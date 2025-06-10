@@ -1,44 +1,45 @@
+// TODO: i18n - processed
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import BeneficiariesPageV2 from './BeneficiariesPageV2';
 import api from '@/lib/api';
 // Mock the API
-vi.mock('@/lib/api');
+import { useTranslation } from "react-i18next";vi.mock('@/lib/api');
 // Mock the navigation
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => mockNavigate,
+    useNavigate: () => mockNavigate
   };
 });
 const mockBeneficiariesData = {
   items: [
-    {
-      id: '1',
-      first_name: 'John',
-      last_name: 'Doe',
-      email: 'john@example.com',
-      phone: '+1234567890',
-      status: 'active',
-      created_at: '2024-01-01T00:00:00Z',
-      evaluation_count: 5,
-      completed_evaluation_count: 3
-    },
-    {
-      id: '2',
-      first_name: 'Jane',
-      last_name: 'Smith',
-      email: 'jane@example.com',
-      phone: null,
-      status: 'pending',
-      created_at: '2024-01-02T00:00:00Z',
-      evaluation_count: 2,
-      completed_evaluation_count: 0
-    },
-  ],
+  {
+    id: '1',
+    first_name: 'John',
+    last_name: 'Doe',
+    email: 'john@example.com',
+    phone: '+1234567890',
+    status: 'active',
+    created_at: '2024-01-01T00:00:00Z',
+    evaluation_count: 5,
+    completed_evaluation_count: 3
+  },
+  {
+    id: '2',
+    first_name: 'Jane',
+    last_name: 'Smith',
+    email: 'jane@example.com',
+    phone: null,
+    status: 'pending',
+    created_at: '2024-01-02T00:00:00Z',
+    evaluation_count: 2,
+    completed_evaluation_count: 0
+  }],
+
   total: 2,
   pages: 1,
   current_page: 1

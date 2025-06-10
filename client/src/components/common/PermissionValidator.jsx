@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * Component-level permission validation utilities
  */
@@ -9,7 +10,7 @@ import { Badge } from '../ui/badge';
 import { Card } from '../ui/card';
 /**
  * Higher-order component for permission-based rendering
- */
+ */import { useTranslation } from "react-i18next";
 export const withPermission = (WrappedComponent, requiredPermission, fallbackComponent = null) => {
   return function PermissionWrappedComponent(props) {
     const { user } = useAuth();
@@ -34,7 +35,7 @@ export const withRole = (WrappedComponent, requiredRoles, fallbackComponent = nu
 /**
  * Conditional rendering component based on permissions
  */
-export const IfPermission = ({ permission, children, fallback = null }) => {
+export const IfPermission = ({ permission, children, fallback = null }) => {const { t } = useTranslation();
   const { user } = useAuth();
   if (!user || !hasPermission(user.role, permission)) {
     return fallback;
@@ -44,7 +45,7 @@ export const IfPermission = ({ permission, children, fallback = null }) => {
 /**
  * Conditional rendering component based on roles
  */
-export const IfRole = ({ roles, children, fallback = null }) => {
+export const IfRole = ({ roles, children, fallback = null }) => {const { t } = useTranslation();
   const { user } = useAuth();
   if (!user || !hasRole(user.role, roles)) {
     return fallback;
@@ -54,9 +55,9 @@ export const IfRole = ({ roles, children, fallback = null }) => {
 /**
  * Conditional rendering component with multiple permission checks
  */
-export const IfAnyPermission = ({ permissions, children, fallback = null }) => {
+export const IfAnyPermission = ({ permissions, children, fallback = null }) => {const { t } = useTranslation();
   const { user } = useAuth();
-  if (!user || !permissions.some(permission => hasPermission(user.role, permission))) {
+  if (!user || !permissions.some((permission) => hasPermission(user.role, permission))) {
     return fallback;
   }
   return children;
@@ -64,9 +65,9 @@ export const IfAnyPermission = ({ permissions, children, fallback = null }) => {
 /**
  * Conditional rendering component requiring all permissions
  */
-export const IfAllPermissions = ({ permissions, children, fallback = null }) => {
+export const IfAllPermissions = ({ permissions, children, fallback = null }) => {const { t } = useTranslation();
   const { user } = useAuth();
-  if (!user || !permissions.every(permission => hasPermission(user.role, permission))) {
+  if (!user || !permissions.every((permission) => hasPermission(user.role, permission))) {
     return fallback;
   }
   return children;
@@ -74,12 +75,12 @@ export const IfAllPermissions = ({ permissions, children, fallback = null }) => 
 /**
  * Component that shows access denied message
  */
-export const AccessDenied = ({ 
-  title = "Access Restricted", 
+export const AccessDenied = ({
+  title = "Access Restricted",
   message = "You do not have permission to access this feature.",
   showRole = true,
   className = "flex items-center justify-center min-h-[300px]"
-}) => {
+}) => {const { t } = useTranslation();
   const { user } = useAuth();
   return (
     <div className={className}>
@@ -87,14 +88,14 @@ export const AccessDenied = ({
         <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
         <h2 className="text-xl font-semibold text-gray-900 mb-2">{title}</h2>
         <p className="text-gray-600 mb-4">{message}</p>
-        {showRole && user?.role && (
-          <p className="text-sm text-gray-500">
-            Current role: <Badge variant="secondary">{user.role}</Badge>
+        {showRole && user?.role &&
+        <p className="text-sm text-gray-500">{t("components.current_role")}
+          <Badge variant="secondary">{user.role}</Badge>
           </p>
-        )}
+        }
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 /**
  * Hook for checking permissions in components
@@ -108,10 +109,10 @@ export const usePermissions = () => {
     return user ? hasRole(user.role, roles) : false;
   };
   const checkAnyPermission = (permissions) => {
-    return user ? permissions.some(permission => hasPermission(user.role, permission)) : false;
+    return user ? permissions.some((permission) => hasPermission(user.role, permission)) : false;
   };
   const checkAllPermissions = (permissions) => {
-    return user ? permissions.every(permission => hasPermission(user.role, permission)) : false;
+    return user ? permissions.every((permission) => hasPermission(user.role, permission)) : false;
   };
   return {
     user,
@@ -126,14 +127,14 @@ export const usePermissions = () => {
 /**
  * Component for secure feature sections
  */
-export const SecureSection = ({ 
-  permission, 
-  roles, 
-  children, 
+export const SecureSection = ({
+  permission,
+  roles,
+  children,
   fallback = null,
   showAccessDenied = false,
   accessDeniedProps = {}
-}) => {
+}) => {const { t } = useTranslation();
   const { user } = useAuth();
   let hasAccess = false;
   if (permission && user) {

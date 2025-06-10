@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useCallback, useEffect, useRef } from 'react';
 /**
  * Custom hook for handling async operations with loading, error, and data states
@@ -5,7 +6,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
  * @param {Array} dependencies - Dependencies for the effect
  * @param {boolean} immediate - Whether to execute immediately on mount
  * @returns {Object} - { execute, data, loading, error, reset }
- */
+ */import { useTranslation } from "react-i18next";
 export const useAsync = (asyncFunction, dependencies = [], immediate = false) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -61,7 +62,7 @@ export const useAsync = (asyncFunction, dependencies = [], immediate = false) =>
     data,
     loading,
     error,
-    reset,
+    reset
   };
 };
 /**

@@ -1,20 +1,21 @@
+// TODO: i18n - processed
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { QUESTION_TYPES } from '@/lib/constants';
 import QuestionEditor from '@/components/evaluation/QuestionEditor';
 // Mock react-hook-form
-vi.mock('react-hook-form', () => ({
+import { useTranslation } from "react-i18next";vi.mock('react-hook-form', () => ({
   useFieldArray: vi.fn().mockReturnValue({
     fields: [],
     append: vi.fn(),
-    remove: vi.fn(),
-  }),
+    remove: vi.fn()
+  })
 }));
 // Test component that wraps QuestionEditor with react-hook-form
-const TestComponent = ({ defaultValues, questionType }) => {
+const TestComponent = ({ defaultValues, questionType }) => {const { t } = useTranslation();
   const { register, control, formState, watch, setValue, trigger } = useForm({
-    defaultValues,
+    defaultValues
   });
   return (
     <QuestionEditor
@@ -24,9 +25,9 @@ const TestComponent = ({ defaultValues, questionType }) => {
       errors={formState.errors}
       watch={watch}
       setValue={setValue}
-      trigger={trigger}
-    />
-  );
+      trigger={trigger} />);
+
+
 };
 describe('QuestionEditor', () => {
   const mockRegister = vi.fn().mockReturnValue({});
@@ -42,37 +43,37 @@ describe('QuestionEditor', () => {
       if (name === 'questions.0.options') {
         return {
           fields: [
-            { id: 'option1', text: 'Option 1', is_correct: false },
-            { id: 'option2', text: 'Option 2', is_correct: false },
-          ],
+          { id: 'option1', text: 'Option 1', is_correct: false },
+          { id: 'option2', text: 'Option 2', is_correct: false }],
+
           append: mockAppend,
-          remove: mockRemove,
+          remove: mockRemove
         };
       }
       if (name === 'questions.0.matches') {
         return {
           fields: [
-            { id: 'match1', left: 'Left 1', right: 'Right 1' },
-            { id: 'match2', left: 'Left 2', right: 'Right 2' },
-          ],
+          { id: 'match1', left: 'Left 1', right: 'Right 1' },
+          { id: 'match2', left: 'Left 2', right: 'Right 2' }],
+
           append: mockAppend,
-          remove: mockRemove,
+          remove: mockRemove
         };
       }
       if (name === 'questions.0.order_items') {
         return {
           fields: [
-            { id: 'item1', text: 'Item 1', position: 0 },
-            { id: 'item2', text: 'Item 2', position: 1 },
-          ],
+          { id: 'item1', text: 'Item 1', position: 0 },
+          { id: 'item2', text: 'Item 2', position: 1 }],
+
           append: mockAppend,
-          remove: mockRemove,
+          remove: mockRemove
         };
       }
       return {
         fields: [],
         append: mockAppend,
-        remove: mockRemove,
+        remove: mockRemove
       };
     });
     // Setup mock for watch function
@@ -95,8 +96,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Check for multiple choice specific elements
     expect(screen.getByText('Options*')).toBeInTheDocument();
@@ -111,8 +112,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Click add option button
     fireEvent.click(screen.getByText('Add Option'));
@@ -128,8 +129,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Get remove buttons (should be two)
     const removeButtons = screen.getAllByRole('button', { name: /minus/i });
@@ -147,8 +148,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Get radio buttons
     const radioButtons = screen.getAllByRole('radio');
@@ -156,9 +157,9 @@ describe('QuestionEditor', () => {
     fireEvent.click(radioButtons[0]);
     // Should call setValue with updated options array
     expect(mockSetValue).toHaveBeenCalledWith('questions.0.options', [
-      { text: '', is_correct: true },
-      { text: '', is_correct: false },
-    ]);
+    { text: '', is_correct: true },
+    { text: '', is_correct: false }]
+    );
   });
   it('renders text question type correctly when question type changes', () => {
     // Override watch for this test
@@ -176,8 +177,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Check for text question specific elements
     expect(screen.getByText('Correct Answer*')).toBeInTheDocument();
@@ -205,8 +206,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Check for true/false question specific elements
     expect(screen.getByText('Correct Answer*')).toBeInTheDocument();
@@ -235,8 +236,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Get true radio button
     const trueRadio = screen.getAllByRole('radio')[0];
@@ -262,8 +263,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Check for matching question specific elements
     expect(screen.getByText('Matching Pairs*')).toBeInTheDocument();
@@ -287,8 +288,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Click add pair button
     fireEvent.click(screen.getByText('Add Pair'));
@@ -311,8 +312,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Check for ordering question specific elements
     expect(screen.getByText('Items to Order*')).toBeInTheDocument();
@@ -335,14 +336,14 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Click add item button
     fireEvent.click(screen.getByText('Add Item'));
     // Should call append function with new item
-    expect(mockAppend).toHaveBeenCalledWith({ 
-      text: '', 
+    expect(mockAppend).toHaveBeenCalledWith({
+      text: '',
       position: 2 // Since there are already 2 items
     });
   });
@@ -362,8 +363,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Get up arrow buttons
     const upButtons = screen.getAllByRole('button', { name: /arrow-up/i });
@@ -371,9 +372,9 @@ describe('QuestionEditor', () => {
     fireEvent.click(upButtons[1]);
     // Should call setValue with reordered items
     expect(mockSetValue).toHaveBeenCalledWith('questions.0.order_items', [
-      { id: 'item2', text: 'Item 2', position: 0 },
-      { id: 'item1', text: 'Item 1', position: 1 },
-    ]);
+    { id: 'item2', text: 'Item 2', position: 0 },
+    { id: 'item1', text: 'Item 1', position: 1 }]
+    );
   });
   it('handles moving an ordering item down', () => {
     // Override watch for this test
@@ -391,8 +392,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Get down arrow buttons
     const downButtons = screen.getAllByRole('button', { name: /arrow-down/i });
@@ -400,9 +401,9 @@ describe('QuestionEditor', () => {
     fireEvent.click(downButtons[0]);
     // Should call setValue with reordered items
     expect(mockSetValue).toHaveBeenCalledWith('questions.0.order_items', [
-      { id: 'item2', text: 'Item 2', position: 0 },
-      { id: 'item1', text: 'Item 1', position: 1 },
-    ]);
+    { id: 'item2', text: 'Item 2', position: 0 },
+    { id: 'item1', text: 'Item 1', position: 1 }]
+    );
   });
   it('updates form when question type changes', () => {
     // Setup effect
@@ -415,8 +416,8 @@ describe('QuestionEditor', () => {
         errors={{}}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Should call useEffect
     expect(useEffectSpy).toHaveBeenCalled();
@@ -426,13 +427,13 @@ describe('QuestionEditor', () => {
   it('shows validation errors when they exist', () => {
     const errors = {
       questions: [
-        {
-          question_text: { message: 'Question text is required' },
-          options: [
-            { text: { message: 'Option text is required' } }
-          ]
-        }
-      ]
+      {
+        question_text: { message: 'Question text is required' },
+        options: [
+        { text: { message: 'Option text is required' } }]
+
+      }]
+
     };
     render(
       <QuestionEditor
@@ -442,8 +443,8 @@ describe('QuestionEditor', () => {
         errors={errors}
         watch={mockWatch}
         setValue={mockSetValue}
-        trigger={mockTrigger}
-      />
+        trigger={mockTrigger} />
+
     );
     // Should show validation errors
     expect(screen.getByText('Question text is required')).toBeInTheDocument();

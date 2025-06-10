@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect, useCallback, useRef } from 'react';
 import api from '@/lib/api';
 
@@ -10,7 +11,7 @@ import api from '@/lib/api';
  * @param {Function} options.onSuccess - Success callback
  * @param {Function} options.onError - Error callback
  * @param {Object} options.config - Axios config options
- */
+ */import { useTranslation } from "react-i18next";
 export const useApi = (url, options = {}) => {
   const {
     immediate = true,
@@ -86,7 +87,7 @@ export const useApi = (url, options = {}) => {
  */
 export const useMutation = (mutationFn, options = {}) => {
   const { onSuccess, onError } = options;
-  
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -113,7 +114,7 @@ export const useMutation = (mutationFn, options = {}) => {
       if (onSuccess) {
         onSuccess(result.data || result);
       }
-      
+
       return result;
     } catch (err) {
       if (err.name !== 'AbortError') {
@@ -192,12 +193,12 @@ export const usePaginatedApi = (baseUrl, options = {}) => {
       });
 
       const { items = [], total_pages = 0, total_items = 0 } = response.data;
-      
+
       setData(items);
       setTotalPages(total_pages);
       setTotalItems(total_items);
       setHasMore(pageNumber < total_pages);
-      
+
       if (onSuccess) {
         onSuccess(response.data);
       }

@@ -1,9 +1,10 @@
+// TODO: i18n - processed
 import { toast } from '@/components/ui/use-toast';
 /**
  * Centralized error handling utilities
  */
 // Error types
-export const ErrorTypes = {
+import { useTranslation } from "react-i18next";export const ErrorTypes = {
   NETWORK: 'NETWORK_ERROR',
   AUTHENTICATION: 'AUTHENTICATION_ERROR',
   AUTHORIZATION: 'AUTHORIZATION_ERROR',
@@ -140,19 +141,19 @@ export const createApiErrorHandler = (defaultOptions = {}) => {
  * Retry failed request with exponential backoff
  */
 export const retryWithBackoff = async (
-  fn,
-  {
-    maxAttempts = 3,
-    initialDelay = 1000,
-    maxDelay = 10000,
-    backoffFactor = 2,
-    shouldRetry = (error) => {
-      const errorType = getErrorType(error);
-      return [ErrorTypes.NETWORK, ErrorTypes.TIMEOUT, ErrorTypes.SERVER].includes(errorType);
-    },
-    onRetry = (attempt, delay) => {}
-  } = {}
-) => {
+fn,
+{
+  maxAttempts = 3,
+  initialDelay = 1000,
+  maxDelay = 10000,
+  backoffFactor = 2,
+  shouldRetry = (error) => {
+    const errorType = getErrorType(error);
+    return [ErrorTypes.NETWORK, ErrorTypes.TIMEOUT, ErrorTypes.SERVER].includes(errorType);
+  },
+  onRetry = (attempt, delay) => {}
+} = {}) =>
+{
   let attempt = 0;
   let delay = initialDelay;
   while (attempt < maxAttempts) {
@@ -164,7 +165,7 @@ export const retryWithBackoff = async (
         throw error;
       }
       onRetry(attempt, delay);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
       delay = Math.min(delay * backoffFactor, maxDelay);
     }
   }

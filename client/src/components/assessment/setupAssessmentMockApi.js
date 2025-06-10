@@ -1,10 +1,11 @@
+// TODO: i18n - processed
 /**
  * setupAssessmentMockApi.js
  * 
  * This file sets up mock API handlers for the assessment management system.
  * It provides Axios interceptors for the trainer-facing assessment functionality.
  */
-import { 
+import {
   getAssessmentTemplates,
   getAssessmentTemplateById,
   createAssessmentTemplate,
@@ -17,13 +18,13 @@ import {
   gradeSubmission,
   getAssessmentAnalytics,
   getAssessmentAnalyticsByAssessment,
-  getAssessmentAnalyticsByCohort
-} from './mockData';
-import { statisticsEndpoints } from './assessmentStatsMockData';
+  getAssessmentAnalyticsByCohort } from
+'./mockData';
+import { statisticsEndpoints } from './assessmentStatsMockData';import { useTranslation } from "react-i18next";
 export const setupAssessmentMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Templates
   // Get all assessment templates
-  api.get = async function(url, config) {
+  api.get = async function (url, config) {
     if (url === '/api/assessment/templates' || url.startsWith('/api/assessment/templates?')) {
       try {
         // Extract status from query parameters if present
@@ -421,7 +422,7 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
     return originalGet.apply(this, [url, config]);
   };
   // POST Requests
-  api.post = async function(url, data, config) {
+  api.post = async function (url, data, config) {
     // Create assessment template
     if (url === '/api/assessment/templates') {
       try {
@@ -502,7 +503,7 @@ export const setupAssessmentMockApi = (api, originalGet, originalPost, originalP
     return originalPost.apply(this, [url, data, config]);
   };
   // PUT Requests
-  api.put = async function(url, data, config) {
+  api.put = async function (url, data, config) {
     // Update assessment template
     if (url.match(/\/api\/assessment\/templates\/[^/?]+$/)) {
       try {

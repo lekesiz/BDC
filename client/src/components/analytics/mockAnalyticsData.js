@@ -1,4 +1,5 @@
-// Mock Analytics Data
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // Mock Analytics Data
 export const generateAnalyticsData = (userRole) => {
   const baseAnalytics = {
     overview: {
@@ -25,29 +26,29 @@ export const generateAnalyticsData = (userRole) => {
       growth: {
         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
         datasets: [
-          {
-            label: "New Users",
-            data: [45, 52, 61, 72, 89, 103],
-            borderColor: "#3B82F6",
-            backgroundColor: "rgba(59, 130, 246, 0.1)"
-          },
-          {
-            label: "Active Users",
-            data: [780, 810, 845, 890, 920, 956],
-            borderColor: "#10B981",
-            backgroundColor: "rgba(16, 185, 129, 0.1)"
-          }
-        ]
+        {
+          label: "New Users",
+          data: [45, 52, 61, 72, 89, 103],
+          borderColor: "#3B82F6",
+          backgroundColor: "rgba(59, 130, 246, 0.1)"
+        },
+        {
+          label: "Active Users",
+          data: [780, 810, 845, 890, 920, 956],
+          borderColor: "#10B981",
+          backgroundColor: "rgba(16, 185, 129, 0.1)"
+        }]
+
       }
     },
     courseMetrics: {
       popular: [
-        { name: "JavaScript Fundamentals", enrollments: 342, completion: 82, rating: 4.8 },
-        { name: "React Development", enrollments: 289, completion: 75, rating: 4.7 },
-        { name: "Python Basics", enrollments: 265, completion: 88, rating: 4.9 },
-        { name: "Data Science Intro", enrollments: 198, completion: 72, rating: 4.6 },
-        { name: "UI/UX Design", enrollments: 176, completion: 85, rating: 4.8 }
-      ],
+      { name: "JavaScript Fundamentals", enrollments: 342, completion: 82, rating: 4.8 },
+      { name: "React Development", enrollments: 289, completion: 75, rating: 4.7 },
+      { name: "Python Basics", enrollments: 265, completion: 88, rating: 4.9 },
+      { name: "Data Science Intro", enrollments: 198, completion: 72, rating: 4.6 },
+      { name: "UI/UX Design", enrollments: 176, completion: 85, rating: 4.8 }],
+
       completionByCategory: {
         labels: ["Programming", "Design", "Data Science", "Business", "Marketing"],
         data: [78, 82, 74, 85, 80],
@@ -72,11 +73,11 @@ export const generateAnalyticsData = (userRole) => {
         percentages: [59.3, 18.5, 15.9, 6.3]
       },
       topPlans: [
-        { plan: "Professional", subscribers: 234, revenue: 58500, growth: 12.3 },
-        { plan: "Standard", subscribers: 456, revenue: 45600, growth: 8.7 },
-        { plan: "Basic", subscribers: 789, revenue: 31560, growth: 15.2 },
-        { plan: "Enterprise", subscribers: 12, revenue: 48000, growth: 25.6 }
-      ]
+      { plan: "Professional", subscribers: 234, revenue: 58500, growth: 12.3 },
+      { plan: "Standard", subscribers: 456, revenue: 45600, growth: 8.7 },
+      { plan: "Basic", subscribers: 789, revenue: 31560, growth: 15.2 },
+      { plan: "Enterprise", subscribers: 12, revenue: 48000, growth: 25.6 }]
+
     },
     performanceMetrics: {
       systemHealth: {
@@ -114,11 +115,11 @@ export const generateAnalyticsData = (userRole) => {
         target: [90, 85, 90, 80, 85]
       },
       learningPaths: [
-        { path: "Web Developer", students: 234, avgProgress: 67, completion: 45 },
-        { path: "Data Scientist", students: 189, avgProgress: 54, completion: 32 },
-        { path: "UI/UX Designer", students: 156, avgProgress: 72, completion: 58 },
-        { path: "Mobile Developer", students: 123, avgProgress: 48, completion: 28 }
-      ]
+      { path: "Web Developer", students: 234, avgProgress: 67, completion: 45 },
+      { path: "Data Scientist", students: 189, avgProgress: 54, completion: 32 },
+      { path: "UI/UX Designer", students: 156, avgProgress: 72, completion: 58 },
+      { path: "Mobile Developer", students: 123, avgProgress: 48, completion: 28 }]
+
     }
   };
   // Add role-specific analytics
@@ -133,10 +134,10 @@ export const generateAnalyticsData = (userRole) => {
           averageScore: 81.2
         },
         coursePerformance: [
-          { course: "JavaScript Advanced", students: 23, avgScore: 84.5, completion: 78 },
-          { course: "React Basics", students: 31, avgScore: 79.2, completion: 82 },
-          { course: "Node.js Backend", students: 13, avgScore: 86.7, completion: 69 }
-        ],
+        { course: "JavaScript Advanced", students: 23, avgScore: 84.5, completion: 78 },
+        { course: "React Basics", students: 31, avgScore: 79.2, completion: 82 },
+        { course: "Node.js Backend", students: 13, avgScore: 86.7, completion: 69 }],
+
         studentEngagement: {
           labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
           attendance: [92, 88, 95, 86, 91, 72, 45],
@@ -151,10 +152,10 @@ export const generateAnalyticsData = (userRole) => {
             "Course Structure": 4.5
           },
           recentReviews: [
-            { student: "John Doe", rating: 5, comment: "Excellent explanations!", date: "2024-01-20" },
-            { student: "Jane Smith", rating: 4, comment: "Very helpful instructor", date: "2024-01-19" },
-            { student: "Mike Johnson", rating: 5, comment: "Great course structure", date: "2024-01-18" }
-          ]
+          { student: "John Doe", rating: 5, comment: "Excellent explanations!", date: "2024-01-20" },
+          { student: "Jane Smith", rating: 4, comment: "Very helpful instructor", date: "2024-01-19" },
+          { student: "Mike Johnson", rating: 5, comment: "Great course structure", date: "2024-01-18" }]
+
         }
       }
     };
@@ -181,10 +182,10 @@ export const generateAnalyticsData = (userRole) => {
           points: 2340,
           rank: 45,
           recentBadges: [
-            { name: "Quick Learner", earned: "2024-01-20", points: 100 },
-            { name: "Perfect Score", earned: "2024-01-18", points: 200 },
-            { name: "Consistent", earned: "2024-01-15", points: 150 }
-          ]
+          { name: "Quick Learner", earned: "2024-01-20", points: 100 },
+          { name: "Perfect Score", earned: "2024-01-18", points: 200 },
+          { name: "Consistent", earned: "2024-01-15", points: 150 }]
+
         },
         comparison: {
           vsClassAverage: {
@@ -204,84 +205,84 @@ export const generateAnalyticsData = (userRole) => {
 // Generate detailed analytics reports
 export const generateAnalyticsReports = () => {
   return [
-    {
-      id: 1,
-      title: "Monthly Performance Report - January 2024",
-      type: "monthly",
-      generatedAt: "2024-02-01",
-      sections: [
-        "Executive Summary",
-        "User Growth",
-        "Course Performance",
-        "Revenue Analysis",
-        "System Performance"
-      ],
-      format: "PDF",
-      size: "3.2 MB"
-    },
-    {
-      id: 2,
-      title: "Q4 2023 Analytics Report",
-      type: "quarterly",
-      generatedAt: "2024-01-15",
-      sections: [
-        "Quarter Overview",
-        "Key Metrics",
-        "Trends Analysis",
-        "Recommendations"
-      ],
-      format: "PDF",
-      size: "5.8 MB"
-    },
-    {
-      id: 3,
-      title: "Annual Report 2023",
-      type: "annual",
-      generatedAt: "2024-01-01",
-      sections: [
-        "Year in Review",
-        "Growth Metrics",
-        "Financial Summary",
-        "Future Outlook"
-      ],
-      format: "PDF",
-      size: "12.4 MB"
-    }
-  ];
+  {
+    id: 1,
+    title: "Monthly Performance Report - January 2024",
+    type: "monthly",
+    generatedAt: "2024-02-01",
+    sections: [
+    "Executive Summary",
+    "User Growth",
+    "Course Performance",
+    "Revenue Analysis",
+    "System Performance"],
+
+    format: "PDF",
+    size: "3.2 MB"
+  },
+  {
+    id: 2,
+    title: "Q4 2023 Analytics Report",
+    type: "quarterly",
+    generatedAt: "2024-01-15",
+    sections: [
+    "Quarter Overview",
+    "Key Metrics",
+    "Trends Analysis",
+    "Recommendations"],
+
+    format: "PDF",
+    size: "5.8 MB"
+  },
+  {
+    id: 3,
+    title: "Annual Report 2023",
+    type: "annual",
+    generatedAt: "2024-01-01",
+    sections: [
+    "Year in Review",
+    "Growth Metrics",
+    "Financial Summary",
+    "Future Outlook"],
+
+    format: "PDF",
+    size: "12.4 MB"
+  }];
+
 };
 // Generate analytics filters
 export const generateAnalyticsFilters = () => {
   return {
     dateRanges: [
-      { value: "today", label: "Today" },
-      { value: "yesterday", label: "Yesterday" },
-      { value: "last7days", label: "Last 7 Days" },
-      { value: "last30days", label: "Last 30 Days" },
-      { value: "last3months", label: "Last 3 Months" },
-      { value: "last6months", label: "Last 6 Months" },
-      { value: "lastyear", label: "Last Year" },
-      { value: "custom", label: "Custom Range" }
-    ],
+    { value: "today", label: "Today" },
+    { value: "yesterday", label: "Yesterday" },
+    { value: "last7days", label: "Last 7 Days" },
+    { value: "last30days", label: "Last 30 Days" },
+    { value: "last3months", label: "Last 3 Months" },
+    { value: "last6months", label: "Last 6 Months" },
+    { value: "lastyear", label: "Last Year" },
+    { value: "custom", label: "Custom Range" }],
+
     metrics: [
-      { value: "users", label: "User Metrics" },
-      { value: "courses", label: "Course Metrics" },
-      { value: "revenue", label: "Revenue Metrics" },
-      { value: "performance", label: "Performance Metrics" },
-      { value: "engagement", label: "Engagement Metrics" }
-    ],
+    { value: "users", label: "User Metrics" },
+    { value: "courses", label: "Course Metrics" },
+    { value: "revenue", label: "Revenue Metrics" },
+    { value: "performance", label: "Performance Metrics" },
+    { value: "engagement", label: "Engagement Metrics" }],
+
     segments: [
-      { value: "all", label: "All Users" },
-      { value: "students", label: "Students Only" },
-      { value: "trainers", label: "Trainers Only" },
-      { value: "newusers", label: "New Users" },
-      { value: "premium", label: "Premium Users" }
-    ],
+    { value: "all", label: "All Users" },
+    { value: "students", label: "Students Only" },
+    { value: "trainers", label: "Trainers Only" },
+    { value: "newusers", label: "New Users" },
+    { value: "premium", label: "Premium Users" }],
+
     comparisons: [
-      { value: "none", label: "No Comparison" },
-      { value: "previous_period", label: "Previous Period" },
-      { value: "previous_year", label: "Previous Year" },
-      { value: "target", label: "vs Target" }
-    ]
+    { value: "none", label: "No Comparison" },
+    { value: "previous_period", label: "Previous Period" },
+    { value: "previous_year", label: "Previous Year" },
+    { value: "target", label: "vs Target" }]
+
   };
 };
 // Generate real-time analytics data
@@ -291,12 +292,12 @@ export const generateRealTimeAnalytics = () => {
     currentSessions: Math.floor(Math.random() * 100) + 150,
     liveClasses: Math.floor(Math.random() * 10) + 5,
     recentActivity: [
-      { type: "login", user: "user123", timestamp: new Date(Date.now() - 30000).toISOString() },
-      { type: "course_start", user: "user456", course: "JavaScript", timestamp: new Date(Date.now() - 60000).toISOString() },
-      { type: "quiz_complete", user: "user789", score: 92, timestamp: new Date(Date.now() - 120000).toISOString() },
-      { type: "video_watch", user: "user234", video: "React Hooks", timestamp: new Date(Date.now() - 180000).toISOString() },
-      { type: "assignment_submit", user: "user567", assignment: "Project 1", timestamp: new Date(Date.now() - 240000).toISOString() }
-    ],
+    { type: "login", user: "user123", timestamp: new Date(Date.now() - 30000).toISOString() },
+    { type: "course_start", user: "user456", course: "JavaScript", timestamp: new Date(Date.now() - 60000).toISOString() },
+    { type: "quiz_complete", user: "user789", score: 92, timestamp: new Date(Date.now() - 120000).toISOString() },
+    { type: "video_watch", user: "user234", video: "React Hooks", timestamp: new Date(Date.now() - 180000).toISOString() },
+    { type: "assignment_submit", user: "user567", assignment: "Project 1", timestamp: new Date(Date.now() - 240000).toISOString() }],
+
     systemStatus: {
       cpu: Math.floor(Math.random() * 30) + 40,
       memory: Math.floor(Math.random() * 20) + 60,

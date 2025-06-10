@@ -1,0 +1,278 @@
+{
+  "api": {
+    "success": {
+      "created": "تم الإنشاء بنجاح",
+      "updated": "تم التحديث بنجاح", 
+      "deleted": "تم الحذف بنجاح",
+      "generic": "تمت العملية بنجاح"
+    },
+    "error": {
+      "not_found": "المورد غير موجود",
+      "unauthorized": "وصول غير مصرح به",
+      "forbidden": "الوصول محظور",
+      "validation": "خطأ في التحقق",
+      "generic": "حدث خطأ",
+      "server": "خطأ في الخادم الداخلي",
+      "conflict": "تعارض في المورد",
+      "rate_limit": "تم تجاوز حد المعدل",
+      "database": "فشلت عملية قاعدة البيانات",
+      "database_integrity": "انتهاك قيد تكامل قاعدة البيانات",
+      "resource_exists": "المورد موجود بالفعل",
+      "invalid_reference": "مرجع غير صالح للمورد المرتبط",
+      "constraint_violation": "انتهاك قيد قاعدة البيانات"
+    },
+    "auth": {
+      "login_success": "تم تسجيل الدخول بنجاح",
+      "login_failed": "بيانات اعتماد غير صحيحة",
+      "logout_success": "تم تسجيل الخروج بنجاح",
+      "logout_failed": "فشل تسجيل الخروج",
+      "register_success": "تم التسجيل بنجاح",
+      "registration_failed": "فشل تسجيل المستخدم. قد يكون البريد الإلكتروني موجوداً بالفعل.",
+      "token_expired": "انتهت صلاحية الرمز",
+      "invalid_token": "رمز غير صالح",
+      "refresh_failed": "فشل تحديث الرمز",
+      "password_reset_sent": "تم إرسال بريد إعادة تعيين كلمة المرور",
+      "password_reset_failed": "فشل إعادة تعيين كلمة المرور. قد لا يكون المستخدم موجوداً.",
+      "password_changed": "تم تغيير كلمة المرور بنجاح",
+      "password_change_failed": "فشل تغيير كلمة المرور. قد تكون كلمة المرور الحالية غير صحيحة.",
+      "account_locked": "الحساب مقفل",
+      "account_disabled": "الحساب معطل",
+      "email_not_verified": "يرجى التحقق من بريدك الإلكتروني",
+      "2fa_required": "المصادقة الثنائية مطلوبة",
+      "2fa_invalid": "رمز التحقق غير صالح"
+    },
+    "validation": {
+      "field_required": "{field} مطلوب",
+      "invalid_email": "تنسيق بريد إلكتروني غير صالح",
+      "invalid_phone": "رقم هاتف غير صالح",
+      "invalid_date": "تنسيق تاريخ غير صالح",
+      "min_length": "يجب أن يكون {field} {length} حرفاً على الأقل",
+      "max_length": "يجب ألا يتجاوز {field} {length} حرفاً",
+      "min_value": "يجب أن يكون {field} {value} على الأقل",
+      "max_value": "يجب ألا يتجاوز {field} {value}",
+      "unique": "{field} موجود بالفعل",
+      "invalid_format": "تنسيق غير صالح لـ {field}",
+      "password_weak": "كلمة المرور ضعيفة جداً",
+      "passwords_not_match": "كلمات المرور غير متطابقة",
+      "request_empty": "نص الطلب فارغ",
+      "missing_fields": "حقول مطلوبة مفقودة",
+      "page_invalid": "يجب أن تكون الصفحة أكبر من 0",
+      "per_page_invalid": "يجب أن يكون عدد العناصر في الصفحة بين 1 و 100",
+      "invalid_role": "دور غير صالح محدد"
+    },
+    "beneficiary": {
+      "created": "تم إنشاء المستفيد بنجاح",
+      "updated": "تم تحديث المستفيد بنجاح",
+      "deleted": "تم حذف المستفيد بنجاح",
+      "not_found": "المستفيد غير موجود",
+      "enrolled": "تم التسجيل في البرنامج بنجاح",
+      "unenrolled": "تم إلغاء التسجيل من البرنامج بنجاح",
+      "already_enrolled": "مسجل بالفعل في هذا البرنامج",
+      "enrollment_limit": "تم الوصول إلى حد التسجيل"
+    },
+    "program": {
+      "created": "تم إنشاء البرنامج بنجاح",
+      "updated": "تم تحديث البرنامج بنجاح",
+      "deleted": "تم حذف البرنامج بنجاح",
+      "not_found": "البرنامج غير موجود",
+      "published": "تم نشر البرنامج بنجاح",
+      "unpublished": "تم إلغاء نشر البرنامج بنجاح",
+      "capacity_reached": "تم الوصول إلى سعة البرنامج",
+      "registration_closed": "التسجيل مغلق",
+      "already_started": "البرنامج قد بدأ بالفعل",
+      "cannot_delete": "لا يمكن حذف برنامج مع تسجيلات نشطة"
+    },
+    "evaluation": {
+      "created": "تم إنشاء التقييم بنجاح",
+      "updated": "تم تحديث التقييم بنجاح",
+      "deleted": "تم حذف التقييم بنجاح",
+      "not_found": "التقييم غير موجود",
+      "submitted": "تم إرسال التقييم بنجاح",
+      "graded": "تم تقييم الدرجات بنجاح",
+      "already_submitted": "تم إرسال التقييم بالفعل",
+      "deadline_passed": "انتهى الموعد النهائي للتسليم",
+      "attempts_exceeded": "تم تجاوز الحد الأقصى للمحاولات",
+      "not_available": "التقييم غير متاح"
+    },
+    "document": {
+      "uploaded": "تم رفع المستند بنجاح",
+      "updated": "تم تحديث المستند بنجاح",
+      "deleted": "تم حذف المستند بنجاح",
+      "not_found": "المستند غير موجود",
+      "shared": "تم مشاركة المستند بنجاح",
+      "access_denied": "تم رفض الوصول إلى هذا المستند",
+      "size_exceeded": "حجم الملف يتجاوز الحد المسموح",
+      "type_not_allowed": "نوع الملف غير مسموح",
+      "quota_exceeded": "تم تجاوز حصة التخزين"
+    },
+    "appointment": {
+      "created": "تم جدولة الموعد بنجاح",
+      "updated": "تم تحديث الموعد بنجاح",
+      "cancelled": "تم إلغاء الموعد بنجاح",
+      "not_found": "الموعد غير موجود",
+      "confirmed": "تم تأكيد الموعد",
+      "reminder_sent": "تم إرسال التذكير بنجاح",
+      "time_conflict": "الوقت المحدد يتعارض مع موعد آخر",
+      "invalid_time": "وقت موعد غير صالح",
+      "past_time": "لا يمكن جدولة موعد في الماضي"
+    },
+    "user": {
+      "created": "تم إنشاء المستخدم بنجاح",
+      "updated": "تم تحديث المستخدم بنجاح",
+      "deleted": "تم حذف المستخدم بنجاح",
+      "not_found": "المستخدم غير موجود",
+      "activated": "تم تفعيل المستخدم بنجاح",
+      "deactivated": "تم إلغاء تفعيل المستخدم بنجاح",
+      "role_changed": "تم تغيير دور المستخدم بنجاح",
+      "password_reset": "تم إرسال بريد إعادة تعيين كلمة المرور",
+      "email_exists": "البريد الإلكتروني موجود بالفعل",
+      "username_exists": "اسم المستخدم موجود بالفعل",
+      "cannot_delete_self": "لا يمكنك حذف حسابك الخاص",
+      "cannot_deactivate_self": "لا يمكنك إلغاء تفعيل حسابك الخاص"
+    },
+    "report": {
+      "generated": "تم إنشاء التقرير بنجاح",
+      "scheduled": "تم جدولة التقرير بنجاح",
+      "not_found": "التقرير غير موجود",
+      "generation_failed": "فشل إنشاء التقرير",
+      "no_data": "لا توجد بيانات متاحة للمعايير المحددة",
+      "exported": "تم تصدير التقرير بنجاح",
+      "emailed": "تم إرسال التقرير بالبريد الإلكتروني بنجاح"
+    },
+    "notification": {
+      "sent": "تم إرسال الإشعار بنجاح",
+      "marked_read": "تم وضع علامة مقروء على الإشعار",
+      "cleared": "تم مسح الإشعارات",
+      "preferences_updated": "تم تحديث تفضيلات الإشعارات"
+    },
+    "settings": {
+      "updated": "تم تحديث الإعدادات بنجاح",
+      "reset": "تم إعادة تعيين الإعدادات إلى الافتراضية",
+      "invalid_value": "قيمة غير صالحة للإعداد",
+      "cannot_modify": "لا يمكن تعديل هذا الإعداد"
+    }
+  },
+  "email": {
+    "subject": {
+      "welcome": "مرحباً بك في BDC",
+      "password_reset": "طلب إعادة تعيين كلمة المرور",
+      "account_activation": "تفعيل حسابك",
+      "appointment_reminder": "تذكير بالموعد",
+      "evaluation_assigned": "تم تعيين تقييم جديد",
+      "evaluation_graded": "تم تقييم الدرجات",
+      "program_enrollment": "تأكيد التسجيل في البرنامج",
+      "document_shared": "تم مشاركة مستند معك",
+      "weekly_summary": "ملخصك الأسبوعي",
+      "certificate_ready": "شهادتك جاهزة"
+    },
+    "greeting": {
+      "formal": "عزيزي {name}",
+      "informal": "مرحباً {name}",
+      "generic": "مرحباً"
+    },
+    "footer": {
+      "regards": "مع أطيب التحيات",
+      "team": "فريق BDC",
+      "unsubscribe": "إلغاء الاشتراك من هذه الرسائل",
+      "help": "تحتاج مساعدة؟ اتصل بالدعم",
+      "copyright": "© 2024 BDC. جميع الحقوق محفوظة."
+    }
+  },
+  "sms": {
+    "appointment_reminder": "تذكير: لديك موعد في {date} الساعة {time}",
+    "evaluation_due": "تقييمك '{title}' مستحق في {date}",
+    "verification_code": "رمز التحقق الخاص بك: {code}",
+    "password_reset": "رمز إعادة تعيين كلمة المرور: {code}",
+    "program_update": "تحديث على برنامجك '{program}': {message}"
+  },
+  "push": {
+    "title": {
+      "new_message": "رسالة جديدة",
+      "appointment_reminder": "تذكير بالموعد",
+      "evaluation_assigned": "تقييم جديد",
+      "grade_posted": "تم نشر الدرجة",
+      "document_shared": "تم مشاركة مستند"
+    },
+    "body": {
+      "new_message": "لديك رسالة جديدة من {sender}",
+      "appointment_reminder": "لا تنسى موعدك في {time}",
+      "evaluation_assigned": "تم تعيين '{title}' لك",
+      "grade_posted": "درجتك لـ '{title}' متاحة الآن",
+      "document_shared": "{sender} شارك مستنداً معك"
+    }
+  },
+  "exports": {
+    "headers": {
+      "beneficiaries": {
+        "first_name": "الاسم الأول",
+        "last_name": "اسم العائلة",
+        "email": "البريد الإلكتروني",
+        "phone": "الهاتف",
+        "date_of_birth": "تاريخ الميلاد",
+        "status": "الحالة",
+        "enrollment_date": "تاريخ التسجيل"
+      },
+      "programs": {
+        "name": "اسم البرنامج",
+        "code": "الرمز",
+        "start_date": "تاريخ البدء",
+        "end_date": "تاريخ الانتهاء",
+        "capacity": "السعة",
+        "enrolled": "المسجلون",
+        "status": "الحالة"
+      },
+      "evaluations": {
+        "title": "العنوان",
+        "type": "النوع",
+        "due_date": "تاريخ الاستحقاق",
+        "average_score": "متوسط الدرجات",
+        "completion_rate": "معدل الإنجاز",
+        "status": "الحالة"
+      }
+    }
+  },
+  "reports": {
+    "attendance": {
+      "title": "تقرير الحضور",
+      "present": "حاضر",
+      "absent": "غائب",
+      "late": "متأخر",
+      "excused": "معذور",
+      "attendance_rate": "معدل الحضور"
+    },
+    "progress": {
+      "title": "تقرير التقدم",
+      "completed_modules": "الوحدات المكتملة",
+      "average_score": "متوسط الدرجات",
+      "completion_rate": "معدل الإنجاز",
+      "time_spent": "الوقت المستغرق"
+    },
+    "evaluation": {
+      "title": "تقرير التقييم",
+      "total_evaluations": "إجمالي التقييمات",
+      "average_score": "متوسط الدرجات",
+      "pass_rate": "معدل النجاح",
+      "pending_grading": "في انتظار التقييم"
+    }
+  },
+  "dates": {
+    "formats": {
+      "short": "%d/%m/%Y",
+      "medium": "%d %b %Y",
+      "long": "%d %B %Y",
+      "full": "%A، %d %B %Y",
+      "time": "%H:%M",
+      "datetime": "%d/%m/%Y %H:%M"
+    },
+    "relative": {
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "tomorrow": "غداً",
+      "in_days": "خلال {count} أيام",
+      "days_ago": "منذ {count} أيام",
+      "just_now": "الآن",
+      "minutes_ago": "منذ {count} دقائق",
+      "hours_ago": "منذ {count} ساعات"
+    }
+  }
+}

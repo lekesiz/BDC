@@ -1,0 +1,16 @@
+{
+  "id": 1,
+  "email": "test@example.com",
+  "name": "Test User",
+  "language": "en",
+  "timezone": "UTC",
+  "preferences": {
+    "theme": "light",
+    "notifications": true,
+    "language_auto_detect": false,
+    "rtl_enabled": true
+  },
+  "role": "user",
+  "created_at": "2025-01-01T00:00:00Z",
+  "updated_at": "2025-01-01T00:00:00Z"
+}

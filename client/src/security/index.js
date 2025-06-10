@@ -1,4 +1,5 @@
-/**
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; /**
  * Frontend Security Module
  * Comprehensive client-side security utilities and protections
  */

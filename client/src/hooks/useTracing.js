@@ -1,19 +1,20 @@
+// TODO: i18n - processed
 /**
  * React Hook for Distributed Tracing
  * Provides easy integration of tracing into React components
  */
 import { useEffect, useRef, useCallback } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import tracingService, { 
-  traceOperation, 
-  tracePageLoad, 
-  traceUserAction, 
+import tracingService, {
+  traceOperation,
+  tracePageLoad,
+  traceUserAction,
   traceError,
-  getCorrelationId 
-} from '../services/tracing';
+  getCorrelationId } from
+'../services/tracing';
 /**
  * Hook for tracing component lifecycle and operations
- */
+ */import { useTranslation } from "react-i18next";
 export const useTracing = (componentName, options = {}) => {
   const spanRef = useRef(null);
   const location = useLocation();
@@ -33,7 +34,7 @@ export const useTracing = (componentName, options = {}) => {
         {
           'component.name': componentName,
           'component.path': location.pathname,
-          'component.params': JSON.stringify(params),
+          'component.params': JSON.stringify(params)
         }
       );
     }
@@ -55,7 +56,7 @@ export const useTracing = (componentName, options = {}) => {
         'INTERNAL',
         {
           'component.name': componentName,
-          'render.timestamp': Date.now(),
+          'render.timestamp': Date.now()
         }
       );
       renderSpan.end();
@@ -70,7 +71,7 @@ export const useTracing = (componentName, options = {}) => {
         if (error instanceof Error) {
           traceError(error, {
             component: componentName,
-            location: location.pathname,
+            location: location.pathname
           });
         }
         originalConsoleError.apply(console, args);
@@ -88,7 +89,7 @@ export const useTracing = (componentName, options = {}) => {
       'INTERNAL',
       {
         'component.name': componentName,
-        ...attributes,
+        ...attributes
       }
     );
   }, [componentName]);
@@ -101,14 +102,14 @@ export const useTracing = (componentName, options = {}) => {
           const result = await operation(span);
           span.setAttributes({
             'operation.result': 'success',
-            'operation.async': true,
+            'operation.async': true
           });
           return result;
         } catch (error) {
           span.setAttributes({
             'operation.result': 'error',
             'operation.async': true,
-            'error.message': error.message,
+            'error.message': error.message
           });
           throw error;
         }
@@ -116,7 +117,7 @@ export const useTracing = (componentName, options = {}) => {
       'INTERNAL',
       {
         'component.name': componentName,
-        ...attributes,
+        ...attributes
       }
     );
   }, [componentName]);
@@ -124,7 +125,7 @@ export const useTracing = (componentName, options = {}) => {
   const traceAction = useCallback((actionName, elementInfo = {}) => {
     return traceUserAction(`${componentName}.${actionName}`, {
       component: componentName,
-      ...elementInfo,
+      ...elementInfo
     });
   }, [componentName]);
   return {
@@ -132,7 +133,7 @@ export const useTracing = (componentName, options = {}) => {
     traceAsync,
     traceAction,
     correlationId: getCorrelationId(),
-    componentSpan: spanRef.current,
+    componentSpan: spanRef.current
   };
 };
 /**
@@ -146,12 +147,12 @@ export const usePageTracing = (pageName) => {
       path: location.pathname,
       search: location.search,
       hash: location.hash,
-      params,
+      params
     });
   }, [pageName, location.pathname, location.search, location.hash, params]);
   return {
     currentPage: pageName,
-    correlationId: getCorrelationId(),
+    correlationId: getCorrelationId()
   };
 };
 /**
@@ -169,7 +170,7 @@ export const useApiTracing = () => {
             'http.url': url,
             'http.request.size': requestData ? JSON.stringify(requestData).length : 0,
             'api.operation': options.operation || 'unknown',
-            'api.version': options.version || 'v1',
+            'api.version': options.version || 'v1'
           });
           // Make the actual API call
           const response = await fetch(url, {
@@ -177,42 +178,42 @@ export const useApiTracing = () => {
             headers: {
               'Content-Type': 'application/json',
               ...tracingService.injectHeaders(),
-              ...options.headers,
+              ...options.headers
             },
             body: requestData ? JSON.stringify(requestData) : undefined,
-            ...options,
+            ...options
           });
           // Add response attributes
           span.setAttributes({
             'http.status_code': response.status,
             'http.response.size': parseInt(response.headers.get('content-length') || '0'),
-            'api.response.correlation_id': response.headers.get('x-correlation-id'),
+            'api.response.correlation_id': response.headers.get('x-correlation-id')
           });
           // Parse response
           const responseData = await response.json();
           if (!response.ok) {
             span.setAttributes({
               'error.type': 'http_error',
-              'error.message': responseData.message || 'HTTP Error',
+              'error.message': responseData.message || 'HTTP Error'
             });
             throw new Error(`HTTP ${response.status}: ${responseData.message || 'Unknown error'}`);
           }
           span.setAttributes({
-            'api.response.success': true,
+            'api.response.success': true
           });
           return responseData;
         } catch (error) {
           span.setAttributes({
             'api.response.success': false,
             'error.type': error.constructor.name,
-            'error.message': error.message,
+            'error.message': error.message
           });
           throw error;
         }
       },
       'CLIENT',
       {
-        'operation.type': 'api_call',
+        'operation.type': 'api_call'
       }
     );
   }, []);
@@ -230,29 +231,29 @@ export const useFormTracing = (formName) => {
           'form.name': formName,
           'form.field_count': Object.keys(formData).length,
           'form.has_errors': Object.keys(validationErrors).length > 0,
-          'form.error_count': Object.keys(validationErrors).length,
+          'form.error_count': Object.keys(validationErrors).length
         });
         // Add field information (excluding sensitive data)
-        Object.keys(formData).forEach(field => {
+        Object.keys(formData).forEach((field) => {
           if (!['password', 'token', 'secret', 'key'].includes(field.toLowerCase())) {
             const value = formData[field];
             span.setAttributes({
               [`form.field.${field}.type`]: typeof value,
               [`form.field.${field}.length`]: value ? value.toString().length : 0,
-              [`form.field.${field}.has_value`]: !!value,
+              [`form.field.${field}.has_value`]: !!value
             });
           }
         });
         // Add validation errors
         if (Object.keys(validationErrors).length > 0) {
           span.setAttributes({
-            'form.validation_errors': JSON.stringify(validationErrors),
+            'form.validation_errors': JSON.stringify(validationErrors)
           });
         }
       },
       'INTERNAL',
       {
-        'operation.type': 'form_submit',
+        'operation.type': 'form_submit'
       }
     );
   }, [formName]);
@@ -264,12 +265,12 @@ export const useFormTracing = (formName) => {
           'form.name': formName,
           'form.field.name': fieldName,
           'form.field.valid': isValid,
-          'form.field.error': errorMessage || '',
+          'form.field.error': errorMessage || ''
         });
       },
       'INTERNAL',
       {
-        'operation.type': 'form_validation',
+        'operation.type': 'form_validation'
       }
     );
   }, [formName]);
@@ -284,7 +285,7 @@ export const usePerformanceTracing = (componentName) => {
     if ('PerformanceObserver' in window) {
       performanceObserver.current = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           traceOperation(
             `performance.${entry.entryType}`,
             (span) => {
@@ -293,17 +294,17 @@ export const usePerformanceTracing = (componentName) => {
                 'performance.type': entry.entryType,
                 'performance.start_time': entry.startTime,
                 'performance.duration': entry.duration,
-                'component.name': componentName,
+                'component.name': componentName
               });
               // Add specific attributes based on entry type
               if (entry.entryType === 'measure') {
                 span.setAttributes({
-                  'performance.measure.detail': entry.detail || '',
+                  'performance.measure.detail': entry.detail || ''
                 });
               } else if (entry.entryType === 'navigation') {
                 span.setAttributes({
                   'performance.navigation.type': entry.type,
-                  'performance.navigation.redirect_count': entry.redirectCount,
+                  'performance.navigation.redirect_count': entry.redirectCount
                 });
               }
             },
@@ -312,8 +313,8 @@ export const usePerformanceTracing = (componentName) => {
           );
         });
       });
-      performanceObserver.current.observe({ 
-        entryTypes: ['measure', 'navigation', 'paint'] 
+      performanceObserver.current.observe({
+        entryTypes: ['measure', 'navigation', 'paint']
       });
     }
     return () => {
@@ -350,14 +351,14 @@ export const useErrorTracing = (componentName) => {
     traceError(error, {
       component: componentName,
       error_boundary: true,
-      ...errorInfo,
+      ...errorInfo
     });
   }, [componentName]);
   const traceAsyncError = useCallback((error, operation = 'unknown') => {
     traceError(error, {
       component: componentName,
       operation,
-      async: true,
+      async: true
     });
   }, [componentName]);
   return { traceComponentError, traceAsyncError };

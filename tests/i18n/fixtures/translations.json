@@ -1,0 +1,586 @@
+{
+  "en": {
+    "translation": {
+      "common": {
+        "welcome": "Welcome",
+        "hello": "Hello {{name}}",
+        "items_count_one": "{{count}} item",
+        "items_count_other": "{{count}} items",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "yes": "Yes",
+        "no": "No",
+        "close": "Close",
+        "open": "Open",
+        "search": "Search",
+        "filter": "Filter",
+        "sort": "Sort",
+        "export": "Export",
+        "import": "Import",
+        "refresh": "Refresh"
+      },
+      "auth": {
+        "login": "Login",
+        "logout": "Logout",
+        "email": "Email",
+        "password": "Password",
+        "confirm_password": "Confirm Password",
+        "forgot_password": "Forgot Password?",
+        "register": "Register",
+        "login_success": "Login successful",
+        "login_failed": "Invalid credentials",
+        "logout_success": "Logout successful",
+        "register_success": "Registration successful",
+        "password_reset": "Password Reset",
+        "new_password": "New Password"
+      },
+      "validation": {
+        "required": "{{field}} is required",
+        "email_invalid": "Invalid email format",
+        "password_weak": "Password must be at least 8 characters",
+        "field_too_short": "{{field}} must be at least {{min}} characters",
+        "field_too_long": "{{field}} must not exceed {{max}} characters",
+        "passwords_not_match": "Passwords do not match",
+        "invalid_format": "Invalid format"
+      },
+      "navigation": {
+        "dashboard": "Dashboard",
+        "beneficiaries": "Beneficiaries",
+        "evaluations": "Evaluations",
+        "programs": "Programs",
+        "calendar": "Calendar",
+        "documents": "Documents",
+        "reports": "Reports",
+        "settings": "Settings",
+        "profile": "Profile",
+        "admin": "Administration",
+        "help": "Help"
+      },
+      "dashboard": {
+        "title": "Dashboard",
+        "welcome_back": "Welcome back, {{name}}!",
+        "statistics": "Statistics",
+        "recent_activity": "Recent Activity",
+        "quick_actions": "Quick Actions",
+        "upcoming_events": "Upcoming Events",
+        "notifications": "Notifications"
+      },
+      "beneficiaries": {
+        "title": "Beneficiaries",
+        "add_new": "Add New Beneficiary",
+        "edit": "Edit Beneficiary",
+        "delete": "Delete Beneficiary",
+        "view": "View Beneficiary",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "name": "Name",
+        "age": "Age",
+        "contact": "Contact Information",
+        "address": "Address",
+        "notes": "Notes"
+      },
+      "evaluations": {
+        "title": "Evaluations",
+        "create": "Create Evaluation",
+        "edit": "Edit Evaluation",
+        "complete": "Complete Evaluation",
+        "results": "Evaluation Results",
+        "score": "Score",
+        "date": "Date",
+        "type": "Type",
+        "status": "Status",
+        "draft": "Draft",
+        "completed": "Completed",
+        "review": "Under Review"
+      },
+      "messages": {
+        "success": {
+          "saved": "Changes saved successfully",
+          "deleted": "Item deleted successfully",
+          "created": "Item created successfully",
+          "updated": "Item updated successfully"
+        },
+        "error": {
+          "generic": "An error occurred",
+          "not_found": "Item not found",
+          "unauthorized": "Unauthorized access",
+          "validation": "Please check your input",
+          "network": "Network error occurred"
+        }
+      }
+    }
+  },
+  "es": {
+    "translation": {
+      "common": {
+        "welcome": "Bienvenido",
+        "hello": "Hola {{name}}",
+        "items_count_one": "{{count}} artículo",
+        "items_count_other": "{{count}} artículos",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "loading": "Cargando...",
+        "error": "Error",
+        "success": "Éxito",
+        "yes": "Sí",
+        "no": "No",
+        "close": "Cerrar",
+        "open": "Abrir",
+        "search": "Buscar",
+        "filter": "Filtrar",
+        "sort": "Ordenar",
+        "export": "Exportar",
+        "import": "Importar",
+        "refresh": "Actualizar"
+      },
+      "auth": {
+        "login": "Iniciar sesión",
+        "logout": "Cerrar sesión",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "confirm_password": "Confirmar contraseña",
+        "forgot_password": "¿Olvidaste tu contraseña?",
+        "register": "Registrarse",
+        "login_success": "Inicio de sesión exitoso",
+        "login_failed": "Credenciales inválidas",
+        "logout_success": "Cierre de sesión exitoso",
+        "register_success": "Registro exitoso",
+        "password_reset": "Restablecer contraseña",
+        "new_password": "Nueva contraseña"
+      },
+      "validation": {
+        "required": "{{field}} es requerido",
+        "email_invalid": "Formato de correo inválido",
+        "password_weak": "La contraseña debe tener al menos 8 caracteres",
+        "field_too_short": "{{field}} debe tener al menos {{min}} caracteres",
+        "field_too_long": "{{field}} no debe exceder {{max}} caracteres",
+        "passwords_not_match": "Las contraseñas no coinciden",
+        "invalid_format": "Formato inválido"
+      },
+      "navigation": {
+        "dashboard": "Tablero",
+        "beneficiaries": "Beneficiarios",
+        "evaluations": "Evaluaciones",
+        "programs": "Programas",
+        "calendar": "Calendario",
+        "documents": "Documentos",
+        "reports": "Informes",
+        "settings": "Configuración",
+        "profile": "Perfil",
+        "admin": "Administración",
+        "help": "Ayuda"
+      },
+      "dashboard": {
+        "title": "Tablero",
+        "welcome_back": "¡Bienvenido de nuevo, {{name}}!",
+        "statistics": "Estadísticas",
+        "recent_activity": "Actividad Reciente",
+        "quick_actions": "Acciones Rápidas",
+        "upcoming_events": "Próximos Eventos",
+        "notifications": "Notificaciones"
+      },
+      "beneficiaries": {
+        "title": "Beneficiarios",
+        "add_new": "Agregar Nuevo Beneficiario",
+        "edit": "Editar Beneficiario",
+        "delete": "Eliminar Beneficiario",
+        "view": "Ver Beneficiario",
+        "status": "Estado",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "name": "Nombre",
+        "age": "Edad",
+        "contact": "Información de Contacto",
+        "address": "Dirección",
+        "notes": "Notas"
+      },
+      "evaluations": {
+        "title": "Evaluaciones",
+        "create": "Crear Evaluación",
+        "edit": "Editar Evaluación",
+        "complete": "Completar Evaluación",
+        "results": "Resultados de Evaluación",
+        "score": "Puntuación",
+        "date": "Fecha",
+        "type": "Tipo",
+        "status": "Estado",
+        "draft": "Borrador",
+        "completed": "Completado",
+        "review": "En Revisión"
+      },
+      "messages": {
+        "success": {
+          "saved": "Cambios guardados exitosamente",
+          "deleted": "Elemento eliminado exitosamente",
+          "created": "Elemento creado exitosamente",
+          "updated": "Elemento actualizado exitosamente"
+        },
+        "error": {
+          "generic": "Ocurrió un error",
+          "not_found": "Elemento no encontrado",
+          "unauthorized": "Acceso no autorizado",
+          "validation": "Por favor revisa tu entrada",
+          "network": "Error de red ocurrido"
+        }
+      }
+    }
+  },
+  "ar": {
+    "translation": {
+      "common": {
+        "welcome": "مرحبا",
+        "hello": "مرحبا {{name}}",
+        "items_count_zero": "لا توجد عناصر",
+        "items_count_one": "عنصر واحد",
+        "items_count_two": "عنصران",
+        "items_count_few": "{{count}} عناصر",
+        "items_count_many": "{{count}} عنصراً",
+        "items_count_other": "{{count}} عنصر",
+        "save": "حفظ",
+        "cancel": "إلغاء",
+        "delete": "حذف",
+        "edit": "تعديل",
+        "loading": "جاري التحميل...",
+        "error": "خطأ",
+        "success": "نجاح",
+        "yes": "نعم",
+        "no": "لا",
+        "close": "إغلاق",
+        "open": "فتح",
+        "search": "بحث",
+        "filter": "تصفية",
+        "sort": "ترتيب",
+        "export": "تصدير",
+        "import": "استيراد",
+        "refresh": "تحديث"
+      },
+      "auth": {
+        "login": "تسجيل الدخول",
+        "logout": "تسجيل الخروج",
+        "email": "البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "confirm_password": "تأكيد كلمة المرور",
+        "forgot_password": "نسيت كلمة المرور؟",
+        "register": "تسجيل",
+        "login_success": "تم تسجيل الدخول بنجاح",
+        "login_failed": "بيانات الاعتماد غير صحيحة",
+        "logout_success": "تم تسجيل الخروج بنجاح",
+        "register_success": "تم التسجيل بنجاح",
+        "password_reset": "إعادة تعيين كلمة المرور",
+        "new_password": "كلمة المرور الجديدة"
+      },
+      "validation": {
+        "required": "{{field}} مطلوب",
+        "email_invalid": "تنسيق البريد الإلكتروني غير صحيح",
+        "password_weak": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+        "field_too_short": "{{field}} يجب أن يكون {{min}} أحرف على الأقل",
+        "field_too_long": "{{field}} يجب ألا يتجاوز {{max}} حرف",
+        "passwords_not_match": "كلمات المرور غير متطابقة",
+        "invalid_format": "تنسيق غير صحيح"
+      },
+      "navigation": {
+        "dashboard": "لوحة التحكم",
+        "beneficiaries": "المستفيدون",
+        "evaluations": "التقييمات",
+        "programs": "البرامج",
+        "calendar": "التقويم",
+        "documents": "الوثائق",
+        "reports": "التقارير",
+        "settings": "الإعدادات",
+        "profile": "الملف الشخصي",
+        "admin": "الإدارة",
+        "help": "المساعدة"
+      },
+      "dashboard": {
+        "title": "لوحة التحكم",
+        "welcome_back": "مرحباً بعودتك، {{name}}!",
+        "statistics": "الإحصائيات",
+        "recent_activity": "النشاط الأخير",
+        "quick_actions": "الإجراءات السريعة",
+        "upcoming_events": "الأحداث القادمة",
+        "notifications": "الإشعارات"
+      },
+      "beneficiaries": {
+        "title": "المستفيدون",
+        "add_new": "إضافة مستفيد جديد",
+        "edit": "تعديل المستفيد",
+        "delete": "حذف المستفيد",
+        "view": "عرض المستفيد",
+        "status": "الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "name": "الاسم",
+        "age": "العمر",
+        "contact": "معلومات الاتصال",
+        "address": "العنوان",
+        "notes": "الملاحظات"
+      },
+      "evaluations": {
+        "title": "التقييمات",
+        "create": "إنشاء تقييم",
+        "edit": "تعديل التقييم",
+        "complete": "إكمال التقييم",
+        "results": "نتائج التقييم",
+        "score": "النتيجة",
+        "date": "التاريخ",
+        "type": "النوع",
+        "status": "الحالة",
+        "draft": "مسودة",
+        "completed": "مكتمل",
+        "review": "قيد المراجعة"
+      },
+      "messages": {
+        "success": {
+          "saved": "تم حفظ التغييرات بنجاح",
+          "deleted": "تم حذف العنصر بنجاح",
+          "created": "تم إنشاء العنصر بنجاح",
+          "updated": "تم تحديث العنصر بنجاح"
+        },
+        "error": {
+          "generic": "حدث خطأ",
+          "not_found": "العنصر غير موجود",
+          "unauthorized": "غير مصرح بالوصول",
+          "validation": "يرجى التحقق من المدخلات",
+          "network": "حدث خطأ في الشبكة"
+        }
+      }
+    }
+  },
+  "he": {
+    "translation": {
+      "common": {
+        "welcome": "ברוך הבא",
+        "hello": "שלום {{name}}",
+        "items_count_one": "פריט אחד",
+        "items_count_two": "שני פריטים",
+        "items_count_many": "{{count}} פריטים",
+        "items_count_other": "{{count}} פריטים",
+        "save": "שמור",
+        "cancel": "ביטול",
+        "delete": "מחק",
+        "edit": "ערוך",
+        "loading": "טוען...",
+        "error": "שגיאה",
+        "success": "הצלחה",
+        "yes": "כן",
+        "no": "לא",
+        "close": "סגור",
+        "open": "פתח",
+        "search": "חיפוש",
+        "filter": "סינון",
+        "sort": "מיון",
+        "export": "ייצוא",
+        "import": "ייבוא",
+        "refresh": "רענון"
+      },
+      "auth": {
+        "login": "התחברות",
+        "logout": "התנתקות",
+        "email": "דוא\"ל",
+        "password": "סיסמה",
+        "confirm_password": "אישור סיסמה",
+        "forgot_password": "שכחת סיסמה?",
+        "register": "הרשמה",
+        "login_success": "התחברות בוצעה בהצלחה",
+        "login_failed": "פרטי התחברות שגויים",
+        "logout_success": "התנתקות בוצעה בהצלחה",
+        "register_success": "הרשמה בוצעה בהצלחה",
+        "password_reset": "איפוס סיסמה",
+        "new_password": "סיסמה חדשה"
+      },
+      "validation": {
+        "required": "{{field}} נדרש",
+        "email_invalid": "כתובת דוא\"ל לא תקינה",
+        "password_weak": "הסיסמה חייבת להכיל לפחות 8 תווים",
+        "field_too_short": "{{field}} חייב להכיל לפחות {{min}} תווים",
+        "field_too_long": "{{field}} לא יכול להכיל יותר מ-{{max}} תווים",
+        "passwords_not_match": "הסיסמאות אינן תואמות",
+        "invalid_format": "פורמט לא תקין"
+      },
+      "navigation": {
+        "dashboard": "לוח בקרה",
+        "beneficiaries": "מוטבים",
+        "evaluations": "הערכות",
+        "programs": "תוכניות",
+        "calendar": "לוח שנה",
+        "documents": "מסמכים",
+        "reports": "דוחות",
+        "settings": "הגדרות",
+        "profile": "פרופיל",
+        "admin": "ניהול",
+        "help": "עזרה"
+      },
+      "dashboard": {
+        "title": "לוח בקרה",
+        "welcome_back": "ברוך שובך, {{name}}!",
+        "statistics": "סטטיסטיקות",
+        "recent_activity": "פעילות אחרונה",
+        "quick_actions": "פעולות מהירות",
+        "upcoming_events": "אירועים קרובים",
+        "notifications": "התראות"
+      },
+      "beneficiaries": {
+        "title": "מוטבים",
+        "add_new": "הוסף מוטב חדש",
+        "edit": "ערוך מוטב",
+        "delete": "מחק מוטב",
+        "view": "צפה במוטב",
+        "status": "סטטוס",
+        "active": "פעיל",
+        "inactive": "לא פעיל",
+        "name": "שם",
+        "age": "גיל",
+        "contact": "פרטי קשר",
+        "address": "כתובת",
+        "notes": "הערות"
+      },
+      "evaluations": {
+        "title": "הערכות",
+        "create": "צור הערכה",
+        "edit": "ערוך הערכה",
+        "complete": "השלם הערכה",
+        "results": "תוצאות הערכה",
+        "score": "ציון",
+        "date": "תאריך",
+        "type": "סוג",
+        "status": "סטטוס",
+        "draft": "טיוטה",
+        "completed": "הושלם",
+        "review": "בבדיקה"
+      },
+      "messages": {
+        "success": {
+          "saved": "השינויים נשמרו בהצלחה",
+          "deleted": "הפריט נמחק בהצלחה",
+          "created": "הפריט נוצר בהצלחה",
+          "updated": "הפריט עודכן בהצלחה"
+        },
+        "error": {
+          "generic": "אירעה שגיאה",
+          "not_found": "הפריט לא נמצא",
+          "unauthorized": "אין הרשאה לגישה",
+          "validation": "אנא בדוק את הקלט",
+          "network": "אירעה שגיאת רשת"
+        }
+      }
+    }
+  },
+  "fr": {
+    "translation": {
+      "common": {
+        "welcome": "Bienvenue",
+        "hello": "Bonjour {{name}}",
+        "items_count_one": "{{count}} élément",
+        "items_count_other": "{{count}} éléments",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "loading": "Chargement...",
+        "error": "Erreur",
+        "success": "Succès",
+        "yes": "Oui",
+        "no": "Non",
+        "close": "Fermer",
+        "open": "Ouvrir",
+        "search": "Rechercher",
+        "filter": "Filtrer",
+        "sort": "Trier",
+        "export": "Exporter",
+        "import": "Importer",
+        "refresh": "Actualiser"
+      },
+      "auth": {
+        "login": "Connexion",
+        "logout": "Déconnexion",
+        "email": "Email",
+        "password": "Mot de passe",
+        "confirm_password": "Confirmer le mot de passe",
+        "forgot_password": "Mot de passe oublié ?",
+        "register": "S'inscrire",
+        "login_success": "Connexion réussie",
+        "login_failed": "Identifiants invalides",
+        "logout_success": "Déconnexion réussie",
+        "register_success": "Inscription réussie",
+        "password_reset": "Réinitialisation du mot de passe",
+        "new_password": "Nouveau mot de passe"
+      },
+      "navigation": {
+        "dashboard": "Tableau de bord",
+        "beneficiaries": "Bénéficiaires",
+        "evaluations": "Évaluations",
+        "programs": "Programmes",
+        "calendar": "Calendrier",
+        "documents": "Documents",
+        "reports": "Rapports",
+        "settings": "Paramètres",
+        "profile": "Profil",
+        "admin": "Administration",
+        "help": "Aide"
+      }
+    }
+  },
+  "de": {
+    "translation": {
+      "common": {
+        "welcome": "Willkommen",
+        "hello": "Hallo {{name}}",
+        "items_count_one": "{{count}} Artikel",
+        "items_count_other": "{{count}} Artikel",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "edit": "Bearbeiten",
+        "loading": "Laden...",
+        "error": "Fehler",
+        "success": "Erfolg",
+        "yes": "Ja",
+        "no": "Nein",
+        "close": "Schließen",
+        "open": "Öffnen",
+        "search": "Suchen",
+        "filter": "Filtern",
+        "sort": "Sortieren",
+        "export": "Exportieren",
+        "import": "Importieren",
+        "refresh": "Aktualisieren"
+      },
+      "auth": {
+        "login": "Anmelden",
+        "logout": "Abmelden",
+        "email": "E-Mail",
+        "password": "Passwort",
+        "confirm_password": "Passwort bestätigen",
+        "forgot_password": "Passwort vergessen?",
+        "register": "Registrieren",
+        "login_success": "Anmeldung erfolgreich",
+        "login_failed": "Ungültige Anmeldedaten",
+        "logout_success": "Abmeldung erfolgreich",
+        "register_success": "Registrierung erfolgreich",
+        "password_reset": "Passwort zurücksetzen",
+        "new_password": "Neues Passwort"
+      },
+      "navigation": {
+        "dashboard": "Dashboard",
+        "beneficiaries": "Begünstigte",
+        "evaluations": "Bewertungen",
+        "programs": "Programme",
+        "calendar": "Kalender",
+        "documents": "Dokumente",
+        "reports": "Berichte",
+        "settings": "Einstellungen",
+        "profile": "Profil",
+        "admin": "Verwaltung",
+        "help": "Hilfe"
+      }
+    }
+  }
+}

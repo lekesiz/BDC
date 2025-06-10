@@ -1,11 +1,12 @@
+// TODO: i18n - processed
 import { http, HttpResponse } from 'msw';
 import { programs, programAnalytics, getProgramsList, getProgramAnalytics, exportProgramAnalytics } from './mockProgramData';
 /**
  * Setup mock API handlers for program analytics
- */
+ */import { useTranslation } from "react-i18next";
 export const setupProgramAnalyticsMockApi = (api, originalGet, originalPost) => {
   // Override API methods with mock implementations
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     // Get all programs
     if (url === '/api/programs') {
       return Promise.resolve({
@@ -20,7 +21,7 @@ export const setupProgramAnalyticsMockApi = (api, originalGet, originalPost) => 
     const programMatch = url.match(/^\/api\/programs\/(\d+)$/);
     if (programMatch) {
       const id = programMatch[1];
-      const program = programs.find(p => p.id.toString() === id);
+      const program = programs.find((p) => p.id.toString() === id);
       if (!program) {
         return Promise.reject({
           response: {
@@ -80,7 +81,7 @@ export const setupProgramAnalyticsMockApi = (api, originalGet, originalPost) => 
     // Fall back to original get method
     return originalGet(url, config);
   };
-  api.post = function(url, data, config) {
+  api.post = function (url, data, config) {
     // Export program analytics
     const exportMatch = url.match(/^\/api\/analytics\/programs\/(\d+)\/export$/);
     if (exportMatch) {

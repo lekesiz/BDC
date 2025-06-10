@@ -1,10 +1,11 @@
-/**
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; /**
  * Comprehensive Beneficiaries Mock Data for Demo and Testing
  */
 // Status options
 export const BENEFICIARY_STATUS = {
   ACTIVE: 'active',
-  INACTIVE: 'inactive', 
+  INACTIVE: 'inactive',
   PENDING: 'pending',
   GRADUATED: 'graduated',
   DROPPED_OUT: 'dropped_out'
@@ -20,31 +21,31 @@ export const PROGRAM_TYPES = {
 };
 // Generate realistic Turkish names
 const firstNames = [
-  'Ahmet', 'Mehmet', 'Mustafa', 'Ali', 'Hüseyin', 'İbrahim', 'İsmail', 'Süleyman', 'Ömer', 'Yusuf',
-  'Fatma', 'Ayşe', 'Emine', 'Hatice', 'Zeynep', 'Elif', 'Meryem', 'Büşra', 'Esra', 'Seda',
-  'Emre', 'Burak', 'Serkan', 'Oğuz', 'Deniz', 'Kaan', 'Arda', 'Berk', 'Efe', 'Kerem',
-  'Selin', 'Ceren', 'Defne', 'Derin', 'İpek', 'Nil', 'Pınar', 'Ezgi', 'Gizem', 'Melis'
-];
+'Ahmet', 'Mehmet', 'Mustafa', 'Ali', 'Hüseyin', 'İbrahim', 'İsmail', 'Süleyman', 'Ömer', 'Yusuf',
+'Fatma', 'Ayşe', 'Emine', 'Hatice', 'Zeynep', 'Elif', 'Meryem', 'Büşra', 'Esra', 'Seda',
+'Emre', 'Burak', 'Serkan', 'Oğuz', 'Deniz', 'Kaan', 'Arda', 'Berk', 'Efe', 'Kerem',
+'Selin', 'Ceren', 'Defne', 'Derin', 'İpek', 'Nil', 'Pınar', 'Ezgi', 'Gizem', 'Melis'];
+
 const lastNames = [
-  'Yılmaz', 'Kaya', 'Demir', 'Şahin', 'Çelik', 'Yıldız', 'Yıldırım', 'Öztürk', 'Aydin', 'Özdemir',
-  'Arslan', 'Doğan', 'Kilic', 'Aslan', 'Çetin', 'Kara', 'Koç', 'Kurt', 'Özkan', 'Şimşek',
-  'Erdoğan', 'Güler', 'Türk', 'Uçar', 'Acar', 'Polat', 'Korkmaz', 'Bulut', 'Güneş', 'Ak'
-];
+'Yılmaz', 'Kaya', 'Demir', 'Şahin', 'Çelik', 'Yıldız', 'Yıldırım', 'Öztürk', 'Aydin', 'Özdemir',
+'Arslan', 'Doğan', 'Kilic', 'Aslan', 'Çetin', 'Kara', 'Koç', 'Kurt', 'Özkan', 'Şimşek',
+'Erdoğan', 'Güler', 'Türk', 'Uçar', 'Acar', 'Polat', 'Korkmaz', 'Bulut', 'Güneş', 'Ak'];
+
 const cities = [
-  'İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya', 'Adana', 'Konya', 'Gaziantep', 'Mersin', 'Diyarbakır',
-  'Kayseri', 'Eskişehir', 'Urfa', 'Malatya', 'Erzurum', 'Van', 'Batman', 'Elazığ', 'Trabzon', 'Samsun'
-];
+'İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya', 'Adana', 'Konya', 'Gaziantep', 'Mersin', 'Diyarbakır',
+'Kayseri', 'Eskişehir', 'Urfa', 'Malatya', 'Erzurum', 'Van', 'Batman', 'Elazığ', 'Trabzon', 'Samsun'];
+
 const skills = [
-  'Microsoft Office', 'İngilizce', 'Almanca', 'Fransızca', 'Muhasebe', 'Grafik Tasarım', 'Web Tasarım',
-  'Pazarlama', 'Satış', 'Müşteri Hizmetleri', 'Proje Yönetimi', 'Veri Analizi', 'Sosyal Medya',
-  'Fotoğrafçılık', 'Video Editing', 'Çeviri', 'Öğretmenlik', 'Hemşirelik', 'Aşçılık', 'Berberlik',
-  'Elektrik', 'Tesisatçılık', 'Marangozluk', 'Kaynakçılık', 'Dikış-Terzilik', 'Kuaförlük', 'Estetisyenlik'
-];
+'Microsoft Office', 'İngilizce', 'Almanca', 'Fransızca', 'Muhasebe', 'Grafik Tasarım', 'Web Tasarım',
+'Pazarlama', 'Satış', 'Müşteri Hizmetleri', 'Proje Yönetimi', 'Veri Analizi', 'Sosyal Medya',
+'Fotoğrafçılık', 'Video Editing', 'Çeviri', 'Öğretmenlik', 'Hemşirelik', 'Aşçılık', 'Berberlik',
+'Elektrik', 'Tesisatçılık', 'Marangozluk', 'Kaynakçılık', 'Dikış-Terzilik', 'Kuaförlük', 'Estetisyenlik'];
+
 const interests = [
-  'Teknoloji', 'Sanat', 'Müzik', 'Spor', 'Okuma', 'Yazma', 'Seyahat', 'Fotoğrafçılık', 'Sinema',
-  'Tiyatro', 'Dans', 'Resim', 'El Sanatları', 'Bahçıvanlık', 'Yemek Yapma', 'Dil Öğrenme',
-  'Gönüllü Çalışma', 'Çevre', 'Eğitim', 'Sağlık', 'Sosyal Medya', 'Oyun', 'Müzecilik'
-];
+'Teknoloji', 'Sanat', 'Müzik', 'Spor', 'Okuma', 'Yazma', 'Seyahat', 'Fotoğrafçılık', 'Sinema',
+'Tiyatro', 'Dans', 'Resim', 'El Sanatları', 'Bahçıvanlık', 'Yemek Yapma', 'Dil Öğrenme',
+'Gönüllü Çalışma', 'Çevre', 'Eğitim', 'Sağlık', 'Sosyal Medya', 'Oyun', 'Müzecilik'];
+
 // Generate random beneficiary
 export const generateBeneficiary = (id) => {
   const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
@@ -90,7 +91,7 @@ export const generateBeneficiary = (id) => {
       gender: Math.random() > 0.5 ? 'Kadın' : 'Erkek',
       nationality: 'Türk',
       idNumber: `${Math.floor(Math.random() * 90000000000) + 10000000000}`,
-      profilePhoto: `https://i.pravatar.cc/150?u=${id}`,
+      profilePhoto: `https://i.pravatar.cc/150?u=${id}`
     },
     contactInfo: {
       address: `${Math.floor(Math.random() * 999) + 1}. Sokak No:${Math.floor(Math.random() * 99) + 1}`,
@@ -106,24 +107,24 @@ export const generateBeneficiary = (id) => {
     educationInfo: {
       highestDegree: ['İlkokul', 'Ortaokul', 'Lise', 'Ön Lisans', 'Lisans', 'Yüksek Lisans'][Math.floor(Math.random() * 6)],
       university: Math.random() > 0.5 ? ['İstanbul Üniversitesi', 'Ankara Üniversitesi', 'İzmir Üniversitesi', 'Bursa Üniversitesi'][Math.floor(Math.random() * 4)] : null,
-      graduationYear: Math.random() > 0.3 ? (2000 + Math.floor(Math.random() * 24)) : null,
+      graduationYear: Math.random() > 0.3 ? 2000 + Math.floor(Math.random() * 24) : null,
       gpa: Math.random() > 0.5 ? (2.0 + Math.random() * 2).toFixed(2) : null,
       languages: ['Türkçe', ...(Math.random() > 0.6 ? ['İngilizce'] : []), ...(Math.random() > 0.8 ? ['Almanca'] : [])]
     },
     employmentInfo: {
       currentStatus: ['Çalışıyor', 'İşsiz', 'Öğrenci', 'Emekli', 'Ev Hanımı'][Math.floor(Math.random() * 5)],
       previousJobs: [
-        {
-          company: `${lastNames[Math.floor(Math.random() * lastNames.length)]} Ltd. Şti.`,
-          position: ['Uzman', 'Asistan', 'Müdür', 'Tekniker', 'Operatör'][Math.floor(Math.random() * 5)],
-          duration: `${1 + Math.floor(Math.random() * 5)} yıl`,
-          startDate: '2020-01-15',
-          endDate: Math.random() > 0.5 ? '2023-06-30' : null
-        }
-      ],
+      {
+        company: `${lastNames[Math.floor(Math.random() * lastNames.length)]} Ltd. Şti.`,
+        position: ['Uzman', 'Asistan', 'Müdür', 'Tekniker', 'Operatör'][Math.floor(Math.random() * 5)],
+        duration: `${1 + Math.floor(Math.random() * 5)} yıl`,
+        startDate: '2020-01-15',
+        endDate: Math.random() > 0.5 ? '2023-06-30' : null
+      }],
+
       skills: userSkills,
       desiredField: currentProgram,
-      salaryExpectation: (3000 + Math.floor(Math.random() * 7000)) + ' TL'
+      salaryExpectation: 3000 + Math.floor(Math.random() * 7000) + ' TL'
     },
     programInfo: {
       currentProgram,
@@ -154,32 +155,32 @@ export const generateBeneficiary = (id) => {
       maritalStatus: ['Bekar', 'Evli', 'Boşanmış', 'Dul'][Math.floor(Math.random() * 4)],
       children: Math.floor(Math.random() * 4),
       householdSize: 1 + Math.floor(Math.random() * 6),
-      monthlyIncome: (2000 + Math.floor(Math.random() * 8000)) + ' TL',
+      monthlyIncome: 2000 + Math.floor(Math.random() * 8000) + ' TL',
       hasDisability: Math.random() > 0.9,
       veteranStatus: Math.random() > 0.95,
       interests: userInterests
     },
     notes: [
-      {
-        id: 1,
-        date: lastActive.toISOString().split('T')[0],
-        author: 'Ahmet Yılmaz',
-        content: 'Öğrenci derse düzenli katılıyor ve başarılı. İletişim becerileri geliştirilmeli.',
-        type: 'progress'
-      },
-      {
-        id: 2,
-        date: new Date(lastActive.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        author: 'Ayşe Demir',
-        content: 'Teknik konularda yardıma ihtiyaç duyuyor. Ek destek sağlanacak.',
-        type: 'support'
-      }
-    ],
+    {
+      id: 1,
+      date: lastActive.toISOString().split('T')[0],
+      author: 'Ahmet Yılmaz',
+      content: 'Öğrenci derse düzenli katılıyor ve başarılı. İletişim becerileri geliştirilmeli.',
+      type: 'progress'
+    },
+    {
+      id: 2,
+      date: new Date(lastActive.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      author: 'Ayşe Demir',
+      content: 'Teknik konularda yardıma ihtiyaç duyuyor. Ek destek sağlanacak.',
+      type: 'support'
+    }],
+
     documents: [
-      { id: 1, name: 'Kimlik Fotokopisi', type: 'identity', uploadDate: createdDate.toISOString().split('T')[0], status: 'approved' },
-      { id: 2, name: 'Diploma', type: 'education', uploadDate: createdDate.toISOString().split('T')[0], status: 'approved' },
-      { id: 3, name: 'CV', type: 'employment', uploadDate: lastActive.toISOString().split('T')[0], status: 'pending' }
-    ],
+    { id: 1, name: 'Kimlik Fotokopisi', type: 'identity', uploadDate: createdDate.toISOString().split('T')[0], status: 'approved' },
+    { id: 2, name: 'Diploma', type: 'education', uploadDate: createdDate.toISOString().split('T')[0], status: 'approved' },
+    { id: 3, name: 'CV', type: 'employment', uploadDate: lastActive.toISOString().split('T')[0], status: 'pending' }],
+
     metadata: {
       createdAt: createdDate.toISOString(),
       updatedAt: lastActive.toISOString(),
@@ -207,18 +208,18 @@ export const mockBeneficiaries = generateBeneficiaries(50);
 // Statistics derived from mock data
 export const beneficiaryStats = {
   total: mockBeneficiaries.length,
-  active: mockBeneficiaries.filter(b => b.programInfo.status === 'active').length,
-  graduated: mockBeneficiaries.filter(b => b.programInfo.status === 'graduated').length,
-  pending: mockBeneficiaries.filter(b => b.programInfo.status === 'pending').length,
+  active: mockBeneficiaries.filter((b) => b.programInfo.status === 'active').length,
+  graduated: mockBeneficiaries.filter((b) => b.programInfo.status === 'graduated').length,
+  pending: mockBeneficiaries.filter((b) => b.programInfo.status === 'pending').length,
   averageAge: Math.round(mockBeneficiaries.reduce((sum, b) => sum + b.personalInfo.age, 0) / mockBeneficiaries.length),
   averageProgress: Math.round(mockBeneficiaries.reduce((sum, b) => sum + b.programInfo.progress, 0) / mockBeneficiaries.length),
   programDistribution: {
-    vocational: mockBeneficiaries.filter(b => b.programInfo.currentProgram === 'vocational').length,
-    academic: mockBeneficiaries.filter(b => b.programInfo.currentProgram === 'academic').length,
-    language: mockBeneficiaries.filter(b => b.programInfo.currentProgram === 'language').length,
-    digital_skills: mockBeneficiaries.filter(b => b.programInfo.currentProgram === 'digital_skills').length,
-    entrepreneurship: mockBeneficiaries.filter(b => b.programInfo.currentProgram === 'entrepreneurship').length,
-    life_skills: mockBeneficiaries.filter(b => b.programInfo.currentProgram === 'life_skills').length
+    vocational: mockBeneficiaries.filter((b) => b.programInfo.currentProgram === 'vocational').length,
+    academic: mockBeneficiaries.filter((b) => b.programInfo.currentProgram === 'academic').length,
+    language: mockBeneficiaries.filter((b) => b.programInfo.currentProgram === 'language').length,
+    digital_skills: mockBeneficiaries.filter((b) => b.programInfo.currentProgram === 'digital_skills').length,
+    entrepreneurship: mockBeneficiaries.filter((b) => b.programInfo.currentProgram === 'entrepreneurship').length,
+    life_skills: mockBeneficiaries.filter((b) => b.programInfo.currentProgram === 'life_skills').length
   }
 };
 export default mockBeneficiaries;

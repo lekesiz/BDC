@@ -1,9 +1,10 @@
+// TODO: i18n - processed
 // PWA Performance Optimization Utilities
 import { pwaService } from '../services/pwa.service';
 /**
  * Resource Preloader
  * Preloads critical resources for better performance
- */
+ */import { useTranslation } from "react-i18next";
 export class ResourcePreloader {
   constructor() {
     this.preloadedResources = new Set();
@@ -15,13 +16,13 @@ export class ResourcePreloader {
    */
   async preloadCritical() {
     const criticalResources = [
-      '/src/App.jsx',
-      '/src/components/layout/Header.jsx',
-      '/src/components/layout/Sidebar.jsx',
-      '/src/components/common/LoadingStates.jsx',
-      '/api/auth/me',
-      '/api/dashboard'
-    ];
+    '/src/App.jsx',
+    '/src/components/layout/Header.jsx',
+    '/src/components/layout/Sidebar.jsx',
+    '/src/components/common/LoadingStates.jsx',
+    '/api/auth/me',
+    '/api/dashboard'];
+
     await this.preload(criticalResources, { priority: 'high' });
   }
   /**
@@ -157,26 +158,26 @@ export class ResourcePreloader {
   getRouteResources(route) {
     const routeResourceMap = {
       '/dashboard': [
-        '/src/pages/dashboard/DashboardPage.jsx',
-        '/src/components/dashboard/ResponsiveWidget.jsx',
-        '/api/dashboard',
-        '/api/notifications'
-      ],
+      '/src/pages/dashboard/DashboardPage.jsx',
+      '/src/components/dashboard/ResponsiveWidget.jsx',
+      '/api/dashboard',
+      '/api/notifications'],
+
       '/beneficiaries': [
-        '/src/pages/beneficiaries/BeneficiariesPage.jsx',
-        '/src/components/beneficiaries/ResponsiveBeneficiariesTable.jsx',
-        '/api/beneficiaries'
-      ],
+      '/src/pages/beneficiaries/BeneficiariesPage.jsx',
+      '/src/components/beneficiaries/ResponsiveBeneficiariesTable.jsx',
+      '/api/beneficiaries'],
+
       '/evaluations': [
-        '/src/pages/evaluation/EvaluationsPage.jsx',
-        '/src/components/evaluation/QuestionEditor.jsx',
-        '/api/evaluations'
-      ],
+      '/src/pages/evaluation/EvaluationsPage.jsx',
+      '/src/components/evaluation/QuestionEditor.jsx',
+      '/api/evaluations'],
+
       '/calendar': [
-        '/src/pages/calendar/CalendarPage.jsx',
-        '/src/components/calendar/AppointmentModal.jsx',
-        '/api/appointments'
-      ]
+      '/src/pages/calendar/CalendarPage.jsx',
+      '/src/components/calendar/AppointmentModal.jsx',
+      '/api/appointments']
+
     };
     return routeResourceMap[route] || [];
   }
@@ -266,16 +267,16 @@ export class LazyLoader {
   loadGenericContent(element) {
     const src = element.dataset.src;
     if (src) {
-      fetch(src)
-        .then(response => response.text())
-        .then(html => {
-          element.innerHTML = html;
-          element.classList.remove('lazy');
-          element.classList.add('loaded');
-        })
-        .catch(error => {
-          console.error('Failed to load lazy content:', error);
-        });
+      fetch(src).
+      then((response) => response.text()).
+      then((html) => {
+        element.innerHTML = html;
+        element.classList.remove('lazy');
+        element.classList.add('loaded');
+      }).
+      catch((error) => {
+        console.error('Failed to load lazy content:', error);
+      });
     }
   }
   destroy() {
@@ -359,7 +360,7 @@ export class CodeSplitter {
     };
   }
   delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 /**
@@ -396,9 +397,9 @@ export class ResourcePrioritizer {
     return this.priorities.get(resourcePath)?.priority || 'normal';
   }
   getCriticalResources() {
-    return Array.from(this.priorities.entries())
-      .filter(([, data]) => data.priority === 'critical')
-      .map(([path]) => path);
+    return Array.from(this.priorities.entries()).
+    filter(([, data]) => data.priority === 'critical').
+    map(([path]) => path);
   }
 }
 // Export singleton instances

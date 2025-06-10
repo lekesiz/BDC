@@ -3,6 +3,7 @@
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask import request, current_app
 from flask_jwt_extended import decode_token
+from flask_jwt_extended.exceptions import InvalidHeaderError
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 import json
 import functools

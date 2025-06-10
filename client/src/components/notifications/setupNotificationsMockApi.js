@@ -1,9 +1,10 @@
-import { 
-  generateNotificationsData, 
+// TODO: i18n - processed
+import {
+  generateNotificationsData,
   generateNotificationPreferences,
   generateNotificationStats,
-  generateNotificationTemplates 
-} from './mockNotificationsData';
+  generateNotificationTemplates } from
+'./mockNotificationsData';import { useTranslation } from "react-i18next";
 export const setupNotificationsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -12,7 +13,7 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     delete: originalDelete || api.delete.bind(api)
   };
   // Notification endpoints
-  api.get = function(url, ...args) {
+  api.get = function (url, ...args) {
     // List notifications
     if (url === '/api/notifications' || url.startsWith('/api/notifications?')) {
       const userRole = localStorage.getItem('userRole') || 'student';
@@ -27,16 +28,16 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
       let filteredNotifications = [...notifications];
       // Filter by category
       if (category) {
-        filteredNotifications = filteredNotifications.filter(n => n.category === category);
+        filteredNotifications = filteredNotifications.filter((n) => n.category === category);
       }
       // Filter by priority
       if (priority) {
-        filteredNotifications = filteredNotifications.filter(n => n.priority === priority);
+        filteredNotifications = filteredNotifications.filter((n) => n.priority === priority);
       }
       // Filter by read status
       if (read !== null) {
         const isRead = read === 'true';
-        filteredNotifications = filteredNotifications.filter(n => n.read === isRead);
+        filteredNotifications = filteredNotifications.filter((n) => n.read === isRead);
       }
       // Apply pagination
       const paginatedNotifications = filteredNotifications.slice(offset, offset + limit);
@@ -45,7 +46,7 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
         data: {
           notifications: paginatedNotifications,
           total: filteredNotifications.length,
-          unread: filteredNotifications.filter(n => !n.read).length,
+          unread: filteredNotifications.filter((n) => !n.read).length,
           hasMore: offset + limit < filteredNotifications.length
         }
       });
@@ -54,18 +55,18 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     if (url === '/api/notifications/unread-count') {
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
-      const unreadCount = notifications.filter(n => !n.read).length;
+      const unreadCount = notifications.filter((n) => !n.read).length;
       return Promise.resolve({
         status: 200,
         data: {
           count: unreadCount,
           byCategory: {
-            academic: notifications.filter(n => n.category === 'academic' && !n.read).length,
-            reminder: notifications.filter(n => n.category === 'reminder' && !n.read).length,
-            system: notifications.filter(n => n.category === 'system' && !n.read).length,
-            communication: notifications.filter(n => n.category === 'communication' && !n.read).length,
-            achievement: notifications.filter(n => n.category === 'achievement' && !n.read).length,
-            event: notifications.filter(n => n.category === 'event' && !n.read).length
+            academic: notifications.filter((n) => n.category === 'academic' && !n.read).length,
+            reminder: notifications.filter((n) => n.category === 'reminder' && !n.read).length,
+            system: notifications.filter((n) => n.category === 'system' && !n.read).length,
+            communication: notifications.filter((n) => n.category === 'communication' && !n.read).length,
+            achievement: notifications.filter((n) => n.category === 'achievement' && !n.read).length,
+            event: notifications.filter((n) => n.category === 'event' && !n.read).length
           }
         }
       });
@@ -75,7 +76,7 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
       const notificationId = parseInt(url.split('/').pop());
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
-      const notification = notifications.find(n => n.id === notificationId);
+      const notification = notifications.find((n) => n.id === notificationId);
       if (notification) {
         return Promise.resolve({
           status: 200,
@@ -120,7 +121,7 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
       const userRole = localStorage.getItem('userRole') || 'student';
       const notifications = generateNotificationsData(userRole);
       // Include read notifications from the past 30 days
-      const historicalNotifications = notifications.map(n => ({
+      const historicalNotifications = notifications.map((n) => ({
         ...n,
         read: true,
         timestamp: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
@@ -136,13 +137,13 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     // Notification categories
     if (url === '/api/notifications/categories') {
       const categories = [
-        { id: 'academic', name: 'Academic', icon: 'graduation-cap', color: 'blue' },
-        { id: 'reminder', name: 'Reminders', icon: 'clock', color: 'orange' },
-        { id: 'system', name: 'System', icon: 'cog', color: 'gray' },
-        { id: 'communication', name: 'Messages', icon: 'message', color: 'green' },
-        { id: 'achievement', name: 'Achievements', icon: 'trophy', color: 'yellow' },
-        { id: 'event', name: 'Events', icon: 'calendar', color: 'purple' }
-      ];
+      { id: 'academic', name: 'Academic', icon: 'graduation-cap', color: 'blue' },
+      { id: 'reminder', name: 'Reminders', icon: 'clock', color: 'orange' },
+      { id: 'system', name: 'System', icon: 'cog', color: 'gray' },
+      { id: 'communication', name: 'Messages', icon: 'message', color: 'green' },
+      { id: 'achievement', name: 'Achievements', icon: 'trophy', color: 'yellow' },
+      { id: 'event', name: 'Events', icon: 'calendar', color: 'purple' }];
+
       return Promise.resolve({
         status: 200,
         data: categories
@@ -152,7 +153,7 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     return originalFunctions.get.call(api, url, ...args);
   };
   // Notification POST endpoints
-  api.post = function(url, data, ...args) {
+  api.post = function (url, data, ...args) {
     // Mark notification as read
     if (url.match(/^\/api\/notifications\/\d+\/read$/)) {
       const notificationId = parseInt(url.split('/')[3]);
@@ -238,7 +239,7 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     return originalFunctions.post.call(api, url, data, ...args);
   };
   // Notification PUT endpoints
-  api.put = function(url, data, ...args) {
+  api.put = function (url, data, ...args) {
     // Update notification preferences
     if (url === '/api/notifications/preferences') {
       return Promise.resolve({
@@ -287,7 +288,7 @@ export const setupNotificationsMockApi = (api, originalGet, originalPost, origin
     return originalFunctions.put.call(api, url, data, ...args);
   };
   // Notification DELETE endpoints
-  api.delete = function(url, ...args) {
+  api.delete = function (url, ...args) {
     // Delete notification
     if (url.match(/^\/api\/notifications\/\d+$/)) {
       const notificationId = parseInt(url.split('/').pop());

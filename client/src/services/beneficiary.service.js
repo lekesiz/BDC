@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import api from '@/lib/api';
 /**
  * Get a list of beneficiaries with pagination and filters
@@ -10,7 +11,7 @@ import api from '@/lib/api';
  * @param {string} params.status - Filter by status
  * @param {string} params.search - Search term
  * @returns {Promise<Object>} Beneficiaries data with pagination
- */
+ */import { useTranslation } from "react-i18next";
 export const getBeneficiaries = async (params = {}) => {
   try {
     const response = await api.get('/api/beneficiaries', { params });

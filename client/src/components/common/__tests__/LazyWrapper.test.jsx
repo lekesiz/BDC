@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * @vitest-environment jsdom
  */
@@ -5,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import LazyWrapper from '../LazyWrapper';
 // Mock the components
-vi.mock('../ErrorBoundary', () => ({
+import { useTranslation } from "react-i18next";vi.mock('../ErrorBoundary', () => ({
   default: ({ children }) => <div data-testid="error-boundary">{children}</div>
 }));
 vi.mock('../../ui/LoadingSpinner', () => ({

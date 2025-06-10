@@ -1,8 +1,9 @@
+// TODO: i18n - processed
 import { useState, useEffect, useCallback } from 'react';
 import { pwaService } from '../services/pwa.service';
 /**
  * Main PWA hook providing comprehensive PWA functionality
- */
+ */import { useTranslation } from "react-i18next";
 export function usePWA() {
   // Always assume online in development to avoid false offline warnings
   const [isOnline, setIsOnline] = useState(import.meta.env.DEV ? true : navigator.onLine);
@@ -36,7 +37,7 @@ export function usePWA() {
     };
     const handleUpdateAvailable = () => setHasUpdate(true);
     const handleSyncSuccess = () => {
-      setSyncStatus(prev => ({
+      setSyncStatus((prev) => ({
         ...prev,
         syncing: false,
         lastSync: new Date()
@@ -81,11 +82,11 @@ export function usePWA() {
   }, []);
   const syncData = useCallback(async (tag, data) => {
     try {
-      setSyncStatus(prev => ({ ...prev, syncing: true }));
+      setSyncStatus((prev) => ({ ...prev, syncing: true }));
       await pwaService.syncData(tag, data);
     } catch (err) {
       setError(err.message);
-      setSyncStatus(prev => ({ ...prev, syncing: false }));
+      setSyncStatus((prev) => ({ ...prev, syncing: false }));
     }
   }, []);
   return {
@@ -216,7 +217,7 @@ export function useBackgroundSync() {
   const addToSyncQueue = useCallback(async (tag, data) => {
     try {
       await pwaService.syncData(tag, data);
-      setSyncQueue(prev => [...prev, { tag, data, timestamp: Date.now() }]);
+      setSyncQueue((prev) => [...prev, { tag, data, timestamp: Date.now() }]);
     } catch (error) {
       console.error('Failed to queue sync:', error);
     }
@@ -227,7 +228,7 @@ export function useBackgroundSync() {
   useEffect(() => {
     const handleSyncSuccess = (data) => {
       setLastSync(new Date());
-      setSyncQueue(prev => prev.filter(item => item.tag !== data.tag));
+      setSyncQueue((prev) => prev.filter((item) => item.tag !== data.tag));
     };
     const handleSyncStart = () => setIsSyncing(true);
     const handleSyncEnd = () => setIsSyncing(false);

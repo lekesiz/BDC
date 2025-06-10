@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
@@ -17,10 +18,10 @@ import {
   ArrowDown,
   RefreshCw,
   Download,
-  Lock
-} from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-const AIInsightsPage = () => {
+  Lock } from
+'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';import { useTranslation } from "react-i18next";
+const AIInsightsPage = () => {const { t } = useTranslation();
   const { user, hasRole } = useAuth();
   const { toast } = useToast();
   // AI Insights are restricted to admin and trainer roles only
@@ -31,16 +32,16 @@ const AIInsightsPage = () => {
       <div className="flex items-center justify-center min-h-[60vh]">
         <Card className="p-8 text-center max-w-md">
           <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h2>
-          <p className="text-gray-600 mb-4">
-            AI Insights are only available to administrators and trainers.
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t("components.access_restricted")}</h2>
+          <p className="text-gray-600 mb-4">{t("pages.ai_insights_are_only_available_to_administrators_a")}
+
           </p>
-          <p className="text-sm text-gray-500">
-            Current role: <Badge variant="secondary">{user?.role}</Badge>
+          <p className="text-sm text-gray-500">{t("components.current_role")}
+            <Badge variant="secondary">{user?.role}</Badge>
           </p>
         </Card>
-      </div>
-    );
+      </div>);
+
   }
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -120,78 +121,78 @@ const AIInsightsPage = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>);
+
   }
   if (!insights) {
     return (
       <div className="text-center py-12">
         <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <p className="text-gray-500">No insights available</p>
-      </div>
-    );
+        <p className="text-gray-500">{t("pages.no_insights_available")}</p>
+      </div>);
+
   }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Brain className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold text-gray-900">AI Insights</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("components.ai_insights")}</h1>
         </div>
         <div className="flex items-center gap-3">
           <Select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
-            className="w-40"
-          >
-            <option value="last_7_days">Last 7 days</option>
-            <option value="last_30_days">Last 30 days</option>
-            <option value="last_90_days">Last 90 days</option>
-            <option value="all_time">All time</option>
+            className="w-40">
+
+            <option value="last_7_days">{t("pages.last_7_days")}</option>
+            <option value="last_30_days">{t("pages.last_30_days")}</option>
+            <option value="last_90_days">{t("pages.last_90_days")}</option>
+            <option value="all_time">{t("components.all_time")}</option>
           </Select>
           <Select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-40"
-          >
-            <option value="all">All Categories</option>
-            <option value="performance">Performance</option>
-            <option value="engagement">Engagement</option>
-            <option value="learning">Learning</option>
-            <option value="trends">Trends</option>
+            className="w-40">
+
+            <option value="all">{t("components.all_categories")}</option>
+            <option value="performance">{t("components.performance")}</option>
+            <option value="engagement">{t("components.engagement")}</option>
+            <option value="learning">{t("lib.learning")}</option>
+            <option value="trends">{t("components.trends")}</option>
           </Select>
           <Button
             variant="outline"
             onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            disabled={refreshing}>
+
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />{t("components.refresh")}
+
           </Button>
-          {hasRole(['super_admin', 'tenant_admin']) && (
-            <Button onClick={handleExport}>
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-          )}
+          {hasRole(['super_admin', 'tenant_admin']) &&
+          <Button onClick={handleExport}>
+              <Download className="h-4 w-4 mr-2" />{t("components.export")}
+
+          </Button>
+          }
         </div>
       </div>
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="p-6">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">Overall Performance</p>
+            <p className="text-sm text-gray-600">{t("pages.overall_performance")}</p>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{insights.metrics.overall_performance}%</p>
           <p className="text-sm text-green-600 flex items-center mt-1">
             <ArrowUp className="h-3 w-3 mr-1" />
-            {insights.metrics.performance_change}% from last period
+            {insights.metrics.performance_change}{t("pages._from_last_period")}
           </p>
         </Card>
         <Card className="p-6">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">Active Learners</p>
+            <p className="text-sm text-gray-600">{t("pages.active_learners")}</p>
             <Users className="h-4 w-4 text-blue-600" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{insights.metrics.active_learners}</p>
@@ -201,32 +202,32 @@ const AIInsightsPage = () => {
         </Card>
         <Card className="p-6">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">Completion Rate</p>
+            <p className="text-sm text-gray-600">{t("components.completion_rate")}</p>
             <Target className="h-4 w-4 text-purple-600" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{insights.metrics.completion_rate}%</p>
           <p className="text-sm text-purple-600 flex items-center mt-1">
             <ArrowUp className="h-3 w-3 mr-1" />
-            {insights.metrics.completion_change}% improvement
+            {insights.metrics.completion_change}{t("pages._improvement")}
           </p>
         </Card>
         <Card className="p-6">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">Risk Assessment</p>
+            <p className="text-sm text-gray-600">{t("pages.risk_assessment")}</p>
             <AlertTriangle className="h-4 w-4 text-amber-600" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{insights.metrics.at_risk_count}</p>
-          <p className="text-sm text-gray-500 mt-1">
-            learners need attention
+          <p className="text-sm text-gray-500 mt-1">{t("pages.learners_need_attention")}
+
           </p>
         </Card>
       </div>
       {/* AI Predictions */}
       <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-4">AI Predictions</h2>
+        <h2 className="text-lg font-semibold mb-4">{t("pages.ai_predictions")}</h2>
         <div className="space-y-4">
-          {insights.predictions.map((prediction, index) => (
-            <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+          {insights.predictions.map((prediction, index) =>
+          <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
               <Brain className="h-5 w-5 text-primary mt-0.5" />
               <div className="flex-1">
                 <p className="font-medium text-gray-900">{prediction.title}</p>
@@ -239,12 +240,12 @@ const AIInsightsPage = () => {
                 </div>
               </div>
             </div>
-          ))}
+          )}
         </div>
       </Card>
       {/* Performance Trends */}
       <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-4">Performance Trends</h2>
+        <h2 className="text-lg font-semibold mb-4">{t("components.performance_trends")}</h2>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={insights.trends.performance}>
@@ -253,20 +254,20 @@ const AIInsightsPage = () => {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="average_score" 
-                stroke="#0088FE" 
+              <Line
+                type="monotone"
+                dataKey="average_score"
+                stroke="#0088FE"
                 name="Average Score"
-                strokeWidth={2}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="completion_rate" 
-                stroke="#00C49F" 
+                strokeWidth={2} />
+
+              <Line
+                type="monotone"
+                dataKey="completion_rate"
+                stroke="#00C49F"
                 name="Completion Rate"
-                strokeWidth={2}
-              />
+                strokeWidth={2} />
+
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -274,7 +275,7 @@ const AIInsightsPage = () => {
       {/* Learning Categories */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Performance by Category</h2>
+          <h2 className="text-lg font-semibold mb-4">{t("pages.performance_by_category")}</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={insights.categories.performance}>
@@ -288,7 +289,7 @@ const AIInsightsPage = () => {
           </div>
         </Card>
         <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Time Distribution</h2>
+          <h2 className="text-lg font-semibold mb-4">{t("pages.time_distribution")}</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -300,11 +301,11 @@ const AIInsightsPage = () => {
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   outerRadius={80}
                   fill="#8884d8"
-                  dataKey="value"
-                >
-                  {insights.categories.time_spent.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
+                  dataKey="value">
+
+                  {insights.categories.time_spent.map((entry, index) =>
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  )}
                 </Pie>
                 <Tooltip />
               </PieChart>
@@ -314,48 +315,48 @@ const AIInsightsPage = () => {
       </div>
       {/* Recommendations */}
       <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-4">AI Recommendations</h2>
+        <h2 className="text-lg font-semibold mb-4">{t("pages.ai_recommendations")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {insights.recommendations.map((rec, index) => (
-            <div key={index} className="border rounded-lg p-4">
+          {insights.recommendations.map((rec, index) =>
+          <div key={index} className="border rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900">{rec.title}</h3>
                   <p className="text-sm text-gray-600 mt-1">{rec.description}</p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Estimated impact: {rec.estimated_impact}
+                  <p className="text-sm text-gray-500 mt-2">{t("pages.estimated_impact")}
+                  {rec.estimated_impact}
                   </p>
                 </div>
               </div>
             </div>
-          ))}
+          )}
         </div>
       </Card>
       {/* Anomalies Detection */}
-      {insights.anomalies && insights.anomalies.length > 0 && (
-        <Card className="p-6 border-amber-200 bg-amber-50">
+      {insights.anomalies && insights.anomalies.length > 0 &&
+      <Card className="p-6 border-amber-200 bg-amber-50">
           <div className="flex items-center gap-3 mb-4">
             <AlertTriangle className="h-5 w-5 text-amber-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Anomalies Detected</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t("pages.anomalies_detected")}</h2>
           </div>
           <div className="space-y-3">
-            {insights.anomalies.map((anomaly, index) => (
-              <div key={index} className="flex items-start gap-3">
+            {insights.anomalies.map((anomaly, index) =>
+          <div key={index} className="flex items-start gap-3">
                 <div className="w-1.5 h-1.5 bg-amber-600 rounded-full mt-2" />
                 <div>
                   <p className="font-medium text-gray-900">{anomaly.title}</p>
                   <p className="text-sm text-gray-600">{anomaly.description}</p>
-                  <p className="text-sm text-amber-600 mt-1">
-                    Action required: {anomaly.action}
+                  <p className="text-sm text-amber-600 mt-1">{t("pages.action_required")}
+                {anomaly.action}
                   </p>
                 </div>
               </div>
-            ))}
+          )}
           </div>
         </Card>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 export default AIInsightsPage;

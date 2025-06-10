@@ -1,4 +1,5 @@
-/**
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; /**
  * Bundle optimization utilities and configurations
  */
 /**
@@ -84,7 +85,7 @@ export const dynamicImport = (importFn, options = {}) => {
     } catch (error) {
       if (attempt < retry) {
         console.warn(`Import failed, retrying (${attempt}/${retry})...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         return attemptImport(attempt + 1);
       }
       onError(error);
@@ -98,14 +99,14 @@ export const dynamicImport = (importFn, options = {}) => {
  */
 export const preloadCriticalResources = () => {
   const resources = [
-    // Preload fonts
-    { href: '/fonts/inter-var.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
-    // Preload critical CSS
-    { href: '/css/critical.css', as: 'style' },
-    // Preload critical JS
-    { href: '/js/app.js', as: 'script' }
-  ];
-  resources.forEach(resource => {
+  // Preload fonts
+  { href: '/fonts/inter-var.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+  // Preload critical CSS
+  { href: '/css/critical.css', as: 'style' },
+  // Preload critical JS
+  { href: '/js/app.js', as: 'script' }];
+
+  resources.forEach((resource) => {
     const link = document.createElement('link');
     link.rel = 'preload';
     link.href = resource.href;
@@ -121,7 +122,7 @@ export const preloadCriticalResources = () => {
 export const prefetchResources = (resources = []) => {
   if ('requestIdleCallback' in window) {
     requestIdleCallback(() => {
-      resources.forEach(resource => {
+      resources.forEach((resource) => {
         const link = document.createElement('link');
         link.rel = 'prefetch';
         link.href = resource;
@@ -135,11 +136,11 @@ export const prefetchResources = (resources = []) => {
  */
 export const addResourceHints = () => {
   const domains = [
-    'https://api.bdc.com',
-    'https://cdn.bdc.com',
-    'https://analytics.bdc.com'
-  ];
-  domains.forEach(domain => {
+  'https://api.bdc.com',
+  'https://cdn.bdc.com',
+  'https://analytics.bdc.com'];
+
+  domains.forEach((domain) => {
     const link = document.createElement('link');
     link.rel = 'dns-prefetch';
     link.href = domain;
@@ -190,7 +191,7 @@ export const lazyLoadImages = (selector = 'img[data-lazy]') => {
   const images = document.querySelectorAll(selector);
   if ('IntersectionObserver' in window) {
     const imageObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const img = entry.target;
           img.src = img.dataset.lazy;
@@ -202,10 +203,10 @@ export const lazyLoadImages = (selector = 'img[data-lazy]') => {
       rootMargin: '50px 0px',
       threshold: 0.01
     });
-    images.forEach(img => imageObserver.observe(img));
+    images.forEach((img) => imageObserver.observe(img));
   } else {
     // Fallback for browsers without Intersection Observer
-    images.forEach(img => {
+    images.forEach((img) => {
       img.src = img.dataset.lazy;
       img.removeAttribute('data-lazy');
     });
@@ -223,22 +224,22 @@ export const checkPerformanceBudget = () => {
   };
   const violations = [];
   // Check JavaScript size
-  const jsSize = performance.getEntriesByType('resource')
-    .filter(entry => entry.name.endsWith('.js'))
-    .reduce((total, entry) => total + entry.transferSize, 0);
+  const jsSize = performance.getEntriesByType('resource').
+  filter((entry) => entry.name.endsWith('.js')).
+  reduce((total, entry) => total + entry.transferSize, 0);
   if (jsSize > budgets.js) {
     violations.push(`JavaScript: ${Math.round(jsSize / 1024)}KB exceeds budget of ${budgets.js / 1024}KB`);
   }
   // Check CSS size
-  const cssSize = performance.getEntriesByType('resource')
-    .filter(entry => entry.name.endsWith('.css'))
-    .reduce((total, entry) => total + entry.transferSize, 0);
+  const cssSize = performance.getEntriesByType('resource').
+  filter((entry) => entry.name.endsWith('.css')).
+  reduce((total, entry) => total + entry.transferSize, 0);
   if (cssSize > budgets.css) {
     violations.push(`CSS: ${Math.round(cssSize / 1024)}KB exceeds budget of ${budgets.css / 1024}KB`);
   }
   // Check total size
-  const totalSize = performance.getEntriesByType('resource')
-    .reduce((total, entry) => total + entry.transferSize, 0);
+  const totalSize = performance.getEntriesByType('resource').
+  reduce((total, entry) => total + entry.transferSize, 0);
   if (totalSize > budgets.total) {
     violations.push(`Total: ${Math.round(totalSize / 1024)}KB exceeds budget of ${budgets.total / 1024}KB`);
   }

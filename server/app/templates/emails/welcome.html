@@ -1,0 +1,31 @@
+{% extends "emails/base.html" %}
+
+{% block title %}{{ subject }}{% endblock %}
+
+{% block header %}{{ subject }}{% endblock %}
+
+{% block content %}
+    <h2>{{ greeting }}</h2>
+    
+    <p>{{ welcome_message }}</p>
+    
+    <p>{{ get_started_message }}</p>
+    
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+        <tr>
+            <td>
+                <a href="{{ login_url }}" class="button">{{ login_button }}</a>
+            </td>
+        </tr>
+    </table>
+    
+    <p>{{ features_intro }}</p>
+    
+    <ul>
+        {% for feature in features %}
+        <li>{{ feature }}</li>
+        {% endfor %}
+    </ul>
+    
+    <p>{{ help_message }}</p>
+{% endblock %}

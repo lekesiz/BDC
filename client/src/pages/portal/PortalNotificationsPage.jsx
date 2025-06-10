@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Bell, 
   Calendar, 
@@ -27,6 +28,7 @@ import { useToast } from '@/components/ui/toast';
  * and updates for the beneficiary student
  */
 const PortalNotificationsPage = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [notifications, setNotifications] = useState({
@@ -46,8 +48,8 @@ const PortalNotificationsPage = () => {
       } catch (error) {
         console.error('Error fetching notifications:', error);
         toast({
-          title: 'Error',
-          description: 'Failed to load notifications',
+          title: t('common.error'),
+          description: t('portal.notifications.messages.loadError'),
           type: 'error',
         });
       } finally {
@@ -79,13 +81,13 @@ const PortalNotificationsPage = () => {
     const now = new Date();
     // If it's today, show only time
     if (date.toDateString() === now.toDateString()) {
-      return `Today at ${formatTime(date)}`;
+      return t('portal.notifications.dateFormats.today', { time: formatTime(date) });
     }
     // If it's yesterday, show "Yesterday"
     const yesterday = new Date(now);
     yesterday.setDate(now.getDate() - 1);
     if (date.toDateString() === yesterday.toDateString()) {
-      return `Yesterday at ${formatTime(date)}`;
+      return t('portal.notifications.dateFormats.yesterday', { time: formatTime(date) });
     }
     // If it's within the last 7 days, show the day of week
     const oneWeekAgo = new Date(now);
@@ -160,8 +162,8 @@ const PortalNotificationsPage = () => {
     } catch (error) {
       console.error('Error marking notification as read:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to mark notification as read',
+        title: t('common.error'),
+        description: t('portal.notifications.messages.markAsReadError'),
         type: 'error',
       });
     }
@@ -176,15 +178,15 @@ const PortalNotificationsPage = () => {
         notifications: prev.notifications.map(notif => ({ ...notif, isRead: true }))
       }));
       toast({
-        title: 'Success',
-        description: 'All notifications marked as read',
+        title: t('common.success'),
+        description: t('portal.notifications.messages.markAllAsReadSuccess'),
         type: 'success',
       });
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to mark all notifications as read',
+        title: t('common.error'),
+        description: t('portal.notifications.messages.markAllAsReadError'),
         type: 'error',
       });
     }
@@ -203,15 +205,15 @@ const PortalNotificationsPage = () => {
         };
       });
       toast({
-        title: 'Success',
-        description: 'Notification deleted',
+        title: t('common.success'),
+        description: t('portal.notifications.messages.deleteSuccess'),
         type: 'success',
       });
     } catch (error) {
       console.error('Error deleting notification:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to delete notification',
+        title: t('common.error'),
+        description: t('portal.notifications.messages.deleteError'),
         type: 'error',
       });
     }
@@ -233,15 +235,15 @@ const PortalNotificationsPage = () => {
       });
       setShowSettings(false);
       toast({
-        title: 'Success',
-        description: 'Notification settings updated',
+        title: t('common.success'),
+        description: t('portal.notifications.messages.settingsUpdateSuccess'),
         type: 'success',
       });
     } catch (error) {
       console.error('Error updating notification settings:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to update notification settings',
+        title: t('common.error'),
+        description: t('portal.notifications.messages.settingsUpdateError'),
         type: 'error',
       });
     }
@@ -259,9 +261,9 @@ const PortalNotificationsPage = () => {
       {/* Page header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold mb-2">Notifications</h1>
+          <h1 className="text-2xl font-bold mb-2">{t('portal.notifications.title')}</h1>
           <p className="text-gray-600">
-            Stay updated with important announcements and notifications
+            {t('portal.notifications.subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -270,14 +272,14 @@ const PortalNotificationsPage = () => {
             onClick={() => setShowSettings(!showSettings)}
           >
             <Settings className="h-4 w-4 mr-2" />
-            Settings
+            {t('portal.notifications.settings')}
           </Button>
           {notifications.unreadCount > 0 && (
             <Button
               onClick={handleMarkAllAsRead}
             >
               <CheckCircle className="h-4 w-4 mr-2" />
-              Mark All as Read
+              {t('portal.notifications.markAllAsRead')}
             </Button>
           )}
         </div>
@@ -286,7 +288,7 @@ const PortalNotificationsPage = () => {
       {showSettings && (
         <Card className="mb-8 overflow-hidden">
           <div className="p-6 bg-gray-50 border-b flex justify-between items-center">
-            <h2 className="text-lg font-medium">Notification Settings</h2>
+            <h2 className="text-lg font-medium">{t('portal.notifications.settingsPanel.title')}</h2>
             <Button
               variant="ghost"
               size="sm"
@@ -297,7 +299,7 @@ const PortalNotificationsPage = () => {
           </div>
           <div className="p-6 space-y-6">
             <div>
-              <h3 className="text-base font-medium mb-3">Delivery Methods</h3>
+              <h3 className="text-base font-medium mb-3">{t('portal.notifications.settingsPanel.deliveryMethods.title')}</h3>
               <div className="space-y-2 pl-2">
                 <label className="flex items-center space-x-2">
                   <input 
@@ -305,7 +307,7 @@ const PortalNotificationsPage = () => {
                     defaultChecked={true}
                     className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span>Email notifications</span>
+                  <span>{t('portal.notifications.settingsPanel.deliveryMethods.email')}</span>
                 </label>
                 <label className="flex items-center space-x-2">
                   <input 
@@ -313,12 +315,12 @@ const PortalNotificationsPage = () => {
                     defaultChecked={true}
                     className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span>Push notifications (browser)</span>
+                  <span>{t('portal.notifications.settingsPanel.deliveryMethods.push')}</span>
                 </label>
               </div>
             </div>
             <div>
-              <h3 className="text-base font-medium mb-3">Notification Categories</h3>
+              <h3 className="text-base font-medium mb-3">{t('portal.notifications.settingsPanel.categories.title')}</h3>
               <div className="space-y-2 pl-2">
                 <label className="flex items-center space-x-2">
                   <input 
@@ -326,7 +328,7 @@ const PortalNotificationsPage = () => {
                     defaultChecked={true}
                     className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span>Schedule updates</span>
+                  <span>{t('portal.notifications.settingsPanel.categories.schedule')}</span>
                 </label>
                 <label className="flex items-center space-x-2">
                   <input 
@@ -334,7 +336,7 @@ const PortalNotificationsPage = () => {
                     defaultChecked={true}
                     className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span>Messages from instructors</span>
+                  <span>{t('portal.notifications.settingsPanel.categories.messages')}</span>
                 </label>
                 <label className="flex items-center space-x-2">
                   <input 
@@ -342,7 +344,7 @@ const PortalNotificationsPage = () => {
                     defaultChecked={true}
                     className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span>Progress updates</span>
+                  <span>{t('portal.notifications.settingsPanel.categories.progress')}</span>
                 </label>
                 <label className="flex items-center space-x-2">
                   <input 
@@ -350,7 +352,7 @@ const PortalNotificationsPage = () => {
                     defaultChecked={true}
                     className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span>Reminders</span>
+                  <span>{t('portal.notifications.settingsPanel.categories.reminders')}</span>
                 </label>
                 <label className="flex items-center space-x-2">
                   <input 
@@ -358,13 +360,13 @@ const PortalNotificationsPage = () => {
                     defaultChecked={true}
                     className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
-                  <span>Alerts and important announcements</span>
+                  <span>{t('portal.notifications.settingsPanel.categories.alerts')}</span>
                 </label>
               </div>
             </div>
             <div className="pt-4 border-t flex justify-end">
               <Button onClick={handleSaveSettings}>
-                Save Settings
+                {t('portal.notifications.settingsPanel.saveButton')}
               </Button>
             </div>
           </div>
@@ -375,7 +377,7 @@ const PortalNotificationsPage = () => {
         <div className="relative flex-1">
           <Input
             type="text"
-            placeholder="Search notifications..."
+            placeholder={t('portal.notifications.search.placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -387,28 +389,28 @@ const PortalNotificationsPage = () => {
             variant={filter === 'all' ? 'default' : 'outline'}
             onClick={() => setFilter('all')}
           >
-            All
+            {t('portal.notifications.filters.all')}
           </Button>
           <Button
             variant={filter === 'schedule' ? 'default' : 'outline'}
             onClick={() => setFilter('schedule')}
           >
             <Calendar className="h-4 w-4 mr-1" />
-            Schedule
+            {t('portal.notifications.filters.schedule')}
           </Button>
           <Button
             variant={filter === 'message' ? 'default' : 'outline'}
             onClick={() => setFilter('message')}
           >
             <MessageSquare className="h-4 w-4 mr-1" />
-            Messages
+            {t('portal.notifications.filters.messages')}
           </Button>
           <Button
             variant={filter === 'progress' ? 'default' : 'outline'}
             onClick={() => setFilter('progress')}
           >
             <BarChart className="h-4 w-4 mr-1" />
-            Progress
+            {t('portal.notifications.filters.progress')}
           </Button>
         </div>
       </div>
@@ -416,11 +418,11 @@ const PortalNotificationsPage = () => {
       {filteredNotifications.length === 0 ? (
         <Card className="p-8 text-center">
           <Bell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-1">No notifications found</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-1">{t('portal.notifications.empty.title')}</h3>
           <p className="text-gray-500">
             {searchTerm || filter !== 'all' 
-              ? 'Try adjusting your search or filter to find what you\'re looking for' 
-              : 'You don\'t have any notifications yet'
+              ? t('portal.notifications.empty.searchMessage') 
+              : t('portal.notifications.empty.defaultMessage')
             }
           </p>
         </Card>
@@ -453,7 +455,7 @@ const PortalNotificationsPage = () => {
                           className="p-0 h-auto mt-2 text-sm"
                           onClick={() => window.location.href = notification.link}
                         >
-                          {notification.linkText || 'View Details'}
+                          {notification.linkText || t('portal.notifications.actions.viewDetails')}
                         </Button>
                       )}
                     </div>
@@ -478,11 +480,11 @@ const PortalNotificationsPage = () => {
                         )}
                         items={[
                           {
-                            label: notification.isRead ? 'Mark as unread' : 'Mark as read',
+                            label: notification.isRead ? t('portal.notifications.actions.markAsUnread') : t('portal.notifications.actions.markAsRead'),
                             onClick: () => handleMarkAsRead(notification.id)
                           },
                           { 
-                            label: 'Delete', 
+                            label: t('portal.notifications.actions.delete'), 
                             onClick: () => handleDeleteNotification(notification.id)
                           }
                         ]}

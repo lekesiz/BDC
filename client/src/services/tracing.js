@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * Frontend Distributed Tracing Service
  * Provides OpenTelemetry instrumentation for React applications
@@ -15,7 +16,7 @@ import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { UserInteractionInstrumentation } from '@opentelemetry/instrumentation-user-interaction';
 import { DocumentLoadInstrumentation } from '@opentelemetry/instrumentation-document-load';
-import { trace, context, propagation, SpanStatusCode, SpanKind } from '@opentelemetry/api';
+import { trace, context, propagation, SpanStatusCode, SpanKind } from '@opentelemetry/api';import { useTranslation } from "react-i18next";
 class FrontendTracingService {
   constructor() {
     this.tracer = null;
@@ -44,7 +45,7 @@ class FrontendTracingService {
           [SemanticResourceAttributes.SERVICE_VERSION]: this.serviceVersion,
           [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: this.environment,
           [SemanticResourceAttributes.SERVICE_NAMESPACE]: 'bdc',
-          [SemanticResourceAttributes.SERVICE_INSTANCE_ID]: `${this.serviceName}-${uuidv4().slice(0, 8)}`,
+          [SemanticResourceAttributes.SERVICE_INSTANCE_ID]: `${this.serviceName}-${uuidv4().slice(0, 8)}`
         })
       );
       // Create tracer provider
@@ -52,9 +53,9 @@ class FrontendTracingService {
         resource,
         sampler: {
           shouldSample: () => ({
-            decision: Math.random() < this.sampleRate ? 1 : 0, // SamplingDecision.RECORD_AND_SAMPLE : SamplingDecision.NOT_RECORD
-          }),
-        },
+            decision: Math.random() < this.sampleRate ? 1 : 0 // SamplingDecision.RECORD_AND_SAMPLE : SamplingDecision.NOT_RECORD
+          })
+        }
       });
       // Create exporters
       const exporters = [];
@@ -64,8 +65,8 @@ class FrontendTracingService {
           new OTLPTraceExporter({
             url: this.otlpEndpoint,
             headers: {
-              'api-key': import.meta.env.VITE_OTEL_API_KEY || 'demo',
-            },
+              'api-key': import.meta.env.VITE_OTEL_API_KEY || 'demo'
+            }
           })
         );
       }
@@ -73,7 +74,7 @@ class FrontendTracingService {
       if (this.jaegerEndpoint) {
         exporters.push(
           new JaegerExporter({
-            endpoint: this.jaegerEndpoint,
+            endpoint: this.jaegerEndpoint
           })
         );
       }
@@ -82,13 +83,13 @@ class FrontendTracingService {
         exporters.push(new ConsoleSpanExporter());
       }
       // Add exporters
-      exporters.forEach(exporter => {
+      exporters.forEach((exporter) => {
         provider.addSpanProcessor(
           new BatchSpanProcessor(exporter, {
             maxQueueSize: 2048,
             maxExportBatchSize: 512,
             scheduledDelayMillis: 5000,
-            exportTimeoutMillis: 30000,
+            exportTimeoutMillis: 30000
           })
         );
       });
@@ -109,56 +110,56 @@ class FrontendTracingService {
       // Register auto-instrumentations
       registerInstrumentations({
         instrumentations: [
-          // Document load instrumentation
-          new DocumentLoadInstrumentation({
-            ignoreNetworkEvents: false,
-          }),
-          // Fetch instrumentation
-          new FetchInstrumentation({
-            propagateTraceHeaderCorsUrls: [
-              /^https?:\/\/localhost/,
-              /^https?:\/\/.*\.bdc\.com/,
-            ],
-            clearTimingResources: true,
-            applyCustomAttributesOnSpan: (span, request, result) => {
-              // Add custom attributes
+        // Document load instrumentation
+        new DocumentLoadInstrumentation({
+          ignoreNetworkEvents: false
+        }),
+        // Fetch instrumentation
+        new FetchInstrumentation({
+          propagateTraceHeaderCorsUrls: [
+          /^https?:\/\/localhost/,
+          /^https?:\/\/.*\.bdc\.com/],
+
+          clearTimingResources: true,
+          applyCustomAttributesOnSpan: (span, request, result) => {
+            // Add custom attributes
+            span.setAttributes({
+              'http.request.correlation_id': this.getCorrelationId(),
+              'http.request.request_id': this.getRequestId(),
+              'user.id': this.userContext?.user_id,
+              'user.role': this.userContext?.role
+            });
+            // Add response attributes
+            if (result instanceof Response) {
               span.setAttributes({
-                'http.request.correlation_id': this.getCorrelationId(),
-                'http.request.request_id': this.getRequestId(),
-                'user.id': this.userContext?.user_id,
-                'user.role': this.userContext?.role,
+                'http.response.size': parseInt(result.headers.get('content-length') || '0'),
+                'http.response.correlation_id': result.headers.get('x-correlation-id'),
+                'http.response.trace_id': result.headers.get('x-trace-id')
               });
-              // Add response attributes
-              if (result instanceof Response) {
-                span.setAttributes({
-                  'http.response.size': parseInt(result.headers.get('content-length') || '0'),
-                  'http.response.correlation_id': result.headers.get('x-correlation-id'),
-                  'http.response.trace_id': result.headers.get('x-trace-id'),
-                });
+            }
+          },
+          requestHook: (span, request) => {
+            // Add request headers for tracing
+            const headers = this.injectHeaders();
+            Object.entries(headers).forEach(([key, value]) => {
+              if (request.headers) {
+                request.headers.set(key, value);
               }
-            },
-            requestHook: (span, request) => {
-              // Add request headers for tracing
-              const headers = this.injectHeaders();
-              Object.entries(headers).forEach(([key, value]) => {
-                if (request.headers) {
-                  request.headers.set(key, value);
-                }
-              });
-            },
-          }),
-          // XMLHttpRequest instrumentation
-          new XMLHttpRequestInstrumentation({
-            propagateTraceHeaderCorsUrls: [
-              /^https?:\/\/localhost/,
-              /^https?:\/\/.*\.bdc\.com/,
-            ],
-          }),
-          // User interaction instrumentation
-          new UserInteractionInstrumentation({
-            eventNames: ['click', 'submit', 'keydown'],
-          }),
-        ],
+            });
+          }
+        }),
+        // XMLHttpRequest instrumentation
+        new XMLHttpRequestInstrumentation({
+          propagateTraceHeaderCorsUrls: [
+          /^https?:\/\/localhost/,
+          /^https?:\/\/.*\.bdc\.com/]
+
+        }),
+        // User interaction instrumentation
+        new UserInteractionInstrumentation({
+          eventNames: ['click', 'submit', 'keydown']
+        })]
+
       });
     } catch (error) {
       console.error('[Tracing] Auto-instrumentation failed:', error);
@@ -182,9 +183,9 @@ class FrontendTracingService {
     try {
       sessionStorage.setItem('bdc_correlation_id', correlationId);
     } catch (e) {
+
       // Session storage not available
-    }
-  }
+    }}
   getRequestId() {
     if (!this.requestId) {
       this.requestId = this.generateRequestId();
@@ -202,7 +203,7 @@ class FrontendTracingService {
       span.setAttributes({
         'user.id': userData.user_id,
         'user.email': userData.email,
-        'user.role': userData.role,
+        'user.role': userData.role
       });
     }
   }
@@ -211,7 +212,7 @@ class FrontendTracingService {
       return trace.wrapSpanContext({
         traceId: '00000000000000000000000000000000',
         spanId: '0000000000000000',
-        traceFlags: 0,
+        traceFlags: 0
       });
     }
     const span = this.tracer.startSpan(name, {
@@ -222,14 +223,14 @@ class FrontendTracingService {
         'deployment.environment': this.environment,
         'correlation_id': this.getCorrelationId(),
         'request_id': this.getRequestId(),
-        ...attributes,
-      },
+        ...attributes
+      }
     });
     // Add user context if available
     if (this.userContext) {
       span.setAttributes({
         'user.id': this.userContext.user_id,
-        'user.role': this.userContext.role,
+        'user.role': this.userContext.role
       });
     }
     return span;
@@ -242,38 +243,38 @@ class FrontendTracingService {
         const result = operation(span);
         // Handle async operations
         if (result && typeof result.then === 'function') {
-          return result
-            .then(res => {
-              const duration = performance.now() - startTime;
-              span.setAttributes({
-                'operation.duration': duration,
-                'operation.result': 'success',
-              });
-              span.setStatus({ code: SpanStatusCode.OK });
-              span.end();
-              return res;
-            })
-            .catch(error => {
-              const duration = performance.now() - startTime;
-              span.setAttributes({
-                'operation.duration': duration,
-                'operation.result': 'error',
-                'error.message': error.message,
-              });
-              span.recordException(error);
-              span.setStatus({ 
-                code: SpanStatusCode.ERROR, 
-                message: error.message 
-              });
-              span.end();
-              throw error;
+          return result.
+          then((res) => {
+            const duration = performance.now() - startTime;
+            span.setAttributes({
+              'operation.duration': duration,
+              'operation.result': 'success'
             });
+            span.setStatus({ code: SpanStatusCode.OK });
+            span.end();
+            return res;
+          }).
+          catch((error) => {
+            const duration = performance.now() - startTime;
+            span.setAttributes({
+              'operation.duration': duration,
+              'operation.result': 'error',
+              'error.message': error.message
+            });
+            span.recordException(error);
+            span.setStatus({
+              code: SpanStatusCode.ERROR,
+              message: error.message
+            });
+            span.end();
+            throw error;
+          });
         } else {
           // Synchronous operation
           const duration = performance.now() - startTime;
           span.setAttributes({
             'operation.duration': duration,
-            'operation.result': 'success',
+            'operation.result': 'success'
           });
           span.setStatus({ code: SpanStatusCode.OK });
           span.end();
@@ -281,9 +282,9 @@ class FrontendTracingService {
         }
       } catch (error) {
         span.recordException(error);
-        span.setStatus({ 
-          code: SpanStatusCode.ERROR, 
-          message: error.message 
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: error.message
         });
         span.end();
         throw error;
@@ -298,13 +299,13 @@ class FrontendTracingService {
           'page.name': pageName,
           'page.url': window.location.href,
           'page.referrer': document.referrer,
-          'page.route_params': JSON.stringify(routeParams),
+          'page.route_params': JSON.stringify(routeParams)
         });
         // Add performance metrics
         if (performance.navigation) {
           span.setAttributes({
             'page.navigation_type': performance.navigation.type,
-            'page.redirect_count': performance.navigation.redirectCount,
+            'page.redirect_count': performance.navigation.redirectCount
           });
         }
         // Add timing metrics
@@ -314,7 +315,7 @@ class FrontendTracingService {
             'page.dom_loading': timing.domLoading - timing.navigationStart,
             'page.dom_interactive': timing.domInteractive - timing.navigationStart,
             'page.dom_complete': timing.domComplete - timing.navigationStart,
-            'page.load_complete': timing.loadEventEnd - timing.navigationStart,
+            'page.load_complete': timing.loadEventEnd - timing.navigationStart
           });
         }
       },
@@ -331,7 +332,7 @@ class FrontendTracingService {
           'element.tag': elementInfo.tagName,
           'element.id': elementInfo.id,
           'element.class': elementInfo.className,
-          'element.text': elementInfo.textContent?.slice(0, 100),
+          'element.text': elementInfo.textContent?.slice(0, 100)
         });
       },
       SpanKind.CLIENT,
@@ -345,7 +346,7 @@ class FrontendTracingService {
         span.setAttributes({
           'http.method': method.toUpperCase(),
           'http.url': url,
-          'http.request.size': requestData ? JSON.stringify(requestData).length : 0,
+          'http.request.size': requestData ? JSON.stringify(requestData).length : 0
         });
       },
       SpanKind.CLIENT,
@@ -361,11 +362,11 @@ class FrontendTracingService {
           'error.type': error.constructor.name,
           'error.message': error.message,
           'error.stack': error.stack,
-          'error.context': JSON.stringify(context),
+          'error.context': JSON.stringify(context)
         });
-        span.setStatus({ 
-          code: SpanStatusCode.ERROR, 
-          message: error.message 
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: error.message
         });
       },
       SpanKind.INTERNAL,
@@ -416,9 +417,9 @@ class FrontendTracingService {
           return result;
         } catch (error) {
           span.recordException(error);
-          span.setStatus({ 
-            code: SpanStatusCode.ERROR, 
-            message: error.message 
+          span.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: error.message
           });
           span.end();
           throw error;
@@ -435,7 +436,7 @@ class FrontendTracingService {
         'web_vital.name': metric.name,
         'web_vital.value': metric.value,
         'web_vital.id': metric.id,
-        'web_vital.delta': metric.delta,
+        'web_vital.delta': metric.delta
       }
     );
     span.setStatus({ code: SpanStatusCode.OK });
@@ -445,28 +446,28 @@ class FrontendTracingService {
 // Create global instance
 const tracingService = new FrontendTracingService();
 // Export convenience functions
-export const createSpan = (name, kind, attributes) => 
-  tracingService.createSpan(name, kind, attributes);
-export const traceOperation = (name, operation, kind, attributes) => 
-  tracingService.traceOperation(name, operation, kind, attributes);
-export const tracePageLoad = (pageName, routeParams) => 
-  tracingService.tracePageLoad(pageName, routeParams);
-export const traceUserAction = (actionName, elementInfo) => 
-  tracingService.traceUserAction(actionName, elementInfo);
-export const traceApiCall = (method, url, requestData) => 
-  tracingService.traceApiCall(method, url, requestData);
-export const traceError = (error, context) => 
-  tracingService.traceError(error, context);
-export const setUserContext = (userData) => 
-  tracingService.setUserContext(userData);
-export const getCorrelationId = () => 
-  tracingService.getCorrelationId();
-export const setCorrelationId = (correlationId) => 
-  tracingService.setCorrelationId(correlationId);
-export const injectHeaders = (headers) => 
-  tracingService.injectHeaders(headers);
-export const extractHeaders = (headers) => 
-  tracingService.extractHeaders(headers);
-export const reportWebVitals = (metric) => 
-  tracingService.reportWebVitals(metric);
+export const createSpan = (name, kind, attributes) =>
+tracingService.createSpan(name, kind, attributes);
+export const traceOperation = (name, operation, kind, attributes) =>
+tracingService.traceOperation(name, operation, kind, attributes);
+export const tracePageLoad = (pageName, routeParams) =>
+tracingService.tracePageLoad(pageName, routeParams);
+export const traceUserAction = (actionName, elementInfo) =>
+tracingService.traceUserAction(actionName, elementInfo);
+export const traceApiCall = (method, url, requestData) =>
+tracingService.traceApiCall(method, url, requestData);
+export const traceError = (error, context) =>
+tracingService.traceError(error, context);
+export const setUserContext = (userData) =>
+tracingService.setUserContext(userData);
+export const getCorrelationId = () =>
+tracingService.getCorrelationId();
+export const setCorrelationId = (correlationId) =>
+tracingService.setCorrelationId(correlationId);
+export const injectHeaders = (headers) =>
+tracingService.injectHeaders(headers);
+export const extractHeaders = (headers) =>
+tracingService.extractHeaders(headers);
+export const reportWebVitals = (metric) =>
+tracingService.reportWebVitals(metric);
 export default tracingService;

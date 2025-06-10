@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React, { useState } from 'react';
 import { RefreshCw, X, Download, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAppUpdate } from '../../hooks/usePWA';
@@ -7,8 +8,8 @@ import { Alert, AlertDescription } from '../ui/alert';
 /**
  * App Update Notification Component
  * Displays when a new version of the app is available
- */
-export function UpdateNotification({ onDismiss, className = '' }) {
+ */import { useTranslation } from "react-i18next";
+export function UpdateNotification({ onDismiss, className = '' }) {const { t } = useTranslation();
   const { hasUpdate, isUpdating, applyUpdate } = useAppUpdate();
   const [dismissed, setDismissed] = useState(false);
   const [updateStatus, setUpdateStatus] = useState(null);
@@ -38,11 +39,11 @@ export function UpdateNotification({ onDismiss, className = '' }) {
     return (
       <Alert className={`border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800 ${className}`}>
         <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-        <AlertDescription className="text-green-800 dark:text-green-200">
-          Update applied successfully! The app will reload shortly.
+        <AlertDescription className="text-green-800 dark:text-green-200">{t("components.update_applied_successfully_the_app_will_reload_sh")}
+
         </AlertDescription>
-      </Alert>
-    );
+      </Alert>);
+
   }
   if (updateStatus === 'error') {
     return (
@@ -51,8 +52,8 @@ export function UpdateNotification({ onDismiss, className = '' }) {
         <AlertDescription className="text-red-800 dark:text-red-200">
           Update failed. Please refresh the page manually or try again later.
         </AlertDescription>
-      </Alert>
-    );
+      </Alert>);
+
   }
   return (
     <Card className={`border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800 ${className}`}>
@@ -60,21 +61,21 @@ export function UpdateNotification({ onDismiss, className = '' }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <RefreshCw className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-            <CardTitle className="text-lg text-orange-900 dark:text-orange-100">
-              New Version Available
+            <CardTitle className="text-lg text-orange-900 dark:text-orange-100">{t("components.new_version_available")}
+
             </CardTitle>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleDismiss}
-            className="h-6 w-6 p-0 text-orange-600 hover:text-orange-800 dark:text-orange-400"
-          >
+            className="h-6 w-6 p-0 text-orange-600 hover:text-orange-800 dark:text-orange-400">
+
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <CardDescription className="text-orange-700 dark:text-orange-300">
-          A new version of BDC is available with improvements and bug fixes.
+        <CardDescription className="text-orange-700 dark:text-orange-300">{t("components.a_new_version_of_bdc_is_available_with_improvement")}
+
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -82,10 +83,10 @@ export function UpdateNotification({ onDismiss, className = '' }) {
           {/* Update benefits */}
           <div className="text-sm text-orange-700 dark:text-orange-300">
             <ul className="list-disc list-inside space-y-1">
-              <li>Performance improvements</li>
-              <li>Security updates</li>
-              <li>Bug fixes and stability</li>
-              <li>New features and enhancements</li>
+              <li>{t("components.performance_improvements")}</li>
+              <li>{t("components.security_updates")}</li>
+              <li>{t("components.bug_fixes_and_stability")}</li>
+              <li>{t("components.new_features_and_enhancements")}</li>
             </ul>
           </div>
           {/* Action buttons */}
@@ -93,34 +94,34 @@ export function UpdateNotification({ onDismiss, className = '' }) {
             <Button
               onClick={handleUpdate}
               disabled={isUpdating || updateStatus === 'updating'}
-              className="bg-orange-600 hover:bg-orange-700 text-white"
-            >
-              {isUpdating || updateStatus === 'updating' ? (
-                <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Updating...
-                </>
-              ) : (
-                <>
-                  <Download className="mr-2 h-4 w-4" />
-                  Update Now
-                </>
-              )}
+              className="bg-orange-600 hover:bg-orange-700 text-white">
+
+              {isUpdating || updateStatus === 'updating' ?
+              <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />{t("components.updating")}
+
+              </> :
+
+              <>
+                  <Download className="mr-2 h-4 w-4" />{t("components.update_now")}
+
+              </>
+              }
             </Button>
-            <Button variant="outline" onClick={handleLater}>
-              Later
+            <Button variant="outline" onClick={handleLater}>{t("components.later")}
+
             </Button>
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>);
+
 }
 /**
  * Update Banner
  * Minimal banner notification for updates
  */
-export function UpdateBanner({ onDismiss, className = '' }) {
+export function UpdateBanner({ onDismiss, className = '' }) {const { t } = useTranslation();
   const { hasUpdate, isUpdating, applyUpdate } = useAppUpdate();
   const [dismissed, setDismissed] = useState(false);
   if (!hasUpdate || dismissed) {
@@ -143,7 +144,7 @@ export function UpdateBanner({ onDismiss, className = '' }) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm">
             <RefreshCw className="h-4 w-4" />
-            <span>New version available</span>
+            <span>{t("components.new_version_available")}</span>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -151,48 +152,48 @@ export function UpdateBanner({ onDismiss, className = '' }) {
               disabled={isUpdating}
               variant="secondary"
               size="sm"
-              className="bg-white text-orange-600 hover:bg-orange-50 text-xs px-2 py-1"
-            >
+              className="bg-white text-orange-600 hover:bg-orange-50 text-xs px-2 py-1">
+
               {isUpdating ? 'Updating...' : 'Update'}
             </Button>
             <Button
               onClick={handleDismiss}
               variant="ghost"
               size="sm"
-              className="text-white hover:bg-orange-700 h-6 w-6 p-0"
-            >
+              className="text-white hover:bg-orange-700 h-6 w-6 p-0">
+
               <X className="h-3 w-3" />
             </Button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 /**
  * Update Status Component
  * Shows update progress and status
  */
-export function UpdateStatus({ className = '' }) {
+export function UpdateStatus({ className = '' }) {const { t } = useTranslation();
   const { hasUpdate, isUpdating } = useAppUpdate();
   if (!hasUpdate && !isUpdating) {
     return null;
   }
   return (
     <div className={`flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 ${className}`}>
-      {isUpdating && (
-        <>
+      {isUpdating &&
+      <>
           <div className="h-3 w-3 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-          <span>Updating app...</span>
+          <span>{t("components.updating_app")}</span>
         </>
-      )}
-      {hasUpdate && !isUpdating && (
-        <>
+      }
+      {hasUpdate && !isUpdating &&
+      <>
           <AlertCircle className="h-3 w-3 text-orange-500" />
-          <span>Update available</span>
+          <span>{t("components.update_available")}</span>
         </>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
 export default UpdateNotification;

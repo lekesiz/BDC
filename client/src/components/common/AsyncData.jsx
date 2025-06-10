@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ErrorState } from './ErrorStates';
@@ -5,7 +6,7 @@ import { CardSkeleton, TableSkeleton, ContentLoader } from './LoadingAnimations'
 import { useAsyncOperation } from '@/hooks/useAsyncOperation';
 /**
  * Comprehensive async data component with loading, error, and empty states
- */
+ */import { useTranslation } from "react-i18next";
 export const AsyncData = ({
   // Data fetching
   fetchData,
@@ -31,7 +32,7 @@ export const AsyncData = ({
   onSuccess,
   onError,
   className = ""
-}) => {
+}) => {const { t } = useTranslation();
   const {
     loading,
     error,
@@ -61,11 +62,11 @@ export const AsyncData = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: animationDuration }}
-        className={className}
-      >
+        className={className}>
+
         <SkeletonComponent {...skeletonProps} />
-      </motion.div>
-    );
+      </motion.div>);
+
   }
   // Error state
   if (error && !data) {
@@ -77,18 +78,18 @@ export const AsyncData = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: animationDuration }}
-        className={className}
-      >
+        className={className}>
+
         <ErrorState
           error={error}
           onRetry={showRetry ? retry : undefined}
-          {...errorProps}
-        />
-      </motion.div>
-    );
+          {...errorProps} />
+
+      </motion.div>);
+
   }
   // Empty state
-  if (!data || (Array.isArray(data) && data.length === 0)) {
+  if (!data || Array.isArray(data) && data.length === 0) {
     if (emptyComponent) {
       return emptyComponent;
     }
@@ -97,11 +98,11 @@ export const AsyncData = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: animationDuration }}
-        className={`text-center py-12 ${className}`}
-      >
+        className={`text-center py-12 ${className}`}>
+
         <p className="text-gray-500">{emptyMessage}</p>
-      </motion.div>
-    );
+      </motion.div>);
+
   }
   // Success state with data
   const content = render ? render(data) : children(data);
@@ -116,12 +117,12 @@ export const AsyncData = ({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: animationDuration }}
-        className={className}
-      >
+        className={className}>
+
         {content}
       </motion.div>
-    </AnimatePresence>
-  );
+    </AnimatePresence>);
+
 };
 /**
  * Paginated async data component
@@ -142,7 +143,7 @@ export const AsyncPaginatedData = ({
   children,
   render,
   className = ""
-}) => {
+}) => {const { t } = useTranslation();
   const [page, setPage] = React.useState(initialPage);
   const [perPage, setPerPage] = React.useState(pageSize);
   const {
@@ -172,59 +173,59 @@ export const AsyncPaginatedData = ({
     return errorComponent || <ErrorState error={error} onRetry={retry} />;
   }
   if (!data || data.items?.length === 0) {
-    return emptyComponent || (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No data available</p>
-      </div>
-    );
+    return emptyComponent ||
+    <div className="text-center py-12">
+        <p className="text-gray-500">{t("components.no_data_available")}</p>
+      </div>;
+
   }
   const content = render ? render(data.items) : children(data.items);
-  const defaultPagination = (
-    <div className="mt-6 flex items-center justify-between">
+  const defaultPagination =
+  <div className="mt-6 flex items-center justify-between">
       <div className="flex items-center gap-2">
-        {showPageSizeSelector && (
-          <>
-            <span className="text-sm text-gray-700">Show</span>
+        {showPageSizeSelector &&
+      <>
+            <span className="text-sm text-gray-700">{t("components.show")}</span>
             <select
-              value={perPage}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-              className="rounded border-gray-300 text-sm"
-            >
-              {pageSizeOptions.map(size => (
-                <option key={size} value={size}>{size}</option>
-              ))}
+          value={perPage}
+          onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+          className="rounded border-gray-300 text-sm">
+
+              {pageSizeOptions.map((size) =>
+          <option key={size} value={size}>{size}</option>
+          )}
             </select>
-            <span className="text-sm text-gray-700">per page</span>
+            <span className="text-sm text-gray-700">{t("components.per_page")}</span>
           </>
-        )}
+      }
       </div>
       <div className="flex items-center gap-2">
         <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 1}
-          className="px-3 py-1 text-sm border rounded disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <span className="text-sm text-gray-700">
-          Page {page} of {data.total_pages}
+        onClick={() => handlePageChange(page - 1)}
+        disabled={page === 1}
+        className="px-3 py-1 text-sm border rounded disabled:opacity-50">{t("components.previous")}
+
+
+      </button>
+        <span className="text-sm text-gray-700">{t("components.page")}
+        {page} of {data.total_pages}
         </span>
         <button
-          onClick={() => handlePageChange(page + 1)}
-          disabled={page === data.total_pages}
-          className="px-3 py-1 text-sm border rounded disabled:opacity-50"
-        >
-          Next
-        </button>
+        onClick={() => handlePageChange(page + 1)}
+        disabled={page === data.total_pages}
+        className="px-3 py-1 text-sm border rounded disabled:opacity-50">{t("components.next")}
+
+
+      </button>
       </div>
-    </div>
-  );
+    </div>;
+
   return (
     <div className={className}>
       {content}
       {paginationComponent || defaultPagination}
-    </div>
-  );
+    </div>);
+
 };
 /**
  * Infinite scroll async data component
@@ -242,7 +243,7 @@ export const AsyncInfiniteData = ({
   children,
   render,
   className = ""
-}) => {
+}) => {const { t } = useTranslation();
   const [page, setPage] = React.useState(1);
   const [items, setItems] = React.useState([]);
   const [hasMore, setHasMore] = React.useState(true);
@@ -257,9 +258,9 @@ export const AsyncInfiniteData = ({
     if (loading || !hasMore) return;
     const result = await execute(() => fetchData({ page, per_page: pageSize }));
     if (result) {
-      setItems(prev => [...prev, ...result.items]);
+      setItems((prev) => [...prev, ...result.items]);
       setHasMore(result.has_next);
-      setPage(prev => prev + 1);
+      setPage((prev) => prev + 1);
     }
   }, [page, pageSize, loading, hasMore, fetchData, execute]);
   React.useEffect(() => {
@@ -268,7 +269,7 @@ export const AsyncInfiniteData = ({
   React.useEffect(() => {
     if (loading) return;
     const observer = new IntersectionObserver(
-      entries => {
+      (entries) => {
         if (entries[0].isIntersecting && hasMore) {
           loadMore();
         }
@@ -292,37 +293,37 @@ export const AsyncInfiniteData = ({
     return errorComponent || <ErrorState error={error} />;
   }
   if (items.length === 0) {
-    return emptyComponent || (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No data available</p>
-      </div>
-    );
+    return emptyComponent ||
+    <div className="text-center py-12">
+        <p className="text-gray-500">{t("components.no_data_available")}</p>
+      </div>;
+
   }
   const content = render ? render(items) : children(items);
   return (
     <div className={className}>
       {content}
-      {hasMore && (
-        <div ref={loadMoreRef} className="py-4">
-          {loading ? (
-            loadMoreComponent || (
-              <div className="text-center">
+      {hasMore &&
+      <div ref={loadMoreRef} className="py-4">
+          {loading ?
+        loadMoreComponent ||
+        <div className="text-center">
                 <div className="inline-flex items-center gap-2 text-gray-500">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500" />
-                  Loading more...
-                </div>
-              </div>
-            )
-          ) : (
-            <div className="h-4" /> // Invisible trigger element
-          )}
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500" />{t("components.loading_more")}
+
+          </div>
+              </div> :
+
+
+        <div className="h-4" /> // Invisible trigger element
+        }
         </div>
-      )}
-      {!hasMore && items.length > 0 && (
-        <div className="text-center py-4 text-gray-500 text-sm">
-          No more items to load
-        </div>
-      )}
-    </div>
-  );
+      }
+      {!hasMore && items.length > 0 &&
+      <div className="text-center py-4 text-gray-500 text-sm">{t("components.no_more_items_to_load")}
+
+      </div>
+      }
+    </div>);
+
 };

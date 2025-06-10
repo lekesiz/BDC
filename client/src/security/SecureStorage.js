@@ -1,4 +1,5 @@
-/**
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; /**
  * Secure Storage Service
  * Provides encrypted local storage with security features
  */
@@ -47,7 +48,7 @@ class SecureStorage {
         this.encryptionKey = await window.crypto.subtle.generateKey(
           {
             name: 'AES-GCM',
-            length: 256,
+            length: 256
           },
           true,
           ['encrypt', 'decrypt']
@@ -73,7 +74,7 @@ class SecureStorage {
         keyArray,
         {
           name: 'AES-GCM',
-          length: 256,
+          length: 256
         },
         true,
         ['encrypt', 'decrypt']
@@ -97,7 +98,7 @@ class SecureStorage {
       const encryptedData = await window.crypto.subtle.encrypt(
         {
           name: 'AES-GCM',
-          iv: iv,
+          iv: iv
         },
         this.encryptionKey,
         encodedData
@@ -129,9 +130,9 @@ class SecureStorage {
     try {
       // Convert from base64
       const combined = new Uint8Array(
-        atob(encryptedData)
-          .split('')
-          .map(char => char.charCodeAt(0))
+        atob(encryptedData).
+        split('').
+        map((char) => char.charCodeAt(0))
       );
       // Extract IV and encrypted data
       const iv = combined.slice(0, 12);
@@ -139,7 +140,7 @@ class SecureStorage {
       const decryptedData = await window.crypto.subtle.decrypt(
         {
           name: 'AES-GCM',
-          iv: iv,
+          iv: iv
         },
         this.encryptionKey,
         encrypted
@@ -209,8 +210,8 @@ class SecureStorage {
     try {
       const storageKey = this.storagePrefix + key;
       // Try both storage types
-      let storedData = localStorage.getItem(storageKey) || 
-                      sessionStorage.getItem(storageKey);
+      let storedData = localStorage.getItem(storageKey) ||
+      sessionStorage.getItem(storageKey);
       if (!storedData) {
         return null;
       }
@@ -277,7 +278,7 @@ class SecureStorage {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash.toString();
@@ -321,7 +322,7 @@ class SecureStorage {
   handlePageHidden() {
     // Clear sensitive session data when page is hidden
     const sensitiveKeys = this.getSensitiveKeys();
-    sensitiveKeys.forEach(key => {
+    sensitiveKeys.forEach((key) => {
       if (key.includes('temp') || key.includes('sensitive')) {
         this.removeItem(key.replace(this.storagePrefix, ''));
       }

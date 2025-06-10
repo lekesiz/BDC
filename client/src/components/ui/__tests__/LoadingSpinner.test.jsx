@@ -1,9 +1,10 @@
+// TODO: i18n - processed
 /**
  * @vitest-environment jsdom
  */
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner from '../LoadingSpinner';import { useTranslation } from "react-i18next";
 describe('LoadingSpinner', () => {
   it('renders with default message', () => {
     render(<LoadingSpinner />);

@@ -1,10 +1,11 @@
+// TODO: i18n - processed
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import api from '@/lib/api';
 // Create context
-export const AuthContext = createContext();
-export const AuthProvider = ({ children }) => {
+import { useTranslation } from "react-i18next";export const AuthContext = createContext();
+export const AuthProvider = ({ children }) => {const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -88,8 +89,8 @@ export const AuthProvider = ({ children }) => {
       console.error('Error status:', error.response?.status);
       const errorMessage = error.response?.data?.message || 'Failed to login';
       setError(errorMessage);
-      return { 
-        success: false, 
+      return {
+        success: false,
         error: errorMessage
       };
     } finally {
@@ -171,8 +172,8 @@ export const AuthProvider = ({ children }) => {
       async (error) => {
         const originalRequest = error.config;
         // Skip refresh logic for login and refresh endpoints
-        const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
-                              originalRequest.url?.includes('/auth/refresh');
+        const isAuthEndpoint = originalRequest.url?.includes('/auth/login') ||
+        originalRequest.url?.includes('/auth/refresh');
         if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
           originalRequest._retry = true;
           try {
@@ -211,6 +212,6 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={value}>
       {children}
-    </AuthContext.Provider>
-  );
+    </AuthContext.Provider>);
+
 };

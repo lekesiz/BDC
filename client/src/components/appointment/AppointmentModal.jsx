@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format, addHours, parseISO } from 'date-fns';
 import { Calendar, Clock, MapPin, Users, User, Tag, AlertTriangle, Trash2, Save, X, ExternalLink } from 'lucide-react';
 import { AnimatedModal } from '@/components/animations';
@@ -29,6 +30,7 @@ const AppointmentModal = ({
   onAppointmentUpdated,
   onAppointmentDeleted
 }) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -103,25 +105,25 @@ const AppointmentModal = ({
   const validateForm = () => {
     const newErrors = {};
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = t('components.appointment_modal.title_required');
     }
     if (!formData.start_date) {
-      newErrors.start_date = 'Start date is required';
+      newErrors.start_date = t('components.appointment_modal.start_date_required');
     }
     if (!formData.start_time) {
-      newErrors.start_time = 'Start time is required';
+      newErrors.start_time = t('components.appointment_modal.start_time_required');
     }
     if (!formData.end_date) {
-      newErrors.end_date = 'End date is required';
+      newErrors.end_date = t('components.appointment_modal.end_date_required');
     }
     if (!formData.end_time) {
-      newErrors.end_time = 'End time is required';
+      newErrors.end_time = t('components.appointment_modal.end_time_required');
     }
     // Check that end time is after start time
     const startDateTime = new Date(`${formData.start_date}T${formData.start_time}`);
     const endDateTime = new Date(`${formData.end_date}T${formData.end_time}`);
     if (endDateTime <= startDateTime) {
-      newErrors.end_time = 'End time must be after start time';
+      newErrors.end_time = t('components.appointment_modal.end_time_after_start');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -155,16 +157,16 @@ const AppointmentModal = ({
         // Update existing appointment
         response = await api.put(`/api/appointments/${appointment.id}`, appointmentData);
         toast({
-          title: 'Success',
-          description: 'Appointment updated successfully',
+          title: t('common.success'),
+          description: t('components.appointment_modal.appointment_updated'),
           type: 'success',
         });
       } else {
         // Create new appointment
         response = await api.post('/api/appointments', appointmentData);
         toast({
-          title: 'Success',
-          description: 'Appointment created successfully',
+          title: t('common.success'),
+          description: t('components.appointment_modal.appointment_created'),
           type: 'success',
         });
       }
@@ -177,8 +179,8 @@ const AppointmentModal = ({
     } catch (error) {
       console.error('Error saving appointment:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to save appointment',
+        title: t('common.error'),
+        description: t('components.appointment_modal.failed_to_save'),
         type: 'error',
       });
     } finally {
@@ -192,16 +194,16 @@ const AppointmentModal = ({
       setIsSubmitting(true);
       await api.delete(`/api/appointments/${appointment.id}`);
       toast({
-        title: 'Success',
-        description: 'Appointment deleted successfully',
+        title: t('common.success'),
+        description: t('components.appointment_modal.appointment_deleted'),
         type: 'success',
       });
       onAppointmentDeleted(appointment.id);
     } catch (error) {
       console.error('Error deleting appointment:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to delete appointment',
+        title: t('common.error'),
+        description: t('components.appointment_modal.failed_to_delete'),
         type: 'error',
       });
     } finally {
@@ -219,16 +221,16 @@ const AppointmentModal = ({
         status: 'canceled',
       });
       toast({
-        title: 'Success',
-        description: 'Appointment canceled successfully',
+        title: t('common.success'),
+        description: t('components.appointment_modal.appointment_canceled'),
         type: 'success',
       });
       onAppointmentUpdated(response.data);
     } catch (error) {
       console.error('Error canceling appointment:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to cancel appointment',
+        title: t('common.error'),
+        description: t('components.appointment_modal.failed_to_cancel'),
         type: 'error',
       });
     } finally {
@@ -243,7 +245,7 @@ const AppointmentModal = ({
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
-            {appointment ? 'Edit Appointment' : 'Create Appointment'}
+            {appointment ? t('components.appointment_modal.edit_appointment') : t('components.appointment_modal.create_appointment')}
           </h2>
         </div>
         <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
@@ -252,27 +254,27 @@ const AppointmentModal = ({
           <div className="space-y-4 mb-6">
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                Title*
+                {t('components.appointment_modal.title')}*
               </label>
               <AnimatedInput
                 id="title"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                placeholder="Appointment title"
+                placeholder={t('components.appointment_modal.title')}
                 error={errors.title}
               />
             </div>
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Description
+                {t('components.appointment_modal.description')}
               </label>
               <textarea
                 id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Description or agenda"
+                placeholder={t('components.appointment_modal.description_placeholder')}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                 rows="2"
               />
@@ -280,7 +282,7 @@ const AppointmentModal = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-                  Appointment Type
+                  {t('components.appointment_modal.appointment_type')}
                 </label>
                 <div className="flex items-center mt-1">
                   <Tag className="w-4 h-4 text-gray-400 mr-2" />
@@ -291,16 +293,16 @@ const AppointmentModal = ({
                     onChange={handleChange}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                   >
-                    <option value="session">Training Session</option>
-                    <option value="evaluation">Evaluation</option>
-                    <option value="meeting">Meeting</option>
-                    <option value="other">Other</option>
+                    <option value="session">{t('components.appointment_modal.training_session')}</option>
+                    <option value="evaluation">{t('components.appointment_modal.evaluation')}</option>
+                    <option value="meeting">{t('components.appointment_modal.meeting')}</option>
+                    <option value="other">{t('components.appointment_modal.other')}</option>
                   </select>
                 </div>
               </div>
               <div>
                 <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-                  Location
+                  {t('components.appointment_modal.location')}
                 </label>
                 <div className="flex items-center mt-1">
                   <MapPin className="w-4 h-4 text-gray-400 mr-2" />
@@ -309,7 +311,7 @@ const AppointmentModal = ({
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
-                    placeholder="Location or virtual link"
+                    placeholder={t('components.appointment_modal.location_placeholder')}
                   />
                 </div>
               </div>
@@ -319,12 +321,12 @@ const AppointmentModal = ({
           <div className="space-y-4 mb-6">
             <h3 className="font-medium flex items-center text-gray-700">
               <Calendar className="w-4 h-4 mr-2" />
-              Date and Time
+              {t('components.appointment_modal.date_and_time')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">
-                  Start Date*
+                  {t('components.appointment_modal.start_date')}*
                 </label>
                 <Input
                   id="start_date"
@@ -337,7 +339,7 @@ const AppointmentModal = ({
               </div>
               <div>
                 <label htmlFor="start_time" className="block text-sm font-medium text-gray-700">
-                  Start Time*
+                  {t('components.appointment_modal.start_time')}*
                 </label>
                 <Input
                   id="start_time"
@@ -350,7 +352,7 @@ const AppointmentModal = ({
               </div>
               <div>
                 <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">
-                  End Date*
+                  {t('components.appointment_modal.end_date')}*
                 </label>
                 <Input
                   id="end_date"
@@ -363,7 +365,7 @@ const AppointmentModal = ({
               </div>
               <div>
                 <label htmlFor="end_time" className="block text-sm font-medium text-gray-700">
-                  End Time*
+                  {t('components.appointment_modal.end_time')}*
                 </label>
                 <Input
                   id="end_time"
@@ -380,12 +382,12 @@ const AppointmentModal = ({
           <div className="space-y-4 mb-6">
             <h3 className="font-medium flex items-center text-gray-700">
               <Users className="w-4 h-4 mr-2" />
-              Participants
+              {t('components.appointment_modal.participants')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="beneficiary_id" className="block text-sm font-medium text-gray-700">
-                  Beneficiary
+                  {t('components.appointment_modal.beneficiary')}
                 </label>
                 <select
                   id="beneficiary_id"
@@ -394,7 +396,7 @@ const AppointmentModal = ({
                   onChange={handleChange}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                 >
-                  <option value="">Select Beneficiary</option>
+                  <option value="">{t('components.appointment_modal.select_beneficiary')}</option>
                   {/* In a real app, this would be populated from an API */}
                   <option value="1">John Doe</option>
                   <option value="2">Jane Smith</option>
@@ -403,7 +405,7 @@ const AppointmentModal = ({
               </div>
               <div>
                 <label htmlFor="trainer_id" className="block text-sm font-medium text-gray-700">
-                  Trainer
+                  {t('components.appointment_modal.trainer')}
                 </label>
                 <select
                   id="trainer_id"
@@ -412,7 +414,7 @@ const AppointmentModal = ({
                   onChange={handleChange}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                 >
-                  <option value="">Select Trainer</option>
+                  <option value="">{t('components.appointment_modal.select_trainer')}</option>
                   {/* In a real app, this would be populated from an API */}
                   <option value="1">Sarah Johnson</option>
                   <option value="2">Michael Chen</option>
@@ -423,7 +425,7 @@ const AppointmentModal = ({
           </div>
           {/* Additional options */}
           <div className="space-y-4 mb-6">
-            <h3 className="font-medium text-gray-700">Additional Options</h3>
+            <h3 className="font-medium text-gray-700">{t('components.appointment_modal.additional_options')}</h3>
             <div className="space-y-3">
               <div className="flex items-center">
                 <input
@@ -435,7 +437,7 @@ const AppointmentModal = ({
                   className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                 />
                 <label htmlFor="is_google_synced" className="ml-2 block text-sm text-gray-700">
-                  Sync with Google Calendar
+                  {t('components.appointment_modal.sync_google_calendar')}
                 </label>
               </div>
               <div className="flex items-center">
@@ -448,20 +450,20 @@ const AppointmentModal = ({
                   className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                 />
                 <label htmlFor="notify_participants" className="ml-2 block text-sm text-gray-700">
-                  Send notifications to participants
+                  {t('components.appointment_modal.send_notifications')}
                 </label>
               </div>
             </div>
             <div>
               <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-                Private Notes
+                {t('components.appointment_modal.private_notes')}
               </label>
               <textarea
                 id="notes"
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}
-                placeholder="Notes visible only to you"
+                placeholder={t('components.appointment_modal.notes_placeholder')}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                 rows="2"
               />
@@ -471,7 +473,7 @@ const AppointmentModal = ({
           {appointment && (
             <div className="mb-6">
               <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                Status
+                {t('components.appointment_modal.status')}
               </label>
               <select
                 id="status"
@@ -481,9 +483,9 @@ const AppointmentModal = ({
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                 disabled={formData.status === 'canceled'}
               >
-                <option value="confirmed">Confirmed</option>
-                <option value="pending">Pending</option>
-                <option value="canceled">Canceled</option>
+                <option value="confirmed">{t('components.appointment_modal.confirmed')}</option>
+                <option value="pending">{t('components.appointment_modal.pending')}</option>
+                <option value="canceled">{t('components.appointment_modal.canceled')}</option>
               </select>
             </div>
           )}
@@ -494,16 +496,16 @@ const AppointmentModal = ({
                 <Calendar className="w-5 h-5" />
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">Synced with Google Calendar</h3>
+                <h3 className="text-sm font-medium text-blue-800">{t('components.appointment_modal.synced_with_google')}</h3>
                 <div className="mt-2 text-sm text-blue-700">
-                  <p>This appointment is synced with Google Calendar. Changes made here will be reflected in your Google Calendar.</p>
+                  <p>{t('components.appointment_modal.synced_description')}</p>
                   <a
                     href={`https://calendar.google.com/calendar/event?eid=${appointment.google_event_id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center mt-1 text-blue-600 hover:text-blue-800"
                   >
-                    View in Google Calendar
+                    {t('components.appointment_modal.view_in_google')}
                     <ExternalLink className="w-3 h-3 ml-1" />
                   </a>
                 </div>
@@ -518,9 +520,9 @@ const AppointmentModal = ({
                   <AlertTriangle className="h-5 w-5 text-red-400" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">Delete Confirmation</h3>
+                  <h3 className="text-sm font-medium text-red-800">{t('components.appointment_modal.delete_confirmation')}</h3>
                   <div className="mt-2 text-sm text-red-700">
-                    <p>Are you sure you want to delete this appointment? This action cannot be undone.</p>
+                    <p>{t('components.appointment_modal.delete_confirm_message')}</p>
                   </div>
                   <div className="mt-4">
                     <div className="flex space-x-3">
@@ -530,7 +532,7 @@ const AppointmentModal = ({
                         variant="outline"
                         className="text-sm"
                       >
-                        Cancel
+                        {t('components.appointment_modal.cancel')}
                       </Button>
                       <Button
                         type="button"
@@ -539,7 +541,7 @@ const AppointmentModal = ({
                         className="text-sm"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? 'Deleting...' : 'Yes, Delete'}
+                        {isSubmitting ? t('components.appointment_modal.deleting') : t('components.appointment_modal.yes_delete')}
                       </Button>
                     </div>
                   </div>
@@ -562,7 +564,7 @@ const AppointmentModal = ({
                     className="text-amber-600 border-amber-600 hover:bg-amber-50 mr-2"
                     disabled={isSubmitting}
                   >
-                    Cancel Appointment
+                    {t('components.appointment_modal.cancel_appointment')}
                   </AnimatedButton>
                 ) : null}
                 <Button
@@ -573,7 +575,7 @@ const AppointmentModal = ({
                   className="flex items-center"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                  {t('components.appointment_modal.delete')}
                 </Button>
               </>
             )}
@@ -586,7 +588,7 @@ const AppointmentModal = ({
               disabled={isSubmitting}
             >
               <X className="w-4 h-4 mr-2" />
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type="button"
@@ -595,7 +597,7 @@ const AppointmentModal = ({
               className="flex items-center"
             >
               <Save className="w-4 h-4 mr-2" />
-              {isSubmitting ? 'Saving...' : appointment ? 'Update' : 'Create'}
+              {isSubmitting ? t('components.appointment_modal.saving') : appointment ? t('components.appointment_modal.update') : t('components.appointment_modal.create')}
             </Button>
           </div>
         </div>

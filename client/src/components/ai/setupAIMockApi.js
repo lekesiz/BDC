@@ -1,9 +1,10 @@
-import { 
-  generateAIData, 
+// TODO: i18n - processed
+import {
+  generateAIData,
   generateAIModelMetrics,
   generateAITrainingHistory,
-  generateAIConfigOptions 
-} from './mockAIData';
+  generateAIConfigOptions } from
+'./mockAIData';import { useTranslation } from "react-i18next";
 export const setupAIMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -12,7 +13,7 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     delete: originalDelete || api.delete.bind(api)
   };
   // AI endpoints
-  api.get = function(url, ...args) {
+  api.get = function (url, ...args) {
     // AI recommendations endpoint
     if (url === '/api/ai/recommendations' || url.startsWith('/api/ai/recommendations?')) {
       const userRole = localStorage.getItem('userRole') || 'student';
@@ -137,16 +138,16 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         totalDuration: "6 months",
         currentProgress: 35,
         modules: [
-          { id: 1, title: "Frontend Fundamentals", status: "completed", duration: "4 weeks" },
-          { id: 2, title: "Backend Development", status: "in_progress", duration: "6 weeks" },
-          { id: 3, title: "Database Design", status: "upcoming", duration: "3 weeks" },
-          { id: 4, title: "DevOps Basics", status: "upcoming", duration: "4 weeks" }
-        ],
+        { id: 1, title: "Frontend Fundamentals", status: "completed", duration: "4 weeks" },
+        { id: 2, title: "Backend Development", status: "in_progress", duration: "6 weeks" },
+        { id: 3, title: "Database Design", status: "upcoming", duration: "3 weeks" },
+        { id: 4, title: "DevOps Basics", status: "upcoming", duration: "4 weeks" }],
+
         milestones: [
-          { id: 1, title: "Frontend Developer", achieved: true, date: "2024-01-15" },
-          { id: 2, title: "Backend Developer", achieved: false, estimatedDate: "2024-03-01" },
-          { id: 3, title: "Full Stack Developer", achieved: false, estimatedDate: "2024-06-15" }
-        ]
+        { id: 1, title: "Frontend Developer", achieved: true, date: "2024-01-15" },
+        { id: 2, title: "Backend Developer", achieved: false, estimatedDate: "2024-03-01" },
+        { id: 3, title: "Full Stack Developer", achieved: false, estimatedDate: "2024-06-15" }]
+
       };
       return Promise.resolve({
         status: 200,
@@ -157,7 +158,7 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     return originalFunctions.get.call(api, url, ...args);
   };
   // AI POST endpoints
-  api.post = function(url, data, ...args) {
+  api.post = function (url, data, ...args) {
     // AI chatbot message endpoint
     if (url === '/api/ai/chatbot/message') {
       const response = {
@@ -165,14 +166,14 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         message: "I understand you're asking about " + data.message + ". Here's what I can help you with...",
         timestamp: new Date().toISOString(),
         suggestions: [
-          "View related documentation",
-          "Watch video tutorial",
-          "Try example code"
-        ],
+        "View related documentation",
+        "Watch video tutorial",
+        "Try example code"],
+
         resources: [
-          { type: "doc", title: "Official Documentation", url: "/docs/topic" },
-          { type: "video", title: "Tutorial Video", url: "/videos/123" }
-        ]
+        { type: "doc", title: "Official Documentation", url: "/docs/topic" },
+        { type: "video", title: "Tutorial Video", url: "/videos/123" }]
+
       };
       return Promise.resolve({
         status: 200,
@@ -188,19 +189,19 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
           type: 'quiz',
           title: `Quiz: ${data.topic}`,
           questions: [
-            {
-              id: 1,
-              question: `What is the main purpose of ${data.topic}?`,
-              options: ["Option A", "Option B", "Option C", "Option D"],
-              correctAnswer: 0
-            },
-            {
-              id: 2,
-              question: `Which of the following is true about ${data.topic}?`,
-              options: ["Option A", "Option B", "Option C", "Option D"],
-              correctAnswer: 2
-            }
-          ]
+          {
+            id: 1,
+            question: `What is the main purpose of ${data.topic}?`,
+            options: ["Option A", "Option B", "Option C", "Option D"],
+            correctAnswer: 0
+          },
+          {
+            id: 2,
+            question: `Which of the following is true about ${data.topic}?`,
+            options: ["Option A", "Option B", "Option C", "Option D"],
+            correctAnswer: 2
+          }]
+
         };
       } else if (data.type === 'summary') {
         generatedContent = {
@@ -209,10 +210,10 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
           title: `Summary: ${data.topic}`,
           content: `This is an AI-generated summary of ${data.topic}. Key points include...`,
           keyPoints: [
-            "Important concept 1",
-            "Important concept 2",
-            "Important concept 3"
-          ]
+          "Important concept 1",
+          "Important concept 2",
+          "Important concept 3"]
+
         };
       } else if (data.type === 'study_plan') {
         generatedContent = {
@@ -221,11 +222,11 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
           title: `Study Plan: ${data.topic}`,
           duration: "4 weeks",
           schedule: [
-            { week: 1, topics: ["Introduction", "Basic Concepts"], hours: 10 },
-            { week: 2, topics: ["Advanced Topics", "Practice"], hours: 12 },
-            { week: 3, topics: ["Projects", "Real-world Applications"], hours: 15 },
-            { week: 4, topics: ["Review", "Assessment"], hours: 8 }
-          ]
+          { week: 1, topics: ["Introduction", "Basic Concepts"], hours: 10 },
+          { week: 2, topics: ["Advanced Topics", "Practice"], hours: 12 },
+          { week: 3, topics: ["Projects", "Real-world Applications"], hours: 15 },
+          { week: 4, topics: ["Review", "Assessment"], hours: 8 }]
+
         };
       }
       return Promise.resolve({
@@ -241,15 +242,15 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
         score: 85,
         feedback: "Great work overall! Your code structure is clean and well-organized.",
         strengths: [
-          "Excellent use of design patterns",
-          "Clear variable naming",
-          "Good error handling"
-        ],
+        "Excellent use of design patterns",
+        "Clear variable naming",
+        "Good error handling"],
+
         improvements: [
-          "Consider adding more comments",
-          "Optimize loop performance",
-          "Add unit tests"
-        ],
+        "Consider adding more comments",
+        "Optimize loop performance",
+        "Add unit tests"],
+
         timestamp: new Date().toISOString()
       };
       return Promise.resolve({
@@ -286,7 +287,7 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     return originalFunctions.post.call(api, url, data, ...args);
   };
   // AI PUT endpoints
-  api.put = function(url, data, ...args) {
+  api.put = function (url, data, ...args) {
     // Update AI configuration
     if (url === '/api/ai/config') {
       return Promise.resolve({
@@ -324,7 +325,7 @@ export const setupAIMockApi = (api, originalGet, originalPost, originalPut, orig
     return originalFunctions.put.call(api, url, data, ...args);
   };
   // AI DELETE endpoints
-  api.delete = function(url, ...args) {
+  api.delete = function (url, ...args) {
     // Delete AI conversation
     if (url.match(/^\/api\/ai\/chatbot\/conversations\/\d+$/)) {
       return Promise.resolve({

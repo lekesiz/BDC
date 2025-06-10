@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * Bundle optimization utilities
  */
@@ -6,7 +7,7 @@ import { lazy } from 'react';
  * Dynamically import React components
  * @param {string} componentPath - Path to the component
  * @returns {React.lazy} Lazy-loaded component
- */
+ */import { useTranslation } from "react-i18next";
 export const lazyLoadComponent = (componentPath) => {
   return lazy(() => import(componentPath));
 };
@@ -18,8 +19,8 @@ export const bundleAnalysis = {
    * Check if bundle analyzer is available
    */
   isAnalyzerAvailable: () => {
-    return process.env.NODE_ENV === 'development' && 
-           process.env.ANALYZE === 'true';
+    return process.env.NODE_ENV === 'development' &&
+    process.env.ANALYZE === 'true';
   },
   /**
    * Get bundle size limit recommendations
@@ -44,48 +45,48 @@ export const bundleAnalysis = {
       // Instead of: import { Button } from '@mui/material';
       // Use: import Button from '@mui/material/Button';
       components: [
-        'Button',
-        'TextField',
-        'Dialog',
-        'Card',
-        'Typography',
-        'Box',
-        'Grid',
-        'IconButton',
-        'Alert',
-        'CircularProgress'
-      ]
+      'Button',
+      'TextField',
+      'Dialog',
+      'Card',
+      'Typography',
+      'Box',
+      'Grid',
+      'IconButton',
+      'Alert',
+      'CircularProgress']
+
     },
     // Lodash optimized imports
     lodash: {
       // Instead of: import _ from 'lodash';
       // Use: import debounce from 'lodash/debounce';
       methods: [
-        'debounce',
-        'throttle',
-        'cloneDeep',
-        'isEqual',
-        'get',
-        'set',
-        'merge',
-        'pick',
-        'omit'
-      ]
+      'debounce',
+      'throttle',
+      'cloneDeep',
+      'isEqual',
+      'get',
+      'set',
+      'merge',
+      'pick',
+      'omit']
+
     },
     // Date-fns optimized imports
     dateFns: {
       // Instead of: import * as dateFns from 'date-fns';
       // Use: import { format } from 'date-fns';
       functions: [
-        'format',
-        'parse',
-        'addDays',
-        'subDays',
-        'differenceInDays',
-        'isValid',
-        'startOfDay',
-        'endOfDay'
-      ]
+      'format',
+      'parse',
+      'addDays',
+      'subDays',
+      'differenceInDays',
+      'isValid',
+      'startOfDay',
+      'endOfDay']
+
     }
   }
 };
@@ -171,9 +172,9 @@ export const imageOptimization = {
   generateSrcSet: (imagePath, sizes = [320, 640, 1024, 1920]) => {
     const basePath = imagePath.replace(/\.[^/.]+$/, '');
     const extension = imagePath.split('.').pop();
-    return sizes
-      .map(size => `${basePath}-${size}w.${extension} ${size}w`)
-      .join(', ');
+    return sizes.
+    map((size) => `${basePath}-${size}w.${extension} ${size}w`).
+    join(', ');
   },
   /**
    * Get optimized image component props
@@ -211,22 +212,22 @@ export const cssOptimization = {
    */
   purgeUnused: {
     content: [
-      './src/**/*.js',
-      './src/**/*.jsx',
-      './public/index.html'
-    ],
+    './src/**/*.js',
+    './src/**/*.jsx',
+    './public/index.html'],
+
     safelist: [
-      // Dynamic classes
-      /^bg-/,
-      /^text-/,
-      /^border-/,
-      // Animation classes
-      /^animate-/,
-      // State classes
-      /^hover:/,
-      /^focus:/,
-      /^active:/
-    ]
+    // Dynamic classes
+    /^bg-/,
+    /^text-/,
+    /^border-/,
+    // Animation classes
+    /^animate-/,
+    // State classes
+    /^hover:/,
+    /^focus:/,
+    /^active:/]
+
   }
 };
 /**
@@ -237,12 +238,12 @@ export const fontOptimization = {
    * Preload critical fonts
    */
   preloadFonts: [
-    {
-      href: '/fonts/inter-var.woff2',
-      type: 'font/woff2',
-      crossOrigin: 'anonymous'
-    }
-  ],
+  {
+    href: '/fonts/inter-var.woff2',
+    type: 'font/woff2',
+    crossOrigin: 'anonymous'
+  }],
+
   /**
    * Font display strategy
    */
@@ -294,8 +295,8 @@ export const performanceMonitoring = {
    */
   webVitals: {
     LCP: { good: 2500, poor: 4000 }, // Largest Contentful Paint
-    FID: { good: 100, poor: 300 },   // First Input Delay
-    CLS: { good: 0.1, poor: 0.25 }   // Cumulative Layout Shift
+    FID: { good: 100, poor: 300 }, // First Input Delay
+    CLS: { good: 0.1, poor: 0.25 } // Cumulative Layout Shift
   },
   /**
    * Custom performance metrics
@@ -318,8 +319,8 @@ export const performanceMonitoring = {
     // Bundle load time
     bundleLoadTime: (callback) => {
       window.addEventListener('load', () => {
-        const loadTime = performance.timing.loadEventEnd - 
-                        performance.timing.navigationStart;
+        const loadTime = performance.timing.loadEventEnd -
+        performance.timing.navigationStart;
         callback(loadTime);
       });
     }
@@ -329,9 +330,9 @@ export const performanceMonitoring = {
    */
   reportMetrics: (metrics) => {
     if (process.env.NODE_ENV === 'production') {
+
       // Send to analytics service
-    }
-  }
+    }}
 };
 /**
  * Development utilities
@@ -352,7 +353,7 @@ export const developmentUtils = {
         const stats = JSON.parse(stdout);
         const limits = bundleAnalysis.getSizeLimits();
         // Check main bundle
-        const mainSize = stats.assets.find(a => a.name.includes('main'))?.size;
+        const mainSize = stats.assets.find((a) => a.name.includes('main'))?.size;
         if (mainSize > limits.js.main * 1024) {
           console.warn(`Main bundle exceeds limit: ${mainSize / 1024}KB > ${limits.js.main}KB`);
         }

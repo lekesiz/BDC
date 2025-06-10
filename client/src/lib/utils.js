@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 /**
@@ -7,7 +8,7 @@ import { twMerge } from 'tailwind-merge';
  * 
  * @param  {...any} inputs - Class names to be combined
  * @returns {string} - Merged class names
- */
+ */import { useTranslation } from "react-i18next";
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
@@ -77,7 +78,7 @@ export function formatTitle(str) {
   // Replace underscores and hyphens with spaces
   const words = str.replace(/[_-]/g, ' ').split(' ');
   // Capitalize each word
-  const capitalizedWords = words.map(word => capitalize(word));
+  const capitalizedWords = words.map((word) => capitalize(word));
   return capitalizedWords.join(' ');
 }
 /**
@@ -104,10 +105,10 @@ export function parseJwt(token) {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
+      atob(base64).
+      split('').
+      map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).
+      join('')
     );
     return JSON.parse(jsonPayload);
   } catch (error) {

@@ -1,10 +1,11 @@
+// TODO: i18n - processed
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, AlertTriangle, XCircle, CheckCircle, Info } from 'lucide-react';
 import { createErrorBoundaryHandler } from '@/utils/errorHandling';
 /**
  * Global error context for centralized error handling
- */
+ */import { useTranslation } from "react-i18next";
 const ErrorContext = createContext();
 export const useError = () => {
   const context = useContext(ErrorContext);
@@ -16,7 +17,7 @@ export const useError = () => {
 /**
  * Error notification component
  */
-const ErrorNotification = ({ error, onClose }) => {
+const ErrorNotification = ({ error, onClose }) => {const { t } = useTranslation();
   const icons = {
     error: XCircle,
     warning: AlertTriangle,
@@ -36,38 +37,38 @@ const ErrorNotification = ({ error, onClose }) => {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className={`flex items-start p-4 mb-4 border rounded-lg ${colorClass}`}
-    >
+      className={`flex items-start p-4 mb-4 border rounded-lg ${colorClass}`}>
+
       <Icon className="w-5 h-5 mr-3 flex-shrink-0 mt-0.5" />
       <div className="flex-1">
-        {error.title && (
-          <h4 className="font-medium mb-1">{error.title}</h4>
-        )}
+        {error.title &&
+        <h4 className="font-medium mb-1">{error.title}</h4>
+        }
         <p className="text-sm">{error.message}</p>
-        {error.details && (
-          <details className="mt-2">
-            <summary className="cursor-pointer text-sm opacity-80">
-              Show details
-            </summary>
+        {error.details &&
+        <details className="mt-2">
+            <summary className="cursor-pointer text-sm opacity-80">{t("components.show_details")}
+
+          </summary>
             <pre className="mt-2 text-xs overflow-auto p-2 bg-black bg-opacity-5 rounded">
               {JSON.stringify(error.details, null, 2)}
             </pre>
           </details>
-        )}
+        }
       </div>
       <button
         onClick={() => onClose(error.id)}
-        className="ml-3 flex-shrink-0 hover:opacity-70 transition-opacity"
-      >
+        className="ml-3 flex-shrink-0 hover:opacity-70 transition-opacity">
+
         <X className="w-5 h-5" />
       </button>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 /**
  * Error provider component
  */
-export const ErrorProvider = ({ children, options = {} }) => {
+export const ErrorProvider = ({ children, options = {} }) => {const { t } = useTranslation();
   const [errors, setErrors] = useState([]);
   const [errorQueue, setErrorQueue] = useState([]);
   const {
@@ -83,11 +84,11 @@ export const ErrorProvider = ({ children, options = {} }) => {
       timestamp: new Date(),
       ...error
     };
-    setErrors(prev => {
+    setErrors((prev) => {
       const updated = [...prev, newError];
       // Keep only the latest maxErrors
       if (updated.length > maxErrors) {
-        setErrorQueue(queue => [...queue, ...updated.slice(0, updated.length - maxErrors)]);
+        setErrorQueue((queue) => [...queue, ...updated.slice(0, updated.length - maxErrors)]);
         return updated.slice(-maxErrors);
       }
       return updated;
@@ -102,12 +103,12 @@ export const ErrorProvider = ({ children, options = {} }) => {
   }, [maxErrors, errorDuration]);
   // Remove error
   const removeError = useCallback((id) => {
-    setErrors(prev => prev.filter(error => error.id !== id));
+    setErrors((prev) => prev.filter((error) => error.id !== id));
     // Check if there are queued errors
-    setErrorQueue(queue => {
+    setErrorQueue((queue) => {
       if (queue.length > 0) {
         const [next, ...rest] = queue;
-        setErrors(prev => [...prev, next]);
+        setErrors((prev) => [...prev, next]);
         return rest;
       }
       return queue;
@@ -192,17 +193,17 @@ export const ErrorProvider = ({ children, options = {} }) => {
       {/* Error notifications container */}
       <div className={`fixed z-50 ${positionClasses[position] || positionClasses['top-right']}`}>
         <AnimatePresence>
-          {errors.map(error => (
-            <ErrorNotification
-              key={error.id}
-              error={error}
-              onClose={removeError}
-            />
-          ))}
+          {errors.map((error) =>
+          <ErrorNotification
+            key={error.id}
+            error={error}
+            onClose={removeError} />
+
+          )}
         </AnimatePresence>
       </div>
-    </ErrorContext.Provider>
-  );
+    </ErrorContext.Provider>);
+
 };
 /**
  * Hook for handling async errors
@@ -217,49 +218,49 @@ export const useAsyncError = () => {
 /**
  * Error boundary component that integrates with ErrorContext
  */
-export const ContextErrorBoundary = ({ children }) => {
+export const ContextErrorBoundary = ({ children }) => {const { t } = useTranslation();
   const { errorBoundaryHandler } = useError();
   return (
     <ErrorBoundary
       onError={errorBoundaryHandler}
-      fallback={(error, errorInfo, reset) => (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      fallback={(error, errorInfo, reset) =>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Something went wrong
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">{t("components.something_went_wrong")}
+
+          </h1>
             <p className="text-gray-600 mb-6">
               An unexpected error occurred. Please try refreshing the page.
             </p>
             <div className="flex gap-3">
               <button
-                onClick={reset}
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                Try Again
-              </button>
+              onClick={reset}
+              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">{t("components.try_again")}
+
+
+            </button>
               <button
-                onClick={() => window.location.href = '/'}
-                className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
-              >
-                Go Home
-              </button>
+              onClick={() => window.location.href = '/'}
+              className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300">{t("components.go_home")}
+
+
+            </button>
             </div>
-            {process.env.NODE_ENV === 'development' && (
-              <details className="mt-6">
-                <summary className="cursor-pointer text-sm text-gray-500">
-                  Error Details
-                </summary>
+            {process.env.NODE_ENV === 'development' &&
+          <details className="mt-6">
+                <summary className="cursor-pointer text-sm text-gray-500">{t("components.error_details")}
+
+            </summary>
                 <pre className="mt-2 text-xs bg-gray-100 p-3 rounded overflow-auto">
                   {error.toString()}
                 </pre>
               </details>
-            )}
+          }
           </div>
         </div>
-      )}
-    >
+      }>
+
       {children}
-    </ErrorBoundary>
-  );
+    </ErrorBoundary>);
+
 };

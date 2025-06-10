@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -8,13 +9,13 @@ import { reportWebVitals, startPerformanceMonitoring } from './utils/performance
 import './i18n/config'; // Initialize i18n
 import './index.css';
 // Create a client
-const queryClient = new QueryClient({
+import { useTranslation } from "react-i18next";const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
+      retry: 1
+    }
+  }
 });
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -22,15 +23,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       future={{
         v7_startTransition: true,
         v7_relativeSplatPath: true
-      }}
-    >
+      }}>
+
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <App />
         </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
 // Initialize performance monitoring
 if (process.env.NODE_ENV === 'production') {
@@ -43,7 +44,7 @@ if (process.env.NODE_ENV === 'production') {
         metric_id: metric.id,
         metric_value: metric.value,
         metric_delta: metric.delta,
-        custom_parameter: metric.navigationType,
+        custom_parameter: metric.navigationType
       });
     }
   });

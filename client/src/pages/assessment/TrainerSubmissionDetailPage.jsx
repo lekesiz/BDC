@@ -1,9 +1,10 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, CheckCircle, XCircle, Award, Clock, 
-  FileText, User, Calendar, BarChart2, MessageSquare
-} from 'lucide-react';
+import {
+  ArrowLeft, CheckCircle, XCircle, Award, Clock,
+  FileText, User, Calendar, BarChart2, MessageSquare } from
+'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,8 +18,8 @@ import { Table } from '@/components/ui/table';
 /**
  * TrainerSubmissionDetailPage displays detailed information about a student's 
  * assessment submission and allows trainers to review, grade, and provide feedback
- */
-const TrainerSubmissionDetailPage = () => {
+ */import { useTranslation } from "react-i18next";
+const TrainerSubmissionDetailPage = () => {const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -76,7 +77,7 @@ const TrainerSubmissionDetailPage = () => {
         toast({
           title: 'Error',
           description: 'Failed to load submission details',
-          type: 'error',
+          type: 'error'
         });
       } finally {
         if (isMounted) {
@@ -104,18 +105,18 @@ const TrainerSubmissionDetailPage = () => {
       const response = await fetch(`/api/assessment/submissions/${id}/feedback`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ feedback: feedbackData }),
+        body: JSON.stringify({ feedback: feedbackData })
       });
       if (!response.ok) throw new Error('Failed to save feedback');
       toast({
         title: 'Success',
         description: 'Feedback saved successfully',
-        type: 'success',
+        type: 'success'
       });
       // Update local state
-      setSubmission(prev => ({
+      setSubmission((prev) => ({
         ...prev,
         feedback: feedbackData
       }));
@@ -124,7 +125,7 @@ const TrainerSubmissionDetailPage = () => {
       toast({
         title: 'Error',
         description: 'Failed to save feedback',
-        type: 'error',
+        type: 'error'
       });
     } finally {
       setIsSaving(false);
@@ -139,8 +140,8 @@ const TrainerSubmissionDetailPage = () => {
       const totalPoints = template?.totalPoints || 100;
       const gradingData = {
         score: manualScore,
-        percentage: Math.round((manualScore / totalPoints) * 100),
-        passed: (manualScore / totalPoints) * 100 >= assessment?.settings?.passingScore || 70,
+        percentage: Math.round(manualScore / totalPoints * 100),
+        passed: manualScore / totalPoints * 100 >= assessment?.settings?.passingScore || 70,
         feedback: {
           ...submission.feedback,
           general: feedback
@@ -152,16 +153,16 @@ const TrainerSubmissionDetailPage = () => {
       const response = await fetch(`/api/assessment/submissions/${id}/grade`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(gradingData),
+        body: JSON.stringify(gradingData)
       });
       if (!response.ok) throw new Error('Failed to grade submission');
       const updatedSubmission = await response.json();
       toast({
         title: 'Success',
         description: 'Submission graded successfully',
-        type: 'success',
+        type: 'success'
       });
       // Update local state
       setSubmission(updatedSubmission);
@@ -170,7 +171,7 @@ const TrainerSubmissionDetailPage = () => {
       toast({
         title: 'Error',
         description: 'Failed to grade submission',
-        type: 'error',
+        type: 'error'
       });
     } finally {
       setIsSaving(false);
@@ -181,8 +182,8 @@ const TrainerSubmissionDetailPage = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-      </div>
-    );
+      </div>);
+
   }
   // Render error state
   if (error || !submission || !assessment || !template) {
@@ -192,24 +193,24 @@ const TrainerSubmissionDetailPage = () => {
           <Button
             variant="ghost"
             onClick={() => navigate('/assessment')}
-            className="flex items-center"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Assessments
+            className="flex items-center">
+
+            <ArrowLeft className="w-4 h-4 mr-2" />{t("pages.back_to_assessments")}
+
           </Button>
         </div>
         <Card className="p-6 text-center">
           <div className="text-red-500 mb-4">
             <XCircle className="w-12 h-12 mx-auto" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">Submission Not Found</h2>
+          <h2 className="text-xl font-semibold mb-2">{t("pages.submission_not_found")}</h2>
           <p className="text-gray-600 mb-4">
             {error || "The requested submission could not be found or has been deleted."}
           </p>
-          <Button onClick={() => navigate('/assessment')}>Back to Assessments</Button>
+          <Button onClick={() => navigate('/assessment')}>{t("pages.back_to_assessments")}</Button>
         </Card>
-      </div>
-    );
+      </div>);
+
   }
   // Calculate score percentage
   const scorePercentage = submission.percentage || 0;
@@ -222,31 +223,31 @@ const TrainerSubmissionDetailPage = () => {
           <Button
             variant="ghost"
             onClick={() => navigate(`/assessment/assigned/${assessment.id}/results`)}
-            className="flex items-center mr-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Results
+            className="flex items-center mr-4">
+
+            <ArrowLeft className="w-4 h-4 mr-2" />{t("components.back_to_results")}
+
           </Button>
           <div>
             <h1 className="text-2xl font-bold">{template.title}</h1>
-            <p className="text-gray-600">Student Submission Review</p>
+            <p className="text-gray-600">{t("pages.student_submission_review")}</p>
           </div>
         </div>
         <div>
-          {submission.status !== 'graded' && (
-            <Button
-              onClick={handleGradeSubmission}
-              disabled={isSaving}
-              className="flex items-center"
-            >
-              {isSaving ? (
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-current"></div>
-              ) : (
-                <CheckCircle className="w-4 h-4 mr-2" />
-              )}
+          {submission.status !== 'graded' &&
+          <Button
+            onClick={handleGradeSubmission}
+            disabled={isSaving}
+            className="flex items-center">
+
+              {isSaving ?
+            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-current"></div> :
+
+            <CheckCircle className="w-4 h-4 mr-2" />
+            }
               {isSaving ? 'Grading...' : 'Grade Submission'}
             </Button>
-          )}
+          }
         </div>
       </div>
       {/* Student Info Card */}
@@ -255,7 +256,7 @@ const TrainerSubmissionDetailPage = () => {
           <div className="flex items-center">
             <User className="w-8 h-8 text-primary mr-4" />
             <div>
-              <p className="text-sm text-gray-600">Student</p>
+              <p className="text-sm text-gray-600">{t("components.student")}</p>
               <p className="font-semibold">{submission.student_name}</p>
               <p className="text-xs text-gray-500">{submission.student_id}</p>
             </div>
@@ -263,7 +264,7 @@ const TrainerSubmissionDetailPage = () => {
           <div className="flex items-center">
             <Calendar className="w-8 h-8 text-primary mr-4" />
             <div>
-              <p className="text-sm text-gray-600">Submitted</p>
+              <p className="text-sm text-gray-600">{t("pages.submitted")}</p>
               <p className="font-semibold">
                 {submission.submitted_at ? format(new Date(submission.submitted_at), "MMM d, yyyy 'at' h:mm a") : 'Not submitted'}
               </p>
@@ -272,7 +273,7 @@ const TrainerSubmissionDetailPage = () => {
           <div className="flex items-center">
             <Clock className="w-8 h-8 text-primary mr-4" />
             <div>
-              <p className="text-sm text-gray-600">Time Spent</p>
+              <p className="text-sm text-gray-600">{t("pages.time_spent")}</p>
               <p className="font-semibold">
                 {submission.time_spent ? `${submission.time_spent} minutes` : 'N/A'}
               </p>
@@ -281,16 +282,16 @@ const TrainerSubmissionDetailPage = () => {
           <div className="flex items-center">
             <Award className="w-8 h-8 text-primary mr-4" />
             <div>
-              <p className="text-sm text-gray-600">Score</p>
+              <p className="text-sm text-gray-600">{t("components.score")}</p>
               <div className="flex items-center">
                 <p className="font-semibold">
                   {submission.score !== undefined ? `${submission.score} points (${scorePercentage}%)` : 'Not graded'}
                 </p>
-                {submission.passed !== undefined && (
-                  <Badge className={`ml-2 ${submission.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {submission.passed !== undefined &&
+                <Badge className={`ml-2 ${submission.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {submission.passed ? 'Passed' : 'Failed'}
                   </Badge>
-                )}
+                }
               </div>
             </div>
           </div>
@@ -300,84 +301,84 @@ const TrainerSubmissionDetailPage = () => {
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
-        className="mb-6"
-      >
+        className="mb-6">
+
         <Tabs.TabsList className="mb-6">
           <Tabs.TabTrigger value="overview">
-            <BarChart2 className="w-4 h-4 mr-2" />
-            Overview
+            <BarChart2 className="w-4 h-4 mr-2" />{t("components.overview")}
+
           </Tabs.TabTrigger>
           <Tabs.TabTrigger value="answers">
-            <FileText className="w-4 h-4 mr-2" />
-            Answers
+            <FileText className="w-4 h-4 mr-2" />{t("pages.answers")}
+
           </Tabs.TabTrigger>
           <Tabs.TabTrigger value="feedback">
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Feedback
+            <MessageSquare className="w-4 h-4 mr-2" />{t("pages.feedback")}
+
           </Tabs.TabTrigger>
         </Tabs.TabsList>
         {/* Overview Tab */}
         <Tabs.TabContent value="overview">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Score Card */}
-            {submission.score !== undefined && (
-              <Card className="p-6">
+            {submission.score !== undefined &&
+            <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <Award className="w-5 h-5 mr-2 text-primary" />
-                  Score Summary
-                </h3>
+                  <Award className="w-5 h-5 mr-2 text-primary" />{t("pages.score_summary")}
+
+              </h3>
                 <div className="space-y-6">
                   <div>
                     <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">Total Score</span>
+                      <span className="text-sm font-medium">{t("pages.total_score")}</span>
                       <span className="text-sm text-gray-500">
                         {submission.score} / {isQuiz ? template.questions?.length * 10 : 100} points
                       </span>
                     </div>
-                    <Progress 
-                      value={scorePercentage} 
-                      className={`h-3 bg-gray-200 ${
-                        scorePercentage >= 90 ? '[&>div]:bg-green-500' :
-                        scorePercentage >= 80 ? '[&>div]:bg-blue-500' :
-                        scorePercentage >= 70 ? '[&>div]:bg-yellow-500' :
-                        scorePercentage >= 60 ? '[&>div]:bg-orange-500' :
-                        '[&>div]:bg-red-500'
-                      }`} 
-                    />
+                    <Progress
+                    value={scorePercentage}
+                    className={`h-3 bg-gray-200 ${
+                    scorePercentage >= 90 ? '[&>div]:bg-green-500' :
+                    scorePercentage >= 80 ? '[&>div]:bg-blue-500' :
+                    scorePercentage >= 70 ? '[&>div]:bg-yellow-500' :
+                    scorePercentage >= 60 ? '[&>div]:bg-orange-500' :
+                    '[&>div]:bg-red-500'}`
+                    } />
+
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg flex items-center justify-between">
-                    <span className="font-medium">Passing Score</span>
+                    <span className="font-medium">{t("pages.passing_score")}</span>
                     <span>{assessment.settings.passingScore}%</span>
                   </div>
                   {/* Score classification */}
                   <div className={`p-4 rounded-lg ${
-                    scorePercentage >= 90 ? 'bg-green-50 text-green-800' :
-                    scorePercentage >= 80 ? 'bg-blue-50 text-blue-800' :
-                    scorePercentage >= 70 ? 'bg-yellow-50 text-yellow-800' :
-                    scorePercentage >= 60 ? 'bg-orange-50 text-orange-800' :
-                    'bg-red-50 text-red-800'
-                  }`}>
+                scorePercentage >= 90 ? 'bg-green-50 text-green-800' :
+                scorePercentage >= 80 ? 'bg-blue-50 text-blue-800' :
+                scorePercentage >= 70 ? 'bg-yellow-50 text-yellow-800' :
+                scorePercentage >= 60 ? 'bg-orange-50 text-orange-800' :
+                'bg-red-50 text-red-800'}`
+                }>
                     <p className="font-medium text-center">
                       {scorePercentage >= 90 ? 'Excellent' :
-                       scorePercentage >= 80 ? 'Very Good' :
-                       scorePercentage >= 70 ? 'Good' :
-                       scorePercentage >= 60 ? 'Satisfactory' :
-                       'Needs Improvement'}
+                    scorePercentage >= 80 ? 'Very Good' :
+                    scorePercentage >= 70 ? 'Good' :
+                    scorePercentage >= 60 ? 'Satisfactory' :
+                    'Needs Improvement'}
                     </p>
                   </div>
                 </div>
               </Card>
-            )}
+            }
             {/* Assessment Details */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <FileText className="w-5 h-5 mr-2 text-primary" />
-                Assessment Details
+                <FileText className="w-5 h-5 mr-2 text-primary" />{t("pages.assessment_details")}
+
               </h3>
               <Table>
                 <Table.Body>
                   <Table.Row>
-                    <Table.Cell className="font-medium">Type</Table.Cell>
+                    <Table.Cell className="font-medium">{t("components.type")}</Table.Cell>
                     <Table.Cell>
                       <Badge className={isQuiz ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}>
                         {template.type}
@@ -385,7 +386,7 @@ const TrainerSubmissionDetailPage = () => {
                     </Table.Cell>
                   </Table.Row>
                   <Table.Row>
-                    <Table.Cell className="font-medium">Duration</Table.Cell>
+                    <Table.Cell className="font-medium">{t("components.duration")}</Table.Cell>
                     <Table.Cell>{isQuiz ? `${template.settings.timeLimit} minutes` : 'No time limit'}</Table.Cell>
                   </Table.Row>
                   <Table.Row>
@@ -393,18 +394,18 @@ const TrainerSubmissionDetailPage = () => {
                     <Table.Cell>{isQuiz ? template.questions?.length || 0 : template.requirements?.length || 0}</Table.Cell>
                   </Table.Row>
                   <Table.Row>
-                    <Table.Cell className="font-medium">Due Date</Table.Cell>
+                    <Table.Cell className="font-medium">{t("pages.due_date")}</Table.Cell>
                     <Table.Cell>{format(new Date(assessment.due_date), "MMM d, yyyy")}</Table.Cell>
                   </Table.Row>
                   <Table.Row>
-                    <Table.Cell className="font-medium">Skills</Table.Cell>
+                    <Table.Cell className="font-medium">{t("components.skills")}</Table.Cell>
                     <Table.Cell>
                       <div className="flex flex-wrap gap-2">
-                        {template.skills?.map(skill => (
-                          <Badge key={skill} variant="outline" className="bg-gray-100">
+                        {template.skills?.map((skill) =>
+                        <Badge key={skill} variant="outline" className="bg-gray-100">
                             {skill}
                           </Badge>
-                        ))}
+                        )}
                       </div>
                     </Table.Cell>
                   </Table.Row>
@@ -414,136 +415,136 @@ const TrainerSubmissionDetailPage = () => {
             {/* Submission Overview */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <FileText className="w-5 h-5 mr-2 text-primary" />
-                Submission Overview
+                <FileText className="w-5 h-5 mr-2 text-primary" />{t("pages.submission_overview")}
+
               </h3>
               <div className="space-y-4">
-                {isQuiz ? (
-                  <>
+                {isQuiz ?
+                <>
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <p className="font-medium">Correct Answers</p>
+                      <p className="font-medium">{t("components.correct_answers")}</p>
                       <p className="font-bold text-green-600">
                         {submission.correctCount || 0} / {template.questions?.length || 0}
                       </p>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <p className="font-medium">Question Types</p>
+                      <p className="font-medium">{t("pages.question_types")}</p>
                       <div>
                         {/* Count question types */}
-                        {template.questions && (
-                          <div className="flex gap-2">
+                        {template.questions &&
+                      <div className="flex gap-2">
                             {Object.entries(template.questions.reduce((acc, q) => {
-                              acc[q.type] = (acc[q.type] || 0) + 1;
-                              return acc;
-                            }, {})).map(([type, count]) => (
-                              <Badge key={type} className="bg-blue-100 text-blue-800">
+                          acc[q.type] = (acc[q.type] || 0) + 1;
+                          return acc;
+                        }, {})).map(([type, count]) =>
+                        <Badge key={type} className="bg-blue-100 text-blue-800">
                                 {type}: {count}
                               </Badge>
-                            ))}
-                          </div>
                         )}
+                          </div>
+                      }
                       </div>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <p className="font-medium">Attempted Questions</p>
+                      <p className="font-medium">{t("pages.attempted_questions")}</p>
                       <p className="font-bold">
                         {submission.answers ? Object.keys(submission.answers).length : 0} / {template.questions?.length || 0}
                       </p>
                     </div>
-                  </>
-                ) : (
-                  <>
+                  </> :
+
+                <>
                     {/* Project submission details */}
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <p className="font-medium">Submission Type</p>
+                      <p className="font-medium">{t("pages.submission_type")}</p>
                       <p>{submission.submission_url ? 'URL' : submission.repository_url ? 'Repository' : 'File Upload'}</p>
                     </div>
-                    {submission.submission_url && (
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <p className="font-medium">Project URL</p>
-                        <a 
-                          href={submission.submission_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          Open Project
-                        </a>
+                    {submission.submission_url &&
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <p className="font-medium">{t("pages.project_url")}</p>
+                        <a
+                      href={submission.submission_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline">{t("pages.open_project")}
+
+
+                    </a>
                       </div>
-                    )}
-                    {submission.repository_url && (
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <p className="font-medium">Repository URL</p>
-                        <a 
-                          href={submission.repository_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          View Repository
-                        </a>
+                  }
+                    {submission.repository_url &&
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <p className="font-medium">{t("pages.repository_url")}</p>
+                        <a
+                      href={submission.repository_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline">{t("pages.view_repository")}
+
+
+                    </a>
                       </div>
-                    )}
+                  }
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <p className="font-medium">Requirements Met</p>
+                      <p className="font-medium">{t("pages.requirements_met")}</p>
                       <p className="font-bold">
-                        {submission.requirements_met?.filter(r => r.met).length || 0} / {template.requirements?.length || 0}
+                        {submission.requirements_met?.filter((r) => r.met).length || 0} / {template.requirements?.length || 0}
                       </p>
                     </div>
                   </>
-                )}
+                }
               </div>
             </Card>
             {/* Feedback Summary */}
-            {submission.feedback && (
-              <Card className="p-6">
+            {submission.feedback &&
+            <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <MessageSquare className="w-5 h-5 mr-2 text-primary" />
-                  Feedback Summary
-                </h3>
+                  <MessageSquare className="w-5 h-5 mr-2 text-primary" />{t("pages.feedback_summary")}
+
+              </h3>
                 <div className="space-y-4">
-                  {submission.feedback.general && (
-                    <div className="p-4 bg-blue-50 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">General Feedback</h4>
+                  {submission.feedback.general &&
+                <div className="p-4 bg-blue-50 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">{t("pages.general_feedback")}</h4>
                       <p className="text-gray-800">{submission.feedback.general}</p>
                     </div>
-                  )}
-                  {submission.feedback.strengths && submission.feedback.strengths.length > 0 && (
-                    <div className="p-4 bg-green-50 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Strengths</h4>
+                }
+                  {submission.feedback.strengths && submission.feedback.strengths.length > 0 &&
+                <div className="p-4 bg-green-50 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">{t("pages.strengths")}</h4>
                       <ul className="list-disc list-inside space-y-1">
-                        {submission.feedback.strengths.map((strength, index) => (
-                          <li key={index} className="text-gray-800">{strength}</li>
-                        ))}
+                        {submission.feedback.strengths.map((strength, index) =>
+                    <li key={index} className="text-gray-800">{strength}</li>
+                    )}
                       </ul>
                     </div>
-                  )}
-                  {submission.feedback.areas_for_improvement && submission.feedback.areas_for_improvement.length > 0 && (
-                    <div className="p-4 bg-amber-50 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Areas for Improvement</h4>
+                }
+                  {submission.feedback.areas_for_improvement && submission.feedback.areas_for_improvement.length > 0 &&
+                <div className="p-4 bg-amber-50 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">{t("components.areas_for_improvement")}</h4>
                       <ul className="list-disc list-inside space-y-1">
-                        {submission.feedback.areas_for_improvement.map((area, index) => (
-                          <li key={index} className="text-gray-800">{area}</li>
-                        ))}
+                        {submission.feedback.areas_for_improvement.map((area, index) =>
+                    <li key={index} className="text-gray-800">{area}</li>
+                    )}
                       </ul>
                     </div>
-                  )}
+                }
                 </div>
               </Card>
-            )}
+            }
           </div>
         </Tabs.TabContent>
         {/* Answers Tab */}
         <Tabs.TabContent value="answers">
-          {isQuiz ? (
-            // Quiz answers
-            <div className="space-y-6">
+          {isQuiz ?
+          // Quiz answers
+          <div className="space-y-6">
               {template.questions?.map((question, index) => {
-                const answer = submission.answers?.[index];
-                const isCorrect = submission.answers && index in submission.answers ? 
-                  submission.answers[index].correct : false;
-                return (
-                  <Card key={index} className="p-6">
+              const answer = submission.answers?.[index];
+              const isCorrect = submission.answers && index in submission.answers ?
+              submission.answers[index].correct : false;
+              return (
+                <Card key={index} className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-start">
                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium mr-3 flex-shrink-0">
@@ -557,183 +558,183 @@ const TrainerSubmissionDetailPage = () => {
                         </div>
                       </div>
                       <div className="flex items-center">
-                        {answer !== undefined ? (
-                          isCorrect ? (
-                            <div className="flex items-center text-green-600">
+                        {answer !== undefined ?
+                      isCorrect ?
+                      <div className="flex items-center text-green-600">
                               <CheckCircle className="w-5 h-5 mr-1" />
-                              <span className="font-medium">Correct</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center text-red-600">
+                              <span className="font-medium">{t("components.correct")}</span>
+                            </div> :
+
+                      <div className="flex items-center text-red-600">
                               <XCircle className="w-5 h-5 mr-1" />
-                              <span className="font-medium">Incorrect</span>
-                            </div>
-                          )
-                        ) : (
-                          <Badge className="bg-amber-100 text-amber-800">
-                            Not Answered
-                          </Badge>
-                        )}
+                              <span className="font-medium">{t("components.incorrect")}</span>
+                            </div> :
+
+
+                      <Badge className="bg-amber-100 text-amber-800">{t("pages.not_answered")}
+
+                      </Badge>
+                      }
                       </div>
                     </div>
                     {/* Display answer based on question type */}
-                    {question.type === 'multipleChoice' && (
-                      <div className="space-y-2 mt-4">
+                    {question.type === 'multipleChoice' &&
+                  <div className="space-y-2 mt-4">
                         {question.options.map((option, optionIndex) => {
-                          const isSelected = answer === optionIndex;
-                          const isOptionCorrect = optionIndex === question.correctAnswer;
-                          let optionClassName = "flex items-start p-3 rounded-lg border ";
-                          if (isSelected && isOptionCorrect) {
-                            optionClassName += "border-green-300 bg-green-50";
-                          } else if (isSelected && !isOptionCorrect) {
-                            optionClassName += "border-red-300 bg-red-50";
-                          } else if (!isSelected && isOptionCorrect) {
-                            optionClassName += "border-green-300 bg-green-50 opacity-60";
-                          } else {
-                            optionClassName += "border-gray-200";
-                          }
-                          return (
-                            <div key={optionIndex} className={optionClassName}>
+                      const isSelected = answer === optionIndex;
+                      const isOptionCorrect = optionIndex === question.correctAnswer;
+                      let optionClassName = "flex items-start p-3 rounded-lg border ";
+                      if (isSelected && isOptionCorrect) {
+                        optionClassName += "border-green-300 bg-green-50";
+                      } else if (isSelected && !isOptionCorrect) {
+                        optionClassName += "border-red-300 bg-red-50";
+                      } else if (!isSelected && isOptionCorrect) {
+                        optionClassName += "border-green-300 bg-green-50 opacity-60";
+                      } else {
+                        optionClassName += "border-gray-200";
+                      }
+                      return (
+                        <div key={optionIndex} className={optionClassName}>
                               <div className="flex items-center h-5">
-                                {isSelected ? (
-                                  isOptionCorrect ? (
-                                    <CheckCircle className="w-5 h-5 text-green-600" />
-                                  ) : (
-                                    <XCircle className="w-5 h-5 text-red-600" />
-                                  )
-                                ) : isOptionCorrect ? (
-                                  <CheckCircle className="w-5 h-5 text-green-600 opacity-60" />
-                                ) : (
-                                  <div className="w-5 h-5 rounded-full border border-gray-300"></div>
-                                )}
+                                {isSelected ?
+                            isOptionCorrect ?
+                            <CheckCircle className="w-5 h-5 text-green-600" /> :
+
+                            <XCircle className="w-5 h-5 text-red-600" /> :
+
+                            isOptionCorrect ?
+                            <CheckCircle className="w-5 h-5 text-green-600 opacity-60" /> :
+
+                            <div className="w-5 h-5 rounded-full border border-gray-300"></div>
+                            }
                               </div>
                               <span className="ml-3">{option}</span>
-                            </div>
-                          );
-                        })}
+                            </div>);
+
+                    })}
                       </div>
-                    )}
-                    {question.type === 'multipleAnswer' && (
-                      <div className="space-y-2 mt-4">
+                  }
+                    {question.type === 'multipleAnswer' &&
+                  <div className="space-y-2 mt-4">
                         {question.options.map((option, optionIndex) => {
-                          const isSelected = answer && Array.isArray(answer) && answer.includes(optionIndex);
-                          const isOptionCorrect = question.correctAnswers.includes(optionIndex);
-                          let optionClassName = "flex items-start p-3 rounded-lg border ";
-                          if (isSelected && isOptionCorrect) {
-                            optionClassName += "border-green-300 bg-green-50";
-                          } else if (isSelected && !isOptionCorrect) {
-                            optionClassName += "border-red-300 bg-red-50";
-                          } else if (!isSelected && isOptionCorrect) {
-                            optionClassName += "border-green-300 bg-green-50 opacity-60";
-                          } else {
-                            optionClassName += "border-gray-200";
-                          }
-                          return (
-                            <div key={optionIndex} className={optionClassName}>
+                      const isSelected = answer && Array.isArray(answer) && answer.includes(optionIndex);
+                      const isOptionCorrect = question.correctAnswers.includes(optionIndex);
+                      let optionClassName = "flex items-start p-3 rounded-lg border ";
+                      if (isSelected && isOptionCorrect) {
+                        optionClassName += "border-green-300 bg-green-50";
+                      } else if (isSelected && !isOptionCorrect) {
+                        optionClassName += "border-red-300 bg-red-50";
+                      } else if (!isSelected && isOptionCorrect) {
+                        optionClassName += "border-green-300 bg-green-50 opacity-60";
+                      } else {
+                        optionClassName += "border-gray-200";
+                      }
+                      return (
+                        <div key={optionIndex} className={optionClassName}>
                               <div className="flex items-center h-5">
-                                {isSelected ? (
-                                  isOptionCorrect ? (
-                                    <CheckCircle className="w-5 h-5 text-green-600" />
-                                  ) : (
-                                    <XCircle className="w-5 h-5 text-red-600" />
-                                  )
-                                ) : isOptionCorrect ? (
-                                  <CheckCircle className="w-5 h-5 text-green-600 opacity-60" />
-                                ) : (
-                                  <div className="w-5 h-5 rounded-full border border-gray-300"></div>
-                                )}
+                                {isSelected ?
+                            isOptionCorrect ?
+                            <CheckCircle className="w-5 h-5 text-green-600" /> :
+
+                            <XCircle className="w-5 h-5 text-red-600" /> :
+
+                            isOptionCorrect ?
+                            <CheckCircle className="w-5 h-5 text-green-600 opacity-60" /> :
+
+                            <div className="w-5 h-5 rounded-full border border-gray-300"></div>
+                            }
                               </div>
                               <span className="ml-3">{option}</span>
-                            </div>
-                          );
-                        })}
+                            </div>);
+
+                    })}
                       </div>
-                    )}
-                    {question.type === 'trueFalse' && (
-                      <div className="flex items-center space-x-4 mt-4">
+                  }
+                    {question.type === 'trueFalse' &&
+                  <div className="flex items-center space-x-4 mt-4">
                         <div className={`flex items-center p-2 rounded-lg ${
-                          answer === true
-                            ? (question.correctAnswer === true ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")
-                            : question.correctAnswer === true ? "bg-green-100 text-green-800 opacity-60" : "bg-gray-100 text-gray-800"
-                        }`}>
-                          <span className="font-medium">True</span>
+                    answer === true ?
+                    question.correctAnswer === true ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800" :
+                    question.correctAnswer === true ? "bg-green-100 text-green-800 opacity-60" : "bg-gray-100 text-gray-800"}`
+                    }>
+                          <span className="font-medium">{t("components.true")}</span>
                           {answer === true && (
-                            question.correctAnswer === true
-                              ? <CheckCircle className="w-4 h-4 ml-2" />
-                              : <XCircle className="w-4 h-4 ml-2" />
-                          )}
+                      question.correctAnswer === true ?
+                      <CheckCircle className="w-4 h-4 ml-2" /> :
+                      <XCircle className="w-4 h-4 ml-2" />)
+                      }
                         </div>
                         <div className={`flex items-center p-2 rounded-lg ${
-                          answer === false
-                            ? (question.correctAnswer === false ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")
-                            : question.correctAnswer === false ? "bg-green-100 text-green-800 opacity-60" : "bg-gray-100 text-gray-800"
-                        }`}>
-                          <span className="font-medium">False</span>
+                    answer === false ?
+                    question.correctAnswer === false ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800" :
+                    question.correctAnswer === false ? "bg-green-100 text-green-800 opacity-60" : "bg-gray-100 text-gray-800"}`
+                    }>
+                          <span className="font-medium">{t("components.false")}</span>
                           {answer === false && (
-                            question.correctAnswer === false
-                              ? <CheckCircle className="w-4 h-4 ml-2" />
-                              : <XCircle className="w-4 h-4 ml-2" />
-                          )}
+                      question.correctAnswer === false ?
+                      <CheckCircle className="w-4 h-4 ml-2" /> :
+                      <XCircle className="w-4 h-4 ml-2" />)
+                      }
                         </div>
                       </div>
-                    )}
-                    {question.type === 'shortAnswer' && (
-                      <div className="space-y-4 mt-4">
+                  }
+                    {question.type === 'shortAnswer' &&
+                  <div className="space-y-4 mt-4">
                         <div>
-                          <h4 className="text-sm font-medium text-gray-700 mb-1">Student's Answer:</h4>
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">{t("pages.students_answer")}</h4>
                           <div className="p-3 rounded-lg border border-gray-200 bg-gray-50">
                             {answer || <span className="text-gray-400">No answer provided</span>}
                           </div>
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium text-gray-700 mb-1">Correct Answer:</h4>
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">{t("components.correct_answer")}</h4>
                           <div className="p-3 rounded-lg border border-green-200 bg-green-50">
-                            {Array.isArray(question.correctAnswer) 
-                              ? question.correctAnswer.join(' or ') 
-                              : question.correctAnswer}
+                            {Array.isArray(question.correctAnswer) ?
+                        question.correctAnswer.join(' or ') :
+                        question.correctAnswer}
                           </div>
                         </div>
                       </div>
-                    )}
-                    {question.type === 'matching' && (
-                      <div className="mt-4">
+                  }
+                    {question.type === 'matching' &&
+                  <div className="mt-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                           {question.items.map((item, itemIndex) => {
-                            const matchedIndex = answer && typeof answer === 'object' ? answer[item.id] : null;
-                            const correctMatchIndex = question.correctMatches[item.id];
-                            const isMatchCorrect = matchedIndex === correctMatchIndex;
-                            return (
-                              <div key={itemIndex} className="flex items-center space-x-2">
+                        const matchedIndex = answer && typeof answer === 'object' ? answer[item.id] : null;
+                        const correctMatchIndex = question.correctMatches[item.id];
+                        const isMatchCorrect = matchedIndex === correctMatchIndex;
+                        return (
+                          <div key={itemIndex} className="flex items-center space-x-2">
                                 <div className="flex-1 p-3 rounded-lg border border-gray-200">
                                   {item.text}
                                 </div>
                                 <div className="flex items-center">
                                   <div className="w-6 h-0.5 bg-gray-300"></div>
-                                  {matchedIndex !== undefined ? (
-                                    isMatchCorrect ? (
-                                      <CheckCircle className="w-5 h-5 text-green-600" />
-                                    ) : (
-                                      <XCircle className="w-5 h-5 text-red-600" />
-                                    )
-                                  ) : (
-                                    <div className="w-5 h-5 rounded-full border border-gray-300"></div>
-                                  )}
+                                  {matchedIndex !== undefined ?
+                              isMatchCorrect ?
+                              <CheckCircle className="w-5 h-5 text-green-600" /> :
+
+                              <XCircle className="w-5 h-5 text-red-600" /> :
+
+
+                              <div className="w-5 h-5 rounded-full border border-gray-300"></div>
+                              }
                                   <div className="w-6 h-0.5 bg-gray-300"></div>
                                 </div>
                                 <div className="flex-1 p-3 rounded-lg border border-gray-200">
-                                  {matchedIndex !== undefined && question.items
-                                    ? question.items.find(i => i.id === matchedIndex)?.match || "Not matched"
-                                    : "Not matched"}
+                                  {matchedIndex !== undefined && question.items ?
+                              question.items.find((i) => i.id === matchedIndex)?.match || "Not matched" :
+                              "Not matched"}
                                 </div>
-                              </div>
-                            );
-                          })}
+                              </div>);
+
+                      })}
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">Correct Matches:</h4>
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">{t("pages.correct_matches")}</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            {question.items.map((item, itemIndex) => (
-                              <div key={itemIndex} className="flex items-center space-x-2">
+                            {question.items.map((item, itemIndex) =>
+                        <div key={itemIndex} className="flex items-center space-x-2">
                                 <div className="flex-1 p-2 rounded-lg bg-green-50 border border-green-200">
                                   {item.text}
                                 </div>
@@ -742,107 +743,107 @@ const TrainerSubmissionDetailPage = () => {
                                   {item.match}
                                 </div>
                               </div>
-                            ))}
+                        )}
                           </div>
                         </div>
                       </div>
-                    )}
+                  }
                     {/* Explanation if available */}
-                    {question.explanation && (
-                      <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
-                        <h4 className="text-sm font-medium text-blue-700 mb-1">Explanation:</h4>
+                    {question.explanation &&
+                  <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                        <h4 className="text-sm font-medium text-blue-700 mb-1">{t("components.explanation")}</h4>
                         <p className="text-sm text-blue-800">{question.explanation}</p>
                       </div>
-                    )}
+                  }
                     {/* Individual feedback if available */}
-                    {submission.answers && 
-                     submission.answers[index] && 
-                     submission.answers[index].feedback && (
-                      <div className="mt-4 p-3 rounded-lg bg-purple-50 border border-purple-200">
+                    {submission.answers &&
+                  submission.answers[index] &&
+                  submission.answers[index].feedback &&
+                  <div className="mt-4 p-3 rounded-lg bg-purple-50 border border-purple-200">
                         <h4 className="text-sm font-medium text-purple-700 mb-1">Feedback:</h4>
                         <p className="text-sm text-purple-800">{submission.answers[index].feedback}</p>
                       </div>
-                    )}
-                  </Card>
-                );
-              })}
-            </div>
-          ) : (
-            // Project submission
-            <div className="space-y-6">
+                  }
+                  </Card>);
+
+            })}
+            </div> :
+
+          // Project submission
+          <div className="space-y-6">
               {/* Project Submission Details */}
               <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Submission Details</h3>
-                {submission.submission_url && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Project URL</h4>
+                <h3 className="text-lg font-semibold mb-4">{t("pages.submission_details")}</h3>
+                {submission.submission_url &&
+              <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">{t("pages.project_url")}</h4>
                     <div className="p-3 rounded-lg border border-gray-200 bg-gray-50">
-                      <a 
-                        href={submission.submission_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
+                      <a
+                    href={submission.submission_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline">
+
                         {submission.submission_url}
                       </a>
                     </div>
                   </div>
-                )}
-                {submission.repository_url && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Repository URL</h4>
+              }
+                {submission.repository_url &&
+              <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">{t("pages.repository_url")}</h4>
                     <div className="p-3 rounded-lg border border-gray-200 bg-gray-50">
-                      <a 
-                        href={submission.repository_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
+                      <a
+                    href={submission.repository_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline">
+
                         {submission.repository_url}
                       </a>
                     </div>
                   </div>
-                )}
-                {submission.notes && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Student Notes</h4>
+              }
+                {submission.notes &&
+              <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">{t("pages.student_notes")}</h4>
                     <div className="p-3 rounded-lg border border-gray-200 bg-gray-50">
                       {submission.notes}
                     </div>
                   </div>
-                )}
+              }
               </Card>
               {/* Project Requirements */}
               <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Project Requirements</h3>
+                <h3 className="text-lg font-semibold mb-4">{t("pages.project_requirements")}</h3>
                 <div className="space-y-4">
                   {template.requirements?.map((requirement, index) => {
-                    const reqResult = submission.requirements_met?.find(r => r.requirement_id === requirement.id);
-                    const isMet = reqResult?.met || false;
-                    return (
-                      <div key={index} className={`p-4 rounded-lg border ${
-                        isMet 
-                          ? 'border-green-200 bg-green-50' 
-                          : reqResult 
-                            ? 'border-red-200 bg-red-50'
-                            : 'border-gray-200 bg-gray-50'
-                      }`}>
+                  const reqResult = submission.requirements_met?.find((r) => r.requirement_id === requirement.id);
+                  const isMet = reqResult?.met || false;
+                  return (
+                    <div key={index} className={`p-4 rounded-lg border ${
+                    isMet ?
+                    'border-green-200 bg-green-50' :
+                    reqResult ?
+                    'border-red-200 bg-red-50' :
+                    'border-gray-200 bg-gray-50'}`
+                    }>
                         <div className="flex justify-between items-start">
                           <div className="flex items-start">
                             <div className="pt-0.5">
-                              {isMet ? (
-                                <CheckCircle className="w-5 h-5 text-green-600" />
-                              ) : reqResult ? (
-                                <XCircle className="w-5 h-5 text-red-600" />
-                              ) : (
-                                <div className="w-5 h-5 rounded-full border border-gray-300"></div>
-                              )}
+                              {isMet ?
+                            <CheckCircle className="w-5 h-5 text-green-600" /> :
+                            reqResult ?
+                            <XCircle className="w-5 h-5 text-red-600" /> :
+
+                            <div className="w-5 h-5 rounded-full border border-gray-300"></div>
+                            }
                             </div>
                             <div className="ml-3">
                               <p className="font-medium">{requirement.description}</p>
-                              {reqResult?.feedback && (
-                                <p className="text-sm text-gray-600 mt-1">{reqResult.feedback}</p>
-                              )}
+                              {reqResult?.feedback &&
+                            <p className="text-sm text-gray-600 mt-1">{reqResult.feedback}</p>
+                            }
                             </div>
                           </div>
                           <div className="text-right">
@@ -851,22 +852,22 @@ const TrainerSubmissionDetailPage = () => {
                             </span>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      </div>);
+
+                })}
                 </div>
               </Card>
               {/* Rubric Scores */}
-              {template.rubric && submission.rubric_scores && (
-                <Card className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Rubric Evaluation</h3>
+              {template.rubric && submission.rubric_scores &&
+            <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">{t("pages.rubric_evaluation")}</h3>
                   <div className="space-y-6">
                     {Object.entries(template.rubric).map(([category, rubricData]) => {
-                      const score = submission.rubric_scores[category];
-                      if (!score) return null;
-                      const percentage = Math.round((score.points_earned / score.points_possible) * 100);
-                      return (
-                        <div key={category}>
+                  const score = submission.rubric_scores[category];
+                  if (!score) return null;
+                  const percentage = Math.round(score.points_earned / score.points_possible * 100);
+                  return (
+                    <div key={category}>
                           <div className="flex justify-between items-start mb-2">
                             <div>
                               <h4 className="text-md font-medium">{rubricData.description}</h4>
@@ -875,109 +876,109 @@ const TrainerSubmissionDetailPage = () => {
                               </p>
                             </div>
                             <Badge className={`${
-                              percentage >= 90 ? 'bg-green-100 text-green-800' :
-                              percentage >= 80 ? 'bg-blue-100 text-blue-800' :
-                              percentage >= 70 ? 'bg-yellow-100 text-yellow-800' :
-                              percentage >= 60 ? 'bg-orange-100 text-orange-800' :
-                              'bg-red-100 text-red-800'
-                            }`}>
+                        percentage >= 90 ? 'bg-green-100 text-green-800' :
+                        percentage >= 80 ? 'bg-blue-100 text-blue-800' :
+                        percentage >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                        percentage >= 60 ? 'bg-orange-100 text-orange-800' :
+                        'bg-red-100 text-red-800'}`
+                        }>
                               {percentage}%
                             </Badge>
                           </div>
-                          <Progress 
-                            value={percentage} 
-                            className={`h-2 bg-gray-200 mb-2 ${
-                              percentage >= 90 ? '[&>div]:bg-green-500' :
-                              percentage >= 80 ? '[&>div]:bg-blue-500' :
-                              percentage >= 70 ? '[&>div]:bg-yellow-500' :
-                              percentage >= 60 ? '[&>div]:bg-orange-500' :
-                              '[&>div]:bg-red-500'
-                            }`} 
-                          />
-                          {score.feedback && (
-                            <div className="p-3 rounded-lg bg-gray-50 text-sm mt-2">
+                          <Progress
+                        value={percentage}
+                        className={`h-2 bg-gray-200 mb-2 ${
+                        percentage >= 90 ? '[&>div]:bg-green-500' :
+                        percentage >= 80 ? '[&>div]:bg-blue-500' :
+                        percentage >= 70 ? '[&>div]:bg-yellow-500' :
+                        percentage >= 60 ? '[&>div]:bg-orange-500' :
+                        '[&>div]:bg-red-500'}`
+                        } />
+
+                          {score.feedback &&
+                      <div className="p-3 rounded-lg bg-gray-50 text-sm mt-2">
                               {score.feedback}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                      }
+                        </div>);
+
+                })}
                   </div>
                 </Card>
-              )}
+            }
             </div>
-          )}
+          }
         </Tabs.TabContent>
         {/* Feedback Tab */}
         <Tabs.TabContent value="feedback">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Grading Section */}
-            {submission.status !== 'graded' && (
-              <Card className="p-6">
+            {submission.status !== 'graded' &&
+            <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center">
-                  <Award className="w-5 h-5 mr-2 text-primary" />
-                  Grade Submission
-                </h3>
-                {isQuiz ? (
-                  <div className="text-gray-600 mb-4">
+                  <Award className="w-5 h-5 mr-2 text-primary" />{t("pages.grade_submission")}
+
+              </h3>
+                {isQuiz ?
+              <div className="text-gray-600 mb-4">
                     <p>This quiz has been auto-graded based on the provided answers.</p>
                     <p className="mt-2">You can review the auto-grading and provide feedback before finalizing the grade.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
+                  </div> :
+
+              <div className="space-y-4">
                     <div>
-                      <label htmlFor="score" className="block text-sm font-medium text-gray-700 mb-1">
-                        Score (out of 100)
-                      </label>
+                      <label htmlFor="score" className="block text-sm font-medium text-gray-700 mb-1">{t("pages.score_out_of_100")}
+
+                  </label>
                       <Input
-                        id="score"
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={manualScore}
-                        onChange={(e) => setManualScore(Number(e.target.value))}
-                        className="w-full"
-                      />
+                    id="score"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={manualScore}
+                    onChange={(e) => setManualScore(Number(e.target.value))}
+                    className="w-full" />
+
                     </div>
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <p className="font-medium">Score: {manualScore} / 100</p>
-                      <p className="text-sm text-gray-600">
-                        Percentage: {Math.round((manualScore / 100) * 100)}%
+                      <p className="text-sm text-gray-600">{t("pages.percentage")}
+                    {Math.round(manualScore / 100 * 100)}%
                       </p>
                       <p className="text-sm text-gray-600">
-                        Status: {Math.round((manualScore / 100) * 100) >= assessment.settings.passingScore ? 'Passed' : 'Failed'}
+                        Status: {Math.round(manualScore / 100 * 100) >= assessment.settings.passingScore ? 'Passed' : 'Failed'}
                       </p>
                     </div>
                   </div>
-                )}
+              }
                 <div className="mt-6">
-                  <Button 
-                    onClick={handleGradeSubmission}
-                    disabled={isSaving}
-                    className="w-full"
-                  >
-                    {isSaving ? (
-                      <>
+                  <Button
+                  onClick={handleGradeSubmission}
+                  disabled={isSaving}
+                  className="w-full">
+
+                    {isSaving ?
+                  <>
                         <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-current"></div>
                         Grading...
-                      </>
-                    ) : (
-                      'Grade and Provide Feedback'
-                    )}
+                      </> :
+
+                  'Grade and Provide Feedback'
+                  }
                   </Button>
                 </div>
               </Card>
-            )}
+            }
             {/* Feedback Section */}
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <MessageSquare className="w-5 h-5 mr-2 text-primary" />
-                Feedback
+                <MessageSquare className="w-5 h-5 mr-2 text-primary" />{t("pages.feedback")}
+
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="feedback" className="block text-sm font-medium text-gray-700 mb-1">
-                    General Feedback
+                  <label htmlFor="feedback" className="block text-sm font-medium text-gray-700 mb-1">{t("pages.general_feedback")}
+
                   </label>
                   <Textarea
                     id="feedback"
@@ -985,65 +986,65 @@ const TrainerSubmissionDetailPage = () => {
                     onChange={(e) => setFeedback(e.target.value)}
                     placeholder="Provide feedback on the overall submission..."
                     rows={6}
-                    className="w-full"
-                  />
+                    className="w-full" />
+
                 </div>
                 <div className="flex justify-end">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={handleSaveFeedback}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? (
-                      <>
+                    disabled={isSaving}>
+
+                    {isSaving ?
+                    <>
                         <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-current"></div>
                         Saving...
-                      </>
-                    ) : (
-                      'Save Feedback'
-                    )}
+                      </> :
+
+                    'Save Feedback'
+                    }
                   </Button>
                 </div>
               </div>
             </Card>
             {/* Previous Feedback */}
-            {submission.feedback && (
-              <Card className="p-6 lg:col-span-2">
-                <h3 className="text-lg font-semibold mb-4">Previous Feedback</h3>
+            {submission.feedback &&
+            <Card className="p-6 lg:col-span-2">
+                <h3 className="text-lg font-semibold mb-4">{t("pages.previous_feedback")}</h3>
                 <div className="space-y-4">
-                  {submission.feedback.general && (
-                    <div className="p-4 bg-blue-50 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">General Feedback</h4>
+                  {submission.feedback.general &&
+                <div className="p-4 bg-blue-50 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">{t("pages.general_feedback")}</h4>
                       <p className="text-gray-800">{submission.feedback.general}</p>
                     </div>
-                  )}
-                  {submission.feedback.strengths && submission.feedback.strengths.length > 0 && (
-                    <div className="p-4 bg-green-50 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Strengths</h4>
+                }
+                  {submission.feedback.strengths && submission.feedback.strengths.length > 0 &&
+                <div className="p-4 bg-green-50 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">{t("pages.strengths")}</h4>
                       <ul className="list-disc list-inside space-y-1">
-                        {submission.feedback.strengths.map((strength, index) => (
-                          <li key={index} className="text-gray-800">{strength}</li>
-                        ))}
+                        {submission.feedback.strengths.map((strength, index) =>
+                    <li key={index} className="text-gray-800">{strength}</li>
+                    )}
                       </ul>
                     </div>
-                  )}
-                  {submission.feedback.areas_for_improvement && submission.feedback.areas_for_improvement.length > 0 && (
-                    <div className="p-4 bg-amber-50 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Areas for Improvement</h4>
+                }
+                  {submission.feedback.areas_for_improvement && submission.feedback.areas_for_improvement.length > 0 &&
+                <div className="p-4 bg-amber-50 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">{t("components.areas_for_improvement")}</h4>
                       <ul className="list-disc list-inside space-y-1">
-                        {submission.feedback.areas_for_improvement.map((area, index) => (
-                          <li key={index} className="text-gray-800">{area}</li>
-                        ))}
+                        {submission.feedback.areas_for_improvement.map((area, index) =>
+                    <li key={index} className="text-gray-800">{area}</li>
+                    )}
                       </ul>
                     </div>
-                  )}
+                }
                 </div>
               </Card>
-            )}
+            }
           </div>
         </Tabs.TabContent>
       </Tabs>
-    </div>
-  );
+    </div>);
+
 };
 export default TrainerSubmissionDetailPage;

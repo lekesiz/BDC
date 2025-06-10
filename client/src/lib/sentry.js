@@ -1,8 +1,9 @@
+// TODO: i18n - processed
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 /**
  * Initialize Sentry for error tracking and performance monitoring
- */
+ */import { useTranslation } from "react-i18next";
 export function initSentry() {
   const environment = import.meta.env.MODE;
   const dsn = import.meta.env.VITE_SENTRY_DSN;
@@ -13,23 +14,23 @@ export function initSentry() {
     dsn,
     environment,
     integrations: [
-      new BrowserTracing({
-        // Set tracing origins to your frontend and backend
-        tracingOrigins: [
-          'localhost',
-          /^https:\/\/.*\.bdc\.com/,
-          /^http:\/\/localhost:\d+/
-        ],
-        // Performance Monitoring
-        routingInstrumentation: Sentry.reactRouterV6Instrumentation(
-          React.useEffect,
-          useLocation,
-          useNavigationType,
-          createRoutesFromChildren,
-          matchRoutes
-        ),
-      }),
-    ],
+    new BrowserTracing({
+      // Set tracing origins to your frontend and backend
+      tracingOrigins: [
+      'localhost',
+      /^https:\/\/.*\.bdc\.com/,
+      /^http:\/\/localhost:\d+/],
+
+      // Performance Monitoring
+      routingInstrumentation: Sentry.reactRouterV6Instrumentation(
+        React.useEffect,
+        useLocation,
+        useNavigationType,
+        createRoutesFromChildren,
+        matchRoutes
+      )
+    })],
+
     // Performance Monitoring
     tracesSampleRate: environment === 'production' ? 0.1 : 1.0,
     // Session Replay
@@ -47,8 +48,8 @@ export function initSentry() {
       if (event.exception) {
         const error = hint.originalException;
         // Filter out network errors that are expected
-        if (error?.message?.includes('Network request failed') && 
-            error?.message?.includes('/api/health')) {
+        if (error?.message?.includes('Network request failed') &&
+        error?.message?.includes('/api/health')) {
           return null;
         }
         // Filter out canceled requests
@@ -61,9 +62,9 @@ export function initSentry() {
     // Add user context
     initialScope: {
       tags: {
-        component: 'frontend',
-      },
-    },
+        component: 'frontend'
+      }
+    }
   });
 }
 /**
@@ -78,7 +79,7 @@ export function setSentryUser(user) {
     id: user.id,
     email: user.email,
     username: user.username,
-    role: user.role,
+    role: user.role
   });
 }
 /**
@@ -89,8 +90,8 @@ export function logToSentry(message, level = 'info', extra = {}) {
     level,
     extra,
     tags: {
-      manual: true,
-    },
+      manual: true
+    }
   });
 }
 /**
@@ -100,8 +101,8 @@ export function captureException(error, context = {}) {
   console.error('Error captured:', error);
   Sentry.captureException(error, {
     contexts: {
-      app: context,
-    },
+      app: context
+    }
   });
 }
 /**
@@ -119,6 +120,6 @@ export function addBreadcrumb(message, category = 'action', data = {}) {
     category,
     level: 'info',
     data,
-    timestamp: Date.now() / 1000,
+    timestamp: Date.now() / 1000
   });
 }

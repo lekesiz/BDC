@@ -1,4 +1,5 @@
-// Helper functions for frontend testing
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // Helper functions for frontend testing
 export const checkPageHealth = () => {
   const issues = [];
   // Check for React error boundaries
@@ -19,7 +20,7 @@ export const checkPageHealth = () => {
   }
   // Check for error messages
   const errorMessages = document.querySelectorAll('.text-red-600, .text-red-500, .bg-red-50');
-  errorMessages.forEach(el => {
+  errorMessages.forEach((el) => {
     const text = el.textContent.trim();
     if (text && text.length > 0 && !text.includes('Delete') && !text.includes('Remove')) {
       issues.push(`Error message: ${text.substring(0, 50)}...`);
@@ -50,22 +51,22 @@ export const checkPageHealth = () => {
 // Auto-navigate and test all pages
 export const runAutomatedTest = async () => {
   const pages = [
-    '/dashboard',
-    '/beneficiaries',
-    '/programs',
-    '/evaluations',
-    '/calendar',
-    '/documents',
-    '/messages',
-    '/analytics',
-    '/reports',
-    '/settings',
-    '/portal'
-  ];
+  '/dashboard',
+  '/beneficiaries',
+  '/programs',
+  '/evaluations',
+  '/calendar',
+  '/documents',
+  '/messages',
+  '/analytics',
+  '/reports',
+  '/settings',
+  '/portal'];
+
   const results = [];
   for (const page of pages) {
     window.location.href = page;
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     const health = checkPageHealth();
     results.push({
       page,

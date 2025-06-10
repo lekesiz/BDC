@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -15,12 +16,12 @@ import {
   Award,
   BookOpen,
   Target,
-  ChevronRight
-} from 'lucide-react';
-import EditProgramModal from '@/components/programs/EditProgramModal'
-import DeleteProgramModal from '@/components/programs/DeleteProgramModal'
-import { useSocket } from '@/contexts/SocketContext'
-const ProgramDetailPage = () => {
+  ChevronRight } from
+'lucide-react';
+import EditProgramModal from '@/components/programs/EditProgramModal';
+import DeleteProgramModal from '@/components/programs/DeleteProgramModal';
+import { useSocket } from '@/contexts/SocketContext';import { useTranslation } from "react-i18next";
+const ProgramDetailPage = () => {const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -120,23 +121,23 @@ const ProgramDetailPage = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>);
+
   }
   if (!program) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Program not found</p>
+        <p className="text-gray-500">{t("components.program_not_found")}</p>
         <Button
           variant="outline"
           className="mt-4"
-          onClick={() => navigate('/programs')}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Programs
+          onClick={() => navigate('/programs')}>
+
+          <ArrowLeft className="h-4 w-4 mr-2" />{t("pages.back_to_programs")}
+
         </Button>
-      </div>
-    );
+      </div>);
+
   }
   return (
     <div className="space-y-6">
@@ -145,47 +146,47 @@ const ProgramDetailPage = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/programs')}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            onClick={() => navigate('/programs')}>
+
+            <ArrowLeft className="h-4 w-4 mr-2" />{t("components.back")}
+
           </Button>
           <h1 className="text-2xl font-bold text-gray-900">{program.name}</h1>
           <Badge className={getStatusColor(program.status)}>
             {program.status}
           </Badge>
         </div>
-        {(user.role === 'super_admin' || user.role === 'tenant_admin') && (
-          <div className="flex gap-3">
+        {(user.role === 'super_admin' || user.role === 'tenant_admin') &&
+        <div className="flex gap-3">
             <EditProgramModal program={program} onUpdated={fetchProgramDetails} />
             <DeleteProgramModal programId={program.id} onDeleted={() => navigate('/programs')} />
           </div>
-        )}
+        }
       </div>
       {/* Overview Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6 md:col-span-2">
-          <h2 className="text-lg font-semibold mb-4">Program Overview</h2>
+          <h2 className="text-lg font-semibold mb-4">{t("pages.program_overview")}</h2>
           <p className="text-gray-600 mb-6">{program.description}</p>
           <div className="space-y-4">
             <div>
               <h3 className="font-medium text-gray-900 mb-2 flex items-center">
-                <Target className="h-4 w-4 mr-2" />
-                Learning Objectives
+                <Target className="h-4 w-4 mr-2" />{t("components.learning_objectives")}
+
               </h3>
               <p className="text-gray-600">{program.objectives || 'No objectives specified'}</p>
             </div>
             <div>
               <h3 className="font-medium text-gray-900 mb-2 flex items-center">
-                <BookOpen className="h-4 w-4 mr-2" />
-                Prerequisites
+                <BookOpen className="h-4 w-4 mr-2" />{t("components.prerequisites")}
+
               </h3>
               <p className="text-gray-600">{program.requirements || 'No prerequisites'}</p>
             </div>
           </div>
         </Card>
         <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Program Details</h2>
+          <h2 className="text-lg font-semibold mb-4">{t("pages.program_details")}</h2>
           <div className="space-y-3">
             <div className="flex items-center text-gray-600">
               <Award className="h-4 w-4 mr-2" />
@@ -204,32 +205,32 @@ const ProgramDetailPage = () => {
             </div>
             <div className="flex items-center text-gray-600">
               <Users className="h-4 w-4 mr-2" />
-              <span className="font-medium">Max Participants:</span>
+              <span className="font-medium">{t("pages.max_participants")}</span>
               <span className="ml-2">{program.max_participants}</span>
             </div>
-            {program.price > 0 && (
-              <div className="flex items-center text-gray-600">
+            {program.price > 0 &&
+            <div className="flex items-center text-gray-600">
                 <span className="font-medium">Price:</span>
                 <span className="ml-2">{program.price} {program.currency}</span>
               </div>
-            )}
+            }
           </div>
         </Card>
       </div>
       {/* Modules Section */}
-      {program.modules && program.modules.length > 0 && (
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Program Modules</h2>
+      {program.modules && program.modules.length > 0 &&
+      <Card className="p-6">
+          <h2 className="text-lg font-semibold mb-4">{t("pages.program_modules")}</h2>
           <div className="space-y-3">
-            {program.modules.map((module, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+            {program.modules.map((module, index) =>
+          <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
                 <div>
-                  <h3 className="font-medium text-gray-900">
-                    Module {index + 1}: {module.name}
+                  <h3 className="font-medium text-gray-900">{t("pages.module")}
+                {index + 1}: {module.name}
                   </h3>
-                  {module.description && (
-                    <p className="text-sm text-gray-600 mt-1">{module.description}</p>
-                  )}
+                  {module.description &&
+              <p className="text-sm text-gray-600 mt-1">{module.description}</p>
+              }
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="text-sm text-gray-500">
@@ -238,26 +239,26 @@ const ProgramDetailPage = () => {
                   <ChevronRight className="h-4 w-4 text-gray-400" />
                 </div>
               </div>
-            ))}
+          )}
           </div>
         </Card>
-      )}
+      }
       {/* Enrolled Students */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Enrolled Students ({enrolledStudents.length})</h2>
-          {(user.role === 'super_admin' || user.role === 'tenant_admin' || user.role === 'trainer') && (
-            <Button onClick={() => navigate(`/programs/${id}/beneficiaries`)}>
-              Manage Students
-            </Button>
-          )}
+          <h2 className="text-lg font-semibold">{t("pages.enrolled_students_")}{enrolledStudents.length})</h2>
+          {(user.role === 'super_admin' || user.role === 'tenant_admin' || user.role === 'trainer') &&
+          <Button onClick={() => navigate(`/programs/${id}/beneficiaries`)}>{t("pages.manage_students")}
+
+          </Button>
+          }
         </div>
-        {enrolledStudents.length === 0 ? (
-          <p className="text-gray-500">No students enrolled yet</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {enrolledStudents.slice(0, 6).map((student) => (
-              <div key={student.id} className="flex items-center gap-3 p-3 border rounded-lg">
+        {enrolledStudents.length === 0 ?
+        <p className="text-gray-500">{t("pages.no_students_enrolled_yet")}</p> :
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {enrolledStudents.slice(0, 6).map((student) =>
+          <div key={student.id} className="flex items-center gap-3 p-3 border rounded-lg">
                 <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-medium">
                   {student.full_name?.charAt(0).toUpperCase()}
                 </div>
@@ -266,31 +267,31 @@ const ProgramDetailPage = () => {
                   <p className="text-sm text-gray-500">{student.email}</p>
                 </div>
               </div>
-            ))}
+          )}
           </div>
-        )}
-        {enrolledStudents.length > 6 && (
-          <p className="text-sm text-gray-500 mt-4">
-            And {enrolledStudents.length - 6} more students...
-          </p>
-        )}
+        }
+        {enrolledStudents.length > 6 &&
+        <p className="text-sm text-gray-500 mt-4">{t("pages.and")}
+          {enrolledStudents.length - 6}{t("pages.more_students")}
+        </p>
+        }
       </Card>
       {/* Upcoming Sessions */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Upcoming Sessions</h2>
-          {(user.role === 'super_admin' || user.role === 'tenant_admin' || user.role === 'trainer') && (
-            <Button onClick={() => navigate(`/programs/${id}/schedule`)}>
-              Manage Schedule
-            </Button>
-          )}
+          <h2 className="text-lg font-semibold">{t("components.upcoming_sessions")}</h2>
+          {(user.role === 'super_admin' || user.role === 'tenant_admin' || user.role === 'trainer') &&
+          <Button onClick={() => navigate(`/programs/${id}/schedule`)}>{t("pages.manage_schedule")}
+
+          </Button>
+          }
         </div>
-        {sessions.length === 0 ? (
-          <p className="text-gray-500">No sessions scheduled</p>
-        ) : (
-          <div className="space-y-3">
-            {sessions.slice(0, 5).map((session) => (
-              <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg">
+        {sessions.length === 0 ?
+        <p className="text-gray-500">{t("pages.no_sessions_scheduled")}</p> :
+
+        <div className="space-y-3">
+            {sessions.slice(0, 5).map((session) =>
+          <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h3 className="font-medium text-gray-900">{session.title}</h3>
                   <p className="text-sm text-gray-600">
@@ -300,11 +301,11 @@ const ProgramDetailPage = () => {
                 </div>
                 <Badge variant="outline">{session.type}</Badge>
               </div>
-            ))}
+          )}
           </div>
-        )}
+        }
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 export default ProgramDetailPage;

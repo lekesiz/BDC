@@ -1,9 +1,10 @@
-import { 
-  generateProgramsData, 
-  generateProgramResources, 
+// TODO: i18n - processed
+import {
+  generateProgramsData,
+  generateProgramResources,
   generateProgramSchedule,
-  generateProgramStats 
-} from './mockProgramsData';
+  generateProgramStats } from
+'./mockProgramsData';import { useTranslation } from "react-i18next";
 export const setupProgramsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -12,7 +13,7 @@ export const setupProgramsMockApi = (api, originalGet, originalPost, originalPut
     delete: originalDelete || api.delete.bind(api)
   };
   // Programs list endpoint
-  api.get = function(url, ...args) {
+  api.get = function (url, ...args) {
     if (url === '/api/programs' || url.startsWith('/api/programs?')) {
       const userRole = localStorage.getItem('userRole') || 'student';
       const programsData = generateProgramsData(userRole);
@@ -24,20 +25,20 @@ export const setupProgramsMockApi = (api, originalGet, originalPost, originalPut
       let programs = programsData.allPrograms || programsData.availablePrograms || [];
       // Filter by category
       if (category) {
-        programs = programs.filter(p => 
-          p.categories.includes(category)
+        programs = programs.filter((p) =>
+        p.categories.includes(category)
         );
       }
       // Filter by status
       if (status) {
-        programs = programs.filter(p => p.status === status);
+        programs = programs.filter((p) => p.status === status);
       }
       // Search filter
       if (search) {
         const searchLower = search.toLowerCase();
-        programs = programs.filter(p => 
-          p.title.toLowerCase().includes(searchLower) ||
-          p.description.toLowerCase().includes(searchLower)
+        programs = programs.filter((p) =>
+        p.title.toLowerCase().includes(searchLower) ||
+        p.description.toLowerCase().includes(searchLower)
         );
       }
       return Promise.resolve({
@@ -76,7 +77,7 @@ export const setupProgramsMockApi = (api, originalGet, originalPost, originalPut
       const userRole = localStorage.getItem('userRole') || 'student';
       const programsData = generateProgramsData(userRole);
       const allPrograms = programsData.allPrograms || programsData.availablePrograms || [];
-      const program = allPrograms.find(p => p.id === programId);
+      const program = allPrograms.find((p) => p.id === programId);
       if (program) {
         return Promise.resolve({
           status: 200,
@@ -95,7 +96,7 @@ export const setupProgramsMockApi = (api, originalGet, originalPost, originalPut
       const userRole = localStorage.getItem('userRole') || 'student';
       const programsData = generateProgramsData(userRole);
       const allPrograms = programsData.allPrograms || programsData.availablePrograms || [];
-      const program = allPrograms.find(p => p.id === programId);
+      const program = allPrograms.find((p) => p.id === programId);
       if (program) {
         return Promise.resolve({
           status: 200,
@@ -135,12 +136,12 @@ export const setupProgramsMockApi = (api, originalGet, originalPost, originalPut
     // Program students endpoint
     if (url.match(/^\/api\/programs\/\d+\/students$/)) {
       const students = [
-        { id: 1, name: "John Doe", progress: 75, lastActive: "2024-01-21" },
-        { id: 2, name: "Jane Smith", progress: 82, lastActive: "2024-01-22" },
-        { id: 3, name: "Mike Johnson", progress: 68, lastActive: "2024-01-20" },
-        { id: 4, name: "Sarah Williams", progress: 90, lastActive: "2024-01-22" },
-        { id: 5, name: "David Brown", progress: 45, lastActive: "2024-01-19" }
-      ];
+      { id: 1, name: "John Doe", progress: 75, lastActive: "2024-01-21" },
+      { id: 2, name: "Jane Smith", progress: 82, lastActive: "2024-01-22" },
+      { id: 3, name: "Mike Johnson", progress: 68, lastActive: "2024-01-20" },
+      { id: 4, name: "Sarah Williams", progress: 90, lastActive: "2024-01-22" },
+      { id: 5, name: "David Brown", progress: 45, lastActive: "2024-01-19" }];
+
       return Promise.resolve({
         status: 200,
         data: {
@@ -152,15 +153,15 @@ export const setupProgramsMockApi = (api, originalGet, originalPost, originalPut
     // Program categories endpoint
     if (url === '/api/programs/categories') {
       const categories = [
-        { id: 1, name: "Web Development", count: 12 },
-        { id: 2, name: "Data Science", count: 8 },
-        { id: 3, name: "Mobile Development", count: 6 },
-        { id: 4, name: "UI/UX Design", count: 5 },
-        { id: 5, name: "DevOps", count: 4 },
-        { id: 6, name: "Cybersecurity", count: 3 },
-        { id: 7, name: "Machine Learning", count: 7 },
-        { id: 8, name: "Cloud Computing", count: 5 }
-      ];
+      { id: 1, name: "Web Development", count: 12 },
+      { id: 2, name: "Data Science", count: 8 },
+      { id: 3, name: "Mobile Development", count: 6 },
+      { id: 4, name: "UI/UX Design", count: 5 },
+      { id: 5, name: "DevOps", count: 4 },
+      { id: 6, name: "Cybersecurity", count: 3 },
+      { id: 7, name: "Machine Learning", count: 7 },
+      { id: 8, name: "Cloud Computing", count: 5 }];
+
       return Promise.resolve({
         status: 200,
         data: {
@@ -172,7 +173,7 @@ export const setupProgramsMockApi = (api, originalGet, originalPost, originalPut
     return originalFunctions.get.call(api, url, ...args);
   };
   // Create program endpoint
-  api.post = function(url, data, ...args) {
+  api.post = function (url, data, ...args) {
     if (url === '/api/programs') {
       const newProgram = {
         id: Date.now(),
@@ -229,7 +230,7 @@ export const setupProgramsMockApi = (api, originalGet, originalPost, originalPut
     return originalFunctions.post.call(api, url, data, ...args);
   };
   // Update program endpoint
-  api.put = function(url, data, ...args) {
+  api.put = function (url, data, ...args) {
     if (url.match(/^\/api\/programs\/\d+$/)) {
       const programId = parseInt(url.split('/').pop());
       const updatedProgram = {
@@ -269,7 +270,7 @@ export const setupProgramsMockApi = (api, originalGet, originalPost, originalPut
     return originalFunctions.put.call(api, url, data, ...args);
   };
   // Delete program endpoint
-  api.delete = function(url, ...args) {
+  api.delete = function (url, ...args) {
     if (url.match(/^\/api\/programs\/\d+$/)) {
       return Promise.resolve({
         status: 200,

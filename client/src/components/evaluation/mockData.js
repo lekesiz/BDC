@@ -1,19 +1,20 @@
+// TODO: i18n - processed
 import { EVALUATION_STATUS, QUESTION_TYPES } from '@/lib/constants';
-import { 
-  mockAnalysisData, 
-  getMockAnalysis, 
+import {
+  mockAnalysisData,
+  getMockAnalysis,
   generateMockAnalysis,
   updateMockAnalysisStatus,
-  updateMockTrainerFeedback 
-} from './mockAnalysisData';
+  updateMockTrainerFeedback } from
+'./mockAnalysisData';
 import {
   mockTrainerEvaluations,
   fetchMockTrainerEvaluations,
   fetchMockTrainerEvaluation,
   createMockTrainerEvaluation,
   shareMockTrainerEvaluation,
-  downloadMockTrainerEvaluationPDF
-} from './mockTrainerEvaluationsData';
+  downloadMockTrainerEvaluationPDF } from
+'./mockTrainerEvaluationsData';
 import {
   mockAppointments,
   fetchMockAppointments,
@@ -25,140 +26,140 @@ import {
   fetchMockAvailability,
   updateMockAvailability,
   fetchMockGoogleCalendarSync,
-  updateMockGoogleCalendarSync
-} from '../appointment/mockAppointmentsData';
+  updateMockGoogleCalendarSync } from
+'../appointment/mockAppointmentsData';
 // Sample evaluations data for development and testing
-export const mockEvaluations = [
+import { useTranslation } from "react-i18next";export const mockEvaluations = [
+{
+  id: 1,
+  title: 'Communication Skills Assessment',
+  description: 'A comprehensive test to evaluate verbal and written communication skills.',
+  instructions: 'Answer all questions to the best of your ability. There is no time limit for this test.',
+  passing_score: 70,
+  time_limit: 0,
+  skills: ['Communication', 'Leadership'],
+  status: EVALUATION_STATUS.ACTIVE,
+  questions: [
   {
     id: 1,
-    title: 'Communication Skills Assessment',
-    description: 'A comprehensive test to evaluate verbal and written communication skills.',
-    instructions: 'Answer all questions to the best of your ability. There is no time limit for this test.',
-    passing_score: 70,
-    time_limit: 0,
-    skills: ['Communication', 'Leadership'],
-    status: EVALUATION_STATUS.ACTIVE,
-    questions: [
-      {
-        id: 1,
-        question_text: 'Which of the following is most important for effective communication?',
-        question_type: QUESTION_TYPES.MULTIPLE_CHOICE,
-        points: 2,
-        options: [
-          { text: 'Speaking loudly', is_correct: false },
-          { text: 'Using complex vocabulary', is_correct: false },
-          { text: 'Active listening', is_correct: true },
-          { text: 'Quick responses', is_correct: false },
-        ],
-      },
-      {
-        id: 2,
-        question_text: 'True or False: Non-verbal cues are less important than verbal communication.',
-        question_type: QUESTION_TYPES.TRUE_FALSE,
-        points: 1,
-        options: [
-          { text: 'True', is_correct: false },
-          { text: 'False', is_correct: true },
-        ],
-      },
-    ],
+    question_text: 'Which of the following is most important for effective communication?',
+    question_type: QUESTION_TYPES.MULTIPLE_CHOICE,
+    points: 2,
+    options: [
+    { text: 'Speaking loudly', is_correct: false },
+    { text: 'Using complex vocabulary', is_correct: false },
+    { text: 'Active listening', is_correct: true },
+    { text: 'Quick responses', is_correct: false }]
+
   },
   {
     id: 2,
-    title: 'Problem Solving Abilities',
-    description: 'This test evaluates your critical thinking and problem-solving strategies.',
-    instructions: 'Read each scenario carefully before selecting your answer. You have 45 minutes to complete this test.',
-    passing_score: 75,
-    time_limit: 45,
-    skills: ['Problem Solving', 'Critical Thinking'],
-    status: EVALUATION_STATUS.DRAFT,
-    questions: [
-      {
-        id: 3,
-        question_text: 'A team is consistently missing deadlines. What should be the first step in addressing this issue?',
-        question_type: QUESTION_TYPES.MULTIPLE_CHOICE,
-        points: 2,
-        options: [
-          { text: 'Replace team members', is_correct: false },
-          { text: 'Extend all future deadlines', is_correct: false },
-          { text: 'Identify the root causes of delays', is_correct: true },
-          { text: 'Implement stricter oversight', is_correct: false },
-        ],
-      },
-    ],
-  },
+    question_text: 'True or False: Non-verbal cues are less important than verbal communication.',
+    question_type: QUESTION_TYPES.TRUE_FALSE,
+    points: 1,
+    options: [
+    { text: 'True', is_correct: false },
+    { text: 'False', is_correct: true }]
+
+  }]
+
+},
+{
+  id: 2,
+  title: 'Problem Solving Abilities',
+  description: 'This test evaluates your critical thinking and problem-solving strategies.',
+  instructions: 'Read each scenario carefully before selecting your answer. You have 45 minutes to complete this test.',
+  passing_score: 75,
+  time_limit: 45,
+  skills: ['Problem Solving', 'Critical Thinking'],
+  status: EVALUATION_STATUS.DRAFT,
+  questions: [
   {
     id: 3,
-    title: 'Technical Skills Assessment',
-    description: 'Evaluation of fundamental technical skills required for the position.',
-    instructions: 'This test includes multiple-choice questions and practical exercises. Complete all sections.',
-    passing_score: 80,
-    time_limit: 60,
-    skills: ['Technical Skills', 'Problem Solving'],
-    status: EVALUATION_STATUS.ARCHIVED,
-    questions: [
-      {
-        id: 4,
-        question_text: 'Match the following technologies with their primary uses:',
-        question_type: QUESTION_TYPES.MATCHING,
-        points: 3,
-        matches: [
-          { left: 'JavaScript', right: 'Web interactivity' },
-          { left: 'SQL', right: 'Database management' },
-          { left: 'Python', right: 'Data analysis' },
-          { left: 'HTML', right: 'Web structure' },
-        ],
-      },
-    ],
-  },
-];
+    question_text: 'A team is consistently missing deadlines. What should be the first step in addressing this issue?',
+    question_type: QUESTION_TYPES.MULTIPLE_CHOICE,
+    points: 2,
+    options: [
+    { text: 'Replace team members', is_correct: false },
+    { text: 'Extend all future deadlines', is_correct: false },
+    { text: 'Identify the root causes of delays', is_correct: true },
+    { text: 'Implement stricter oversight', is_correct: false }]
+
+  }]
+
+},
+{
+  id: 3,
+  title: 'Technical Skills Assessment',
+  description: 'Evaluation of fundamental technical skills required for the position.',
+  instructions: 'This test includes multiple-choice questions and practical exercises. Complete all sections.',
+  passing_score: 80,
+  time_limit: 60,
+  skills: ['Technical Skills', 'Problem Solving'],
+  status: EVALUATION_STATUS.ARCHIVED,
+  questions: [
+  {
+    id: 4,
+    question_text: 'Match the following technologies with their primary uses:',
+    question_type: QUESTION_TYPES.MATCHING,
+    points: 3,
+    matches: [
+    { left: 'JavaScript', right: 'Web interactivity' },
+    { left: 'SQL', right: 'Database management' },
+    { left: 'Python', right: 'Data analysis' },
+    { left: 'HTML', right: 'Web structure' }]
+
+  }]
+
+}];
+
 // Mock data for test sessions
 export const mockSessions = [
+{
+  id: 1,
+  test_id: 1,
+  user_id: 1,
+  started_at: '2023-06-15T14:30:00Z',
+  completed_at: '2023-06-15T15:15:00Z',
+  status: 'completed',
+  score: 85,
+  responses: [
   {
-    id: 1,
-    test_id: 1,
-    user_id: 1,
-    started_at: '2023-06-15T14:30:00Z',
-    completed_at: '2023-06-15T15:15:00Z',
-    status: 'completed',
-    score: 85,
-    responses: [
-      {
-        question_id: 1,
-        response_data: 2, // Index of selected option
-        is_correct: true,
-        points: 2,
-        explanation: 'Active listening is essential for effective communication as it ensures that the message is properly understood and the speaker feels heard and valued.',
-      },
-      {
-        question_id: 2,
-        response_data: false, // False selected
-        is_correct: true,
-        points: 1,
-        explanation: 'Non-verbal cues such as body language, facial expressions, and tone of voice are crucial components of effective communication and often convey more meaning than words alone.',
-      },
-    ],
-  }
-];
+    question_id: 1,
+    response_data: 2, // Index of selected option
+    is_correct: true,
+    points: 2,
+    explanation: 'Active listening is essential for effective communication as it ensures that the message is properly understood and the speaker feels heard and valued.'
+  },
+  {
+    question_id: 2,
+    response_data: false, // False selected
+    is_correct: true,
+    points: 1,
+    explanation: 'Non-verbal cues such as body language, facial expressions, and tone of voice are crucial components of effective communication and often convey more meaning than words alone.'
+  }]
+
+}];
+
 // Mock feedback data
 export const mockFeedback = {
   overall_assessment: 'You demonstrated good communication skills with particular strength in understanding the importance of active listening. Your responses indicate a solid grasp of both verbal and non-verbal communication principles.',
   strengths: [
-    'Strong understanding of active listening as a key component of effective communication',
-    'Good recognition of the importance of non-verbal cues in communication',
-  ],
+  'Strong understanding of active listening as a key component of effective communication',
+  'Good recognition of the importance of non-verbal cues in communication'],
+
   areas_for_improvement: [
-    'Further development in understanding complex communication scenarios',
-    'More practice in distinguishing between different communication strategies',
-  ],
+  'Further development in understanding complex communication scenarios',
+  'More practice in distinguishing between different communication strategies'],
+
   recommendations: [
-    'Practice active listening techniques in daily conversations',
-    'Observe and analyze non-verbal cues in professional settings',
-    'Consider taking the advanced communication course for more in-depth learning',
-  ],
+  'Practice active listening techniques in daily conversations',
+  'Observe and analyze non-verbal cues in professional settings',
+  'Consider taking the advanced communication course for more in-depth learning'],
+
   skill_feedback: {
     'Communication': 'Your communication skills are above average. You understand core concepts but could benefit from practical application.',
-    'Leadership': 'Your leadership communication shows promise. Focus on developing more advanced techniques for team communication.',
+    'Leadership': 'Your leadership communication shows promise. Focus on developing more advanced techniques for team communication.'
   }
 };
 // Mock API responses
@@ -171,20 +172,20 @@ export const mockApiResponses = {
         total: mockEvaluations.length,
         page: 1,
         per_page: 10
-      },
+      }
     };
   },
   getEvaluation: (id) => {
-    const evaluation = mockEvaluations.find(e => e.id === parseInt(id));
+    const evaluation = mockEvaluations.find((e) => e.id === parseInt(id));
     if (evaluation) {
       return {
         status: 200,
-        data: evaluation,
+        data: evaluation
       };
     }
     return {
       status: 404,
-      data: { message: 'Evaluation not found' },
+      data: { message: 'Evaluation not found' }
     };
   },
   createEvaluation: (data) => {
@@ -194,52 +195,52 @@ export const mockApiResponses = {
       data: {
         ...data,
         id: mockEvaluations.length + 1,
-        created_at: new Date().toISOString(),
-      },
+        created_at: new Date().toISOString()
+      }
     };
   },
   updateEvaluation: (id, data) => {
-    const evaluation = mockEvaluations.find(e => e.id === parseInt(id));
+    const evaluation = mockEvaluations.find((e) => e.id === parseInt(id));
     if (evaluation) {
       return {
         status: 200,
         data: {
           ...evaluation,
           ...data,
-          updated_at: new Date().toISOString(),
-        },
+          updated_at: new Date().toISOString()
+        }
       };
     }
     return {
       status: 404,
-      data: { message: 'Evaluation not found' },
+      data: { message: 'Evaluation not found' }
     };
   },
   deleteEvaluation: (id) => {
-    const evaluation = mockEvaluations.find(e => e.id === parseInt(id));
+    const evaluation = mockEvaluations.find((e) => e.id === parseInt(id));
     if (evaluation) {
       return {
         status: 204,
-        data: null,
+        data: null
       };
     }
     return {
       status: 404,
-      data: { message: 'Evaluation not found' },
+      data: { message: 'Evaluation not found' }
     };
   },
   // Session API responses
   getSession: (id) => {
-    const session = mockSessions.find(s => s.id === parseInt(id));
+    const session = mockSessions.find((s) => s.id === parseInt(id));
     if (session) {
       return {
         status: 200,
-        data: session,
+        data: session
       };
     }
     return {
       status: 404,
-      data: { message: 'Session not found' },
+      data: { message: 'Session not found' }
     };
   },
   createSession: (data) => {
@@ -249,17 +250,17 @@ export const mockApiResponses = {
         ...data,
         id: mockSessions.length + 1,
         status: 'completed',
-        score: 85, // Mock score
-      },
+        score: 85 // Mock score
+      }
     };
   },
   getFeedback: (id) => {
     // In a real app, this would retrieve feedback specific to the session
     return {
       status: 200,
-      data: mockFeedback,
+      data: mockFeedback
     };
-  },
+  }
 };
 // This function can be used to intercept API calls during development
 export const setupMockApi = (api) => {
@@ -269,7 +270,7 @@ export const setupMockApi = (api) => {
   const originalPut = api.put;
   const originalDelete = api.delete;
   // Mock API endpoints
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     // Evaluations list
     if (url === '/api/evaluations') {
       return Promise.resolve(mockApiResponses.getEvaluations());
@@ -278,7 +279,7 @@ export const setupMockApi = (api) => {
     if (url.includes('/analysis/report')) {
       return Promise.resolve({
         status: 200,
-        data: new Blob(['Mock Analysis PDF content'], { type: 'application/pdf' }),
+        data: new Blob(['Mock Analysis PDF content'], { type: 'application/pdf' })
       });
     }
     // Appointments list
@@ -332,7 +333,7 @@ export const setupMockApi = (api) => {
     if (url.includes('/certificate') || url.includes('/report')) {
       return Promise.resolve({
         status: 200,
-        data: new Blob(['Mock PDF content'], { type: 'application/pdf' }),
+        data: new Blob(['Mock PDF content'], { type: 'application/pdf' })
       });
     }
     // Evaluation session
@@ -348,7 +349,7 @@ export const setupMockApi = (api) => {
     // Fallback to original implementation
     return originalGet.call(this, url, config);
   };
-  api.post = function(url, data, config) {
+  api.post = function (url, data, config) {
     // Create appointment
     if (url === '/api/appointments') {
       return Promise.resolve(createMockAppointment(data));
@@ -383,7 +384,7 @@ export const setupMockApi = (api) => {
     // Fallback to original implementation
     return originalPost.call(this, url, data, config);
   };
-  api.put = function(url, data, config) {
+  api.put = function (url, data, config) {
     // Update appointment
     const updateAppointmentMatch = url.match(/\/api\/appointments\/(\d+)/);
     if (updateAppointmentMatch) {
@@ -427,7 +428,7 @@ export const setupMockApi = (api) => {
     // Fallback to original implementation
     return originalPut.call(this, url, data, config);
   };
-  api.delete = function(url, config) {
+  api.delete = function (url, config) {
     // Delete appointment
     const deleteAppointmentMatch = url.match(/\/api\/appointments\/(\d+)/);
     if (deleteAppointmentMatch) {

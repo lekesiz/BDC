@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -11,17 +12,17 @@ import { cn } from '@/lib/utils';
  * @param {string} props.placeholder - Placeholder text
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Select component
- */
-export const Select = React.forwardRef(({ 
+ */import { useTranslation } from "react-i18next";
+export const Select = React.forwardRef(({
   options = [],
   value,
   onValueChange,
   placeholder = 'Select an option',
   className,
-  ...props 
+  ...props
 }, ref) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const selectedOption = options.find(opt => opt.value === value);
+  const selectedOption = options.find((opt) => opt.value === value);
   return (
     <div className="relative" ref={ref}>
       <button
@@ -34,36 +35,36 @@ export const Select = React.forwardRef(({
           "disabled:cursor-not-allowed disabled:opacity-50",
           className
         )}
-        {...props}
-      >
+        {...props}>
+
         <span className={!selectedOption ? 'text-muted-foreground' : ''}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <ChevronDown className="h-4 w-4 opacity-50" />
       </button>
-      {isOpen && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border bg-background shadow-lg">
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => {
-                onValueChange(option.value);
-                setIsOpen(false);
-              }}
-              className={cn(
-                "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
-                "hover:bg-accent hover:text-accent-foreground",
-                value === option.value && "bg-accent text-accent-foreground"
-              )}
-            >
+      {isOpen &&
+      <div className="absolute z-50 mt-1 w-full rounded-md border bg-background shadow-lg">
+          {options.map((option) =>
+        <button
+          key={option.value}
+          type="button"
+          onClick={() => {
+            onValueChange(option.value);
+            setIsOpen(false);
+          }}
+          className={cn(
+            "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+            "hover:bg-accent hover:text-accent-foreground",
+            value === option.value && "bg-accent text-accent-foreground"
+          )}>
+
               {option.label}
             </button>
-          ))}
+        )}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 });
 Select.displayName = "Select";
 export default Select;

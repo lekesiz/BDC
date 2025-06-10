@@ -1,10 +1,11 @@
+// TODO: i18n - processed
 import axios from 'axios';
-import { setupMockApi } from '@/lib/setupMockApi';
+import { setupMockApi } from '@/lib/setupMockApi';import { useTranslation } from "react-i18next";
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: {
-    'Content-Type': 'application/json',
-  },
+    'Content-Type': 'application/json'
+  }
   // withCredentials: true, // Temporarily disabled for testing
 });
 // NOTE: Auth interceptors are handled by AuthContext.jsx

@@ -1,4 +1,5 @@
-export const setupAISettingsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next";export const setupAISettingsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
     post: originalPost || api.post.bind(api),
@@ -45,7 +46,7 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
     }
   };
   // Intercept GET requests
-  api.get = function(url, ...args) {
+  api.get = function (url, ...args) {
     // Get AI settings
     if (url === '/api/settings/ai') {
       return Promise.resolve({
@@ -57,7 +58,7 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
     return originalFunctions.get.call(this, url, ...args);
   };
   // Intercept PUT requests
-  api.put = function(url, data, ...args) {
+  api.put = function (url, data, ...args) {
     // Update AI settings
     if (url === '/api/settings/ai') {
       // Update mock data
@@ -82,7 +83,7 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
     return originalFunctions.put.call(this, url, data, ...args);
   };
   // Intercept POST requests
-  api.post = function(url, data, ...args) {
+  api.post = function (url, data, ...args) {
     // Test AI provider connection
     if (url === '/api/settings/ai/test') {
       const { provider, config } = data;
@@ -107,11 +108,11 @@ export const setupAISettingsMockApi = (api, originalGet, originalPost, originalP
             message: `Successfully connected to ${provider}`,
             details: {
               model: config.model,
-              available_models: provider === 'openai' 
-                ? ['gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo']
-                : provider === 'anthropic'
-                ? ['claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku']
-                : ['gemini-pro', 'gemini-pro-vision']
+              available_models: provider === 'openai' ?
+              ['gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo'] :
+              provider === 'anthropic' ?
+              ['claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku'] :
+              ['gemini-pro', 'gemini-pro-vision']
             }
           }
         });

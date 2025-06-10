@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -10,42 +11,42 @@ import { cn } from '@/lib/utils';
  * @param {React.ReactNode} props.action - Action button or content
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} EmptyState component
- */
-const EmptyState = ({ 
+ */import { useTranslation } from "react-i18next";
+const EmptyState = ({
   icon,
   title,
   description,
   action,
   className,
-  ...props 
-}) => {
+  ...props
+}) => {const { t } = useTranslation();
   return (
-    <div 
+    <div
       className={cn(
         "flex flex-col items-center justify-center py-12 px-4 text-center",
         className
       )}
-      {...props}
-    >
-      {icon && (
-        <div className="mb-4 text-muted-foreground">
+      {...props}>
+
+      {icon &&
+      <div className="mb-4 text-muted-foreground">
           {icon}
         </div>
-      )}
-      {title && (
-        <h3 className="mb-2 text-lg font-semibold">{title}</h3>
-      )}
-      {description && (
-        <p className="mb-4 text-sm text-muted-foreground max-w-md">
+      }
+      {title &&
+      <h3 className="mb-2 text-lg font-semibold">{title}</h3>
+      }
+      {description &&
+      <p className="mb-4 text-sm text-muted-foreground max-w-md">
           {description}
         </p>
-      )}
-      {action && (
-        <div className="mt-4">
+      }
+      {action &&
+      <div className="mt-4">
           {action}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 export default EmptyState;

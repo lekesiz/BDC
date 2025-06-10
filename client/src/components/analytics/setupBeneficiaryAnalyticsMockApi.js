@@ -1,11 +1,12 @@
+// TODO: i18n - processed
 import { http, HttpResponse } from 'msw';
 import { beneficiaries, beneficiaryAnalytics, getBeneficiariesList, getBeneficiaryAnalytics, exportBeneficiaryAnalytics } from './mockBeneficiaryData';
 /**
  * Setup mock API handlers for beneficiary analytics
- */
+ */import { useTranslation } from "react-i18next";
 export const setupBeneficiaryAnalyticsMockApi = (api, originalGet, originalPost) => {
   // Override API methods with mock implementations
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     // Get all beneficiaries
     if (url === '/api/beneficiaries') {
       return Promise.resolve({
@@ -20,7 +21,7 @@ export const setupBeneficiaryAnalyticsMockApi = (api, originalGet, originalPost)
     const beneficiaryMatch = url.match(/^\/api\/beneficiaries\/(\d+)$/);
     if (beneficiaryMatch) {
       const id = beneficiaryMatch[1];
-      const beneficiary = beneficiaries.find(b => b.id.toString() === id);
+      const beneficiary = beneficiaries.find((b) => b.id.toString() === id);
       if (!beneficiary) {
         return Promise.reject({
           response: {
@@ -81,7 +82,7 @@ export const setupBeneficiaryAnalyticsMockApi = (api, originalGet, originalPost)
     // Fall back to original get method
     return originalGet(url, config);
   };
-  api.post = function(url, data, config) {
+  api.post = function (url, data, config) {
     // Export beneficiary analytics
     const exportMatch = url.match(/^\/api\/analytics\/beneficiaries\/(\d+)\/export$/);
     if (exportMatch) {

@@ -9,6 +9,7 @@ from app.extensions import db, logger, limiter
 from app.schemas import UserSchema, UserCreateSchema, UserUpdateSchema, UserProfileSchema
 from app.models import User
 from app.middleware.request_context import admin_required, role_required
+from app.middleware.i18n_middleware import i18n_response
 
 from app.utils.logging import logger
 
@@ -18,6 +19,7 @@ users_bp = Blueprint('users', __name__)
 
 @users_bp.route('/me', methods=['GET'])
 @jwt_required()
+@i18n_response
 def get_current_user():
     """Get current authenticated user."""
     try:
@@ -27,7 +29,7 @@ def get_current_user():
         if not user:
             return jsonify({
                 'error': 'not_found',
-                'message': 'User not found'
+                'message': '$t:api.user.not_found'
             }), 404
         
         # Serialize user data
@@ -40,82 +42,69 @@ def get_current_user():
         logger.exception(f"Get current user error: {str(e)}")
         return jsonify({
             'error': 'server_error',
-            'message': 'An unexpected error occurred'
+            'message': '$t:api.error.server'
         }), 500
 
 
 @users_bp.route('', methods=['GET'])
 @jwt_required()
 @role_required(['super_admin', 'tenant_admin'])
+@i18n_response
 def get_users():
-    """Get all users."""
+    """Get all users (admin only)."""
     try:
-        # Get query parameters with both naming conventions for compatibility
+        # Get pagination parameters
         page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', request.args.get('limit', 10, type=int), type=int)
-        role = request.args.get('role')
-        # Dikkat: is_active parametresini parse ederken None kontrolü yapıyoruz
-        is_active_param = request.args.get('is_active')
-        if is_active_param is not None:
-            is_active = is_active_param.lower() == 'true'
-        else:
-            is_active = None
+        per_page = request.args.get('per_page', 10, type=int)
         
-        # status parametresi (frontend'den geliyor olabilir)
+        # Get filters
+        role = request.args.get('role')
         status = request.args.get('status')
-        tenant_id = request.args.get('tenant_id', type=int)
-        sort_by = request.args.get('sort_by', 'created_at')
-        sort_direction = request.args.get('sort_direction', 'desc')
+        search = request.args.get('search')
         
         # Build query
         query = User.query
         
+        # Apply filters
         if role:
             query = query.filter_by(role=role)
+        if status:
+            query = query.filter_by(status=status)
+        if search:
+            query = query.filter(
+                db.or_(
+                    User.first_name.ilike(f'%{search}%'),
+                    User.last_name.ilike(f'%{search}%'),
+                    User.email.ilike(f'%{search}%')
+                )
+            )
         
-        # is_active filtresi - varsayılan olarak sadece aktif kullanıcıları göster
-        if is_active is not None:
-            query = query.filter_by(is_active=is_active)
-        elif status:
-            # Frontend'den status parametresi gelirse
-            if status == 'active':
-                query = query.filter_by(is_active=True)
-            elif status == 'inactive':
-                query = query.filter_by(is_active=False)
-        else:
-            # Hiçbir filtre yoksa varsayılan olarak sadece aktif kullanıcıları göster
-            query = query.filter_by(is_active=True)
-            
-        if tenant_id:
-            query = query.filter_by(tenant_id=tenant_id)
+        # Get current user's tenant_id for filtering
+        current_user_id = get_jwt_identity()
+        current_user = User.query.get(current_user_id)
         
-        # Apply sorting
-        sort_attr = getattr(User, sort_by, None)
-        if sort_attr:
-            if sort_direction.lower() == 'desc':
-                query = query.order_by(sort_attr.desc())
-            else:
-                query = query.order_by(sort_attr.asc())
+        # Filter by tenant for tenant admins
+        if current_user.role == 'tenant_admin':
+            query = query.filter_by(tenant_id=current_user.tenant_id)
         
-        # Paginate query
-        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+        # Paginate
+        paginated = query.paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
         
         # Serialize data
         schema = UserSchema(many=True)
-        users = schema.dump(pagination.items)
+        users = schema.dump(paginated.items)
         
-        # Return paginated response
         return jsonify({
-            'items': users,
-            'page': pagination.page,
-            'per_page': pagination.per_page,
-            'total': pagination.total,
-            'pages': pagination.pages,
-            'filters': {
-                'is_active': is_active,
-                'status': status,
-                'role': role,
-                'show_inactive': is_active is False or status == 'inactive'
+            'users': users,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': paginated.total,
+                'pages': paginated.pages
             }
         }), 200
     
@@ -123,158 +112,13 @@ def get_users():
         logger.exception(f"Get users error: {str(e)}")
         return jsonify({
             'error': 'server_error',
-            'message': 'An unexpected error occurred'
-        }), 500
-
-
-@users_bp.route('/profile-picture', methods=['POST'])
-@jwt_required()
-def upload_profile_picture():
-    """Upload profile picture."""
-    try:
-        from werkzeug.utils import secure_filename
-        import os
-        
-        user_id = get_jwt_identity()
-        user = User.query.get(user_id)
-        
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-            
-        # Check if the post request has the file part
-        if 'profile_picture' not in request.files:
-            return jsonify({'error': 'No file part'}), 400
-            
-        file = request.files['profile_picture']
-        
-        # If user does not select file, browser also submits an empty part
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
-        
-        # Get allowed extensions
-        ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-        
-        def allowed_file(filename):
-            return '.' in filename and \
-                   filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-        
-        if file and allowed_file(file.filename):
-            # Create secure filename
-            filename = secure_filename(file.filename)
-            timestamp = str(int(time.time()))
-            filename = f"{user_id}_{timestamp}_{filename}"
-            
-            # Save file
-            upload_folder = current_app.config['UPLOAD_FOLDER']
-            profile_pictures_folder = os.path.join(upload_folder, 'profile_pictures')
-            
-            # Create directory if it doesn't exist
-            if not os.path.exists(profile_pictures_folder):
-                os.makedirs(profile_pictures_folder)
-            
-            file_path = os.path.join(profile_pictures_folder, filename)
-            file.save(file_path)
-            
-            # Update user's profile picture URL
-            user.profile_picture = f'/uploads/profile_pictures/{filename}'
-            db.session.commit()
-            
-            return jsonify({
-                'message': 'Profile picture uploaded successfully',
-                'profile_picture': user.profile_picture
-            }), 200
-        else:
-            return jsonify({'error': 'Invalid file type. Allowed types: png, jpg, jpeg, gif'}), 400
-    
-    except Exception as e:
-        logger.exception(f"Upload profile picture error: {str(e)}")
-        return jsonify({
-            'error': 'server_error',
-            'message': 'An unexpected error occurred'
-        }), 500
-
-
-@users_bp.route('/me/profile', methods=['GET'])
-@jwt_required()
-def get_me_profile():
-    """Get the current user's profile information."""
-    try:
-        user_id = get_jwt_identity()
-        user = User.query.get(user_id)
-        
-        if not user:
-            return jsonify({
-                'error': 'not_found',
-                'message': 'User not found'
-            }), 404
-        
-        # Use UserProfileSchema for detailed profile information
-        schema = UserProfileSchema()
-        profile_data = schema.dump(user)
-        
-        # Add additional profile information
-        profile_data['stats'] = {
-            'appointments_count': 0,  # To be implemented
-            'evaluations_count': 0,   # To be implemented
-            'documents_count': 0      # To be implemented
-        }
-        
-        return jsonify(profile_data), 200
-    
-    except Exception as e:
-        logger.exception(f"Get user profile error: {str(e)}")
-        return jsonify({
-            'error': 'server_error',
-            'message': 'An unexpected error occurred'
-        }), 500
-
-
-@users_bp.route('/me/profile', methods=['PUT', 'PATCH'])
-@jwt_required()
-def update_me_profile():
-    """Update the current user's profile information."""
-    try:
-        user_id = get_jwt_identity()
-        user = User.query.get(user_id)
-        
-        if not user:
-            return jsonify({
-                'error': 'not_found',
-                'message': 'User not found'
-            }), 404
-        
-        # Get update data
-        data = request.get_json()
-        
-        # Update user fields
-        updateable_fields = ['first_name', 'last_name', 'phone', 'bio', 'timezone', 'organization', 'address', 'city', 'state', 'zip_code', 'country', 'email_notifications', 'push_notifications', 'sms_notifications', 'language', 'theme']
-        for field in updateable_fields:
-            if field in data:
-                setattr(user, field, data[field])
-        
-        # Commit changes
-        db.session.commit()
-        
-        # Return updated profile
-        schema = UserProfileSchema()
-        updated_profile = schema.dump(user)
-        
-        return jsonify({
-            'message': 'Profile updated successfully',
-            'profile': updated_profile
-        }), 200
-    
-    except Exception as e:
-        logger.exception(f"Update user profile error: {str(e)}")
-        db.session.rollback()
-        return jsonify({
-            'error': 'server_error',
-            'message': 'An unexpected error occurred'
+            'message': '$t:api.error.server'
         }), 500
 
 
 @users_bp.route('/<int:user_id>', methods=['GET'])
 @jwt_required()
+@i18n_response
 def get_user(user_id):
     """Get a specific user."""
     try:
@@ -283,10 +127,30 @@ def get_user(user_id):
         if not user:
             return jsonify({
                 'error': 'not_found',
-                'message': 'User not found'
+                'message': '$t:api.user.not_found'
             }), 404
         
-        # Serialize data
+        # Check permissions
+        current_user_id = get_jwt_identity()
+        current_user = User.query.get(current_user_id)
+        
+        # Allow users to see their own profile
+        if current_user_id != user_id:
+            # Check admin permissions
+            if current_user.role not in ['super_admin', 'tenant_admin']:
+                return jsonify({
+                    'error': 'forbidden',
+                    'message': '$t:api.error.forbidden'
+                }), 403
+            
+            # Tenant admins can only see users in their tenant
+            if current_user.role == 'tenant_admin' and user.tenant_id != current_user.tenant_id:
+                return jsonify({
+                    'error': 'forbidden',
+                    'message': '$t:api.error.forbidden'
+                }), 403
+        
+        # Serialize user data
         schema = UserSchema()
         user_data = schema.dump(user)
         
@@ -296,206 +160,365 @@ def get_user(user_id):
         logger.exception(f"Get user error: {str(e)}")
         return jsonify({
             'error': 'server_error',
-            'message': 'An unexpected error occurred'
+            'message': '$t:api.error.server'
         }), 500
 
 
 @users_bp.route('', methods=['POST'])
 @jwt_required()
 @role_required(['super_admin', 'tenant_admin'])
+@i18n_response
 def create_user():
-    """Create a new user."""
+    """Create a new user (admin only)."""
     try:
-        # Get request data
-        data = request.get_json()
+        # Get JSON data
+        json_data = request.get_json()
         
-        # Validate data
+        if not json_data:
+            return jsonify({
+                'error': 'invalid_request',
+                'message': '$t:api.validation.request_empty'
+            }), 400
+        
+        # Validate request data
         schema = UserCreateSchema()
-        validated_data = schema.load(data)
+        try:
+            data = schema.load(json_data)
+        except ValidationError as e:
+            return jsonify({
+                'error': 'validation_error',
+                'message': '$t:api.error.validation',
+                'errors': e.messages
+            }), 400
         
-        # Check if user already exists
-        existing_user = User.query.filter_by(email=validated_data['email']).first()
+        # Check if email already exists
+        existing_user = User.query.filter_by(email=data['email']).first()
         if existing_user:
             return jsonify({
-                'error': 'already_exists',
-                'message': 'User with this email already exists'
+                'error': 'conflict',
+                'message': '$t:api.user.email_exists'
             }), 409
         
-        # Remove confirm_password and any non-model fields before creating user
-        validated_data.pop('confirm_password', None)
-        validated_data.pop('status', None)  # Frontend'in gönderdiği fazladan alan
+        # Get current user for tenant assignment
+        current_user_id = get_jwt_identity()
+        current_user = User.query.get(current_user_id)
         
-        # Create new user with only valid model fields
-        user_data = {
-            'email': validated_data['email'],
-            'password': validated_data['password'],
-            'first_name': validated_data['first_name'],
-            'last_name': validated_data['last_name'],
-            'role': validated_data['role'],
-            'phone': validated_data.get('phone'),
-            'organization': validated_data.get('organization'),
-            'tenant_id': validated_data.get('tenant_id'),
-            'is_active': True
-        }
+        # Set tenant_id for tenant admins
+        if current_user.role == 'tenant_admin':
+            data['tenant_id'] = current_user.tenant_id
         
-        user = User(**user_data)
+        # Create user
+        user = User(**data)
+        user.set_password(data['password'])
+        
         db.session.add(user)
         db.session.commit()
         
-        # Serialize response
-        response_schema = UserSchema()
-        user_data = response_schema.dump(user)
+        # Serialize user data
+        schema = UserSchema()
+        user_data = schema.dump(user)
         
         return jsonify({
-            'message': 'User created successfully',
+            'message': '$t:api.user.created',
             'user': user_data
         }), 201
     
-    except ValidationError as e:
-        return jsonify({
-            'error': 'validation_error',
-            'message': 'Invalid data provided',
-            'errors': e.messages
-        }), 400
-    
     except Exception as e:
         logger.exception(f"Create user error: {str(e)}")
+        db.session.rollback()
         return jsonify({
             'error': 'server_error',
-            'message': f'Error: {str(e)}'  # Debug için detaylı hata mesajı
+            'message': '$t:api.error.server'
         }), 500
 
 
 @users_bp.route('/<int:user_id>', methods=['PUT'])
 @jwt_required()
+@i18n_response
 def update_user(user_id):
     """Update a user."""
     try:
-        # Get current user
-        current_user_id = get_jwt_identity()
-        current_user = User.query.get(current_user_id)
-        
-        # Get user to update
         user = User.query.get(user_id)
         
         if not user:
             return jsonify({
                 'error': 'not_found',
-                'message': 'User not found'
+                'message': '$t:api.user.not_found'
             }), 404
         
         # Check permissions
-        if current_user.role not in ['super_admin', 'tenant_admin'] and current_user_id != user_id:
+        current_user_id = get_jwt_identity()
+        current_user = User.query.get(current_user_id)
+        
+        # Allow users to update their own profile
+        if current_user_id != user_id:
+            # Check admin permissions
+            if current_user.role not in ['super_admin', 'tenant_admin']:
+                return jsonify({
+                    'error': 'forbidden',
+                    'message': '$t:api.error.forbidden'
+                }), 403
+            
+            # Tenant admins can only update users in their tenant
+            if current_user.role == 'tenant_admin' and user.tenant_id != current_user.tenant_id:
+                return jsonify({
+                    'error': 'forbidden',
+                    'message': '$t:api.error.forbidden'
+                }), 403
+        
+        # Get JSON data
+        json_data = request.get_json()
+        
+        if not json_data:
             return jsonify({
-                'error': 'forbidden',
-                'message': 'You do not have permission to update this user'
-            }), 403
+                'error': 'invalid_request',
+                'message': '$t:api.validation.request_empty'
+            }), 400
         
-        # Get request data
-        data = request.get_json()
+        # Validate request data
+        schema = UserUpdateSchema()
+        try:
+            data = schema.load(json_data)
+        except ValidationError as e:
+            return jsonify({
+                'error': 'validation_error',
+                'message': '$t:api.error.validation',
+                'errors': e.messages
+            }), 400
         
-        # Validate data with user_id context for email validation
-        schema = UserUpdateSchema(context={'user_id': user_id})
-        validated_data = schema.load(data)
+        # Check if email is being changed and already exists
+        if 'email' in data and data['email'] != user.email:
+            existing_user = User.query.filter_by(email=data['email']).first()
+            if existing_user:
+                return jsonify({
+                    'error': 'conflict',
+                    'message': '$t:api.user.email_exists'
+                }), 409
         
-        # Handle special fields
-        if 'status' in validated_data:
-            # Map frontend status to backend is_active
-            user.is_active = validated_data.pop('status') == 'active'
-        
-        if 'password' in validated_data:
-            # Update password using the property setter
-            user.password = validated_data.pop('password')
-        
-        # Update other fields
-        for key, value in validated_data.items():
-            if hasattr(user, key):
+        # Update user fields
+        for key, value in data.items():
+            if key != 'password':  # Handle password separately
                 setattr(user, key, value)
         
+        # Update password if provided
+        if 'password' in data:
+            user.set_password(data['password'])
+        
+        user.updated_at = db.func.now()
         db.session.commit()
         
-        # Serialize response
-        response_schema = UserSchema()
-        user_data = response_schema.dump(user)
+        # Serialize user data
+        schema = UserSchema()
+        user_data = schema.dump(user)
         
         return jsonify({
-            'message': 'User updated successfully',
+            'message': '$t:api.user.updated',
             'user': user_data
         }), 200
     
-    except ValidationError as e:
-        return jsonify({
-            'error': 'validation_error',
-            'message': 'Invalid data provided',
-            'errors': e.messages
-        }), 400
-    
     except Exception as e:
         logger.exception(f"Update user error: {str(e)}")
+        db.session.rollback()
         return jsonify({
             'error': 'server_error',
-            'message': 'An unexpected error occurred'
+            'message': '$t:api.error.server'
         }), 500
 
 
 @users_bp.route('/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 @role_required(['super_admin', 'tenant_admin'])
+@i18n_response
 def delete_user(user_id):
-    """Delete a user."""
+    """Delete a user (admin only)."""
     try:
         user = User.query.get(user_id)
         
         if not user:
             return jsonify({
                 'error': 'not_found',
-                'message': 'User not found'
+                'message': '$t:api.user.not_found'
             }), 404
         
-        # Soft delete the user (sadece pasif yap)
-        user.is_active = False
+        # Get current user
+        current_user_id = get_jwt_identity()
+        current_user = User.query.get(current_user_id)
+        
+        # Prevent self-deletion
+        if current_user_id == user_id:
+            return jsonify({
+                'error': 'forbidden',
+                'message': '$t:api.user.cannot_delete_self'
+            }), 403
+        
+        # Tenant admins can only delete users in their tenant
+        if current_user.role == 'tenant_admin' and user.tenant_id != current_user.tenant_id:
+            return jsonify({
+                'error': 'forbidden',
+                'message': '$t:api.error.forbidden'
+            }), 403
+        
+        # Soft delete
+        user.status = 'deleted'
+        user.deleted_at = db.func.now()
         db.session.commit()
         
-        # Gerçek silme için (opsiyonel - query param ile kontrol edilebilir):
-        # if request.args.get('hard_delete', 'false').lower() == 'true':
-        #     db.session.delete(user)
-        #     db.session.commit()
-        
         return jsonify({
-            'message': 'User deactivated successfully'  # Daha açıklayıcı mesaj
+            'message': '$t:api.user.deleted'
         }), 200
     
     except Exception as e:
         logger.exception(f"Delete user error: {str(e)}")
+        db.session.rollback()
         return jsonify({
             'error': 'server_error',
-            'message': 'An unexpected error occurred'
+            'message': '$t:api.error.server'
         }), 500
 
 
-@users_bp.route('/<int:user_id>/profile', methods=['GET'])
+@users_bp.route('/<int:user_id>/activate', methods=['POST'])
 @jwt_required()
-def get_user_profile(user_id):
-    """Get user profile."""
+@role_required(['super_admin', 'tenant_admin'])
+@i18n_response
+def activate_user(user_id):
+    """Activate a user (admin only)."""
     try:
         user = User.query.get(user_id)
         
         if not user:
             return jsonify({
                 'error': 'not_found',
-                'message': 'User not found'
+                'message': '$t:api.user.not_found'
             }), 404
         
-        # Serialize data with profile schema
-        schema = UserProfileSchema()
-        profile_data = schema.dump(user)
+        # Get current user
+        current_user_id = get_jwt_identity()
+        current_user = User.query.get(current_user_id)
         
-        return jsonify(profile_data), 200
+        # Tenant admins can only activate users in their tenant
+        if current_user.role == 'tenant_admin' and user.tenant_id != current_user.tenant_id:
+            return jsonify({
+                'error': 'forbidden',
+                'message': '$t:api.error.forbidden'
+            }), 403
+        
+        # Activate user
+        user.status = 'active'
+        user.updated_at = db.func.now()
+        db.session.commit()
+        
+        return jsonify({
+            'message': '$t:api.user.activated'
+        }), 200
     
     except Exception as e:
-        logger.exception(f"Get user profile error: {str(e)}")
+        logger.exception(f"Activate user error: {str(e)}")
+        db.session.rollback()
         return jsonify({
             'error': 'server_error',
-            'message': 'An unexpected error occurred'
+            'message': '$t:api.error.server'
         }), 500
 
+
+@users_bp.route('/<int:user_id>/deactivate', methods=['POST'])
+@jwt_required()
+@role_required(['super_admin', 'tenant_admin'])
+@i18n_response
+def deactivate_user(user_id):
+    """Deactivate a user (admin only)."""
+    try:
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({
+                'error': 'not_found',
+                'message': '$t:api.user.not_found'
+            }), 404
+        
+        # Get current user
+        current_user_id = get_jwt_identity()
+        current_user = User.query.get(current_user_id)
+        
+        # Prevent self-deactivation
+        if current_user_id == user_id:
+            return jsonify({
+                'error': 'forbidden',
+                'message': '$t:api.user.cannot_deactivate_self'
+            }), 403
+        
+        # Tenant admins can only deactivate users in their tenant
+        if current_user.role == 'tenant_admin' and user.tenant_id != current_user.tenant_id:
+            return jsonify({
+                'error': 'forbidden',
+                'message': '$t:api.error.forbidden'
+            }), 403
+        
+        # Deactivate user
+        user.status = 'inactive'
+        user.updated_at = db.func.now()
+        db.session.commit()
+        
+        return jsonify({
+            'message': '$t:api.user.deactivated'
+        }), 200
+    
+    except Exception as e:
+        logger.exception(f"Deactivate user error: {str(e)}")
+        db.session.rollback()
+        return jsonify({
+            'error': 'server_error',
+            'message': '$t:api.error.server'
+        }), 500
+
+
+@users_bp.route('/<int:user_id>/change-role', methods=['POST'])
+@jwt_required()
+@role_required(['super_admin'])
+@i18n_response
+def change_user_role(user_id):
+    """Change user role (super admin only)."""
+    try:
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({
+                'error': 'not_found',
+                'message': '$t:api.user.not_found'
+            }), 404
+        
+        # Get JSON data
+        json_data = request.get_json()
+        
+        if not json_data or 'role' not in json_data:
+            return jsonify({
+                'error': 'invalid_request',
+                'message': '$t:api.validation.field_required',
+                'field': 'role'
+            }), 400
+        
+        new_role = json_data['role']
+        
+        # Validate role
+        valid_roles = ['super_admin', 'tenant_admin', 'trainer', 'trainee']
+        if new_role not in valid_roles:
+            return jsonify({
+                'error': 'validation_error',
+                'message': '$t:api.validation.invalid_role'
+            }), 400
+        
+        # Update role
+        user.role = new_role
+        user.updated_at = db.func.now()
+        db.session.commit()
+        
+        return jsonify({
+            'message': '$t:api.user.role_changed'
+        }), 200
+    
+    except Exception as e:
+        logger.exception(f"Change user role error: {str(e)}")
+        db.session.rollback()
+        return jsonify({
+            'error': 'server_error',
+            'message': '$t:api.error.server'
+        }), 500

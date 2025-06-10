@@ -1,4 +1,5 @@
-// Mock of framer-motion for tests
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // Mock of framer-motion for tests
 // Create a simple mock component that just renders children
 const createMockComponent = (name) => {
   const component = ({ children, ...props }) => {

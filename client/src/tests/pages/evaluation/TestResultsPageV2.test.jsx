@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -5,7 +6,7 @@ import TestResultsPageV2 from '../../../pages/evaluation/TestResultsPageV2';
 import axios from '../../../lib/api';
 import * as useToastModule from '../../../hooks/useToast';
 // Mock modules
-vi.mock('../../../lib/api');
+import { useTranslation } from "react-i18next";vi.mock('../../../lib/api');
 vi.mock('../../../hooks/useToast', () => ({
   useToast: vi.fn().mockReturnValue({
     toast: vi.fn()
@@ -26,7 +27,7 @@ vi.mock('chart.js', () => ({
   Title: class {},
   Tooltip: class {},
   Legend: class {},
-  RadialLinearScale: class {},
+  RadialLinearScale: class {}
 }));
 // Mock Chart components
 vi.mock('react-chartjs-2', () => ({
@@ -34,7 +35,7 @@ vi.mock('react-chartjs-2', () => ({
   Bar: () => <div data-testid="bar-chart">Bar Chart</div>,
   Pie: () => <div data-testid="pie-chart">Pie Chart</div>,
   Doughnut: () => <div data-testid="doughnut-chart">Doughnut Chart</div>,
-  Radar: () => <div data-testid="radar-chart">Radar Chart</div>,
+  Radar: () => <div data-testid="radar-chart">Radar Chart</div>
 }));
 // Mock useNavigate hook
 const mockNavigate = vi.fn();
@@ -43,7 +44,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    useParams: () => ({ sessionId: '123' }),
+    useParams: () => ({ sessionId: '123' })
   };
 });
 // Toast functions are mocked above
@@ -56,7 +57,7 @@ document.createElement = vi.fn().mockImplementation((tag) => {
       href: '',
       setAttribute: vi.fn(),
       click: vi.fn(),
-      remove: vi.fn(),
+      remove: vi.fn()
     };
   }
   return {};
@@ -75,17 +76,17 @@ const mockSessionData = {
     time_spent: 2100, // 35 minutes in seconds
     completed_at: '2023-06-15T10:45:00Z',
     responses: [
-      {
-        id: '1',
-        is_correct: true,
-        answer: 'JavaScript',
-      },
-      {
-        id: '2',
-        is_correct: false,
-        answer: 'Cascading Style Sheets',
-      },
-    ],
+    {
+      id: '1',
+      is_correct: true,
+      answer: 'JavaScript'
+    },
+    {
+      id: '2',
+      is_correct: false,
+      answer: 'Cascading Style Sheets'
+    }]
+
   },
   test: {
     id: '456',
@@ -94,86 +95,86 @@ const mockSessionData = {
     passing_score: 70,
     total_questions: 20,
     questions: [
-      {
-        id: '1',
-        question_text: 'What is JavaScript?',
-        correct_answer: 'JavaScript',
-        difficulty: 'Easy',
-        points: 5,
-        explanation: 'JavaScript is a programming language used for web development.',
-      },
-      {
-        id: '2',
-        question_text: 'What does CSS stand for?',
-        correct_answer: 'Cascading Style Sheets',
-        difficulty: 'Medium',
-        points: 5,
-        explanation: 'CSS is used for styling web pages.',
-      },
-    ],
+    {
+      id: '1',
+      question_text: 'What is JavaScript?',
+      correct_answer: 'JavaScript',
+      difficulty: 'Easy',
+      points: 5,
+      explanation: 'JavaScript is a programming language used for web development.'
+    },
+    {
+      id: '2',
+      question_text: 'What does CSS stand for?',
+      correct_answer: 'Cascading Style Sheets',
+      difficulty: 'Medium',
+      points: 5,
+      explanation: 'CSS is used for styling web pages.'
+    }]
+
   },
   analysis: {
     skill_analysis: [
-      {
-        skill_name: 'JavaScript',
-        description: 'Core JavaScript concepts',
-        score: 90,
-        recommendations: ['Practice more advanced JS concepts', 'Learn about ES6 features'],
-      },
-      {
-        skill_name: 'HTML',
-        description: 'HTML structure and semantics',
-        score: 85,
-        recommendations: ['Learn more about accessibility', 'Practice semantic HTML'],
-      },
-      {
-        skill_name: 'CSS',
-        description: 'CSS styling and layout',
-        score: 75,
-        recommendations: ['Practice CSS Grid', 'Learn about CSS animations'],
-      },
-    ],
+    {
+      skill_name: 'JavaScript',
+      description: 'Core JavaScript concepts',
+      score: 90,
+      recommendations: ['Practice more advanced JS concepts', 'Learn about ES6 features']
+    },
+    {
+      skill_name: 'HTML',
+      description: 'HTML structure and semantics',
+      score: 85,
+      recommendations: ['Learn more about accessibility', 'Practice semantic HTML']
+    },
+    {
+      skill_name: 'CSS',
+      description: 'CSS styling and layout',
+      score: 75,
+      recommendations: ['Practice CSS Grid', 'Learn about CSS animations']
+    }],
+
     topic_analysis: [
-      { topic: 'Variables', score: 100 },
-      { topic: 'Functions', score: 85 },
-      { topic: 'DOM Manipulation', score: 75 },
-    ],
+    { topic: 'Variables', score: 100 },
+    { topic: 'Functions', score: 85 },
+    { topic: 'DOM Manipulation', score: 75 }],
+
     difficulty_analysis: {
       easy: 95,
       medium: 80,
-      hard: 65,
-    },
-  },
+      hard: 65
+    }
+  }
 };
 const mockHistoryData = [
-  {
-    id: '123',
-    test_id: '456',
-    score: 85,
-    status: 'passed',
-    completed_at: '2023-06-15T10:45:00Z',
-    correct_answers: 17,
-    total_questions: 20,
-  },
-  {
-    id: '122',
-    test_id: '456',
-    score: 70,
-    status: 'passed',
-    completed_at: '2023-06-10T14:30:00Z',
-    correct_answers: 14,
-    total_questions: 20,
-  },
-  {
-    id: '121',
-    test_id: '456',
-    score: 60,
-    status: 'failed',
-    completed_at: '2023-06-05T09:15:00Z',
-    correct_answers: 12,
-    total_questions: 20,
-  },
-];
+{
+  id: '123',
+  test_id: '456',
+  score: 85,
+  status: 'passed',
+  completed_at: '2023-06-15T10:45:00Z',
+  correct_answers: 17,
+  total_questions: 20
+},
+{
+  id: '122',
+  test_id: '456',
+  score: 70,
+  status: 'passed',
+  completed_at: '2023-06-10T14:30:00Z',
+  correct_answers: 14,
+  total_questions: 20
+},
+{
+  id: '121',
+  test_id: '456',
+  score: 60,
+  status: 'failed',
+  completed_at: '2023-06-05T09:15:00Z',
+  correct_answers: 12,
+  total_questions: 20
+}];
+
 const mockComparisonsData = {
   dimensions: ['JavaScript', 'HTML', 'CSS', 'React', 'Node.js'],
   your_scores: [90, 85, 75, 80, 70],
@@ -186,7 +187,7 @@ const mockComparisonsData = {
   success_rate: 68,
   achievement_title: 'Web Development Pro',
   achievement_description: 'You demonstrated strong web development skills!',
-  badges: ['JavaScript Expert', 'HTML Proficient', 'Fast Learner'],
+  badges: ['JavaScript Expert', 'HTML Proficient', 'Fast Learner']
 };
 describe('TestResultsPageV2', () => {
   beforeEach(() => {
@@ -218,10 +219,10 @@ describe('TestResultsPageV2', () => {
     );
     // Loading state should be shown - check for any loading indicator
     try {
-      const loadingElement = screen.getByTestId('loading-skeleton') || 
-                            screen.getByRole('status') || 
-                            screen.getByText(/loading/i) || 
-                            screen.getByText(/yükleniyor/i);
+      const loadingElement = screen.getByTestId('loading-skeleton') ||
+      screen.getByRole('status') ||
+      screen.getByText(/loading/i) ||
+      screen.getByText(/yükleniyor/i);
       expect(loadingElement).toBeInTheDocument();
     } catch (error) {
       // If no specific loading indicator, verify that content hasn't loaded yet

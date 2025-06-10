@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import {
   fetchConversations,
   fetchMessages,
@@ -8,12 +9,12 @@ import {
   markNotificationAsRead,
   markAllNotificationsAsRead,
   fetchNotificationSettings,
-  updateNotificationSettings
-} from './mockMessagingData';
+  updateNotificationSettings } from
+'./mockMessagingData';
 // This function sets up mock API handlers for messaging and notification endpoints
-export const setupMessagingMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
+import { useTranslation } from "react-i18next";export const setupMessagingMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Override GET requests for messaging and notification endpoints
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     // Fetch conversations
     if (url === '/api/conversations') {
       return Promise.resolve(fetchConversations());
@@ -44,7 +45,7 @@ export const setupMessagingMockApi = (api, originalGet, originalPost, originalPu
     return originalGet.call(this, url, config);
   };
   // Override POST requests for messaging and notification endpoints
-  api.post = function(url, data, config) {
+  api.post = function (url, data, config) {
     // Send a message
     const sendMessageMatch = url.match(/\/api\/conversations\/(\d+)\/messages$/);
     if (sendMessageMatch) {
@@ -72,7 +73,7 @@ export const setupMessagingMockApi = (api, originalGet, originalPost, originalPu
     return originalPost.call(this, url, data, config);
   };
   // Override PUT requests for messaging and notification endpoints
-  api.put = function(url, data, config) {
+  api.put = function (url, data, config) {
     // Update notification settings
     if (url === '/api/settings/notifications') {
       return Promise.resolve(updateNotificationSettings(data));

@@ -1,4 +1,5 @@
-// Main integration components
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // Main integration components
 export { default as IntegrationManager } from './IntegrationManager';
 export { default as BaseIntegration } from './BaseIntegration';
 export { default as IntegrationStatusDashboard } from './IntegrationStatusDashboard';

@@ -1,4 +1,5 @@
-import { generateDashboardData, generateDashboardNotifications, generateQuickActions } from './mockDashboardData';
+// TODO: i18n - processed
+import { generateDashboardData, generateDashboardNotifications, generateQuickActions } from './mockDashboardData';import { useTranslation } from "react-i18next";
 export const setupDashboardMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -7,7 +8,7 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     delete: originalDelete || api.delete.bind(api)
   };
   // Dashboard overview endpoint
-  api.get = function(url, ...args) {
+  api.get = function (url, ...args) {
     if (url === '/api/dashboard' || url === '/api/dashboard/overview') {
       // Get user role from context or default to student
       const userRole = localStorage.getItem('userRole') || 'student';
@@ -49,7 +50,7 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         status: 200,
         data: {
           notifications,
-          unreadCount: notifications.filter(n => !n.read).length
+          unreadCount: notifications.filter((n) => !n.read).length
         }
       });
     }
@@ -107,12 +108,12 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
         status: 200,
         data: {
           widgets: [
-            { id: 'overview', name: 'Overview', enabled: true, order: 1 },
-            { id: 'quickStats', name: 'Quick Stats', enabled: true, order: 2 },
-            { id: 'recentActivity', name: 'Recent Activity', enabled: true, order: 3 },
-            { id: 'performanceChart', name: 'Performance', enabled: true, order: 4 },
-            { id: 'notifications', name: 'Notifications', enabled: true, order: 5 }
-          ]
+          { id: 'overview', name: 'Overview', enabled: true, order: 1 },
+          { id: 'quickStats', name: 'Quick Stats', enabled: true, order: 2 },
+          { id: 'recentActivity', name: 'Recent Activity', enabled: true, order: 3 },
+          { id: 'performanceChart', name: 'Performance', enabled: true, order: 4 },
+          { id: 'notifications', name: 'Notifications', enabled: true, order: 5 }]
+
         }
       });
     }
@@ -120,7 +121,7 @@ export const setupDashboardMockApi = (api, originalGet, originalPost, originalPu
     return originalFunctions.get.call(api, url, ...args);
   };
   // Widget configuration update
-  api.put = function(url, data, ...args) {
+  api.put = function (url, data, ...args) {
     if (url === '/api/dashboard/widgets') {
       return Promise.resolve({
         status: 200,

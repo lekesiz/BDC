@@ -1,4 +1,5 @@
-/**
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; /**
  * Evaluations Mock Data for Demo and Testing
  */
 // Evaluation types
@@ -36,27 +37,27 @@ export const QUESTION_TYPES = {
 };
 // Sample evaluation topics
 const evaluationTopics = [
-  'Genel Yetenek', 'Matematik', 'Türkçe', 'İngilizce', 'Bilgisayar Bilimleri',
-  'Mesleki Bilgi', 'İş Güvenliği', 'İletişim Becerileri', 'Problem Çözme',
-  'Yaratıcı Düşünce', 'Liderlik', 'Takım Çalışması', 'Proje Yönetimi',
-  'Dijital Okuryazarlık', 'Finansal Okuryazarlık', 'Girişimcilik'
-];
+'Genel Yetenek', 'Matematik', 'Türkçe', 'İngilizce', 'Bilgisayar Bilimleri',
+'Mesleki Bilgi', 'İş Güvenliği', 'İletişim Becerileri', 'Problem Çözme',
+'Yaratıcı Düşünce', 'Liderlik', 'Takım Çalışması', 'Proje Yönetimi',
+'Dijital Okuryazarlık', 'Finansal Okuryazarlık', 'Girişimcilik'];
+
 // Generate sample questions
 const generateQuestions = (count, type = null) => {
   const questions = [];
   const questionTexts = [
-    'Aşağıdakilerden hangisi doğrudur?',
-    'Bu konuyla ilgili en uygun yaklaşım nedir?',
-    'Verilen durumda nasıl davranılmalıdır?',
-    'Bu problemin çözümü için hangi adımlar izlenmelidir?',
-    'Aşağıdaki kavramlardan hangisi tanımla eşleşir?'
-  ];
+  'Aşağıdakilerden hangisi doğrudur?',
+  'Bu konuyla ilgili en uygun yaklaşım nedir?',
+  'Verilen durumda nasıl davranılmalıdır?',
+  'Bu problemin çözümü için hangi adımlar izlenmelidir?',
+  'Aşağıdaki kavramlardan hangisi tanımla eşleşir?'];
+
   const options = [
-    ['Seçenek A', 'Seçenek B', 'Seçenek C', 'Seçenek D'],
-    ['Doğru planlamak', 'Hızlı hareket etmek', 'Beklemek', 'Vazgeçmek'],
-    ['Sakin kalmak', 'Acele etmek', 'Panik yapmak', 'Görmezden gelmek'],
-    ['Analiz → Plan → Uygulama → Değerlendirme', 'Uygulama → Plan → Analiz', 'Plan → Analiz → Uygulama', 'Değerlendirme → Plan → Uygulama']
-  ];
+  ['Seçenek A', 'Seçenek B', 'Seçenek C', 'Seçenek D'],
+  ['Doğru planlamak', 'Hızlı hareket etmek', 'Beklemek', 'Vazgeçmek'],
+  ['Sakin kalmak', 'Acele etmek', 'Panik yapmak', 'Görmezden gelmek'],
+  ['Analiz → Plan → Uygulama → Değerlendirme', 'Uygulama → Plan → Analiz', 'Plan → Analiz → Uygulama', 'Değerlendirme → Plan → Uygulama']];
+
   for (let i = 1; i <= count; i++) {
     const questionType = type || Object.values(QUESTION_TYPES)[Math.floor(Math.random() * Object.values(QUESTION_TYPES).length)];
     const questionText = questionTexts[Math.floor(Math.random() * questionTexts.length)];
@@ -155,10 +156,10 @@ const generateEvaluation = (id) => {
     // Tags and categories
     tags: [topic, difficulty, type].filter(Boolean),
     learningOutcomes: [
-      `${topic} alanında temel kavramları anlama`,
-      'Problem çözme becerileri geliştirme',
-      'Analitik düşünce becerileri kazanma'
-    ]
+    `${topic} alanında temel kavramları anlama`,
+    'Problem çözme becerileri geliştirme',
+    'Analitik düşünce becerileri kazanma']
+
   };
 };
 // Generate evaluation results/attempts
@@ -168,7 +169,7 @@ const generateEvaluationResult = (evaluationId, userId) => {
   const endTime = new Date(startTime.getTime() + duration * 60 * 1000);
   const totalQuestions = Math.floor(Math.random() * 20) + 10;
   const correctAnswers = Math.floor(Math.random() * totalQuestions);
-  const score = Math.round((correctAnswers / totalQuestions) * 100);
+  const score = Math.round(correctAnswers / totalQuestions * 100);
   return {
     id: Math.floor(Math.random() * 10000),
     evaluationId,
@@ -207,15 +208,15 @@ const generateEvaluationResult = (evaluationId, userId) => {
       intermediate: Math.floor(Math.random() * 30) + 70,
       advanced: Math.floor(Math.random() * 40) + 60
     },
-    feedback: score >= 90 ? 'Mükemmel performans!' : 
-             score >= 80 ? 'Çok iyi çalışma!' :
-             score >= 70 ? 'İyi bir performans.' :
-             score >= 60 ? 'Geçer not, geliştirilmeli.' : 'Başarısız, tekrar çalışılmalı.',
+    feedback: score >= 90 ? 'Mükemmel performans!' :
+    score >= 80 ? 'Çok iyi çalışma!' :
+    score >= 70 ? 'İyi bir performans.' :
+    score >= 60 ? 'Geçer not, geliştirilmeli.' : 'Başarısız, tekrar çalışılmalı.',
     recommendations: [
-      score < 70 ? 'Temel konuları tekrar edin' : 'İleri düzey konulara geçebilirsiniz',
-      'Pratik sorular çözün',
-      'Zaman yönetiminizi geliştirin'
-    ].filter(Boolean)
+    score < 70 ? 'Temel konuları tekrar edin' : 'İleri düzey konulara geçebilirsiniz',
+    'Pratik sorular çözün',
+    'Zaman yönetiminizi geliştirin'].
+    filter(Boolean)
   };
 };
 // Generate mock data
@@ -232,22 +233,22 @@ for (let evalId = 1; evalId <= 25; evalId++) {
 // Evaluation statistics
 export const evaluationStats = {
   total: mockEvaluations.length,
-  active: mockEvaluations.filter(e => e.status === 'active').length,
-  draft: mockEvaluations.filter(e => e.status === 'draft').length,
-  completed: mockEvaluations.filter(e => e.status === 'completed').length,
+  active: mockEvaluations.filter((e) => e.status === 'active').length,
+  draft: mockEvaluations.filter((e) => e.status === 'draft').length,
+  completed: mockEvaluations.filter((e) => e.status === 'completed').length,
   totalAttempts: mockEvaluationResults.length,
   averageScore: Math.round(mockEvaluationResults.reduce((sum, r) => sum + r.score, 0) / mockEvaluationResults.length),
-  passRate: Math.round((mockEvaluationResults.filter(r => r.passed).length / mockEvaluationResults.length) * 100),
+  passRate: Math.round(mockEvaluationResults.filter((r) => r.passed).length / mockEvaluationResults.length * 100),
   byType: Object.values(EVALUATION_TYPES).reduce((acc, type) => {
-    acc[type] = mockEvaluations.filter(e => e.type === type).length;
+    acc[type] = mockEvaluations.filter((e) => e.type === type).length;
     return acc;
   }, {}),
   byDifficulty: Object.values(DIFFICULTY_LEVELS).reduce((acc, level) => {
-    acc[level] = mockEvaluations.filter(e => e.difficulty === level).length;
+    acc[level] = mockEvaluations.filter((e) => e.difficulty === level).length;
     return acc;
   }, {}),
   categoryDistribution: evaluationTopics.reduce((acc, topic) => {
-    acc[topic] = mockEvaluations.filter(e => e.category === topic).length;
+    acc[topic] = mockEvaluations.filter((e) => e.category === topic).length;
     return acc;
   }, {})
 };

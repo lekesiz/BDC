@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { setupMockApi as setupEvaluationMockApi } from '@/components/evaluation/mockData';
 import { setupDocumentsMockApi } from '@/components/document/setupDocumentsMockApi';
 import { setupMessagingMockApi } from '@/components/messaging/setupMessagingMockApi';
@@ -22,7 +23,7 @@ import { setupUsersMockApi } from '@/lib/mockData/setupUsersMockApi';
 import { setupAuthMockApi } from '@/lib/mockData/setupAuthMockApi';
 import { setupQuickMockAPIs } from '@/lib/mockData/quickMockData';
 // This function sets up all mock API handlers
-export const setupMockApi = (api) => {
+import { useTranslation } from "react-i18next";export const setupMockApi = (api) => {
   // Store the original methods
   const originalGet = api.get;
   const originalPost = api.post;

@@ -1,4 +1,5 @@
-// PWA Service - Comprehensive Progressive Web App functionality
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // PWA Service - Comprehensive Progressive Web App functionality
 class PWAService {
   constructor() {
     this.swRegistration = null;
@@ -26,13 +27,13 @@ class PWAService {
     if (!('serviceWorker' in navigator)) {
       return;
     }
-    
+
     // Skip service worker in development mode to avoid errors
     if (import.meta.env.DEV) {
       console.info('Service Worker is disabled in development mode');
       return;
     }
-    
+
     try {
       this.swRegistration = await navigator.serviceWorker.register('/sw.js', {
         scope: '/'
@@ -122,9 +123,9 @@ class PWAService {
     newWorker.addEventListener('statechange', () => {
       if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
         this.updateAvailable = true;
-        this.emit('updateAvailable', { 
+        this.emit('updateAvailable', {
           version: 'new version available',
-          worker: newWorker 
+          worker: newWorker
         });
       }
     });
@@ -143,7 +144,7 @@ class PWAService {
   }
   isInstalled() {
     return window.matchMedia('(display-mode: standalone)').matches ||
-           window.navigator.standalone === true;
+    window.navigator.standalone === true;
   }
   // Update Methods
   async applyUpdate() {
@@ -304,7 +305,7 @@ class PWAService {
   }
   emit(event, data) {
     if (this.listeners.has(event)) {
-      this.listeners.get(event).forEach(callback => {
+      this.listeners.get(event).forEach((callback) => {
         try {
           callback(data);
         } catch (error) {

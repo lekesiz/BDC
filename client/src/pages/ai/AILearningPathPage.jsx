@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
@@ -18,9 +19,9 @@ import {
   Download,
   Share2,
   BookOpen,
-  Lock
-} from 'lucide-react';
-const AILearningPathPage = () => {
+  Lock } from
+'lucide-react';import { useTranslation } from "react-i18next";
+const AILearningPathPage = () => {const { t } = useTranslation();
   const { user, hasRole } = useAuth();
   const { toast } = useToast();
   // AI Learning Path is restricted to admin and trainer roles only
@@ -31,16 +32,16 @@ const AILearningPathPage = () => {
       <div className="flex items-center justify-center min-h-[60vh]">
         <Card className="p-8 text-center max-w-md">
           <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h2>
-          <p className="text-gray-600 mb-4">
-            AI Learning Path Optimization is only available to administrators and trainers.
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t("components.access_restricted")}</h2>
+          <p className="text-gray-600 mb-4">{t("pages.ai_learning_path_optimization_is_only_available_to")}
+
           </p>
-          <p className="text-sm text-gray-500">
-            Current role: <span className="font-medium">{user?.role}</span>
+          <p className="text-sm text-gray-500">{t("components.current_role")}
+            <span className="font-medium">{user?.role}</span>
           </p>
         </Card>
-      </div>
-    );
+      </div>);
+
   }
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -55,22 +56,22 @@ const AILearningPathPage = () => {
     learning_style: 'balanced'
   });
   const focusAreas = [
-    'technical_skills',
-    'soft_skills',
-    'leadership',
-    'communication',
-    'problem_solving',
-    'creativity',
-    'time_management',
-    'teamwork'
-  ];
+  'technical_skills',
+  'soft_skills',
+  'leadership',
+  'communication',
+  'problem_solving',
+  'creativity',
+  'time_management',
+  'teamwork'];
+
   const learningStyles = [
-    { value: 'visual', label: 'Visual Learning' },
-    { value: 'auditory', label: 'Auditory Learning' },
-    { value: 'kinesthetic', label: 'Hands-on Learning' },
-    { value: 'reading', label: 'Reading/Writing' },
-    { value: 'balanced', label: 'Balanced Approach' }
-  ];
+  { value: 'visual', label: 'Visual Learning' },
+  { value: 'auditory', label: 'Auditory Learning' },
+  { value: 'kinesthetic', label: 'Hands-on Learning' },
+  { value: 'reading', label: 'Reading/Writing' },
+  { value: 'balanced', label: 'Balanced Approach' }];
+
   useEffect(() => {
     fetchBeneficiaries();
     fetchLearningPaths();
@@ -257,184 +258,184 @@ const AILearningPathPage = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>);
+
   }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Map className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold text-gray-900">AI Learning Path Optimization</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("pages.ai_learning_path_optimization")}</h1>
         </div>
       </div>
       {/* Generate New Path */}
       <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-4">Generate New Learning Path</h2>
+        <h2 className="text-lg font-semibold mb-4">{t("pages.generate_new_learning_path")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Beneficiary
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t("components.beneficiary")}
+
             </label>
             <select
               value={selectedBeneficiary}
               onChange={(e) => setSelectedBeneficiary(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              <option value="">Select beneficiary</option>
-              {beneficiaries.map((beneficiary) => (
-                <option key={beneficiary.id} value={beneficiary.id}>
+              className="w-full px-3 py-2 border border-gray-300 rounded-md">
+
+              <option value="">{t("pages.select_beneficiary")}</option>
+              {beneficiaries.map((beneficiary) =>
+              <option key={beneficiary.id} value={beneficiary.id}>
                   {beneficiary.full_name}
                 </option>
-              ))}
+              )}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Duration
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t("components.duration")}
+
             </label>
             <select
               value={pathSettings.duration}
               onChange={(e) => setPathSettings({ ...pathSettings, duration: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              <option value="1_month">1 Month</option>
-              <option value="3_months">3 Months</option>
-              <option value="6_months">6 Months</option>
-              <option value="1_year">1 Year</option>
+              className="w-full px-3 py-2 border border-gray-300 rounded-md">
+
+              <option value="1_month">{t("pages.1_month")}</option>
+              <option value="3_months">{t("pages.3_months")}</option>
+              <option value="6_months">{t("pages.6_months")}</option>
+              <option value="1_year">{t("pages.1_year")}</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Intensity
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t("pages.intensity")}
+
             </label>
             <select
               value={pathSettings.intensity}
               onChange={(e) => setPathSettings({ ...pathSettings, intensity: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              <option value="light">Light (2-3 hrs/week)</option>
-              <option value="moderate">Moderate (5-8 hrs/week)</option>
-              <option value="intensive">Intensive (10+ hrs/week)</option>
+              className="w-full px-3 py-2 border border-gray-300 rounded-md">
+
+              <option value="light">{t("pages.light_23_hrsweek")}</option>
+              <option value="moderate">{t("pages.moderate_58_hrsweek")}</option>
+              <option value="intensive">{t("pages.intensive_10_hrsweek")}</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Learning Style
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t("pages.learning_style")}
+
             </label>
             <select
               value={pathSettings.learning_style}
               onChange={(e) => setPathSettings({ ...pathSettings, learning_style: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              {learningStyles.map((style) => (
-                <option key={style.value} value={style.value}>
+              className="w-full px-3 py-2 border border-gray-300 rounded-md">
+
+              {learningStyles.map((style) =>
+              <option key={style.value} value={style.value}>
                   {style.label}
                 </option>
-              ))}
+              )}
             </select>
           </div>
         </div>
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Focus Areas
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t("components.focus_areas")}
+
           </label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {focusAreas.map((area) => (
-              <label key={area} className="flex items-center gap-2">
+            {focusAreas.map((area) =>
+            <label key={area} className="flex items-center gap-2">
                 <input
-                  type="checkbox"
-                  checked={pathSettings.focus_areas.includes(area)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setPathSettings({
-                        ...pathSettings,
-                        focus_areas: [...pathSettings.focus_areas, area]
-                      });
-                    } else {
-                      setPathSettings({
-                        ...pathSettings,
-                        focus_areas: pathSettings.focus_areas.filter(a => a !== area)
-                      });
-                    }
-                  }}
-                  className="rounded text-primary"
-                />
+                type="checkbox"
+                checked={pathSettings.focus_areas.includes(area)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setPathSettings({
+                      ...pathSettings,
+                      focus_areas: [...pathSettings.focus_areas, area]
+                    });
+                  } else {
+                    setPathSettings({
+                      ...pathSettings,
+                      focus_areas: pathSettings.focus_areas.filter((a) => a !== area)
+                    });
+                  }
+                }}
+                className="rounded text-primary" />
+
                 <span className="text-sm">
-                  {area.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                  {area.split('_').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                 </span>
               </label>
-            ))}
+            )}
           </div>
         </div>
         <Button
           onClick={handleGeneratePath}
           disabled={generating || !selectedBeneficiary}
-          className="w-full md:w-auto"
-        >
-          {generating ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Map className="h-4 w-4 mr-2" />
-              Generate Learning Path
-            </>
-          )}
+          className="w-full md:w-auto">
+
+          {generating ?
+          <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("pages.generating")}
+
+          </> :
+
+          <>
+              <Map className="h-4 w-4 mr-2" />{t("pages.generate_learning_path")}
+
+          </>
+          }
         </Button>
       </Card>
       {/* Selected Path Details */}
-      {selectedPath && (
-        <Card className="p-6">
+      {selectedPath &&
+      <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-lg font-semibold">{selectedPath.title}</h2>
               <p className="text-sm text-gray-600">{selectedPath.description}</p>
             </div>
             <div className="flex gap-2">
-              {hasRole(['super_admin', 'tenant_admin', 'trainer']) && (
-                <>
+              {hasRole(['super_admin', 'tenant_admin', 'trainer']) &&
+            <>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleExportPath(selectedPath.id)}
-                  >
+                variant="outline"
+                size="sm"
+                onClick={() => handleExportPath(selectedPath.id)}>
+
                     <Download className="h-4 w-4" />
                   </Button>
                   <Button
-                    size="sm"
-                    onClick={() => handleStartPath(selectedPath.id)}
-                  >
-                    <Play className="h-4 w-4 mr-1" />
-                    Start Path
-                  </Button>
+                size="sm"
+                onClick={() => handleStartPath(selectedPath.id)}>
+
+                    <Play className="h-4 w-4 mr-1" />{t("pages.start_path")}
+
+              </Button>
                 </>
-              )}
+            }
             </div>
           </div>
           {/* Learning Milestones */}
           <div className="space-y-4">
-            <h3 className="font-medium text-gray-900">Learning Milestones</h3>
+            <h3 className="font-medium text-gray-900">{t("pages.learning_milestones")}</h3>
             <div className="relative">
-              {selectedPath.milestones.map((milestone, index) => (
-                <div key={index} className="flex gap-4 mb-6 last:mb-0">
+              {selectedPath.milestones.map((milestone, index) =>
+            <div key={index} className="flex gap-4 mb-6 last:mb-0">
                   <div className="relative">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      milestone.status === 'completed' ? 'bg-green-500 text-white' :
-                      milestone.status === 'in_progress' ? 'bg-blue-500 text-white' :
-                      'bg-gray-300 text-gray-600'
-                    }`}>
-                      {milestone.status === 'completed' ? (
-                        <CheckCircle className="h-5 w-5" />
-                      ) : (
-                        <span className="font-semibold">{index + 1}</span>
-                      )}
+                milestone.status === 'completed' ? 'bg-green-500 text-white' :
+                milestone.status === 'in_progress' ? 'bg-blue-500 text-white' :
+                'bg-gray-300 text-gray-600'}`
+                }>
+                      {milestone.status === 'completed' ?
+                  <CheckCircle className="h-5 w-5" /> :
+
+                  <span className="font-semibold">{index + 1}</span>
+                  }
                     </div>
-                    {index < selectedPath.milestones.length - 1 && (
-                      <div className="absolute top-10 left-1/2 w-0.5 h-16 bg-gray-300 -translate-x-1/2" />
-                    )}
+                    {index < selectedPath.milestones.length - 1 &&
+                <div className="absolute top-10 left-1/2 w-0.5 h-16 bg-gray-300 -translate-x-1/2" />
+                }
                   </div>
                   <div className="flex-1">
                     <div className="bg-gray-50 rounded-lg p-4">
@@ -458,49 +459,49 @@ const AILearningPathPage = () => {
                           {milestone.difficulty}
                         </Badge>
                       </div>
-                      {milestone.resources && milestone.resources.length > 0 && (
-                        <div className="mt-3 pt-3 border-t">
+                      {milestone.resources && milestone.resources.length > 0 &&
+                  <div className="mt-3 pt-3 border-t">
                           <p className="text-sm font-medium text-gray-700 mb-2">Resources:</p>
                           <div className="space-y-1">
-                            {milestone.resources.map((resource, rIndex) => (
-                              <a
-                                key={rIndex}
-                                href={resource.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
-                              >
+                            {milestone.resources.map((resource, rIndex) =>
+                      <a
+                        key={rIndex}
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm text-blue-600 hover:underline">
+
                                 <BookOpen className="h-3 w-3" />
                                 {resource.title}
                               </a>
-                            ))}
+                      )}
                           </div>
                         </div>
-                      )}
+                  }
                     </div>
                   </div>
                 </div>
-              ))}
+            )}
             </div>
           </div>
         </Card>
-      )}
+      }
       {/* Existing Learning Paths */}
       <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-4">Active Learning Paths</h2>
-        {learningPaths.length === 0 ? (
-          <div className="text-center py-8">
+        <h2 className="text-lg font-semibold mb-4">{t("pages.active_learning_paths")}</h2>
+        {learningPaths.length === 0 ?
+        <div className="text-center py-8">
             <Map className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No active learning paths</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {learningPaths.map((path) => (
-              <div
-                key={path.id}
-                className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => setSelectedPath(path)}
-              >
+            <p className="text-gray-500">{t("pages.no_active_learning_paths")}</p>
+          </div> :
+
+        <div className="space-y-4">
+            {learningPaths.map((path) =>
+          <div
+            key={path.id}
+            className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => setSelectedPath(path)}>
+
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -516,9 +517,9 @@ const AILearningPathPage = () => {
                     {/* Progress Bar */}
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-primary h-2 rounded-full transition-all"
-                        style={{ width: `${path.progress}%` }}
-                      />
+                    className="bg-primary h-2 rounded-full transition-all"
+                    style={{ width: `${path.progress}%` }} />
+
                     </div>
                     <div className="flex items-center justify-between mt-3">
                       <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -526,38 +527,38 @@ const AILearningPathPage = () => {
                         <span>{path.duration}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        {path.status === 'in_progress' && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Pause logic
-                            }}
-                          >
+                        {path.status === 'in_progress' &&
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Pause logic
+                      }}>
+
                             <Pause className="h-4 w-4" />
                           </Button>
-                        )}
-                        {path.status === 'paused' && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleStartPath(path.id);
-                            }}
-                          >
+                    }
+                        {path.status === 'paused' &&
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartPath(path.id);
+                      }}>
+
                             <Play className="h-4 w-4" />
                           </Button>
-                        )}
+                    }
                         <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleExportPath(path.id);
-                          }}
-                        >
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleExportPath(path.id);
+                      }}>
+
                           <Download className="h-4 w-4" />
                         </Button>
                       </div>
@@ -566,11 +567,11 @@ const AILearningPathPage = () => {
                   <ChevronRight className="h-5 w-5 text-gray-400 ml-4" />
                 </div>
               </div>
-            ))}
+          )}
           </div>
-        )}
+        }
       </Card>
-    </div>
-  );
+    </div>);
+
 };
 export default AILearningPathPage;

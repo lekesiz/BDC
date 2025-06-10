@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -6,7 +7,7 @@ import api from '@/lib/api';
 import { QUESTION_TYPES } from '@/lib/constants';
 import { useToast } from '@/components/ui/toast';
 // Mock modules
-vi.mock('@/lib/api');
+import { useTranslation } from "react-i18next";vi.mock('@/lib/api');
 vi.mock('@/components/ui/toast');
 // Mock useNavigate hook
 const mockNavigate = vi.fn();
@@ -15,13 +16,13 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    useParams: () => ({ id: '123' }),
+    useParams: () => ({ id: '123' })
   };
 });
 // Mock toast hook
 const mockAddToast = vi.fn();
 useToast.mockReturnValue({
-  toast: mockAddToast,
+  toast: mockAddToast
 });
 // Mock URL utilities
 global.URL.createObjectURL = vi.fn(() => 'mock-url');
@@ -32,7 +33,7 @@ document.createElement = vi.fn().mockImplementation((tag) => {
       href: '',
       setAttribute: vi.fn(),
       click: vi.fn(),
-      remove: vi.fn(),
+      remove: vi.fn()
     };
   }
   return {};
@@ -47,42 +48,42 @@ const mockSessionData = {
   completed_at: '2023-06-15T10:45:00Z',
   score: 80,
   responses: [
-    {
-      question_id: '1',
-      response_data: 0, // Multiple choice selected option index
-      is_correct: true,
-      points: 10,
-      explanation: 'Correct! JavaScript is a programming language.',
-    },
-    {
-      question_id: '2',
-      response_data: 'Container for storing values', // Text response
-      is_correct: true,
-      points: 10,
-      explanation: 'Good definition of a variable.',
-    },
-    {
-      question_id: '3',
-      response_data: true, // True/False response
-      is_correct: false,
-      points: 0,
-      explanation: 'HTML is not a programming language.',
-    },
-    {
-      question_id: '4',
-      response_data: [0, 2, 1], // Matching response
-      is_correct: false,
-      points: 5,
-      explanation: 'Some matches were incorrect.',
-    },
-    {
-      question_id: '5',
-      response_data: [2, 0, 1], // Ordering response
-      is_correct: true,
-      points: 15,
-      explanation: 'Correct order!',
-    },
-  ],
+  {
+    question_id: '1',
+    response_data: 0, // Multiple choice selected option index
+    is_correct: true,
+    points: 10,
+    explanation: 'Correct! JavaScript is a programming language.'
+  },
+  {
+    question_id: '2',
+    response_data: 'Container for storing values', // Text response
+    is_correct: true,
+    points: 10,
+    explanation: 'Good definition of a variable.'
+  },
+  {
+    question_id: '3',
+    response_data: true, // True/False response
+    is_correct: false,
+    points: 0,
+    explanation: 'HTML is not a programming language.'
+  },
+  {
+    question_id: '4',
+    response_data: [0, 2, 1], // Matching response
+    is_correct: false,
+    points: 5,
+    explanation: 'Some matches were incorrect.'
+  },
+  {
+    question_id: '5',
+    response_data: [2, 0, 1], // Ordering response
+    is_correct: true,
+    points: 15,
+    explanation: 'Correct order!'
+  }]
+
 };
 // Sample test data
 const mockTestData = {
@@ -93,84 +94,84 @@ const mockTestData = {
   passing_score: 70,
   skills: ['JavaScript', 'HTML', 'CSS', 'Web Development'],
   questions: [
-    {
-      id: '1',
-      question_text: 'What is JavaScript?',
-      question_type: QUESTION_TYPES.MULTIPLE_CHOICE,
-      points: 10,
-      skills: ['JavaScript'],
-      options: [
-        { text: 'A programming language', is_correct: true },
-        { text: 'A markup language', is_correct: false },
-        { text: 'A database system', is_correct: false },
-        { text: 'A styling language', is_correct: false },
-      ],
-    },
-    {
-      id: '2',
-      question_text: 'What is a variable?',
-      question_type: QUESTION_TYPES.TEXT,
-      points: 10,
-      skills: ['JavaScript', 'Programming'],
-      correct_answer: 'A container for storing data values',
-    },
-    {
-      id: '3',
-      question_text: 'HTML is a programming language',
-      question_type: QUESTION_TYPES.TRUE_FALSE,
-      points: 10,
-      skills: ['HTML'],
-      options: [
-        { text: 'True', is_correct: false },
-        { text: 'False', is_correct: true },
-      ],
-    },
-    {
-      id: '4',
-      question_text: 'Match the following',
-      question_type: QUESTION_TYPES.MATCHING,
-      points: 10,
-      skills: ['Web Development'],
-      matches: [
-        { left: 'HTML', right: 'Structure', position: 0 },
-        { left: 'CSS', right: 'Style', position: 1 },
-        { left: 'JavaScript', right: 'Behavior', position: 2 },
-      ],
-    },
-    {
-      id: '5',
-      question_text: 'Order the steps to create a web page',
-      question_type: QUESTION_TYPES.ORDERING,
-      points: 15,
-      skills: ['Web Development'],
-      order_items: [
-        { text: 'Write HTML', position: 0 },
-        { text: 'Add CSS', position: 1 },
-        { text: 'Add JavaScript', position: 2 },
-      ],
-    },
-  ],
+  {
+    id: '1',
+    question_text: 'What is JavaScript?',
+    question_type: QUESTION_TYPES.MULTIPLE_CHOICE,
+    points: 10,
+    skills: ['JavaScript'],
+    options: [
+    { text: 'A programming language', is_correct: true },
+    { text: 'A markup language', is_correct: false },
+    { text: 'A database system', is_correct: false },
+    { text: 'A styling language', is_correct: false }]
+
+  },
+  {
+    id: '2',
+    question_text: 'What is a variable?',
+    question_type: QUESTION_TYPES.TEXT,
+    points: 10,
+    skills: ['JavaScript', 'Programming'],
+    correct_answer: 'A container for storing data values'
+  },
+  {
+    id: '3',
+    question_text: 'HTML is a programming language',
+    question_type: QUESTION_TYPES.TRUE_FALSE,
+    points: 10,
+    skills: ['HTML'],
+    options: [
+    { text: 'True', is_correct: false },
+    { text: 'False', is_correct: true }]
+
+  },
+  {
+    id: '4',
+    question_text: 'Match the following',
+    question_type: QUESTION_TYPES.MATCHING,
+    points: 10,
+    skills: ['Web Development'],
+    matches: [
+    { left: 'HTML', right: 'Structure', position: 0 },
+    { left: 'CSS', right: 'Style', position: 1 },
+    { left: 'JavaScript', right: 'Behavior', position: 2 }]
+
+  },
+  {
+    id: '5',
+    question_text: 'Order the steps to create a web page',
+    question_type: QUESTION_TYPES.ORDERING,
+    points: 15,
+    skills: ['Web Development'],
+    order_items: [
+    { text: 'Write HTML', position: 0 },
+    { text: 'Add CSS', position: 1 },
+    { text: 'Add JavaScript', position: 2 }]
+
+  }]
+
 };
 // Sample feedback data
 const mockFeedbackData = {
   overall_assessment: 'You have a good understanding of web development concepts, but could improve in some areas.',
   strengths: [
-    'Strong understanding of JavaScript fundamentals',
-    'Solid grasp of programming concepts',
-  ],
+  'Strong understanding of JavaScript fundamentals',
+  'Solid grasp of programming concepts'],
+
   areas_for_improvement: [
-    'More practice with HTML concepts needed',
-    'Review matching of technologies with their purposes',
-  ],
+  'More practice with HTML concepts needed',
+  'Review matching of technologies with their purposes'],
+
   recommendations: [
-    'Complete additional HTML exercises',
-    'Review the relationship between HTML, CSS, and JavaScript',
-  ],
+  'Complete additional HTML exercises',
+  'Review the relationship between HTML, CSS, and JavaScript'],
+
   skill_feedback: {
     'JavaScript': 'Your JavaScript knowledge is strong, scoring 90% in this area.',
     'HTML': 'You should review HTML concepts, as you scored only a 60% in this area.',
-    'Web Development': 'Good understanding of web development workflow, but some gaps in matching technologies to their purposes.',
-  },
+    'Web Development': 'Good understanding of web development workflow, but some gaps in matching technologies to their purposes.'
+  }
 };
 describe('TestResultsPage', () => {
   beforeEach(() => {
@@ -216,7 +217,7 @@ describe('TestResultsPage', () => {
       expect(mockAddToast).toHaveBeenCalledWith({
         title: 'Error',
         description: 'Failed to load test results',
-        type: 'error',
+        type: 'error'
       });
     });
   });
@@ -376,7 +377,7 @@ describe('TestResultsPage', () => {
     // Check API call
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith('/api/evaluations/sessions/123/certificate', {
-        responseType: 'blob',
+        responseType: 'blob'
       });
     });
     // Check download link was created and clicked
@@ -405,7 +406,7 @@ describe('TestResultsPage', () => {
     // Check API call
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith('/api/evaluations/sessions/123/report', {
-        responseType: 'blob',
+        responseType: 'blob'
       });
     });
     // Check download link was created and clicked
@@ -449,7 +450,7 @@ describe('TestResultsPage', () => {
       expect(mockAddToast).toHaveBeenCalledWith({
         title: 'Error',
         description: 'Failed to download certificate',
-        type: 'error',
+        type: 'error'
       });
     });
   });

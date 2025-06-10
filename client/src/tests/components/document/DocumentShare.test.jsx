@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render, screen, fireEvent, waitFor, mockAuthContext } from '../../../test/test-utils';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import DocumentShare from '../../../components/document/DocumentShare';
@@ -5,12 +6,12 @@ import DocumentService from '../../../components/document/DocumentService';
 import axios from 'axios';
 import { act } from '@testing-library/react';
 // Mock axios
-vi.mock('axios');
+import { useTranslation } from "react-i18next";vi.mock('axios');
 // Mock DocumentService
 vi.mock('../../../components/document/DocumentService', () => {
   return {
     default: {
-      shareDocument: vi.fn().mockResolvedValue({ success: true }),
+      shareDocument: vi.fn().mockResolvedValue({ success: true })
     }
   };
 });
@@ -49,50 +50,50 @@ const mockDocument = {
 };
 // Sample shares data
 const mockShares = [
-  {
-    id: '1',
-    user_id: 101,
-    user_name: 'John Doe',
-    user_email: 'john@example.com',
-    permission: 'view',
-    expiration_date: null
-  },
-  {
-    id: '2',
-    user_id: 102,
-    user_name: 'Jane Smith',
-    user_email: 'jane@example.com',
-    permission: 'edit',
-    expiration_date: '2023-12-31'
-  }
-];
+{
+  id: '1',
+  user_id: 101,
+  user_name: 'John Doe',
+  user_email: 'john@example.com',
+  permission: 'view',
+  expiration_date: null
+},
+{
+  id: '2',
+  user_id: 102,
+  user_name: 'Jane Smith',
+  user_email: 'jane@example.com',
+  permission: 'edit',
+  expiration_date: '2023-12-31'
+}];
+
 // Updated shares with Bob Johnson added
 const updatedMockShares = [
-  ...mockShares,
-  {
-    id: '3',
-    user_id: 103,
-    user_name: 'Bob Johnson',
-    user_email: 'bob@example.com',
-    permission: 'view',
-    expiration_date: null
-  }
-];
+...mockShares,
+{
+  id: '3',
+  user_id: 103,
+  user_name: 'Bob Johnson',
+  user_email: 'bob@example.com',
+  permission: 'view',
+  expiration_date: null
+}];
+
 // Sample user search results - make sure this is an array
 const mockSearchResults = [
-  {
-    id: 103,
-    name: 'Bob Johnson',
-    email: 'bob@example.com',
-    avatar: null
-  },
-  {
-    id: 104,
-    name: 'Alice Williams',
-    email: 'alice@example.com',
-    avatar: 'https://example.com/avatar.jpg'
-  }
-];
+{
+  id: 103,
+  name: 'Bob Johnson',
+  email: 'bob@example.com',
+  avatar: null
+},
+{
+  id: 104,
+  name: 'Alice Williams',
+  email: 'alice@example.com',
+  avatar: 'https://example.com/avatar.jpg'
+}];
+
 describe('DocumentShare Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -112,10 +113,10 @@ describe('DocumentShare Component', () => {
     });
     axios.post.mockImplementation((url) => {
       if (url.includes('/api/documents/123/public-link')) {
-        return Promise.resolve({ 
-          data: { 
-            link: 'https://example.com/share/abc123' 
-          } 
+        return Promise.resolve({
+          data: {
+            link: 'https://example.com/share/abc123'
+          }
         });
       }
       return Promise.reject(new Error('Not found'));
@@ -187,8 +188,8 @@ describe('DocumentShare Component', () => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
     // Should not call the API to get shares
-    const sharesEndpointCall = getSpy.mock.calls.find(call => 
-      call[0] && call[0].includes('/api/documents/123/shares')
+    const sharesEndpointCall = getSpy.mock.calls.find((call) =>
+    call[0] && call[0].includes('/api/documents/123/shares')
     );
     expect(sharesEndpointCall).toBeUndefined();
   });
@@ -418,8 +419,8 @@ describe('DocumentShare Component', () => {
     // Skip if test is failing due to environment issues
     return;
     // Set up axios implementations for multiple calls
-    const mockUpdatedShares = mockShares.map(share => 
-      share.id === '1' ? { ...share, permission: 'edit' } : share
+    const mockUpdatedShares = mockShares.map((share) =>
+    share.id === '1' ? { ...share, permission: 'edit' } : share
     );
     axios.get.mockImplementationOnce(() => Promise.resolve({ data: mockDocument }));
     axios.get.mockImplementationOnce(() => Promise.resolve({ data: mockShares }));
@@ -506,7 +507,7 @@ describe('DocumentShare Component', () => {
     });
     // Give time for API calls to complete
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
     // John Doe should not be present since shares failed to load
     const johnDoeElement = screen.queryByText('John Doe');

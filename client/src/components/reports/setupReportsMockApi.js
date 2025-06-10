@@ -1,20 +1,21 @@
-import { 
-  reports, 
-  scheduledReports, 
-  getReportFields, 
-  getReportFilters, 
-  getReportPreview, 
+// TODO: i18n - processed
+import {
+  reports,
+  scheduledReports,
+  getReportFields,
+  getReportFilters,
+  getReportPreview,
   saveReport,
   getScheduledReport,
   saveScheduledReport,
-  users
-} from './mockReportsData';
+  users } from
+'./mockReportsData';
 /**
  * Setup mock API handlers for reports system
- */
+ */import { useTranslation } from "react-i18next";
 export const setupReportsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Override API methods with mock implementations
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     // Get all reports
     if (url === '/api/reports') {
       return Promise.resolve({
@@ -38,7 +39,7 @@ export const setupReportsMockApi = (api, originalGet, originalPost, originalPut,
     }
     // Get saved reports
     if (url === '/api/reports/saved') {
-      const savedReports = reports.filter(report => report.is_saved);
+      const savedReports = reports.filter((report) => report.is_saved);
       return Promise.resolve({
         data: savedReports,
         status: 200,
@@ -49,7 +50,7 @@ export const setupReportsMockApi = (api, originalGet, originalPost, originalPut,
     }
     // Get report templates
     if (url === '/api/reports/templates') {
-      const templates = reports.filter(report => report.is_template);
+      const templates = reports.filter((report) => report.is_template);
       return Promise.resolve({
         data: templates,
         status: 200,
@@ -111,7 +112,7 @@ export const setupReportsMockApi = (api, originalGet, originalPost, originalPut,
     const reportMatch = url.match(/^\/api\/reports\/(\d+)$/);
     if (reportMatch) {
       const id = reportMatch[1];
-      const report = reports.find(r => r.id.toString() === id);
+      const report = reports.find((r) => r.id.toString() === id);
       if (!report) {
         return Promise.reject({
           response: {
@@ -154,10 +155,10 @@ export const setupReportsMockApi = (api, originalGet, originalPost, originalPut,
       const queryString = url.split('?')[1] || '';
       const params = new URLSearchParams(queryString);
       const query = params.get('q') || '';
-      const filteredUsers = users.filter(user => 
-        user.first_name.toLowerCase().includes(query.toLowerCase()) ||
-        user.last_name.toLowerCase().includes(query.toLowerCase()) ||
-        user.email.toLowerCase().includes(query.toLowerCase())
+      const filteredUsers = users.filter((user) =>
+      user.first_name.toLowerCase().includes(query.toLowerCase()) ||
+      user.last_name.toLowerCase().includes(query.toLowerCase()) ||
+      user.email.toLowerCase().includes(query.toLowerCase())
       );
       return Promise.resolve({
         data: filteredUsers,
@@ -184,7 +185,7 @@ export const setupReportsMockApi = (api, originalGet, originalPost, originalPut,
     // Fall back to original get method
     return originalGet(url, config);
   };
-  api.post = function(url, data, config) {
+  api.post = function (url, data, config) {
     // Save report
     if (url === '/api/reports/save') {
       const savedReport = saveReport(data);
@@ -211,7 +212,7 @@ export const setupReportsMockApi = (api, originalGet, originalPost, originalPut,
     const shareMatch = url.match(/^\/api\/reports\/(\d+)\/share$/);
     if (shareMatch) {
       const id = shareMatch[1];
-      const updatedReport = reports.find(r => r.id.toString() === id);
+      const updatedReport = reports.find((r) => r.id.toString() === id);
       if (!updatedReport) {
         return Promise.reject({
           response: {
@@ -231,12 +232,12 @@ export const setupReportsMockApi = (api, originalGet, originalPost, originalPut,
     // Fall back to original post method
     return originalPost(url, data, config);
   };
-  api.put = function(url, data, config) {
+  api.put = function (url, data, config) {
     // Update report
     const reportMatch = url.match(/^\/api\/reports\/(\d+)$/);
     if (reportMatch) {
       const id = reportMatch[1];
-      const report = reports.find(r => r.id.toString() === id);
+      const report = reports.find((r) => r.id.toString() === id);
       if (!report) {
         return Promise.reject({
           response: {
@@ -258,7 +259,7 @@ export const setupReportsMockApi = (api, originalGet, originalPost, originalPut,
     const scheduledMatch = url.match(/^\/api\/reports\/scheduled\/(\d+)$/);
     if (scheduledMatch) {
       const id = scheduledMatch[1];
-      const report = scheduledReports.find(r => r.id.toString() === id);
+      const report = scheduledReports.find((r) => r.id.toString() === id);
       if (!report) {
         return Promise.reject({
           response: {
@@ -279,12 +280,12 @@ export const setupReportsMockApi = (api, originalGet, originalPost, originalPut,
     // Fall back to original put method
     return originalPut(url, data, config);
   };
-  api.delete = function(url, config) {
+  api.delete = function (url, config) {
     // Delete report
     const reportMatch = url.match(/^\/api\/reports\/(\d+)$/);
     if (reportMatch) {
       const id = reportMatch[1];
-      const index = reports.findIndex(r => r.id.toString() === id);
+      const index = reports.findIndex((r) => r.id.toString() === id);
       if (index === -1) {
         return Promise.reject({
           response: {
@@ -306,7 +307,7 @@ export const setupReportsMockApi = (api, originalGet, originalPost, originalPut,
     const scheduledMatch = url.match(/^\/api\/reports\/scheduled\/(\d+)$/);
     if (scheduledMatch) {
       const id = scheduledMatch[1];
-      const index = scheduledReports.findIndex(r => r.id.toString() === id);
+      const index = scheduledReports.findIndex((r) => r.id.toString() === id);
       if (index === -1) {
         return Promise.reject({
           response: {

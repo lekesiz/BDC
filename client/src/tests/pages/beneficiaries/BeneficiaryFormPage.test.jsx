@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -6,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/toast';
 import api from '@/lib/api';
 // Mock the modules
-vi.mock('@/hooks/useAuth');
+import { useTranslation } from "react-i18next";vi.mock('@/hooks/useAuth');
 vi.mock('@/components/ui/toast');
 vi.mock('@/lib/api');
 vi.mock('react-hook-form', async () => {
@@ -24,7 +25,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useParams: () => mockParams,
-    useNavigate: () => mockNavigate,
+    useNavigate: () => mockNavigate
   };
 });
 // Mock URL.createObjectURL
@@ -41,19 +42,19 @@ useToast.mockReturnValue({
 });
 // Mock trainers data
 const mockTrainers = [
-  {
-    id: '1',
-    first_name: 'Jane',
-    last_name: 'Trainer',
-    email: 'jane@example.com',
-  },
-  {
-    id: '2',
-    first_name: 'John',
-    last_name: 'Coach',
-    email: 'john@example.com',
-  }
-];
+{
+  id: '1',
+  first_name: 'Jane',
+  last_name: 'Trainer',
+  email: 'jane@example.com'
+},
+{
+  id: '2',
+  first_name: 'John',
+  last_name: 'Coach',
+  email: 'john@example.com'
+}];
+
 // Mock beneficiary data for edit mode
 const mockBeneficiary = {
   id: '123',
@@ -88,7 +89,7 @@ describe('BeneficiaryFormPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset params for each test
-    Object.keys(mockParams).forEach(key => delete mockParams[key]);
+    Object.keys(mockParams).forEach((key) => delete mockParams[key]);
     // Default mock implementations
     api.get.mockImplementation((url) => {
       if (url.includes('/api/users')) {
@@ -337,10 +338,10 @@ describe('BeneficiaryFormPage', () => {
   });
   it('handles API errors on submit', async () => {
     // Mock API error
-    api.post.mockRejectedValueOnce({ 
-      response: { 
-        data: { message: 'Email already exists' } 
-      } 
+    api.post.mockRejectedValueOnce({
+      response: {
+        data: { message: 'Email already exists' }
+      }
     });
     render(
       <BrowserRouter>

@@ -1,4 +1,5 @@
-/**
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; /**
  * Responsive utility classes for mobile-first design
  */
 // Touch-friendly tap target sizes (minimum 44px as per iOS guidelines)

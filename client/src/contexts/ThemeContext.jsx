@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+// TODO: i18n - processed
+import { createContext, useContext, useState, useEffect } from 'react';import { useTranslation } from "react-i18next";
 const ThemeContext = createContext();
 export const useTheme = () => {
   const context = useContext(ThemeContext);
@@ -7,7 +8,7 @@ export const useTheme = () => {
   }
   return context;
 };
-export const ThemeProvider = ({ children }) => {
+export const ThemeProvider = ({ children }) => {const { t } = useTranslation();
   const [theme, setTheme] = useState(() => {
     // Check for saved theme preference or default to light
     const savedTheme = localStorage.getItem('theme');
@@ -45,7 +46,7 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem('fontSize', fontSize);
   }, [fontSize]);
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    setTheme((prevTheme) => prevTheme === 'light' ? 'dark' : 'light');
   };
   const changeTheme = (newTheme) => {
     setTheme(newTheme);
@@ -70,6 +71,6 @@ export const ThemeProvider = ({ children }) => {
   return (
     <ThemeContext.Provider value={value}>
       {children}
-    </ThemeContext.Provider>
-  );
+    </ThemeContext.Provider>);
+
 };

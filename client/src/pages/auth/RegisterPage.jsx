@@ -11,29 +11,34 @@ import { Input } from '@/components/ui/input';
 import { Form, FormGroup, FormLabel, FormControl, FormHelper, Select } from '@/components/ui/form';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 // Registration form validation schema
-const registerSchema = z.object({
-  first_name: z.string().min(2, 'First name must be at least 2 characters'),
-  last_name: z.string().min(2, 'Last name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+const createRegisterSchema = (t) => z.object({
+  first_name: z.string().min(2, t('validation.firstName.min', { min: 2 })),
+  last_name: z.string().min(2, t('validation.lastName.min', { min: 2 })),
+  email: z.string().email(t('validation.email.invalid')),
+  password: z.string().min(8, t('validation.password.min', { min: 8 })),
   confirm_password: z.string(),
   role: z.enum(['trainee', 'trainer']),
-  organization: z.string().min(2, 'Organization name must be at least 2 characters').optional(),
+  organization: z.string().min(2, t('validation.organization.min', { min: 2 })).optional(),
 })
 .refine(data => data.password === data.confirm_password, {
-  message: "Passwords don't match",
+  message: t('validation.password.mismatch'),
   path: ['confirm_password'],
 });
 /**
  * Register page component
  */
 const RegisterPage = () => {
+  const { t } = useTranslation();
   const { register: registerUser, error: authError } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Create schema with translations
+  const registerSchema = createRegisterSchema(t);
+  
   // React Hook Form with Zod validation
   const { 
     register, 

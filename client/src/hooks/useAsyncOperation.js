@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
 /**
@@ -10,7 +11,7 @@ import { toast } from '@/components/ui/use-toast';
  * @param {function} options.onSuccess Callback for successful operations
  * @param {function} options.onError Callback for failed operations
  * @returns {Object} Hook state and methods
- */
+ */import { useTranslation } from "react-i18next";
 export const useAsyncOperation = (options = {}) => {
   const {
     showErrorToast = true,
@@ -31,14 +32,14 @@ export const useAsyncOperation = (options = {}) => {
     errorMessage,
     silent = false
   } = {}) => {
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null }));
     const attemptExecution = async (attemptNumber = 0) => {
       try {
         const result = await asyncFunction();
-        setState(prev => ({ 
-          ...prev, 
-          loading: false, 
-          data: result, 
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          data: result,
           error: null,
           attempt: 0
         }));
@@ -52,13 +53,13 @@ export const useAsyncOperation = (options = {}) => {
       } catch (error) {
         console.error('Async operation error:', error);
         if (attemptNumber < retryCount) {
-          setState(prev => ({ ...prev, attempt: attemptNumber + 1 }));
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          setState((prev) => ({ ...prev, attempt: attemptNumber + 1 }));
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
           return attemptExecution(attemptNumber + 1);
         }
-        setState(prev => ({ 
-          ...prev, 
-          loading: false, 
+        setState((prev) => ({
+          ...prev,
+          loading: false,
           error,
           attempt: 0
         }));

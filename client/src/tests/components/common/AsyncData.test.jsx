@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, act } from '../../../test/test-utils';
 // Mock the module with an absolute path
@@ -11,7 +12,7 @@ vi.mock('../../../hooks/useAsyncOperation', () => {
 // Import the mocked module
 import { useAsyncOperation } from '../../../hooks/useAsyncOperation';
 // Import the component
-import { AsyncData } from '../../../components/common/AsyncData.jsx';
+import { AsyncData } from '../../../components/common/AsyncData.jsx';import { useTranslation } from "react-i18next";
 describe('AsyncData', () => {
   // Reset mocks before each test
   beforeEach(() => {
@@ -31,8 +32,8 @@ describe('AsyncData', () => {
       <AsyncData
         fetchData={mockFetch}
         loadingComponent={<div>Loading...</div>}
-        render={() => <div>Data loaded</div>}
-      />
+        render={() => <div>Data loaded</div>} />
+
     );
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
@@ -51,8 +52,8 @@ describe('AsyncData', () => {
       <AsyncData
         fetchData={mockFetch}
         loadingComponent={<div>Loading...</div>}
-        render={(data) => <div>Data: {data.name}</div>}
-      />
+        render={(data) => <div>Data: {data.name}</div>} />
+
     );
     // Initially shows loading state
     expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -69,8 +70,8 @@ describe('AsyncData', () => {
         <AsyncData
           fetchData={mockFetch}
           loadingComponent={<div>Loading...</div>}
-          render={(data) => <div>Data: {data.name}</div>}
-        />
+          render={(data) => <div>Data: {data.name}</div>} />
+
       );
     });
     // Then shows the data
@@ -92,8 +93,8 @@ describe('AsyncData', () => {
         fetchData={mockFetch}
         loadingComponent={<div>Loading...</div>}
         errorComponent={<div>Error occurred</div>}
-        render={(data) => <div>Data loaded</div>}
-      />
+        render={(data) => <div>Data loaded</div>} />
+
     );
     // Initially shows loading state
     expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -111,8 +112,8 @@ describe('AsyncData', () => {
           fetchData={mockFetch}
           loadingComponent={<div>Loading...</div>}
           errorComponent={<div>Error occurred</div>}
-          render={(data) => <div>Data loaded</div>}
-        />
+          render={(data) => <div>Data loaded</div>} />
+
       );
     });
     // Then shows the error state
@@ -133,8 +134,8 @@ describe('AsyncData', () => {
         fetchData={mockFetch}
         loadingComponent={<div>Loading...</div>}
         emptyComponent={<div>No data available</div>}
-        render={(data) => <div>Data loaded</div>}
-      />
+        render={(data) => <div>Data loaded</div>} />
+
     );
     // Initially shows loading state
     expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -152,8 +153,8 @@ describe('AsyncData', () => {
           fetchData={mockFetch}
           loadingComponent={<div>Loading...</div>}
           emptyComponent={<div>No data available</div>}
-          render={(data) => <div>Data loaded</div>}
-        />
+          render={(data) => <div>Data loaded</div>} />
+
       );
     });
     // Then shows the empty state
@@ -176,8 +177,8 @@ describe('AsyncData', () => {
         fetchData={mockFetch}
         dependencies={[1]}
         loadingComponent={<div>Loading...</div>}
-        render={(data) => <div>Data: {data.name}</div>}
-      />
+        render={(data) => <div>Data: {data.name}</div>} />
+
     );
     // Initial render should show data and call execute
     expect(screen.getByText('Data: Test Item')).toBeInTheDocument();
@@ -190,8 +191,8 @@ describe('AsyncData', () => {
           fetchData={mockFetch}
           dependencies={[2]} // Changed dependency
           loadingComponent={<div>Loading...</div>}
-          render={(data) => <div>Data: {data.name}</div>}
-        />
+          render={(data) => <div>Data: {data.name}</div>} />
+
       );
     });
     // The useEffect should be triggered because dependencies changed,

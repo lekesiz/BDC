@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -6,7 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import api from '../../lib/api';
 import { API_ENDPOINTS } from '../../lib/constants';
 // Mock modules
-vi.mock('../../hooks/useAuth');
+import { useTranslation } from "react-i18next";vi.mock('../../hooks/useAuth');
 vi.mock('../../lib/api', () => ({
   default: {
     get: vi.fn(),
@@ -164,14 +165,14 @@ describe('DashboardPage', () => {
           return Promise.resolve({
             data: {
               tests: [
-                {
-                  id: 1,
-                  title: 'JavaScript Test',
-                  status: 'completed',
-                  score: 85,
-                  date: '2024-01-15T10:00:00Z'
-                }
-              ]
+              {
+                id: 1,
+                title: 'JavaScript Test',
+                status: 'completed',
+                score: 85,
+                date: '2024-01-15T10:00:00Z'
+              }]
+
             }
           });
         default:
@@ -208,14 +209,14 @@ describe('DashboardPage', () => {
           return Promise.resolve({
             data: {
               events: [
-                {
-                  id: 1,
-                  title: 'System Update Meeting',
-                  date: '2024-01-15',
-                  time: '10:00 AM',
-                  beneficiary: 'John Doe'
-                }
-              ]
+              {
+                id: 1,
+                title: 'System Update Meeting',
+                date: '2024-01-15',
+                time: '10:00 AM',
+                beneficiary: 'John Doe'
+              }]
+
             }
           });
         default:

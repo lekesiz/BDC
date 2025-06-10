@@ -1,9 +1,10 @@
+// TODO: i18n - processed
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ErrorBoundary from '../../../components/common/ErrorBoundary';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Create a component that will throw an error
-const ThrowError = () => {
+import { useTranslation } from "react-i18next";const ThrowError = () => {const { t } = useTranslation();
   throw new Error('Test error');
   return null;
 };

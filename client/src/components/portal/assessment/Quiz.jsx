@@ -1,15 +1,16 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  CheckCircle, 
-  XCircle, 
-  AlertCircle, 
-  ChevronLeft, 
+import {
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  ChevronLeft,
   ChevronRight,
   RotateCcw,
   Award,
-  Timer
-} from 'lucide-react';
+  Timer } from
+'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -17,18 +18,18 @@ import {
   TrueFalseQuestion,
   ShortAnswerQuestion,
   MatchingQuestion,
-  MultipleAnswerQuestion
-} from './QuestionTypes';
+  MultipleAnswerQuestion } from
+'./QuestionTypes';
 /**
  * Quiz Component
  * Handles quiz flow, timer, scoring, and results
- */
-const Quiz = ({ 
-  quizData, 
-  onComplete, 
+ */import { useTranslation } from "react-i18next";
+const Quiz = ({
+  quizData,
+  onComplete,
   onExit,
-  timedMode = false 
-}) => {
+  timedMode = false
+}) => {const { t } = useTranslation();
   const navigate = useNavigate();
   const [activeQuestion, setActiveQuestion] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
@@ -41,7 +42,7 @@ const Quiz = ({
     if (!timedMode || quizCompleted || !quizData.timeLimit) return;
     // Start the timer
     const timer = setInterval(() => {
-      setRemainingTime(prevTime => {
+      setRemainingTime((prevTime) => {
         // If time is up, automatically submit the quiz
         if (prevTime <= 1) {
           clearInterval(timer);
@@ -62,7 +63,7 @@ const Quiz = ({
   };
   // Handle answering a question
   const handleAnswer = (answer) => {
-    setUserAnswers(prev => ({
+    setUserAnswers((prev) => ({
       ...prev,
       [activeQuestion]: answer
     }));
@@ -119,7 +120,7 @@ const Quiz = ({
     return {
       correct,
       total,
-      percentage: Math.round((correct / total) * 100)
+      percentage: Math.round(correct / total * 100)
     };
   };
   // Check if an answer is correct
@@ -132,20 +133,20 @@ const Quiz = ({
         return answer === question.correctAnswer;
       case 'shortAnswer':
         if (Array.isArray(question.correctAnswer)) {
-          return question.correctAnswer.some(ans => 
-            answer.toLowerCase().trim() === ans.toLowerCase().trim()
+          return question.correctAnswer.some((ans) =>
+          answer.toLowerCase().trim() === ans.toLowerCase().trim()
           );
         }
         return answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim();
       case 'matching':
         return Object.keys(question.correctMatches).every(
-          itemId => answer[itemId] === question.correctMatches[itemId]
+          (itemId) => answer[itemId] === question.correctMatches[itemId]
         );
       case 'multipleAnswer':
         if (!answer || answer.length === 0) return false;
         if (answer.length !== question.correctAnswers.length) return false;
-        return question.correctAnswers.every(ans => answer.includes(ans)) &&
-               answer.every(ans => question.correctAnswers.includes(ans));
+        return question.correctAnswers.every((ans) => answer.includes(ans)) &&
+        answer.every((ans) => question.correctAnswers.includes(ans));
       default:
         return false;
     }
@@ -176,44 +177,44 @@ const Quiz = ({
       <Card className="p-6">
         <div className="text-center mb-8">
           <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-4 ${
-            passed ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-          }`}>
-            {passed ? (
-              <Award className="h-12 w-12" />
-            ) : (
-              <XCircle className="h-12 w-12" />
-            )}
+          passed ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`
+          }>
+            {passed ?
+            <Award className="h-12 w-12" /> :
+
+            <XCircle className="h-12 w-12" />
+            }
           </div>
           <h2 className="text-2xl font-bold mb-2">
             {passed ? 'Congratulations!' : 'Quiz Completed'}
           </h2>
-          <p className="text-lg">
-            You scored <span className="font-semibold">{score.percentage}%</span>
+          <p className="text-lg">{t("components.you_scored")}
+            <span className="font-semibold">{score.percentage}%</span>
           </p>
           <p className="text-gray-500 mt-1">
-            {score.correct} out of {score.total} questions correct
+            {score.correct}{t("components.out_of")}{score.total}{t("components.questions_correct")}
           </p>
-          {timedMode && quizData.timeLimit && (
-            <p className="text-gray-500 mt-2">
-              Time spent: {Math.floor((quizData.timeLimit - remainingTime) / 60)}m {(quizData.timeLimit - remainingTime) % 60}s
+          {timedMode && quizData.timeLimit &&
+          <p className="text-gray-500 mt-2">{t("components.time_spent")}
+            {Math.floor((quizData.timeLimit - remainingTime) / 60)}m {(quizData.timeLimit - remainingTime) % 60}s
             </p>
-          )}
+          }
         </div>
         <div className="flex flex-col sm:flex-row gap-2 justify-center">
           <Button variant="outline" onClick={handleRestartQuiz}>
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Restart Quiz
+            <RotateCcw className="h-4 w-4 mr-2" />{t("components.restart_quiz")}
+
           </Button>
           <Button variant="outline" onClick={handleReviewQuiz}>
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Review Answers
+            <CheckCircle className="h-4 w-4 mr-2" />{t("components.review_answers")}
+
           </Button>
-          <Button onClick={onExit}>
-            Exit
+          <Button onClick={onExit}>{t("components.exit")}
+
           </Button>
         </div>
-      </Card>
-    );
+      </Card>);
+
   }
   // Render the current question
   return (
@@ -221,116 +222,116 @@ const Quiz = ({
       {/* Quiz header */}
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-xl font-semibold">{quizData.title}</h2>
-        {timedMode && remainingTime > 0 && (
-          <div className="flex items-center bg-gray-100 rounded-full px-3 py-1">
+        {timedMode && remainingTime > 0 &&
+        <div className="flex items-center bg-gray-100 rounded-full px-3 py-1">
             <Timer className="h-4 w-4 mr-2 text-gray-500" />
             <span className="font-medium">{formatTimeRemaining()}</span>
           </div>
-        )}
+        }
       </div>
       {/* Progress indicator */}
       <div className="mb-6">
         <div className="flex justify-between text-sm text-gray-500 mb-2">
-          <span>Question {activeQuestion + 1} of {quizData.questions.length}</span>
+          <span>{t("components.question")}{activeQuestion + 1} of {quizData.questions.length}</span>
           <span>
             {Object.keys(userAnswers).length} of {quizData.questions.length} answered
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2.5">
-          <div 
-            className="bg-primary h-2.5 rounded-full" 
-            style={{ width: `${(Object.keys(userAnswers).length / quizData.questions.length) * 100}%` }}
-          ></div>
+          <div
+            className="bg-primary h-2.5 rounded-full"
+            style={{ width: `${Object.keys(userAnswers).length / quizData.questions.length * 100}%` }}>
+          </div>
         </div>
       </div>
       {/* Question */}
       <div className="mb-8">
-        {currentQuestion.type === 'multipleChoice' && (
-          <MultipleChoiceQuestion
-            question={currentQuestion.question}
-            options={currentQuestion.options}
-            correctAnswer={currentQuestion.correctAnswer}
-            onAnswer={handleAnswer}
-            userAnswer={userAnswers[activeQuestion]}
-            showFeedback={reviewMode}
-            questionIndex={activeQuestion}
-          />
-        )}
-        {currentQuestion.type === 'trueFalse' && (
-          <TrueFalseQuestion
-            question={currentQuestion.question}
-            correctAnswer={currentQuestion.correctAnswer}
-            onAnswer={handleAnswer}
-            userAnswer={userAnswers[activeQuestion]}
-            showFeedback={reviewMode}
-            explanation={currentQuestion.explanation}
-            questionIndex={activeQuestion}
-          />
-        )}
-        {currentQuestion.type === 'shortAnswer' && (
-          <ShortAnswerQuestion
-            question={currentQuestion.question}
-            correctAnswer={currentQuestion.correctAnswer}
-            onAnswer={handleAnswer}
-            userAnswer={userAnswers[activeQuestion]}
-            showFeedback={reviewMode}
-            explanation={currentQuestion.explanation}
-            questionIndex={activeQuestion}
-          />
-        )}
-        {currentQuestion.type === 'matching' && (
-          <MatchingQuestion
-            question={currentQuestion.question}
-            items={currentQuestion.items}
-            correctMatches={currentQuestion.correctMatches}
-            onAnswer={handleAnswer}
-            userMatches={userAnswers[activeQuestion]}
-            showFeedback={reviewMode}
-            questionIndex={activeQuestion}
-          />
-        )}
-        {currentQuestion.type === 'multipleAnswer' && (
-          <MultipleAnswerQuestion
-            question={currentQuestion.question}
-            options={currentQuestion.options}
-            correctAnswers={currentQuestion.correctAnswers}
-            onAnswer={handleAnswer}
-            userAnswers={userAnswers[activeQuestion]}
-            showFeedback={reviewMode}
-            explanation={currentQuestion.explanation}
-            questionIndex={activeQuestion}
-          />
-        )}
+        {currentQuestion.type === 'multipleChoice' &&
+        <MultipleChoiceQuestion
+          question={currentQuestion.question}
+          options={currentQuestion.options}
+          correctAnswer={currentQuestion.correctAnswer}
+          onAnswer={handleAnswer}
+          userAnswer={userAnswers[activeQuestion]}
+          showFeedback={reviewMode}
+          questionIndex={activeQuestion} />
+
+        }
+        {currentQuestion.type === 'trueFalse' &&
+        <TrueFalseQuestion
+          question={currentQuestion.question}
+          correctAnswer={currentQuestion.correctAnswer}
+          onAnswer={handleAnswer}
+          userAnswer={userAnswers[activeQuestion]}
+          showFeedback={reviewMode}
+          explanation={currentQuestion.explanation}
+          questionIndex={activeQuestion} />
+
+        }
+        {currentQuestion.type === 'shortAnswer' &&
+        <ShortAnswerQuestion
+          question={currentQuestion.question}
+          correctAnswer={currentQuestion.correctAnswer}
+          onAnswer={handleAnswer}
+          userAnswer={userAnswers[activeQuestion]}
+          showFeedback={reviewMode}
+          explanation={currentQuestion.explanation}
+          questionIndex={activeQuestion} />
+
+        }
+        {currentQuestion.type === 'matching' &&
+        <MatchingQuestion
+          question={currentQuestion.question}
+          items={currentQuestion.items}
+          correctMatches={currentQuestion.correctMatches}
+          onAnswer={handleAnswer}
+          userMatches={userAnswers[activeQuestion]}
+          showFeedback={reviewMode}
+          questionIndex={activeQuestion} />
+
+        }
+        {currentQuestion.type === 'multipleAnswer' &&
+        <MultipleAnswerQuestion
+          question={currentQuestion.question}
+          options={currentQuestion.options}
+          correctAnswers={currentQuestion.correctAnswers}
+          onAnswer={handleAnswer}
+          userAnswers={userAnswers[activeQuestion]}
+          showFeedback={reviewMode}
+          explanation={currentQuestion.explanation}
+          questionIndex={activeQuestion} />
+
+        }
       </div>
       {/* Navigation buttons */}
       <div className="flex justify-between">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={handlePreviousQuestion}
-          disabled={activeQuestion === 0}
-        >
-          <ChevronLeft className="h-4 w-4 mr-2" />
-          Previous
+          disabled={activeQuestion === 0}>
+
+          <ChevronLeft className="h-4 w-4 mr-2" />{t("components.previous")}
+
         </Button>
         <div className="flex gap-2">
-          {reviewMode && (
-            <Button variant="outline" onClick={() => setShowResults(true)}>
-              Back to Results
+          {reviewMode &&
+          <Button variant="outline" onClick={() => setShowResults(true)}>{t("components.back_to_results")}
+
+          </Button>
+          }
+          {activeQuestion === quizData.questions.length - 1 && !reviewMode ?
+          <Button onClick={handleCompleteQuiz}>{t("components.submit_quiz")}
+
+          </Button> :
+
+          <Button onClick={handleNextQuestion}>{t("components.next")}
+
+            <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
-          )}
-          {activeQuestion === quizData.questions.length - 1 && !reviewMode ? (
-            <Button onClick={handleCompleteQuiz}>
-              Submit Quiz
-            </Button>
-          ) : (
-            <Button onClick={handleNextQuestion}>
-              Next
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </Button>
-          )}
+          }
         </div>
       </div>
-    </Card>
-  );
+    </Card>);
+
 };
 export default Quiz;

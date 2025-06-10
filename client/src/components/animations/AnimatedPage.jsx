@@ -1,6 +1,7 @@
+// TODO: i18n - processed
 import { motion } from 'framer-motion';
-import { pageTransition } from '@/lib/animations';
-export const AnimatedPage = ({ children, className, ...props }) => {
+import { pageTransition } from '@/lib/animations';import { useTranslation } from "react-i18next";
+export const AnimatedPage = ({ children, className, ...props }) => {const { t } = useTranslation();
   return (
     <motion.div
       variants={pageTransition}
@@ -8,9 +9,9 @@ export const AnimatedPage = ({ children, className, ...props }) => {
       animate="animate"
       exit="exit"
       className={className}
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </motion.div>
-  );
+    </motion.div>);
+
 };

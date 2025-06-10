@@ -1,11 +1,12 @@
+// TODO: i18n - processed
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';import { useTranslation } from "react-i18next";
 class ErrorBoundaryWithLogging extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
+    this.state = {
       hasError: false,
       error: null,
       errorInfo: null,
@@ -36,17 +37,17 @@ class ErrorBoundaryWithLogging extends React.Component {
     }
     localStorage.setItem('bdc_error_log', JSON.stringify(existingErrors));
     // Update state
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       error,
       errorInfo,
       errorCount: prevState.errorCount + 1
     }));
   }
   handleReset = () => {
-    this.setState({ 
-      hasError: false, 
-      error: null, 
-      errorInfo: null 
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null
     });
     // Optionally reload the page
     if (this.state.errorCount > 2) {
@@ -68,8 +69,8 @@ class ErrorBoundaryWithLogging extends React.Component {
               <p className="text-gray-600">
                 An error occurred while rendering this component. The error has been logged for debugging.
               </p>
-              {process.env.NODE_ENV === 'development' && (
-                <div className="space-y-2">
+              {process.env.NODE_ENV === 'development' &&
+              <div className="space-y-2">
                   <details className="bg-gray-100 p-4 rounded-md">
                     <summary className="cursor-pointer font-medium text-sm">
                       Error Details (Development Only)
@@ -80,47 +81,47 @@ class ErrorBoundaryWithLogging extends React.Component {
                           {this.state.error && this.state.error.toString()}
                         </p>
                       </div>
-                      {this.state.errorInfo && (
-                        <div>
+                      {this.state.errorInfo &&
+                    <div>
                           <p className="text-xs text-gray-500 font-medium mb-1">Component Stack:</p>
                           <pre className="text-xs font-mono text-gray-600 overflow-auto max-h-40">
                             {this.state.errorInfo.componentStack}
                           </pre>
                         </div>
-                      )}
+                    }
                     </div>
                   </details>
                   <div className="text-xs text-gray-500">
                     Error #{this.state.errorCount} • Check console for full details
                   </div>
                 </div>
-              )}
+              }
               <div className="flex gap-2">
-                <Button 
+                <Button
                   onClick={this.handleReset}
                   variant="primary"
-                  className="flex items-center gap-2"
-                >
+                  className="flex items-center gap-2">
+
                   <RefreshCw className="h-4 w-4" />
                   Try Again
                 </Button>
                 <Button
                   onClick={() => window.history.back()}
-                  variant="outline"
-                >
+                  variant="outline">
+
                   Go Back
                 </Button>
                 <Button
                   onClick={() => window.location.href = '/'}
-                  variant="outline"
-                >
+                  variant="outline">
+
                   Go to Dashboard
                 </Button>
               </div>
             </CardContent>
           </Card>
-        </div>
-      );
+        </div>);
+
     }
     return this.props.children;
   }

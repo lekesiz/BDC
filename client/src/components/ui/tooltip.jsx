@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -11,16 +12,16 @@ import { cn } from '@/lib/utils';
  * @param {boolean} props.arrow - Whether to show an arrow pointing to the target
  * @param {number} props.delay - Delay before showing the tooltip in ms
  * @returns {JSX.Element} Tooltip component
- */
-const Tooltip = ({ 
-  children, 
-  content, 
-  position = 'top', 
-  className, 
+ */import { useTranslation } from "react-i18next";
+const Tooltip = ({
+  children,
+  content,
+  position = 'top',
+  className,
   arrow = true,
   delay = 300,
-  ...props 
-}) => {
+  ...props
+}) => {const { t } = useTranslation();
   const [isVisible, setIsVisible] = React.useState(false);
   const [coords, setCoords] = React.useState({ x: 0, y: 0 });
   const targetRef = React.useRef(null);
@@ -61,12 +62,12 @@ const Tooltip = ({
   React.useEffect(() => {
     const handleOutsideClick = (e) => {
       if (
-        isVisible && 
-        tooltipRef.current && 
-        !tooltipRef.current.contains(e.target) && 
-        targetRef.current && 
-        !targetRef.current.contains(e.target)
-      ) {
+      isVisible &&
+      tooltipRef.current &&
+      !tooltipRef.current.contains(e.target) &&
+      targetRef.current &&
+      !targetRef.current.contains(e.target))
+      {
         setIsVisible(false);
       }
     };
@@ -82,32 +83,32 @@ const Tooltip = ({
         className="inline-flex"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        {...props}
-      >
+        {...props}>
+
         {children}
       </div>
-      {isVisible && content && (
-        <div
-          ref={tooltipRef}
-          role="tooltip"
-          className={cn(
-            "absolute z-50 max-w-xs px-3 py-1.5 text-sm text-white bg-gray-900 rounded shadow-sm",
-            positionMap[position],
-            className
-          )}
-        >
+      {isVisible && content &&
+      <div
+        ref={tooltipRef}
+        role="tooltip"
+        className={cn(
+          "absolute z-50 max-w-xs px-3 py-1.5 text-sm text-white bg-gray-900 rounded shadow-sm",
+          positionMap[position],
+          className
+        )}>
+
           {content}
-          {arrow && (
-            <span 
-              className={cn(
-                "absolute w-0 h-0 border-4 border-gray-900",
-                arrowPositionMap[position]
-              )}
-            />
-          )}
+          {arrow &&
+        <span
+          className={cn(
+            "absolute w-0 h-0 border-4 border-gray-900",
+            arrowPositionMap[position]
+          )} />
+
+        }
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 };
 export { Tooltip };

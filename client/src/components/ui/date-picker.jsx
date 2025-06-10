@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -10,13 +11,13 @@ import { cn } from '@/lib/utils';
  * @param {string} props.placeholder - Placeholder text
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} DatePicker component
- */
-export const DatePicker = React.forwardRef(({ 
+ */import { useTranslation } from "react-i18next";
+export const DatePicker = React.forwardRef(({
   value,
   onChange,
   placeholder = "Select date",
   className,
-  ...props 
+  ...props
 }, ref) => {
   return (
     <div className="relative">
@@ -35,11 +36,11 @@ export const DatePicker = React.forwardRef(({
             className
           )}
           placeholder={placeholder}
-          {...props}
-        />
+          {...props} />
+
         <Calendar className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-50 pointer-events-none" />
       </div>
-    </div>
-  );
+    </div>);
+
 });
 DatePicker.displayName = "DatePicker";

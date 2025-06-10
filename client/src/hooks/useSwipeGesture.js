@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect, useRef } from 'react';
 /**
  * Hook for detecting swipe gestures on touch devices
@@ -9,7 +10,7 @@ import { useState, useEffect, useRef } from 'react';
  * @param {number} config.threshold - Minimum distance for swipe detection (default: 50)
  * @param {number} config.timeout - Maximum time for swipe gesture (default: 500ms)
  * @returns {Object} - Touch event handlers to spread on element
- */
+ */import { useTranslation } from "react-i18next";
 export const useSwipeGesture = ({
   onSwipeLeft,
   onSwipeRight,

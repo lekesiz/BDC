@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader, AlertTriangle, Clock, CheckCircle, AlertCircle, Info } from 'lucide-react';
@@ -10,8 +11,8 @@ import { toast } from '../../../hooks/useToast';
 import Quiz from '../../../components/portal/assessment/Quiz';
 /**
  * PortalQuizPage handles the quiz-taking experience with improved UX
- */
-const PortalQuizPage = () => {
+ */import { useTranslation } from "react-i18next";
+const PortalQuizPage = () => {const { t } = useTranslation();
   const { assessmentId, assignmentId } = useParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -29,10 +30,10 @@ const PortalQuizPage = () => {
         setErrorMessage(null);
         // Fetch assessment metadata and quiz data
         const [assessmentRes, quizRes, attemptRes] = await Promise.all([
-          axios.get(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}`),
-          axios.get(`/api/portal/assessments/${assessmentId}/quiz`),
-          axios.get(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}/last-attempt`)
-        ]);
+        axios.get(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}`),
+        axios.get(`/api/portal/assessments/${assessmentId}/quiz`),
+        axios.get(`/api/portal/assessments/${assessmentId}/assignments/${assignmentId}/last-attempt`)]
+        );
         setAssessment(assessmentRes.data);
         setQuizData(quizRes.data);
         setPreviousAttempt(attemptRes.data);
@@ -47,7 +48,7 @@ const PortalQuizPage = () => {
         toast({
           title: 'Error',
           description: 'Failed to load quiz data',
-          variant: 'error',
+          variant: 'error'
         });
       } finally {
         setIsLoading(false);
@@ -67,7 +68,7 @@ const PortalQuizPage = () => {
       toast({
         title: 'Error',
         description: 'Failed to start quiz',
-        variant: 'error',
+        variant: 'error'
       });
     }
   };
@@ -80,7 +81,7 @@ const PortalQuizPage = () => {
       toast({
         title: 'Success',
         description: 'Quiz completed successfully',
-        variant: 'success',
+        variant: 'success'
       });
       // Navigate to results page
       navigate(`/portal/assessments/results/${assessmentId}/${assignmentId}`);
@@ -89,7 +90,7 @@ const PortalQuizPage = () => {
       toast({
         title: 'Error',
         description: 'Failed to submit quiz results',
-        variant: 'error',
+        variant: 'error'
       });
     }
   };
@@ -109,8 +110,8 @@ const PortalQuizPage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Loader className="w-10 h-10 text-blue-600 animate-spin" />
-      </div>
-    );
+      </div>);
+
   }
   // Render error state
   if (errorMessage) {
@@ -118,14 +119,14 @@ const PortalQuizPage = () => {
       <div className="container mx-auto py-6">
         <Card className="p-6 max-w-lg mx-auto text-center">
           <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Error Loading Quiz</h2>
+          <h2 className="text-xl font-bold mb-2">{t("pages.error_loading_quiz")}</h2>
           <p className="text-gray-600 mb-4">{errorMessage}</p>
-          <Button onClick={() => navigate('/portal/assessments')}>
-            Back to Assessments
+          <Button onClick={() => navigate('/portal/assessments')}>{t("pages.back_to_assessments")}
+
           </Button>
         </Card>
-      </div>
-    );
+      </div>);
+
   }
   // Render confirmation screen
   if (showConfirmation && !quizStarted) {
@@ -142,34 +143,34 @@ const PortalQuizPage = () => {
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             {/* Quiz Details */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold mb-3">Quiz Details</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("pages.quiz_details")}</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
                     <AlertCircle className="h-4 w-4 text-blue-600" />
                   </div>
                   <div>
-                    <p className="font-medium">Questions</p>
+                    <p className="font-medium">{t("pages.questions")}</p>
                     <p className="text-sm text-gray-600">{quizData.questions.length} questions</p>
                   </div>
                 </div>
-                {assessment.timeLimit && (
-                  <div className="flex items-center gap-3">
+                {assessment.timeLimit &&
+                <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                       <Clock className="h-4 w-4 text-green-600" />
                     </div>
                     <div>
-                      <p className="font-medium">Time Limit</p>
+                      <p className="font-medium">{t("pages.time_limit")}</p>
                       <p className="text-sm text-gray-600">{Math.floor(assessment.timeLimit / 60)} minutes</p>
                     </div>
                   </div>
-                )}
+                }
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
                     <CheckCircle className="h-4 w-4 text-purple-600" />
                   </div>
                   <div>
-                    <p className="font-medium">Passing Score</p>
+                    <p className="font-medium">{t("pages.passing_score")}</p>
                     <p className="text-sm text-gray-600">{assessment.passingScore}%</p>
                   </div>
                 </div>
@@ -178,7 +179,7 @@ const PortalQuizPage = () => {
                     <Info className="h-4 w-4 text-orange-600" />
                   </div>
                   <div>
-                    <p className="font-medium">Attempts</p>
+                    <p className="font-medium">{t("pages.attempts")}</p>
                     <p className="text-sm text-gray-600">
                       {attemptsUsed} of {assessment.attemptsAllowed} used
                     </p>
@@ -188,74 +189,74 @@ const PortalQuizPage = () => {
             </div>
             {/* Instructions */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold mb-3">Instructions</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("components.instructions")}</h3>
               <ul className="space-y-2 text-gray-700">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Navigate between questions using Previous and Next buttons</span>
+                  <span>{t("pages.navigate_between_questions_using_previous_and_next")}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Your progress is automatically saved as you answer</span>
+                  <span>{t("pages.your_progress_is_automatically_saved_as_you_answer")}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>You can flag questions to review later</span>
+                  <span>{t("pages.you_can_flag_questions_to_review_later")}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Review all answers before submitting</span>
+                  <span>{t("pages.review_all_answers_before_submitting")}</span>
                 </li>
-                {assessment.timeLimit && (
-                  <li className="flex items-start gap-2">
+                {assessment.timeLimit &&
+                <li className="flex items-start gap-2">
                     <AlertCircle className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
-                    <span>Timer starts when you begin the quiz</span>
+                    <span>{t("pages.timer_starts_when_you_begin_the_quiz")}</span>
                   </li>
-                )}
+                }
               </ul>
             </div>
           </div>
           {/* Previous Attempt Info */}
-          {previousAttempt && previousAttempt.status === 'completed' && (
-            <Alert className="mb-6">
+          {previousAttempt && previousAttempt.status === 'completed' &&
+          <Alert className="mb-6">
               <Info className="h-4 w-4" />
               <div>
-                <h4 className="font-semibold">Previous Attempt</h4>
+                <h4 className="font-semibold">{t("pages.previous_attempt")}</h4>
                 <p>
-                  Score: {previousAttempt.score}% • 
-                  Completed: {new Date(previousAttempt.completedAt).toLocaleDateString()}
+                  Score: {previousAttempt.score}{t("pages._completed")}
+                {new Date(previousAttempt.completedAt).toLocaleDateString()}
                 </p>
               </div>
             </Alert>
-          )}
+          }
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 justify-between">
-            <Button 
-              variant="outline" 
-              onClick={handleExitQuiz}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Assessments
+            <Button
+              variant="outline"
+              onClick={handleExitQuiz}>
+
+              <ArrowLeft className="h-4 w-4 mr-2" />{t("pages.back_to_assessments")}
+
             </Button>
-            {canRetake ? (
-              <Button 
-                onClick={handleStartQuiz}
-                size="lg"
-              >
+            {canRetake ?
+            <Button
+              onClick={handleStartQuiz}
+              size="lg">
+
                 {previousAttempt?.status === 'in_progress' ? 'Resume Quiz' : 'Start Quiz'}
-              </Button>
-            ) : (
-              <div className="text-right">
-                <Badge variant="error" className="mb-2">No attempts remaining</Badge>
-                <p className="text-sm text-gray-600">
-                  You've used all available attempts for this quiz.
-                </p>
+              </Button> :
+
+            <div className="text-right">
+                <Badge variant="error" className="mb-2">{t("pages.no_attempts_remaining")}</Badge>
+                <p className="text-sm text-gray-600">{t("pages.youve_used_all_available_attempts_for_this_quiz")}
+
+              </p>
               </div>
-            )}
+            }
           </div>
         </Card>
-      </div>
-    );
+      </div>);
+
   }
   // Render quiz component with improved props
   return (
@@ -264,18 +265,18 @@ const PortalQuizPage = () => {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">{assessment.title}</h2>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
-              onClick={handleExitQuiz}
-            >
-              Save & Exit
+              onClick={handleExitQuiz}>{t("pages.save_exit")}
+
+
             </Button>
           </div>
         </div>
       </div>
       <div className="container mx-auto py-6 px-4 max-w-4xl">
-        <Quiz 
+        <Quiz
           quizData={quizData}
           assessment={assessment}
           previousAttempt={previousAttempt}
@@ -292,10 +293,10 @@ const PortalQuizPage = () => {
             }
           }}
           timedMode={Boolean(assessment.timeLimit)}
-          timeLimit={assessment.timeLimit}
-        />
+          timeLimit={assessment.timeLimit} />
+
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export default PortalQuizPage;

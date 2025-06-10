@@ -1,4 +1,5 @@
-// UI component library exports
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // UI component library exports
 // Layout & Containers
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card';
 // Form Controls

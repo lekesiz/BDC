@@ -1,7 +1,8 @@
+// TODO: i18n - processed
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { toast } from 'react-toastify';
-import io from 'socket.io-client';
+import io from 'socket.io-client';import { useTranslation } from "react-i18next";
 const NotificationContext = createContext();
 export const useNotifications = () => {
   const context = useContext(NotificationContext);
@@ -10,7 +11,7 @@ export const useNotifications = () => {
   }
   return context;
 };
-export const NotificationProviderV2 = ({ children }) => {
+export const NotificationProviderV2 = ({ children }) => {const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [ws, setWs] = useState(null);
@@ -85,20 +86,20 @@ export const NotificationProviderV2 = ({ children }) => {
     switch (data.type) {
       case 'new_notification':
         const notification = data.notification;
-        setNotifications(prev => [notification, ...prev]);
-        setUnreadCount(prev => prev + 1);
+        setNotifications((prev) => [notification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
         showNotification(notification);
         break;
       case 'notification_read':
-        setNotifications(prev =>
-          prev.map(n => n.id === data.notificationId ? { ...n, is_read: true } : n)
+        setNotifications((prev) =>
+        prev.map((n) => n.id === data.notificationId ? { ...n, is_read: true } : n)
         );
-        setUnreadCount(prev => Math.max(0, prev - 1));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
         break;
       case 'notification_deleted':
-        setNotifications(prev => prev.filter(n => n.id !== data.notificationId));
+        setNotifications((prev) => prev.filter((n) => n.id !== data.notificationId));
         if (!data.wasRead) {
-          setUnreadCount(prev => Math.max(0, prev - 1));
+          setUnreadCount((prev) => Math.max(0, prev - 1));
         }
         break;
       case 'unread_count':
@@ -109,12 +110,12 @@ export const NotificationProviderV2 = ({ children }) => {
   };
   const showNotification = (notification) => {
     // Show toast notification
-    const toastContent = (
-      <div>
+    const toastContent =
+    <div>
         <strong>{notification.title}</strong>
         <p>{notification.message}</p>
-      </div>
-    );
+      </div>;
+
     switch (notification.type) {
       case 'error':
         toast.error(toastContent, { autoClose: false });
@@ -148,13 +149,13 @@ export const NotificationProviderV2 = ({ children }) => {
   const markAsRead = async (notificationIds) => {
     try {
       await axios.put('/api/notifications/read', { notification_ids: notificationIds });
-      setNotifications(prev =>
-        prev.map(n => notificationIds.includes(n.id) ? { ...n, is_read: true } : n)
+      setNotifications((prev) =>
+      prev.map((n) => notificationIds.includes(n.id) ? { ...n, is_read: true } : n)
       );
-      const readCount = notifications.filter(n => 
-        notificationIds.includes(n.id) && !n.is_read
+      const readCount = notifications.filter((n) =>
+      notificationIds.includes(n.id) && !n.is_read
       ).length;
-      setUnreadCount(prev => Math.max(0, prev - readCount));
+      setUnreadCount((prev) => Math.max(0, prev - readCount));
     } catch (error) {
       console.error('Failed to mark notifications as read:', error);
       throw error;
@@ -163,11 +164,11 @@ export const NotificationProviderV2 = ({ children }) => {
   const deleteNotifications = async (notificationIds) => {
     try {
       await axios.delete('/api/notifications', { data: { notification_ids: notificationIds } });
-      const deletedUnreadCount = notifications.filter(n => 
-        notificationIds.includes(n.id) && !n.is_read
+      const deletedUnreadCount = notifications.filter((n) =>
+      notificationIds.includes(n.id) && !n.is_read
       ).length;
-      setNotifications(prev => prev.filter(n => !notificationIds.includes(n.id)));
-      setUnreadCount(prev => Math.max(0, prev - deletedUnreadCount));
+      setNotifications((prev) => prev.filter((n) => !notificationIds.includes(n.id)));
+      setUnreadCount((prev) => Math.max(0, prev - deletedUnreadCount));
     } catch (error) {
       console.error('Failed to delete notifications:', error);
       throw error;
@@ -176,7 +177,7 @@ export const NotificationProviderV2 = ({ children }) => {
   const markAllAsRead = async () => {
     try {
       await axios.put('/api/notifications/read-all');
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (error) {
       console.error('Failed to mark all as read:', error);
@@ -202,7 +203,7 @@ export const NotificationProviderV2 = ({ children }) => {
   return (
     <NotificationContext.Provider value={value}>
       {children}
-    </NotificationContext.Provider>
-  );
+    </NotificationContext.Provider>);
+
 };
 export default NotificationProviderV2;

@@ -1,0 +1,36 @@
+# File Upload Security System Requirements
+
+# Core dependencies
+python-magic==0.4.27          # File type detection using libmagic
+python-magic-bin==0.4.14      # Windows support for python-magic
+
+# Image processing
+Pillow==10.1.0               # Image processing and manipulation
+pillow-heif==0.13.1          # HEIF/HEIC image format support
+
+# Cloud storage
+boto3==1.29.7                # AWS S3 integration
+botocore==1.32.7             # AWS SDK core
+
+# Encryption
+cryptography==41.0.7         # Encryption and cryptographic functions
+
+# Database (if not already in main requirements)
+SQLAlchemy>=1.4.0           # ORM for audit logging
+alembic>=1.8.0              # Database migrations
+
+# Optional but recommended
+clamd==1.0.2                # ClamAV Python client (for virus scanning)
+requests==2.31.0            # HTTP client for API calls
+
+# Development dependencies
+pytest==7.4.3               # Testing framework
+pytest-mock==3.12.0         # Mock objects for testing
+pytest-cov==4.1.0          # Code coverage
+black==23.11.0             # Code formatting
+flake8==6.1.0              # Code linting
+mypy==1.7.0                # Type checking
+
+# Performance monitoring (optional)
+prometheus-client==0.19.0   # Metrics collection
+psutil==5.9.6              # System monitoring

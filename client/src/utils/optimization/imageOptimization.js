@@ -1,15 +1,16 @@
+// TODO: i18n - processed
 /**
  * Image optimization utilities
  */
 import React, { useState, useEffect } from 'react';
 /**
  * Image formats and quality settings
- */
+ */import { useTranslation } from "react-i18next";
 export const imageFormats = {
   webp: {
     quality: 0.85,
-    supported: typeof window !== 'undefined' && 
-               window.document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0
+    supported: typeof window !== 'undefined' &&
+    window.document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0
   },
   avif: {
     quality: 0.85,
@@ -43,12 +44,12 @@ export const imageOptimizationUtils = {
    * Generate srcset for responsive images
    */
   generateSrcSet: (basePath, extension = 'jpg', sizes = ['small', 'medium', 'large']) => {
-    return sizes
-      .map(size => {
-        const dimensions = imageSizes[size];
-        return `${basePath}-${dimensions.width}x${dimensions.height}.${extension} ${dimensions.width}w`;
-      })
-      .join(', ');
+    return sizes.
+    map((size) => {
+      const dimensions = imageSizes[size];
+      return `${basePath}-${dimensions.width}x${dimensions.height}.${extension} ${dimensions.width}w`;
+    }).
+    join(', ');
   },
   /**
    * Generate picture element with multiple formats
@@ -56,7 +57,7 @@ export const imageOptimizationUtils = {
   generatePictureElement: (basePath, alt, sizes = ['small', 'medium', 'large']) => {
     const formats = ['avif', 'webp', 'jpg'];
     return {
-      sources: formats.slice(0, -1).map(format => ({
+      sources: formats.slice(0, -1).map((format) => ({
         type: `image/${format}`,
         srcSet: imageOptimizationUtils.generateSrcSet(basePath, format, sizes)
       })),
@@ -278,7 +279,7 @@ export const OptimizedImage = ({
   style,
   onLoad,
   onError
-}) => {
+}) => {const { t } = useTranslation();
   const [currentSrc, setCurrentSrc] = useState(placeholder || src);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -311,7 +312,7 @@ export const OptimizedImage = ({
   };
   if (hasError) {
     return (
-      <div 
+      <div
         className={className}
         style={{
           ...style,
@@ -322,11 +323,11 @@ export const OptimizedImage = ({
           justifyContent: 'center',
           backgroundColor: '#f0f0f0',
           color: '#666'
-        }}
-      >
-        Failed to load image
-      </div>
-    );
+        }}>{t("components.failed_to_load_image")}
+
+
+      </div>);
+
   }
   // Use picture element for better format support
   const formats = ['avif', 'webp'];
@@ -334,18 +335,18 @@ export const OptimizedImage = ({
   const extension = src.split('.').pop();
   return (
     <picture>
-      {formats.map(format => (
-        imageFormats[format].supported && (
-          <source
-            key={format}
-            type={`image/${format}`}
-            srcSet={`${basePath}.${format}`}
-          />
-        )
-      ))}
+      {formats.map((format) =>
+      imageFormats[format].supported &&
+      <source
+        key={format}
+        type={`image/${format}`}
+        srcSet={`${basePath}.${format}`} />
+
+
+      )}
       <img {...imgProps} />
-    </picture>
-  );
+    </picture>);
+
 };
 /**
  * Image upload optimizer
@@ -358,7 +359,7 @@ export const ImageUploadOptimizer = ({
   acceptedFormats = ['image/jpeg', 'image/png', 'image/webp'],
   quality = 0.85,
   targetFormat = 'webp'
-}) => {
+}) => {const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = React.useRef(null);
   const handleFile = async (file) => {
@@ -416,25 +417,25 @@ export const ImageUploadOptimizer = ({
         cursor: 'pointer',
         transition: 'border-color 0.3s ease'
       }}
-      onClick={() => fileInputRef.current?.click()}
-    >
+      onClick={() => fileInputRef.current?.click()}>
+
       <input
         ref={fileInputRef}
         type="file"
         multiple
         accept={acceptedFormats.join(',')}
         onChange={handleFileSelect}
-        style={{ display: 'none' }}
-      />
+        style={{ display: 'none' }} />
+
       <p>
         {isDragging ? 'Drop images here' : 'Drag & drop images or click to upload'}
       </p>
-      <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
-        Max size: {maxFileSize / (1024 * 1024)}MB | 
-        Formats: {acceptedFormats.map(f => f.split('/')[1]).join(', ')}
+      <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>{t("utils.max_size")}
+        {maxFileSize / (1024 * 1024)}{t("utils.mb_formats")}
+        {acceptedFormats.map((f) => f.split('/')[1]).join(', ')}
       </p>
-    </div>
-  );
+    </div>);
+
 };
 /**
  * Image performance monitor

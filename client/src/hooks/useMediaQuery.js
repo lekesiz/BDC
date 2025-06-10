@@ -1,9 +1,10 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 /**
  * Custom hook for responsive design
  * @param {string} query - Media query string
  * @returns {boolean} - Whether the media query matches
- */
+ */import { useTranslation } from "react-i18next";
 export const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(false);
   useEffect(() => {

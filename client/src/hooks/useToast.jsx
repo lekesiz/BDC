@@ -1,26 +1,27 @@
+// TODO: i18n - processed
 import { useContext, createContext, useState, useCallback } from 'react';
 // Create toast context
-const ToastContext = createContext();
+import { useTranslation } from "react-i18next";const ToastContext = createContext();
 // Toast provider component
-export const ToastProvider = ({ children }) => {
+export const ToastProvider = ({ children }) => {const { t } = useTranslation();
   const [toasts, setToasts] = useState([]);
   const toast = useCallback((message, type = 'info') => {
     const id = Math.random().toString(36).substr(2, 9);
     const newToast = { id, message, type };
-    setToasts(prev => [...prev, newToast]);
+    setToasts((prev) => [...prev, newToast]);
     // Auto remove after 3 seconds
     setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
+      setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 3000);
   }, []);
   const removeToast = useCallback((id) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
   return (
     <ToastContext.Provider value={{ toasts, toast, removeToast }}>
       {children}
-    </ToastContext.Provider>
-  );
+    </ToastContext.Provider>);
+
 };
 // Hook to use toast
 export const useToast = () => {

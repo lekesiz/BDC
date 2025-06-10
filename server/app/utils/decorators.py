@@ -33,14 +33,71 @@ def requires_permission(permission):
             verify_jwt_in_request()
             user_id = get_jwt_identity()
             
-            # For now, just check if user is authenticated
-            # In production, check actual permissions
             if not user_id:
-                return jsonify({'error': 'Permission denied'}), 403
+                return jsonify({'error': 'Authentication required'}), 401
+            
+            # Get user from database
+            from app.models import User
+            from flask import g
+            user = User.query.get(user_id)
+            
+            if not user or not user.is_active:
+                return jsonify({'error': 'User not found or inactive'}), 401
+            
+            # Set user in g for access in route
+            g.current_user = user
+            
+            # Super admin has all permissions
+            if user.role == 'super_admin':
+                return f(*args, **kwargs)
+            
+            # Check permission based on role
+            if not _has_permission(user.role, permission):
+                return jsonify({
+                    'error': 'Permission denied',
+                    'message': f'Required permission: {permission}'
+                }), 403
             
             return f(*args, **kwargs)
         return decorated_function
     return decorator
+
+
+def _has_permission(role, permission):
+    """Check if role has permission."""
+    # Define role permissions
+    permissions = {
+        'tenant_admin': [
+            'users.view', 'users.create', 'users.edit', 'users.delete',
+            'beneficiaries.view', 'beneficiaries.create', 'beneficiaries.edit', 
+            'beneficiaries.delete', 'beneficiaries.export',
+            'programs.view', 'programs.create', 'programs.edit', 'programs.delete',
+            'evaluations.view', 'evaluations.create', 'evaluations.edit', 'evaluations.delete',
+            'appointments.view', 'appointments.create', 'appointments.edit', 'appointments.delete',
+            'documents.view', 'documents.upload', 'documents.delete',
+            'reports.view', 'reports.generate', 'reports.export',
+            'settings.view', 'settings.edit'
+        ],
+        'trainer': [
+            'beneficiaries.view', 'beneficiaries.create', 'beneficiaries.edit',
+            'programs.view', 'programs.enroll',
+            'evaluations.view', 'evaluations.create', 'evaluations.edit',
+            'appointments.view', 'appointments.create', 'appointments.edit',
+            'documents.view', 'documents.upload',
+            'reports.view', 'reports.generate'
+        ],
+        'trainee': [
+            'profile.view', 'profile.edit',
+            'programs.view', 'programs.enroll',
+            'evaluations.view', 'evaluations.take',
+            'appointments.view', 'appointments.book',
+            'documents.view',
+            'reports.view_own'
+        ]
+    }
+    
+    role_permissions = permissions.get(role, [])
+    return permission in role_permissions
 
 
 def admin_required(f):

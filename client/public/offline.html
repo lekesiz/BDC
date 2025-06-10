@@ -4,68 +4,463 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Offline - BDC</title>
+  <link rel="icon" href="/icons/icon-192x192.png">
+  <meta name="theme-color" content="#3b82f6">
   <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-light: #9ca3af;
+      --bg-primary: #f9fafb;
+      --bg-card: #ffffff;
+      --border: #e5e7eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --border-radius: 8px;
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+        --text-light: #9ca3af;
+        --bg-primary: #111827;
+        --bg-card: #1f2937;
+        --border: #374151;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f9fafb;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
       margin: 0;
       padding: 20px;
+      transition: all 0.3s ease;
     }
+
     .offline-container {
       text-align: center;
-      max-width: 400px;
+      max-width: 480px;
+      width: 100%;
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 40px 24px;
+      border: 1px solid var(--border);
     }
+
     .offline-icon {
-      width: 100px;
-      height: 100px;
+      width: 80px;
+      height: 80px;
       margin: 0 auto 24px;
-      opacity: 0.3;
+      color: var(--text-light);
+      animation: pulse 2s ease-in-out infinite;
     }
-    h1 {
-      color: #111827;
-      font-size: 24px;
-      margin-bottom: 8px;
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 0.3; }
     }
-    p {
-      color: #6b7280;
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 20px;
+      color: #dc2626;
+      font-size: 14px;
+      font-weight: 500;
       margin-bottom: 24px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .status-indicator {
+        background: #7f1d1d;
+        border-color: #991b1b;
+        color: #fca5a5;
+      }
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: currentColor;
+      border-radius: 50%;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
+    }
+
+    h1 {
+      color: var(--text-primary);
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-bottom: 32px;
       line-height: 1.5;
     }
-    button {
-      background-color: #3b82f6;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.2s;
+
+    .features-available {
+      text-align: left;
+      margin: 32px 0;
+      padding: 20px;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: var(--border-radius);
     }
-    button:hover {
-      background-color: #2563eb;
+
+    @media (prefers-color-scheme: dark) {
+      .features-available {
+        background: #0c4a6e;
+        border-color: #0369a1;
+      }
+    }
+
+    .features-title {
+      font-weight: 600;
+      color: #0369a1;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .features-title {
+        color: #7dd3fc;
+      }
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      color: #075985;
+      font-size: 14px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .feature-item {
+        color: #a5d8ff;
+      }
+    }
+
+    .feature-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--success);
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .connection-status {
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--bg-primary);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border);
+    }
+
+    .status-online {
+      border-color: var(--success);
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .status-online {
+        background: #064e3b;
+        color: #6ee7b7;
+      }
+    }
+
+    .small-text {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 16px;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 480px) {
+      .offline-container {
+        padding: 32px 20px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .action-buttons {
+        gap: 8px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="offline-container">
+    <!-- Status Indicator -->
+    <div class="status-indicator" id="statusIndicator">
+      <div class="status-dot"></div>
+      <span id="statusText">Offline</span>
+    </div>
+
+    <!-- Offline Icon -->
     <svg class="offline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"></path>
     </svg>
+
+    <!-- Main Content -->
     <h1>You're offline</h1>
-    <p>It looks like you've lost your internet connection. Some features may be unavailable until you're back online.</p>
-    <button onclick="window.location.reload()">Try Again</button>
+    <p class="subtitle">
+      No internet connection detected. Some features may be limited, but you can still access previously loaded content.
+    </p>
+
+    <!-- Available Features -->
+    <div class="features-available">
+      <div class="features-title">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        What's still available:
+      </div>
+      <ul class="feature-list">
+        <li class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Previously loaded pages and data
+        </li>
+        <li class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Cached evaluation results
+        </li>
+        <li class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Draft content (will sync when online)
+        </li>
+        <li class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Offline note-taking and form completion
+        </li>
+      </ul>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-primary" onclick="retryConnection()" id="retryBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        <span id="retryText">Check Connection</span>
+      </button>
+      
+      <a href="/" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        Go to Homepage
+      </a>
+    </div>
+
+    <!-- Connection Status -->
+    <div class="connection-status" id="connectionStatus">
+      <div style="font-weight: 500; margin-bottom: 4px;">Connection Status</div>
+      <div style="font-size: 14px;" id="connectionDetails">
+        Checking network status...
+      </div>
+    </div>
+
+    <div class="small-text">
+      Your actions will be automatically synchronized when you're back online.
+    </div>
   </div>
+
   <script>
-    // Check connection status periodically
+    let retryAttempts = 0;
+    const maxRetryAttempts = 5;
+    
+    function updateConnectionStatus() {
+      const statusIndicator = document.getElementById('statusIndicator');
+      const statusText = document.getElementById('statusText');
+      const connectionStatus = document.getElementById('connectionStatus');
+      const connectionDetails = document.getElementById('connectionDetails');
+      
+      if (navigator.onLine) {
+        statusIndicator.style.background = '#ecfdf5';
+        statusIndicator.style.borderColor = '#10b981';
+        statusIndicator.style.color = '#065f46';
+        statusText.textContent = 'Back Online';
+        
+        connectionStatus.className = 'connection-status status-online';
+        connectionDetails.textContent = 'Internet connection restored. Redirecting...';
+        
+        // Reload page after showing online status briefly
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        connectionDetails.textContent = `No internet connection detected. Retry attempt: ${retryAttempts}/${maxRetryAttempts}`;
+      }
+    }
+    
+    function retryConnection() {
+      const retryBtn = document.getElementById('retryBtn');
+      const retryText = document.getElementById('retryText');
+      
+      retryBtn.disabled = true;
+      retryText.textContent = 'Checking...';
+      retryBtn.querySelector('svg').classList.add('spinner');
+      
+      retryAttempts++;
+      
+      setTimeout(() => {
+        updateConnectionStatus();
+        
+        retryBtn.disabled = false;
+        retryText.textContent = 'Check Connection';
+        retryBtn.querySelector('svg').classList.remove('spinner');
+        
+        if (!navigator.onLine && retryAttempts >= maxRetryAttempts) {
+          retryText.textContent = 'Still Offline';
+          setTimeout(() => {
+            retryText.textContent = 'Check Connection';
+          }, 2000);
+        }
+      }, 2000);
+    }
+    
+    // Check connection status on load
+    updateConnectionStatus();
+    
+    // Listen for online/offline events
+    window.addEventListener('online', () => {
+      retryAttempts = 0;
+      updateConnectionStatus();
+    });
+    
+    window.addEventListener('offline', updateConnectionStatus);
+    
+    // Periodic connection check
     setInterval(() => {
       if (navigator.onLine) {
-        window.location.reload();
+        updateConnectionStatus();
       }
-    }, 5000);
+    }, 10000);
+    
+    // Service Worker communication
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data.type === 'CONNECTIVITY_CHANGED') {
+          updateConnectionStatus();
+        }
+      });
+    }
+    
+    // Add visual feedback for user interactions
+    document.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') {
+        e.target.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+          e.target.style.transform = '';
+        }, 150);
+      }
+    });
   </script>
 </body>
 </html>

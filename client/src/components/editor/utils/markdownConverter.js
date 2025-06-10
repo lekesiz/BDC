@@ -1,4 +1,5 @@
-// Basic markdown converter for TipTap
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // Basic markdown converter for TipTap
 export const htmlToMarkdown = (html) => {
   // Create a temporary div to parse HTML
   const div = document.createElement('div');
@@ -12,9 +13,9 @@ export const htmlToMarkdown = (html) => {
       return '';
     }
     const tagName = node.tagName.toLowerCase();
-    const children = Array.from(node.childNodes)
-      .map(child => convertNode(child, level))
-      .join('');
+    const children = Array.from(node.childNodes).
+    map((child) => convertNode(child, level)).
+    join('');
     switch (tagName) {
       case 'h1':
         return `# ${children}\n\n`;
@@ -51,17 +52,17 @@ export const htmlToMarkdown = (html) => {
         const lang = node.querySelector('code')?.className?.match(/language-(\w+)/)?.[1] || '';
         return `\`\`\`${lang}\n${children}\n\`\`\`\n\n`;
       case 'ul':
-        return node.querySelectorAll('li').length > 0 
-          ? Array.from(node.children)
-              .map(li => `- ${convertNode(li, level + 1).trim()}`)
-              .join('\n') + '\n\n'
-          : '';
+        return node.querySelectorAll('li').length > 0 ?
+        Array.from(node.children).
+        map((li) => `- ${convertNode(li, level + 1).trim()}`).
+        join('\n') + '\n\n' :
+        '';
       case 'ol':
-        return node.querySelectorAll('li').length > 0
-          ? Array.from(node.children)
-              .map((li, index) => `${index + 1}. ${convertNode(li, level + 1).trim()}`)
-              .join('\n') + '\n\n'
-          : '';
+        return node.querySelectorAll('li').length > 0 ?
+        Array.from(node.children).
+        map((li, index) => `${index + 1}. ${convertNode(li, level + 1).trim()}`).
+        join('\n') + '\n\n' :
+        '';
       case 'li':
         if (node.getAttribute('data-type') === 'taskItem') {
           const checked = node.querySelector('input[type="checkbox"]')?.checked;
@@ -76,25 +77,25 @@ export const htmlToMarkdown = (html) => {
         const alt = node.getAttribute('alt') || '';
         return `![${alt}](${src})`;
       case 'blockquote':
-        return children.split('\n')
-          .map(line => `> ${line}`)
-          .join('\n') + '\n\n';
+        return children.split('\n').
+        map((line) => `> ${line}`).
+        join('\n') + '\n\n';
       case 'table':
         const rows = Array.from(node.querySelectorAll('tr'));
         if (rows.length === 0) return '';
-        const headers = Array.from(rows[0].querySelectorAll('th, td'))
-          .map(cell => convertNode(cell, level).trim());
+        const headers = Array.from(rows[0].querySelectorAll('th, td')).
+        map((cell) => convertNode(cell, level).trim());
         const separator = headers.map(() => '---').join(' | ');
-        const bodyRows = rows.slice(1).map(row => 
-          Array.from(row.querySelectorAll('td'))
-            .map(cell => convertNode(cell, level).trim())
-            .join(' | ')
+        const bodyRows = rows.slice(1).map((row) =>
+        Array.from(row.querySelectorAll('td')).
+        map((cell) => convertNode(cell, level).trim()).
+        join(' | ')
         );
         return [
-          headers.join(' | '),
-          separator,
-          ...bodyRows
-        ].join('\n') + '\n\n';
+        headers.join(' | '),
+        separator,
+        ...bodyRows].
+        join('\n') + '\n\n';
       case 'th':
       case 'td':
         return children;
@@ -132,7 +133,7 @@ export const htmlToMarkdown = (html) => {
     }
   };
   // Convert all top-level nodes
-  Array.from(div.childNodes).forEach(node => {
+  Array.from(div.childNodes).forEach((node) => {
     markdown += convertNode(node);
   });
   // Clean up extra newlines

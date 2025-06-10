@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * Enhanced route renderer with centralized protection and lazy loading
  */
@@ -20,8 +21,8 @@ import SimpleLoginPage from '../../pages/auth/SimpleLoginPage';
 // Test pages - removed for production build
 /**
  * Component that renders a protected route with role checking
- */
-const ProtectedRouteWrapper = ({ route }) => {
+ */import { useTranslation } from "react-i18next";
+const ProtectedRouteWrapper = ({ route }) => {const { t } = useTranslation();
   const { user } = useAuth();
   // Check if user can access this route
   const canAccess = canAccessRoute(user?.role, route.access);
@@ -32,20 +33,20 @@ const ProtectedRouteWrapper = ({ route }) => {
   return (
     <LazyWrapper>
       <Component />
-    </LazyWrapper>
-  );
+    </LazyWrapper>);
+
 };
 /**
  * Main route renderer component
  */
-const RouteRenderer = () => {
+const RouteRenderer = () => {const { t } = useTranslation();
   const { isLoading } = useAuth();
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="lg" />
-      </div>
-    );
+      </div>);
+
   }
   // Get all flattened routes from configuration
   const routes = getFlattenedRoutes();
@@ -62,61 +63,61 @@ const RouteRenderer = () => {
       <Route
         path="/"
         element={
-          <ProtectedRoute>
+        <ProtectedRoute>
             <Suspense fallback={<LoadingSpinner />}>
               <DashboardLayout />
             </Suspense>
           </ProtectedRoute>
-        }
-      >
+        }>
+
         {/* Dashboard root with role-based redirection */}
         <Route index element={<RoleBasedRedirect />} />
         <Route path="dashboard" element={<Navigate to="/" replace />} />
         {/* Dynamically render all configured routes */}
-        {routes.map((route) => (
-          <Route
-            key={route.key}
-            path={route.path}
-            element={<ProtectedRouteWrapper route={route} />}
-          />
-        ))}
+        {routes.map((route) =>
+        <Route
+          key={route.key}
+          path={route.path}
+          element={<ProtectedRouteWrapper route={route} />} />
+
+        )}
       </Route>
       {/* Error routes */}
-      <Route 
-        path="/unauthorized" 
+      <Route
+        path="/unauthorized"
         element={
-          <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center min-h-screen">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
-              <p className="text-gray-600 mb-4">You don't have permission to access this page.</p>
-              <button 
-                onClick={() => window.history.back()}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Go Back
-              </button>
+              <h1 className="text-2xl font-bold text-red-600 mb-4">{t("components.access_denied")}</h1>
+              <p className="text-gray-600 mb-4">{t("components.you_dont_have_permission_to_access_this_page")}</p>
+              <button
+              onClick={() => window.history.back()}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">{t("components.go_back")}
+
+
+            </button>
             </div>
           </div>
-        } 
-      />
-      <Route 
-        path="*" 
+        } />
+
+      <Route
+        path="*"
         element={
-          <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center min-h-screen">
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-800 mb-4">Page Not Found</h1>
-              <p className="text-gray-600 mb-4">The page you're looking for doesn't exist.</p>
-              <button 
-                onClick={() => window.location.href = '/'}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Go Home
-              </button>
+              <h1 className="text-2xl font-bold text-gray-800 mb-4">{t("components.page_not_found")}</h1>
+              <p className="text-gray-600 mb-4">{t("components.the_page_youre_looking_for_doesnt_exist")}</p>
+              <button
+              onClick={() => window.location.href = '/'}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">{t("components.go_home")}
+
+
+            </button>
             </div>
           </div>
-        } 
-      />
-    </Routes>
-  );
+        } />
+
+    </Routes>);
+
 };
 export default RouteRenderer;

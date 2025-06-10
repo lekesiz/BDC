@@ -1,4 +1,5 @@
-// Secure credential storage utility for integration credentials
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; // Secure credential storage utility for integration credentials
 // In production, these should be stored server-side with proper encryption
 class SecureStorage {
   constructor() {
@@ -16,8 +17,8 @@ class SecureStorage {
   }
   // Simple key generation (replace with proper crypto in production)
   generateKey() {
-    return Array.from({ length: 32 }, () => 
-      Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
+    return Array.from({ length: 32 }, () =>
+    Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
     ).join('');
   }
   // Simple XOR encryption (replace with AES in production)
@@ -112,20 +113,20 @@ class SecureStorage {
   // Check if field is sensitive
   isSensitiveField(fieldName) {
     const sensitiveFields = [
-      'apiKey',
-      'apiSecret',
-      'secretKey',
-      'clientSecret',
-      'authToken',
-      'accessToken',
-      'refreshToken',
-      'password',
-      'privateKey',
-      'webhookSecret',
-      'signingSecret'
-    ];
-    return sensitiveFields.some(field => 
-      fieldName.toLowerCase().includes(field.toLowerCase())
+    'apiKey',
+    'apiSecret',
+    'secretKey',
+    'clientSecret',
+    'authToken',
+    'accessToken',
+    'refreshToken',
+    'password',
+    'privateKey',
+    'webhookSecret',
+    'signingSecret'];
+
+    return sensitiveFields.some((field) =>
+    fieldName.toLowerCase().includes(field.toLowerCase())
     );
   }
   // Get storage object
@@ -179,7 +180,7 @@ class SecureStorage {
     const age = Date.now() - new Date(data.timestamp).getTime();
     return {
       days: Math.floor(age / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((age % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+      hours: Math.floor(age % (1000 * 60 * 60 * 24) / (1000 * 60 * 60)),
       isExpired: age > 90 * 24 * 60 * 60 * 1000 // 90 days
     };
   }
@@ -265,8 +266,8 @@ class RetryManager {
         continue;
       }
       try {
-        await new Promise(resolve => 
-          setTimeout(resolve, item.retryDelay * Math.pow(item.backoffMultiplier, item.attempts))
+        await new Promise((resolve) =>
+        setTimeout(resolve, item.retryDelay * Math.pow(item.backoffMultiplier, item.attempts))
         );
         await executeFn(item.request);
         processed.push(item);
@@ -279,8 +280,8 @@ class RetryManager {
       }
     }
     // Remove processed items
-    const remaining = queue.filter(item => 
-      !processed.includes(item) && !failed.includes(item)
+    const remaining = queue.filter((item) =>
+    !processed.includes(item) && !failed.includes(item)
     );
     this.retryQueues.set(integrationId, remaining);
     return { processed: processed.length, failed: failed.length };
@@ -302,5 +303,4 @@ class RetryManager {
 export {
   secureStorage,
   RateLimiter,
-  RetryManager
-};
+  RetryManager };

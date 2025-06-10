@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { AlertCircle, X } from 'lucide-react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from './modal';
 import { Button } from './button';
@@ -14,7 +15,7 @@ import { Button } from './button';
  * @param {string} props.cancelText - Text for the cancel button
  * @param {boolean} props.isDanger - Whether this is a dangerous action (changes styling)
  * @returns {JSX.Element} ConfirmationDialog component
- */
+ */import { useTranslation } from "react-i18next";
 const ConfirmationDialog = ({
   isOpen,
   onClose,
@@ -23,8 +24,8 @@ const ConfirmationDialog = ({
   description,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
-  isDanger = false,
-}) => {
+  isDanger = false
+}) => {const { t } = useTranslation();
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
       <div className="flex items-start justify-between">
@@ -32,18 +33,18 @@ const ConfirmationDialog = ({
         <button
           type="button"
           className="text-gray-400 hover:text-gray-500"
-          onClick={onClose}
-        >
+          onClick={onClose}>
+
           <X className="h-5 w-5" />
         </button>
       </div>
       <ModalBody className="pt-2 pb-4">
-        {isDanger && (
-          <div className="flex items-center text-amber-500 mb-2">
+        {isDanger &&
+        <div className="flex items-center text-amber-500 mb-2">
             <AlertCircle className="h-5 w-5 mr-2" />
-            <span className="font-medium">Warning</span>
+            <span className="font-medium">{t("components.warning")}</span>
           </div>
-        )}
+        }
         <p className="text-sm text-gray-500">{description}</p>
       </ModalBody>
       <ModalFooter>
@@ -55,12 +56,12 @@ const ConfirmationDialog = ({
           onClick={() => {
             onConfirm();
             onClose();
-          }}
-        >
+          }}>
+
           {confirmText}
         </Button>
       </ModalFooter>
-    </Modal>
-  );
+    </Modal>);
+
 };
 export default ConfirmationDialog;

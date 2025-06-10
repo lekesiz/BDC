@@ -1,8 +1,9 @@
+// TODO: i18n - processed
 import React, { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 /**
  * Tabs context to manage tab state
- */
+ */import { useTranslation } from "react-i18next";
 const TabsContext = React.createContext(null);
 /**
  * Tabs container component that manages the active tab state
@@ -14,14 +15,14 @@ const TabsContext = React.createContext(null);
  * @param {React.ReactNode} props.children - Tabs content
  * @returns {JSX.Element} Tabs component
  */
-const Tabs = ({ 
-  defaultValue, 
+const Tabs = ({
+  defaultValue,
   value: controlledValue,
   onValueChange,
-  className, 
-  children, 
-  ...props 
-}) => {
+  className,
+  children,
+  ...props
+}) => {const { t } = useTranslation();
   const [value, setValue] = React.useState(defaultValue);
   const activeValue = controlledValue !== undefined ? controlledValue : value;
   const handleValueChange = React.useCallback((newValue) => {
@@ -35,8 +36,8 @@ const Tabs = ({
       <div className={cn("w-full", className)} {...props}>
         {children}
       </div>
-    </TabsContext.Provider>
-  );
+    </TabsContext.Provider>);
+
 };
 /**
  * Tab list component that contains the tab triggers
@@ -46,13 +47,13 @@ const Tabs = ({
  * @param {React.ReactNode} props.children - Tab triggers
  * @returns {JSX.Element} TabsList component
  */
-const TabsList = ({ className, children, ...props }) => {
+const TabsList = ({ className, children, ...props }) => {const { t } = useTranslation();
   const tabsRef = useRef([]);
   const { value: activeValue } = React.useContext(TabsContext);
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      const currentIndex = tabsRef.current.findIndex(tab => tab === e.target);
+      const currentIndex = tabsRef.current.findIndex((tab) => tab === e.target);
       if (currentIndex === -1) return;
       let nextIndex;
       switch (e.key) {
@@ -87,26 +88,26 @@ const TabsList = ({ className, children, ...props }) => {
     };
   }, []);
   return (
-    <div 
+    <div
       className={cn(
         "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
         className
-      )} 
+      )}
       role="tablist"
       aria-orientation="horizontal"
-      {...props}
-    >
+      {...props}>
+
       {React.Children.map(children, (child, index) => {
         if (React.isValidElement(child) && child.type === TabTrigger) {
           return React.cloneElement(child, {
             ref: (el) => tabsRef.current[index] = el,
-            tabIndex: child.props.value === activeValue ? 0 : -1,
+            tabIndex: child.props.value === activeValue ? 0 : -1
           });
         }
         return child;
       })}
-    </div>
-  );
+    </div>);
+
 };
 /**
  * Tab trigger button that activates its associated content
@@ -136,11 +137,11 @@ const TabTrigger = React.forwardRef(({ value, className, disabled, children, ...
         className
       )}
       onClick={() => !disabled && onValueChange(value)}
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </button>
-  );
+    </button>);
+
 });
 TabTrigger.displayName = 'TabTrigger';
 /**
@@ -152,7 +153,7 @@ TabTrigger.displayName = 'TabTrigger';
  * @param {React.ReactNode} props.children - Panel content
  * @returns {JSX.Element|null} TabContent component or null if inactive
  */
-const TabContent = ({ value, className, children, forceRender = false, ...props }) => {
+const TabContent = ({ value, className, children, forceRender = false, ...props }) => {const { t } = useTranslation();
   const { value: activeValue } = React.useContext(TabsContext);
   const isActive = activeValue === value;
   if (!isActive && !forceRender) return null;
@@ -169,10 +170,10 @@ const TabContent = ({ value, className, children, forceRender = false, ...props 
         !isActive && "hidden",
         className
       )}
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </div>
-  );
+    </div>);
+
 };
 export { Tabs, TabsList, TabTrigger, TabContent };

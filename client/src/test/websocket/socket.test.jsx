@@ -1,8 +1,9 @@
+// TODO: i18n - processed
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 // Mock socket context
-const mockSocket = {
+import { useTranslation } from "react-i18next";const mockSocket = {
   connected: true,
   on: vi.fn(),
   off: vi.fn(),
@@ -20,7 +21,7 @@ describe('WebSocket Basic Test', () => {
     vi.clearAllMocks();
   });
   afterEach(() => {
-    Object.keys(savedHandlers).forEach(key => {
+    Object.keys(savedHandlers).forEach((key) => {
       delete savedHandlers[key];
     });
   });

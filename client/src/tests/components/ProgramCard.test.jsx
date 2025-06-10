@@ -1,7 +1,8 @@
+// TODO: i18n - processed
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import ProgramCard from '@/components/programs/ProgramCard';
+import ProgramCard from '@/components/programs/ProgramCard';import { useTranslation } from "react-i18next";
 const mockProgram = {
   id: 1,
   name: 'Test Program',
@@ -31,12 +32,12 @@ describe('ProgramCard', () => {
     const onEdit = vi.fn();
     const onDelete = vi.fn();
     renderWithRouter(
-      <ProgramCard 
-        program={mockProgram} 
-        user={mockUser} 
-        onEdit={onEdit} 
-        onDelete={onDelete} 
-      />
+      <ProgramCard
+        program={mockProgram}
+        user={mockUser}
+        onEdit={onEdit}
+        onDelete={onDelete} />
+
     );
     expect(screen.getByText('Test Program')).toBeInTheDocument();
     expect(screen.getByText('Code: TEST001')).toBeInTheDocument();
@@ -48,12 +49,12 @@ describe('ProgramCard', () => {
     const onEdit = vi.fn();
     const onDelete = vi.fn();
     renderWithRouter(
-      <ProgramCard 
-        program={mockProgram} 
-        user={mockUser} 
-        onEdit={onEdit} 
-        onDelete={onDelete} 
-      />
+      <ProgramCard
+        program={mockProgram}
+        user={mockUser}
+        onEdit={onEdit}
+        onDelete={onDelete} />
+
     );
     const statusBadge = screen.getByText('Active');
     expect(statusBadge).toBeInTheDocument();
@@ -63,12 +64,12 @@ describe('ProgramCard', () => {
     const onEdit = vi.fn();
     const onDelete = vi.fn();
     renderWithRouter(
-      <ProgramCard 
-        program={mockProgram} 
-        user={mockUser} 
-        onEdit={onEdit} 
-        onDelete={onDelete} 
-      />
+      <ProgramCard
+        program={mockProgram}
+        user={mockUser}
+        onEdit={onEdit}
+        onDelete={onDelete} />
+
     );
     const editButton = screen.getByRole('button', { name: /edit/i });
     fireEvent.click(editButton);
@@ -80,12 +81,12 @@ describe('ProgramCard', () => {
     // Mock confirm dialog
     global.confirm = vi.fn(() => true);
     renderWithRouter(
-      <ProgramCard 
-        program={mockProgram} 
-        user={mockUser} 
-        onEdit={onEdit} 
-        onDelete={onDelete} 
-      />
+      <ProgramCard
+        program={mockProgram}
+        user={mockUser}
+        onEdit={onEdit}
+        onDelete={onDelete} />
+
     );
     const deleteButton = screen.getByRole('button', { name: /delete/i });
     fireEvent.click(deleteButton);
@@ -97,12 +98,12 @@ describe('ProgramCard', () => {
     const onDelete = vi.fn();
     const studentUser = { role: 'trainee' };
     renderWithRouter(
-      <ProgramCard 
-        program={mockProgram} 
-        user={studentUser} 
-        onEdit={onEdit} 
-        onDelete={onDelete} 
-      />
+      <ProgramCard
+        program={mockProgram}
+        user={studentUser}
+        onEdit={onEdit}
+        onDelete={onDelete} />
+
     );
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
@@ -111,12 +112,12 @@ describe('ProgramCard', () => {
     const onEdit = vi.fn();
     const onDelete = vi.fn();
     renderWithRouter(
-      <ProgramCard 
-        program={mockProgram} 
-        user={mockUser} 
-        onEdit={onEdit} 
-        onDelete={onDelete} 
-      />
+      <ProgramCard
+        program={mockProgram}
+        user={mockUser}
+        onEdit={onEdit}
+        onDelete={onDelete} />
+
     );
     expect(screen.getByText('Intermediate')).toBeInTheDocument();
   });
@@ -124,12 +125,12 @@ describe('ProgramCard', () => {
     const onEdit = vi.fn();
     const onDelete = vi.fn();
     renderWithRouter(
-      <ProgramCard 
-        program={mockProgram} 
-        user={mockUser} 
-        onEdit={onEdit} 
-        onDelete={onDelete} 
-      />
+      <ProgramCard
+        program={mockProgram}
+        user={mockUser}
+        onEdit={onEdit}
+        onDelete={onDelete} />
+
     );
     expect(screen.getByText(/Starts:/)).toBeInTheDocument();
   });
@@ -137,12 +138,12 @@ describe('ProgramCard', () => {
     const onEdit = vi.fn();
     const onDelete = vi.fn();
     renderWithRouter(
-      <ProgramCard 
-        program={mockProgram} 
-        user={mockUser} 
-        onEdit={onEdit} 
-        onDelete={onDelete} 
-      />
+      <ProgramCard
+        program={mockProgram}
+        user={mockUser}
+        onEdit={onEdit}
+        onDelete={onDelete} />
+
     );
     expect(screen.getByText('Technical')).toBeInTheDocument();
   });

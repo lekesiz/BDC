@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 /**
  * Enhanced ProtectedRoute component with centralized role and permission checking
  */
@@ -24,17 +25,17 @@ import LoadingSpinner from '../ui/LoadingSpinner';
  * @param {string} [props.redirectTo='/login'] - Where to redirect if not authorized
  * @param {string} [props.unauthorizedRedirect='/unauthorized'] - Where to redirect if unauthorized
  * @returns {React.ReactNode} The child components or a redirect
- */
-const EnhancedProtectedRoute = ({ 
-  children, 
-  requiredRole, 
+ */import { useTranslation } from "react-i18next";
+const EnhancedProtectedRoute = ({
+  children,
+  requiredRole,
   requiredPermission,
   access,
   customAccessCheck,
   requireAuth = true,
   redirectTo = '/login',
   unauthorizedRedirect = '/unauthorized'
-}) => {
+}) => {const { t } = useTranslation();
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
   // Show loading state
@@ -42,8 +43,8 @@ const EnhancedProtectedRoute = ({
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="lg" />
-      </div>
-    );
+      </div>);
+
   }
   // Check authentication requirement
   if (requireAuth && !isAuthenticated) {
@@ -67,7 +68,7 @@ const EnhancedProtectedRoute = ({
     // Check required permission
     else if (requiredPermission) {
       if (Array.isArray(requiredPermission)) {
-        authorized = requiredPermission.some(permission => hasPermission(user.role, permission));
+        authorized = requiredPermission.some((permission) => hasPermission(user.role, permission));
       } else {
         authorized = hasPermission(user.role, requiredPermission);
       }
@@ -87,61 +88,61 @@ const EnhancedProtectedRoute = ({
 /**
  * Convenience wrapper for role-based protection
  */
-export const RoleProtectedRoute = ({ children, roles, ...props }) => (
-  <EnhancedProtectedRoute requiredRole={roles} {...props}>
+export const RoleProtectedRoute = ({ children, roles, ...props }) =>
+<EnhancedProtectedRoute requiredRole={roles} {...props}>
     {children}
-  </EnhancedProtectedRoute>
-);
+  </EnhancedProtectedRoute>;
+
 /**
  * Convenience wrapper for permission-based protection
  */
-export const PermissionProtectedRoute = ({ children, permissions, ...props }) => (
-  <EnhancedProtectedRoute requiredPermission={permissions} {...props}>
+export const PermissionProtectedRoute = ({ children, permissions, ...props }) =>
+<EnhancedProtectedRoute requiredPermission={permissions} {...props}>
     {children}
-  </EnhancedProtectedRoute>
-);
+  </EnhancedProtectedRoute>;
+
 /**
  * Convenience wrapper for admin-only routes
  */
-export const AdminRoute = ({ children, ...props }) => (
-  <EnhancedProtectedRoute 
-    requiredRole={['super_admin', 'tenant_admin']} 
-    {...props}
-  >
+export const AdminRoute = ({ children, ...props }) =>
+<EnhancedProtectedRoute
+  requiredRole={['super_admin', 'tenant_admin']}
+  {...props}>
+
     {children}
-  </EnhancedProtectedRoute>
-);
+  </EnhancedProtectedRoute>;
+
 /**
  * Convenience wrapper for management routes (admin + trainer)
  */
-export const ManagementRoute = ({ children, ...props }) => (
-  <EnhancedProtectedRoute 
-    requiredRole={['super_admin', 'tenant_admin', 'trainer']} 
-    {...props}
-  >
+export const ManagementRoute = ({ children, ...props }) =>
+<EnhancedProtectedRoute
+  requiredRole={['super_admin', 'tenant_admin', 'trainer']}
+  {...props}>
+
     {children}
-  </EnhancedProtectedRoute>
-);
+  </EnhancedProtectedRoute>;
+
 /**
  * Convenience wrapper for student-only routes
  */
-export const StudentRoute = ({ children, ...props }) => (
-  <EnhancedProtectedRoute 
-    requiredRole={['student', 'trainee']} 
-    {...props}
-  >
+export const StudentRoute = ({ children, ...props }) =>
+<EnhancedProtectedRoute
+  requiredRole={['student', 'trainee']}
+  {...props}>
+
     {children}
-  </EnhancedProtectedRoute>
-);
+  </EnhancedProtectedRoute>;
+
 /**
  * Public route wrapper (no authentication required)
  */
-export const PublicRoute = ({ children, ...props }) => (
-  <EnhancedProtectedRoute 
-    requireAuth={false} 
-    {...props}
-  >
+export const PublicRoute = ({ children, ...props }) =>
+<EnhancedProtectedRoute
+  requireAuth={false}
+  {...props}>
+
     {children}
-  </EnhancedProtectedRoute>
-);
+  </EnhancedProtectedRoute>;
+
 export default EnhancedProtectedRoute;

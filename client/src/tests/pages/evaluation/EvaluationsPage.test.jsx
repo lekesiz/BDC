@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -6,7 +7,7 @@ import api from '@/lib/api';
 import { EVALUATION_STATUS } from '@/lib/constants';
 import { useToast } from '@/components/ui/toast';
 // Mock modules
-vi.mock('@/lib/api');
+import { useTranslation } from "react-i18next";vi.mock('@/lib/api');
 vi.mock('@/components/ui/toast');
 // Mock useNavigate hook
 const mockNavigate = vi.fn();
@@ -14,57 +15,57 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => mockNavigate,
+    useNavigate: () => mockNavigate
   };
 });
 // Mock toast hook
 const mockAddToast = vi.fn();
 useToast.mockReturnValue({
-  toast: mockAddToast,
+  toast: mockAddToast
 });
 // Sample evaluations data
 const mockEvaluations = {
   items: [
-    {
-      id: '1',
-      title: 'JavaScript Basics',
-      description: 'Test your knowledge of JavaScript fundamentals',
-      status: EVALUATION_STATUS.ACTIVE,
-      time_limit: 30,
-      questions: [
-        { id: '1', question_text: 'What is JavaScript?' },
-        { id: '2', question_text: 'What is a variable?' },
-      ],
-      passing_score: 70,
-      skills: ['JavaScript', 'Programming'],
-    },
-    {
-      id: '2',
-      title: 'HTML & CSS',
-      description: 'Test your knowledge of HTML and CSS',
-      status: EVALUATION_STATUS.DRAFT,
-      time_limit: 45,
-      questions: [
-        { id: '3', question_text: 'What is HTML?' },
-        { id: '4', question_text: 'What is CSS?' },
-      ],
-      passing_score: 60,
-      skills: ['HTML', 'CSS', 'Web Development'],
-    },
-    {
-      id: '3',
-      title: 'React Fundamentals',
-      description: 'Test your knowledge of React JS',
-      status: EVALUATION_STATUS.ARCHIVED,
-      time_limit: null,
-      questions: [
-        { id: '5', question_text: 'What is React?' },
-        { id: '6', question_text: 'What is JSX?' },
-      ],
-      passing_score: 75,
-      skills: ['React', 'JavaScript', 'Web Development'],
-    },
-  ],
+  {
+    id: '1',
+    title: 'JavaScript Basics',
+    description: 'Test your knowledge of JavaScript fundamentals',
+    status: EVALUATION_STATUS.ACTIVE,
+    time_limit: 30,
+    questions: [
+    { id: '1', question_text: 'What is JavaScript?' },
+    { id: '2', question_text: 'What is a variable?' }],
+
+    passing_score: 70,
+    skills: ['JavaScript', 'Programming']
+  },
+  {
+    id: '2',
+    title: 'HTML & CSS',
+    description: 'Test your knowledge of HTML and CSS',
+    status: EVALUATION_STATUS.DRAFT,
+    time_limit: 45,
+    questions: [
+    { id: '3', question_text: 'What is HTML?' },
+    { id: '4', question_text: 'What is CSS?' }],
+
+    passing_score: 60,
+    skills: ['HTML', 'CSS', 'Web Development']
+  },
+  {
+    id: '3',
+    title: 'React Fundamentals',
+    description: 'Test your knowledge of React JS',
+    status: EVALUATION_STATUS.ARCHIVED,
+    time_limit: null,
+    questions: [
+    { id: '5', question_text: 'What is React?' },
+    { id: '6', question_text: 'What is JSX?' }],
+
+    passing_score: 75,
+    skills: ['React', 'JavaScript', 'Web Development']
+  }]
+
 };
 describe('EvaluationsPage', () => {
   beforeEach(() => {
@@ -125,7 +126,7 @@ describe('EvaluationsPage', () => {
       expect(mockAddToast).toHaveBeenCalledWith({
         title: 'Error',
         description: 'Failed to load evaluations',
-        type: 'error',
+        type: 'error'
       });
     });
   });
@@ -205,7 +206,7 @@ describe('EvaluationsPage', () => {
     expect(mockAddToast).toHaveBeenCalledWith({
       title: 'Success',
       description: 'Evaluation deleted successfully',
-      type: 'success',
+      type: 'success'
     });
   });
   it('does not delete when user cancels confirmation', async () => {
@@ -250,7 +251,7 @@ describe('EvaluationsPage', () => {
       expect(mockAddToast).toHaveBeenCalledWith({
         title: 'Error',
         description: 'Failed to delete evaluation',
-        type: 'error',
+        type: 'error'
       });
     });
   });

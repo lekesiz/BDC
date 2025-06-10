@@ -1,7 +1,8 @@
+// TODO: i18n - processed
 import { useEffect, useRef } from 'react';
 /**
  * Custom hook for managing focus in accessible web applications
- */
+ */import { useTranslation } from "react-i18next";
 export const useFocusManagement = () => {
   const previousElementRef = useRef(null);
   /**
@@ -42,25 +43,25 @@ export const useFocusManagement = () => {
   const getFocusableElements = (container) => {
     if (!container) return [];
     const focusableSelectors = [
-      'a[href]',
-      'button:not([disabled])',
-      'input:not([disabled])',
-      'select:not([disabled])',
-      'textarea:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])',
-      '[contenteditable="true"]'
-    ].join(', ');
-    return Array.from(container.querySelectorAll(focusableSelectors))
-      .filter(element => !element.hasAttribute('disabled') && isVisible(element));
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+    '[contenteditable="true"]'].
+    join(', ');
+    return Array.from(container.querySelectorAll(focusableSelectors)).
+    filter((element) => !element.hasAttribute('disabled') && isVisible(element));
   };
   /**
    * Check if an element is visible
    */
   const isVisible = (element) => {
     const style = window.getComputedStyle(element);
-    return style.display !== 'none' && 
-           style.visibility !== 'hidden' && 
-           style.opacity !== '0';
+    return style.display !== 'none' &&
+    style.visibility !== 'hidden' &&
+    style.opacity !== '0';
   };
   /**
    * Trap focus within a container (useful for modals)

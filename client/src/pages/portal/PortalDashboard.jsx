@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { AnimatedCard, AnimatedButton, AnimatedPage, AnimatedList, AnimatedListItem } from '@/components/animations';
 import { OptimizedAnimation, BatchAnimation } from '@/components/animations/OptimizedAnimation';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/animations';
 import {
@@ -42,6 +44,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 const PortalDashboardV3 = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
   const [coursesData, setCoursesData] = useState([]);
@@ -69,7 +72,7 @@ const PortalDashboardV3 = () => {
         // Set default data structures to prevent errors
         setDashboardData({
           user: {
-            name: user?.first_name || 'Student',
+            name: user?.first_name || t('portal.dashboard.defaultStudent'),
             email: user?.email || '',
             profile_picture: user?.profile_picture || ''
           },
@@ -86,7 +89,7 @@ const PortalDashboardV3 = () => {
         setCoursesData([]);
         setProgressData({
           overall_progress: 0,
-          current_level: 'Beginner',
+          current_level: t('portal.dashboard.defaultLevel'),
           skills_distribution: [],
           monthly_progress: []
         });
@@ -114,7 +117,7 @@ const PortalDashboardV3 = () => {
             onClick={() => window.location.reload()} 
             className="mt-4"
           >
-            Retry
+            {t('portal.dashboard.retry')}
           </Button>
         </Card>
       </div>
@@ -136,12 +139,12 @@ const PortalDashboardV3 = () => {
       >
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Welcome back, {userData.name}!</h1>
-            <p className="text-primary-lighter">Track your progress and achieve your goals</p>
+            <h1 className="text-3xl font-bold mb-2">{t('portal.dashboard.welcome', { name: userData.name })}</h1>
+            <p className="text-primary-lighter">{t('portal.dashboard.subtitle')}</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-primary-lighter">Current Level</p>
-            <p className="text-2xl font-bold">{progressData?.current_level || 'Beginner'}</p>
+            <p className="text-sm text-primary-lighter">{t('portal.dashboard.currentLevel')}</p>
+            <p className="text-2xl font-bold">{progressData?.current_level || t('portal.dashboard.defaultLevel')}</p>
           </div>
         </div>
       </motion.div>
@@ -153,32 +156,32 @@ const PortalDashboardV3 = () => {
         animate="animate"
       >
         <StatsCard
-          title="Enrolled Programs"
+          title={t('portal.dashboard.stats.enrolledPrograms')}
           value={stats.enrolled_programs}
           icon={<BookOpen className="w-6 h-6" />}
           color="bg-blue-500"
-          subtitle={`${stats.completed_programs} completed`}
+          subtitle={t('portal.dashboard.stats.enrolledProgramsSubtitle', { count: stats.completed_programs })}
         />
         <StatsCard
-          title="Average Progress"
+          title={t('portal.dashboard.stats.averageProgress')}
           value={`${Math.round(stats.average_progress)}%`}
           icon={<TrendingUp className="w-6 h-6" />}
           color="bg-purple-500"
-          subtitle="Across all programs"
+          subtitle={t('portal.dashboard.stats.averageProgressSubtitle')}
         />
         <StatsCard
-          title="Attendance Rate"
+          title={t('portal.dashboard.stats.attendanceRate')}
           value={`${Math.round(stats.total_attendance_rate || 0)}%`}
           icon={<CheckCircle2 className="w-6 h-6" />}
           color="bg-green-500"
-          subtitle="Keep it up!"
+          subtitle={t('portal.dashboard.stats.attendanceRateSubtitle')}
         />
         <StatsCard
-          title="Achievements"
+          title={t('portal.dashboard.stats.achievements')}
           value={achievementsData.length}
           icon={<Award className="w-6 h-6" />}
           color="bg-orange-500"
-          subtitle="Badges earned"
+          subtitle={t('portal.dashboard.stats.achievementsSubtitle')}
         />
       </motion.div>
       {/* Main Content Grid */}
@@ -188,10 +191,10 @@ const PortalDashboardV3 = () => {
           {/* Active Programs */}
           <AnimatedCard className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Active Programs</h2>
+              <h2 className="text-xl font-semibold">{t('portal.dashboard.sections.activePrograms.title')}</h2>
               <Link to="/portal/courses">
                 <AnimatedButton variant="ghost" size="sm">
-                  View All <ArrowRight className="w-4 h-4 ml-1" />
+                  {t('portal.dashboard.sections.activePrograms.viewAll')} <ArrowRight className="w-4 h-4 ml-1" />
                 </AnimatedButton>
               </Link>
             </div>
@@ -202,22 +205,22 @@ const PortalDashboardV3 = () => {
                   title={course.name}
                   progress={course.progress || 0}
                   nextSession={getNextSession(course)}
-                  moduleProgress={`Module ${course.current_module || 1} of ${course.total_modules || 1}`}
+                  moduleProgress={t('portal.dashboard.sections.activePrograms.moduleProgress', { current: course.current_module || 1, total: course.total_modules || 1 })}
                   instructor={course.instructor}
                 />
               ))}
               {coursesData.filter(course => course.enrollment_status === 'enrolled').length === 0 && (
-                <p className="text-gray-500 text-center py-8">No active programs</p>
+                <p className="text-gray-500 text-center py-8">{t('portal.dashboard.sections.activePrograms.empty')}</p>
               )}
             </div>
           </AnimatedCard>
           {/* Recent Assessments */}
           <AnimatedCard className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Recent Assessments</h2>
+              <h2 className="text-xl font-semibold">{t('portal.dashboard.sections.recentAssessments.title')}</h2>
               <Link to="/portal/assessments">
                 <Button variant="ghost" size="sm">
-                  View All <ArrowRight className="w-4 h-4 ml-1" />
+                  {t('portal.dashboard.sections.recentAssessments.viewAll')} <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
             </div>
@@ -225,7 +228,7 @@ const PortalDashboardV3 = () => {
               {recent_tests.map((test) => (
                 <AssessmentCard
                   key={test.id}
-                  title={test.evaluation?.title || 'Assessment'}
+                  title={test.evaluation?.title || t('portal.dashboard.sections.recentAssessments.defaultTitle')}
                   date={new Date(test.created_at).toLocaleDateString()}
                   score={test.score}
                   status={test.status}
@@ -233,13 +236,13 @@ const PortalDashboardV3 = () => {
                 />
               ))}
               {recent_tests.length === 0 && (
-                <p className="text-gray-500 text-center py-8">No recent assessments</p>
+                <p className="text-gray-500 text-center py-8">{t('portal.dashboard.sections.recentAssessments.empty')}</p>
               )}
             </div>
           </AnimatedCard>
           {/* Performance Analytics */}
           <AnimatedCard className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Performance Trend</h2>
+            <h2 className="text-xl font-semibold mb-4">{t('portal.dashboard.sections.performanceTrend.title')}</h2>
             {performanceData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={performanceData}>
@@ -248,13 +251,13 @@ const PortalDashboardV3 = () => {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="average_score" stroke="#8884d8" name="Assessment Score" />
-                  <Line type="monotone" dataKey="completion_rate" stroke="#82ca9d" name="Completion Rate" />
-                  <Line type="monotone" dataKey="attendance_rate" stroke="#ffc658" name="Attendance Rate" />
+                  <Line type="monotone" dataKey="average_score" stroke="#8884d8" name={t('portal.dashboard.sections.performanceTrend.assessmentScore')} />
+                  <Line type="monotone" dataKey="completion_rate" stroke="#82ca9d" name={t('portal.dashboard.sections.performanceTrend.completionRate')} />
+                  <Line type="monotone" dataKey="attendance_rate" stroke="#ffc658" name={t('portal.dashboard.sections.performanceTrend.attendanceRate')} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-gray-500 text-center py-8">No performance data available</p>
+              <p className="text-gray-500 text-center py-8">{t('portal.dashboard.sections.performanceTrend.empty')}</p>
             )}
           </AnimatedCard>
         </div>
@@ -263,10 +266,10 @@ const PortalDashboardV3 = () => {
           {/* Upcoming Schedule */}
           <AnimatedCard className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Upcoming Schedule</h2>
+              <h2 className="text-xl font-semibold">{t('portal.dashboard.sections.upcomingSchedule.title')}</h2>
               <Link to="/portal/calendar">
                 <Button variant="ghost" size="sm">
-                  View Calendar <Calendar className="w-4 h-4 ml-1" />
+                  {t('portal.dashboard.sections.upcomingSchedule.viewCalendar')} <Calendar className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
             </div>
@@ -274,7 +277,7 @@ const PortalDashboardV3 = () => {
               {upcoming_sessions.map((session) => (
                 <ScheduleItem
                   key={session.id}
-                  title={session.module?.name || session.title || 'Training Session'}
+                  title={session.module?.name || session.title || t('portal.dashboard.sections.upcomingSchedule.defaultSession')}
                   date={new Date(session.session_date || session.datetime).toLocaleDateString()}
                   time={new Date(session.session_date || session.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   location={session.location}
@@ -282,14 +285,14 @@ const PortalDashboardV3 = () => {
                 />
               ))}
               {upcoming_sessions.length === 0 && (
-                <p className="text-gray-500 text-center py-8">No upcoming sessions</p>
+                <p className="text-gray-500 text-center py-8">{t('portal.dashboard.sections.upcomingSchedule.empty')}</p>
               )}
             </div>
           </AnimatedCard>
           {/* Skills Progress */}
           <OptimizedAnimation threshold={0.3}>
             <AnimatedCard className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Skills Development</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('portal.dashboard.sections.skillsDevelopment.title')}</h2>
               {skillsData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={250}>
                   <RadarChart data={skillsData}>
@@ -300,11 +303,11 @@ const PortalDashboardV3 = () => {
                   </RadarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-gray-500 text-center py-8">No skills data available</p>
+                <p className="text-gray-500 text-center py-8">{t('portal.dashboard.sections.skillsDevelopment.empty')}</p>
               )}
             <Link to="/portal/skills" className="block mt-4">
               <Button variant="outline" className="w-full">
-                View Detailed Progress
+                {t('portal.dashboard.sections.skillsDevelopment.viewDetailed')}
               </Button>
             </Link>
           </AnimatedCard>
@@ -312,10 +315,10 @@ const PortalDashboardV3 = () => {
           {/* Achievements */}
           <AnimatedCard className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Recent Achievements</h2>
+              <h2 className="text-xl font-semibold">{t('portal.dashboard.sections.recentAchievements.title')}</h2>
               <Link to="/portal/achievements">
                 <Button variant="ghost" size="sm">
-                  View All <Award className="w-4 h-4 ml-1" />
+                  {t('portal.dashboard.sections.recentAchievements.viewAll')} <Award className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
             </div>
@@ -330,32 +333,32 @@ const PortalDashboardV3 = () => {
                 />
               ))}
               {achievementsData.length === 0 && (
-                <p className="text-gray-500 text-center py-8">No achievements yet</p>
+                <p className="text-gray-500 text-center py-8">{t('portal.dashboard.sections.recentAchievements.empty')}</p>
               )}
             </div>
           </AnimatedCard>
           {/* Quick Actions */}
           <AnimatedCard className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+            <h2 className="text-xl font-semibold mb-4">{t('portal.dashboard.sections.quickActions.title')}</h2>
             <div className="grid grid-cols-2 gap-3">
               <QuickActionButton
                 icon={<FileText className="w-5 h-5" />}
-                label="Resources"
+                label={t('portal.dashboard.sections.quickActions.resources')}
                 to="/portal/resources"
               />
               <QuickActionButton
                 icon={<Brain className="w-5 h-5" />}
-                label="Take Test"
+                label={t('portal.dashboard.sections.quickActions.takeTest')}
                 to="/portal/assessments"
               />
               <QuickActionButton
                 icon={<Activity className="w-5 h-5" />}
-                label="Progress"
+                label={t('portal.dashboard.sections.quickActions.progress')}
                 to="/portal/progress"
               />
               <QuickActionButton
                 icon={<Users className="w-5 h-5" />}
-                label="Profile"
+                label={t('portal.dashboard.sections.quickActions.profile')}
                 to="/portal/profile"
               />
             </div>
@@ -414,7 +417,7 @@ const AssessmentCard = ({ title, date, score, status, feedback }) => (
           </span>
         </>
       ) : (
-        <span className="text-sm text-yellow-600 font-medium">In Progress</span>
+        <span className="text-sm text-yellow-600 font-medium">{t('portal.dashboard.sections.recentAssessments.inProgress')}</span>
       )}
     </div>
   </div>
@@ -463,9 +466,9 @@ const getNextSession = (course) => {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
   if (date.toDateString() === today.toDateString()) {
-    return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    return t('portal.dashboard.dateFormats.today', { time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
   } else if (date.toDateString() === tomorrow.toDateString()) {
-    return `Tomorrow at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    return t('portal.dashboard.dateFormats.tomorrow', { time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
   } else {
     return `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
   }
@@ -489,10 +492,10 @@ const getScoreColor = (score) => {
   return 'text-red-600';
 };
 const getScoreLabel = (score) => {
-  if (score >= 90) return 'Excellent';
-  if (score >= 80) return 'Very Good';
-  if (score >= 70) return 'Good';
-  if (score >= 60) return 'Satisfactory';
-  return 'Needs Improvement';
+  if (score >= 90) return t('portal.dashboard.scoreLabels.excellent');
+  if (score >= 80) return t('portal.dashboard.scoreLabels.veryGood');
+  if (score >= 70) return t('portal.dashboard.scoreLabels.good');
+  if (score >= 60) return t('portal.dashboard.scoreLabels.satisfactory');
+  return t('portal.dashboard.scoreLabels.needsImprovement');
 };
 export default PortalDashboardV3;

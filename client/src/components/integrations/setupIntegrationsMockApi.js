@@ -1,9 +1,10 @@
-import { 
-  generateIntegrationsData, 
+// TODO: i18n - processed
+import {
+  generateIntegrationsData,
   generateIntegrationActivity,
   generateIntegrationStats,
-  generateOAuthConfigs 
-} from './mockIntegrationsData';
+  generateOAuthConfigs } from
+'./mockIntegrationsData';import { useTranslation } from "react-i18next";
 export const setupIntegrationsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -12,7 +13,7 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     delete: originalDelete || api.delete.bind(api)
   };
   // Integration endpoints
-  api.get = function(url, ...args) {
+  api.get = function (url, ...args) {
     // List all integrations
     if (url === '/api/integrations') {
       const integrationsData = generateIntegrationsData();
@@ -28,7 +29,7 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     if (url.match(/^\/api\/integrations\/[\w-]+$/)) {
       const integrationId = url.split('/').pop();
       const integrationsData = generateIntegrationsData();
-      const integration = integrationsData.available.find(i => i.id === integrationId);
+      const integration = integrationsData.available.find((i) => i.id === integrationId);
       if (integration) {
         return Promise.resolve({
           status: 200,
@@ -75,7 +76,7 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     if (url.match(/^\/api\/integrations\/webhooks\/\d+$/)) {
       const webhookId = parseInt(url.split('/').pop());
       const integrationsData = generateIntegrationsData();
-      const webhook = integrationsData.webhooks.find(w => w.id === webhookId);
+      const webhook = integrationsData.webhooks.find((w) => w.id === webhookId);
       if (webhook) {
         return Promise.resolve({
           status: 200,
@@ -111,7 +112,7 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     if (url.match(/^\/api\/integrations\/[\w-]+\/settings$/)) {
       const integrationId = url.split('/')[3];
       const integrationsData = generateIntegrationsData();
-      const integration = integrationsData.available.find(i => i.id === integrationId);
+      const integration = integrationsData.available.find((i) => i.id === integrationId);
       if (integration) {
         return Promise.resolve({
           status: 200,
@@ -127,12 +128,12 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     // Webhook events
     if (url === '/api/integrations/webhook-events') {
       const events = [
-        { category: "Enrollment", events: ["enrollment.created", "enrollment.updated", "enrollment.deleted"] },
-        { category: "Course", events: ["course.started", "course.completed", "course.abandoned"] },
-        { category: "Payment", events: ["payment.success", "payment.failed", "subscription.created", "subscription.cancelled"] },
-        { category: "User", events: ["user.created", "user.updated", "user.deleted", "user.login"] },
-        { category: "Certificate", events: ["certificate.issued", "certificate.revoked"] }
-      ];
+      { category: "Enrollment", events: ["enrollment.created", "enrollment.updated", "enrollment.deleted"] },
+      { category: "Course", events: ["course.started", "course.completed", "course.abandoned"] },
+      { category: "Payment", events: ["payment.success", "payment.failed", "subscription.created", "subscription.cancelled"] },
+      { category: "User", events: ["user.created", "user.updated", "user.deleted", "user.login"] },
+      { category: "Certificate", events: ["certificate.issued", "certificate.revoked"] }];
+
       return Promise.resolve({
         status: 200,
         data: events
@@ -142,7 +143,7 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     return originalFunctions.get.call(api, url, ...args);
   };
   // Integration POST endpoints
-  api.post = function(url, data, ...args) {
+  api.post = function (url, data, ...args) {
     // Connect integration
     if (url.match(/^\/api\/integrations\/[\w-]+\/connect$/)) {
       const integrationId = url.split('/')[3];
@@ -233,7 +234,7 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     return originalFunctions.post.call(api, url, data, ...args);
   };
   // Integration PUT endpoints
-  api.put = function(url, data, ...args) {
+  api.put = function (url, data, ...args) {
     // Update integration settings
     if (url.match(/^\/api\/integrations\/[\w-]+\/settings$/)) {
       const integrationId = url.split('/')[3];
@@ -299,7 +300,7 @@ export const setupIntegrationsMockApi = (api, originalGet, originalPost, origina
     return originalFunctions.put.call(api, url, data, ...args);
   };
   // Integration DELETE endpoints
-  api.delete = function(url, ...args) {
+  api.delete = function (url, ...args) {
     // Disconnect integration
     if (url.match(/^\/api\/integrations\/[\w-]+\/disconnect$/)) {
       const integrationId = url.split('/')[3];

@@ -1,8 +1,9 @@
+// TODO: i18n - processed
 import { render, screen, fireEvent } from '../../../test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DocumentViewer from '../../../components/document/DocumentViewer';
 // Set up fake timers
-vi.useFakeTimers();
+import { useTranslation } from "react-i18next";vi.useFakeTimers();
 // Mock document objects for different file types
 const pdfDocument = {
   id: '1',

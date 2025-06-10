@@ -126,15 +126,15 @@ const SettingsPage = () => {
       await api.put('/api/settings/notifications', notificationSettings);
       addToast({
         type: 'success',
-        title: 'Settings updated',
-        message: 'Your notification settings have been saved.',
+        title: t('settings.page.messages.settingsSaved'),
+        message: t('settings.page.messages.updateSuccess', { type: 'notification' }),
       });
     } catch (err) {
       console.error('Failed to save notification settings:', err);
       addToast({
         type: 'error',
-        title: 'Update failed',
-        message: err.response?.data?.message || 'Failed to update settings. Please try again.',
+        title: t('common.error'),
+        message: err.response?.data?.message || t('settings.page.messages.updateFailed'),
       });
     } finally {
       setIsLoading(false);
@@ -148,15 +148,15 @@ const SettingsPage = () => {
       await api.put('/api/settings/privacy', privacySettings);
       addToast({
         type: 'success',
-        title: 'Settings updated',
-        message: 'Your privacy settings have been saved.',
+        title: t('settings.page.messages.settingsSaved'),
+        message: t('settings.page.messages.updateSuccess', { type: 'privacy' }),
       });
     } catch (err) {
       console.error('Failed to save privacy settings:', err);
       addToast({
         type: 'error',
-        title: 'Update failed',
-        message: err.response?.data?.message || 'Failed to update settings. Please try again.',
+        title: t('common.error'),
+        message: err.response?.data?.message || t('settings.page.messages.updateFailed'),
       });
     } finally {
       setIsLoading(false);
@@ -173,15 +173,15 @@ const SettingsPage = () => {
       });
       addToast({
         type: 'success',
-        title: 'Settings updated',
-        message: 'Your preferences have been saved.',
+        title: t('settings.page.messages.settingsSaved'),
+        message: t('settings.page.messages.updateSuccess', { type: 'preferences' }),
       });
     } catch (err) {
       console.error('Failed to save preferences:', err);
       addToast({
         type: 'error',
-        title: 'Update failed',
-        message: err.response?.data?.message || 'Failed to update settings. Please try again.',
+        title: t('common.error'),
+        message: err.response?.data?.message || t('settings.page.messages.updateFailed'),
       });
     } finally {
       setIsLoading(false);
@@ -195,13 +195,13 @@ const SettingsPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        Settings
+        {t('settings.page.title')}
       </motion.h1>
       <AnimatedCard>
         <CardHeader>
-          <CardTitle>Account Settings</CardTitle>
+          <CardTitle>{t('settings.page.accountSettings')}</CardTitle>
           <CardDescription>
-            Manage your account preferences and settings
+            {t('settings.page.accountSettingsDescription')}
           </CardDescription>
         </CardHeader>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -209,23 +209,23 @@ const SettingsPage = () => {
             <TabsList className="mb-6">
               <TabTrigger value="notifications">
                 <Bell className="h-4 w-4 mr-2" />
-                Notifications
+                {t('settings.page.tabs.notifications')}
               </TabTrigger>
               <TabTrigger value="privacy">
                 <Shield className="h-4 w-4 mr-2" />
-                Privacy
+                {t('settings.page.tabs.privacy')}
               </TabTrigger>
               <TabTrigger value="preferences">
                 <Globe className="h-4 w-4 mr-2" />
-                Preferences
+                {t('settings.page.tabs.preferences')}
               </TabTrigger>
               <TabTrigger value="ai">
                 <Brain className="h-4 w-4 mr-2" />
-                AI
+                {t('settings.page.tabs.ai')}
               </TabTrigger>
               <TabTrigger value="integrations">
                 <Globe className="h-4 w-4 mr-2" />
-                Integrations
+                {t('settings.page.tabs.integrations')}
               </TabTrigger>
             </TabsList>
           </CardContent>
@@ -242,13 +242,13 @@ const SettingsPage = () => {
                   className="space-y-4"
                   variants={staggerItem}
                 >
-                  <h3 className="text-lg font-medium">Email Notifications</h3>
+                  <h3 className="text-lg font-medium">{t('settings.page.notifications.email.title')}</h3>
                   <div className="space-y-3">
                   {/* Email Notifications toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium">Email Notifications</h4>
-                      <p className="text-sm text-muted-foreground">Receive email notifications for important updates</p>
+                      <h4 className="text-sm font-medium">{t('settings.page.notifications.email.title')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('settings.page.notifications.email.description')}</p>
                     </div>
                     <div className="flex items-center">
                       <input 
@@ -262,8 +262,8 @@ const SettingsPage = () => {
                   {/* Marketing Emails toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium">Marketing Emails</h4>
-                      <p className="text-sm text-muted-foreground">Receive emails about new features and offers</p>
+                      <h4 className="text-sm font-medium">{t('settings.page.notifications.email.marketing')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('settings.page.notifications.email.marketingDescription')}</p>
                     </div>
                     <div className="flex items-center">
                       <input 
@@ -278,13 +278,13 @@ const SettingsPage = () => {
               </motion.div>
               </motion.div>
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Push Notifications</h3>
+                <h3 className="text-lg font-medium">{t('settings.page.notifications.push.title')}</h3>
                 <div className="space-y-3">
                   {/* Push Notifications toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium">Push Notifications</h4>
-                      <p className="text-sm text-muted-foreground">Receive push notifications in your browser</p>
+                      <h4 className="text-sm font-medium">{t('settings.page.notifications.push.title')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('settings.page.notifications.push.description')}</p>
                     </div>
                     <div className="flex items-center">
                       <input 
@@ -298,8 +298,8 @@ const SettingsPage = () => {
                   {/* New Messages toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium">New Messages</h4>
-                      <p className="text-sm text-muted-foreground">Get notified when you receive new messages</p>
+                      <h4 className="text-sm font-medium">{t('settings.page.notifications.push.newMessages')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('settings.page.notifications.push.newMessagesDescription')}</p>
                     </div>
                     <div className="flex items-center">
                       <input 
@@ -313,8 +313,8 @@ const SettingsPage = () => {
                   {/* Session Reminders toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium">Session Reminders</h4>
-                      <p className="text-sm text-muted-foreground">Get reminders for upcoming sessions</p>
+                      <h4 className="text-sm font-medium">{t('settings.page.notifications.push.sessionReminders')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('settings.page.notifications.push.sessionRemindersDescription')}</p>
                     </div>
                     <div className="flex items-center">
                       <input 
@@ -328,8 +328,8 @@ const SettingsPage = () => {
                   {/* Evaluation Results toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium">Evaluation Results</h4>
-                      <p className="text-sm text-muted-foreground">Get notified when your evaluation results are ready</p>
+                      <h4 className="text-sm font-medium">{t('settings.page.notifications.push.evaluationResults')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('settings.page.notifications.push.evaluationResultsDescription')}</p>
                     </div>
                     <div className="flex items-center">
                       <input 
@@ -343,13 +343,13 @@ const SettingsPage = () => {
                 </div>
               </div>
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">SMS Notifications</h3>
+                <h3 className="text-lg font-medium">{t('settings.page.notifications.sms.title')}</h3>
                 <div className="space-y-3">
                   {/* SMS Notifications toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium">SMS Notifications</h4>
-                      <p className="text-sm text-muted-foreground">Receive text message notifications (carrier charges may apply)</p>
+                      <h4 className="text-sm font-medium">{t('settings.page.notifications.sms.title')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('settings.page.notifications.sms.description')}</p>
                     </div>
                     <div className="flex items-center">
                       <input 
@@ -370,7 +370,7 @@ const SettingsPage = () => {
                 disabled={isLoading}
                 className="ml-auto"
               >
-                Save Notification Settings
+                {t('settings.page.notifications.saveButton')}
               </Button>
             </CardFooter>
           </TabContent>
@@ -379,12 +379,12 @@ const SettingsPage = () => {
             <TabContent value="privacy">
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Privacy Settings</h3>
+                <h3 className="text-lg font-medium">{t('settings.page.privacy.title')}</h3>
                 <div className="space-y-3">
                   {/* Profile Visibility */}
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Profile Visibility</h4>
-                    <p className="text-sm text-muted-foreground">Control who can see your profile information</p>
+                    <h4 className="text-sm font-medium">{t('settings.page.privacy.profileVisibility.title')}</h4>
+                    <p className="text-sm text-muted-foreground">{t('settings.page.privacy.profileVisibility.description')}</p>
                     <div className="flex flex-col space-y-1 mt-2">
                       <div className="flex items-center">
                         <input 
@@ -396,7 +396,7 @@ const SettingsPage = () => {
                           onChange={() => handlePrivacyChange('profile_visibility', 'all')}
                         />
                         <label htmlFor="visibility-all" className="ml-2 text-sm text-gray-700">
-                          Everyone
+                          {t('settings.page.privacy.profileVisibility.everyone')}
                         </label>
                       </div>
                       <div className="flex items-center">
@@ -409,7 +409,7 @@ const SettingsPage = () => {
                           onChange={() => handlePrivacyChange('profile_visibility', 'connections')}
                         />
                         <label htmlFor="visibility-connections" className="ml-2 text-sm text-gray-700">
-                          Only connections
+                          {t('settings.page.privacy.profileVisibility.connections')}
                         </label>
                       </div>
                       <div className="flex items-center">
@@ -422,7 +422,7 @@ const SettingsPage = () => {
                           onChange={() => handlePrivacyChange('profile_visibility', 'none')}
                         />
                         <label htmlFor="visibility-none" className="ml-2 text-sm text-gray-700">
-                          Private
+                          {t('settings.page.privacy.profileVisibility.private')}
                         </label>
                       </div>
                     </div>
@@ -430,8 +430,8 @@ const SettingsPage = () => {
                   {/* Online Status toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium">Show Online Status</h4>
-                      <p className="text-sm text-muted-foreground">Allow others to see when you're online</p>
+                      <h4 className="text-sm font-medium">{t('settings.page.privacy.onlineStatus.title')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('settings.page.privacy.onlineStatus.description')}</p>
                     </div>
                     <div className="flex items-center">
                       <input 
@@ -445,8 +445,8 @@ const SettingsPage = () => {
                   {/* Activity Sharing toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium">Share Activity</h4>
-                      <p className="text-sm text-muted-foreground">Share your learning progress and achievements</p>
+                      <h4 className="text-sm font-medium">{t('settings.page.privacy.activitySharing.title')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('settings.page.privacy.activitySharing.description')}</p>
                     </div>
                     <div className="flex items-center">
                       <input 
@@ -460,13 +460,13 @@ const SettingsPage = () => {
                 </div>
               </div>
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Data Collection</h3>
+                <h3 className="text-lg font-medium">{t('settings.page.privacy.dataCollection.title')}</h3>
                 <div className="space-y-3">
                   {/* Data Collection toggle */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium">Allow Data Collection</h4>
-                      <p className="text-sm text-muted-foreground">Help us improve our platform by sharing usage data</p>
+                      <h4 className="text-sm font-medium">{t('settings.page.privacy.dataCollection.allowCollection')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('settings.page.privacy.dataCollection.description')}</p>
                     </div>
                     <div className="flex items-center">
                       <input 
@@ -479,9 +479,9 @@ const SettingsPage = () => {
                   </div>
                 </div>
               </div>
-              <Alert type="info" title="Data Privacy">
-                Your data is always protected and never shared with third parties without your consent.
-                View our <a href="/privacy-policy" className="text-primary underline">Privacy Policy</a> for more information.
+              <Alert type="info" title={t('settings.page.privacy.dataPrivacyNotice.title')}>
+                {t('settings.page.privacy.dataPrivacyNotice.message')}
+                View our <a href="/privacy-policy" className="text-primary underline">{t('settings.page.privacy.dataPrivacyNotice.privacyPolicyLink')}</a> for more information.
               </Alert>
             </CardContent>
             <CardFooter className="border-t pt-6">
@@ -491,7 +491,7 @@ const SettingsPage = () => {
                 disabled={isLoading}
                 className="ml-auto"
               >
-                Save Privacy Settings
+                {t('settings.page.privacy.saveButton')}
               </Button>
             </CardFooter>
             </TabContent>
@@ -501,12 +501,12 @@ const SettingsPage = () => {
                 <div className="flex items-center justify-center min-h-[300px]">
                   <div className="text-center">
                     <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Restricted</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('settings.page.accessRestricted.title')}</h3>
                     <p className="text-gray-600 mb-4">
-                      Advanced privacy settings are only available to administrators and trainers.
+                      {t('settings.page.accessRestricted.privacyMessage')}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Current role: <Badge variant="secondary">{user?.role}</Badge>
+                      {t('settings.page.accessRestricted.currentRole')} <Badge variant="secondary">{user?.role}</Badge>
                     </p>
                   </div>
                 </div>
@@ -517,12 +517,12 @@ const SettingsPage = () => {
           <TabContent value="preferences">
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Appearance</h3>
+                <h3 className="text-lg font-medium">{t('settings.page.preferences.appearance.title')}</h3>
                 <div className="space-y-3">
                   {/* Theme Selection */}
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Theme</h4>
-                    <p className="text-sm text-muted-foreground">Choose your preferred theme</p>
+                    <h4 className="text-sm font-medium">{t('settings.page.preferences.appearance.theme.title')}</h4>
+                    <p className="text-sm text-muted-foreground">{t('settings.page.preferences.appearance.theme.description')}</p>
                     <div className="grid grid-cols-3 gap-2 mt-2">
                       <button
                         type="button"
@@ -530,7 +530,7 @@ const SettingsPage = () => {
                         onClick={() => handleThemeChange('light')}
                       >
                         <Sun className="h-5 w-5 mb-1" />
-                        <span className="text-sm font-medium">Light</span>
+                        <span className="text-sm font-medium">{t('settings.page.preferences.appearance.theme.light')}</span>
                       </button>
                       <button
                         type="button"
@@ -538,7 +538,7 @@ const SettingsPage = () => {
                         onClick={() => handleThemeChange('dark')}
                       >
                         <Moon className="h-5 w-5 mb-1" />
-                        <span className="text-sm font-medium">Dark</span>
+                        <span className="text-sm font-medium">{t('settings.page.preferences.appearance.theme.dark')}</span>
                       </button>
                       <button
                         type="button"
@@ -546,19 +546,19 @@ const SettingsPage = () => {
                         onClick={() => handleThemeChange('system')}
                       >
                         <Monitor className="h-5 w-5 mb-1" />
-                        <span className="text-sm font-medium">System</span>
+                        <span className="text-sm font-medium">{t('settings.page.preferences.appearance.theme.system')}</span>
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Language</h3>
+                <h3 className="text-lg font-medium">{t('settings.page.preferences.language.title')}</h3>
                 <div className="space-y-3">
                   {/* Language Selection */}
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Display Language</h4>
-                    <p className="text-sm text-muted-foreground">Choose your preferred language for the interface</p>
+                    <h4 className="text-sm font-medium">{t('settings.page.preferences.language.displayLanguage')}</h4>
+                    <p className="text-sm text-muted-foreground">{t('settings.page.preferences.language.description')}</p>
                     <div className="mt-2">
                       <select
                         value={language}
@@ -575,8 +575,8 @@ const SettingsPage = () => {
                   </div>
                 </div>
               </div>
-              <Alert type="warning" title="Theme Support">
-                Theme settings are currently in beta and may not apply to all parts of the application.
+              <Alert type="warning" title={t('settings.page.preferences.themeSupport.title')}>
+                {t('settings.page.preferences.themeSupport.message')}
               </Alert>
             </CardContent>
             <CardFooter className="border-t pt-6">
@@ -586,7 +586,7 @@ const SettingsPage = () => {
                 disabled={isLoading}
                 className="ml-auto"
               >
-                Save Preferences
+                {t('settings.page.preferences.saveButton')}
               </AnimatedButton>
             </CardFooter>
           </TabContent>
@@ -601,12 +601,12 @@ const SettingsPage = () => {
                 <div className="flex items-center justify-center min-h-[300px]">
                   <div className="text-center">
                     <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Restricted</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('settings.page.accessRestricted.title')}</h3>
                     <p className="text-gray-600 mb-4">
-                      AI settings are only available to administrators and trainers.
+                      {t('settings.page.accessRestricted.aiMessage')}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Current role: <Badge variant="secondary">{user?.role}</Badge>
+                      {t('settings.page.accessRestricted.currentRole')} <Badge variant="secondary">{user?.role}</Badge>
                     </p>
                   </div>
                 </div>
@@ -618,9 +618,9 @@ const SettingsPage = () => {
             <TabContent value="integrations">
               <CardContent className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">External Service Integrations</h3>
+                <h3 className="text-lg font-medium">{t('settings.page.integrations.title')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Configure connections to external services and APIs
+                  {t('settings.page.integrations.description')}
                 </p>
                 {/* Wedof Integration */}
                 <Card>
@@ -631,8 +631,8 @@ const SettingsPage = () => {
                           <Globe className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                          <h4 className="font-medium">Wedof API</h4>
-                          <p className="text-sm text-muted-foreground">Sync beneficiary and program data</p>
+                          <h4 className="font-medium">{t('settings.page.integrations.wedof.name')}</h4>
+                          <p className="text-sm text-muted-foreground">{t('settings.page.integrations.wedof.description')}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -641,7 +641,7 @@ const SettingsPage = () => {
                           size="sm"
                           onClick={() => window.open('/integrations/wedof', '_blank')}
                         >
-                          Configure
+                          {t('settings.page.integrations.wedof.configure')}
                         </Button>
                       </div>
                     </div>
@@ -656,48 +656,48 @@ const SettingsPage = () => {
                           <Globe className="h-5 w-5 text-red-600" />
                         </div>
                         <div>
-                          <h4 className="font-medium">Google Workspace</h4>
-                          <p className="text-sm text-muted-foreground">Calendar, Drive, and Gmail integration</p>
+                          <h4 className="font-medium">{t('settings.page.integrations.google.name')}</h4>
+                          <p className="text-sm text-muted-foreground">{t('settings.page.integrations.google.description')}</p>
                         </div>
                       </div>
                     </div>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-3 border rounded">
                         <div>
-                          <p className="font-medium text-sm">Google Calendar</p>
-                          <p className="text-xs text-muted-foreground">Sync appointments and sessions</p>
+                          <p className="font-medium text-sm">{t('settings.page.integrations.google.calendar.name')}</p>
+                          <p className="text-xs text-muted-foreground">{t('settings.page.integrations.google.calendar.description')}</p>
                         </div>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => window.open('/calendar/google-integration', '_blank')}
                         >
-                          Setup
+                          {t('settings.page.integrations.google.calendar.setup')}
                         </Button>
                       </div>
                       <div className="flex items-center justify-between p-3 border rounded">
                         <div>
-                          <p className="font-medium text-sm">Google Drive</p>
-                          <p className="text-xs text-muted-foreground">Store and share documents</p>
+                          <p className="font-medium text-sm">{t('settings.page.integrations.google.drive.name')}</p>
+                          <p className="text-xs text-muted-foreground">{t('settings.page.integrations.google.drive.description')}</p>
                         </div>
                         <div className="space-y-2">
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">
-                              Client ID
+                              {t('settings.page.integrations.google.drive.clientId')}
                             </label>
                             <Input
                               type="text"
-                              placeholder="Google OAuth Client ID"
+                              placeholder={t('settings.page.integrations.google.drive.clientIdPlaceholder')}
                               className="text-xs"
                             />
                           </div>
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">
-                              Client Secret
+                              {t('settings.page.integrations.google.drive.clientSecret')}
                             </label>
                             <Input
                               type="password"
-                              placeholder="Google OAuth Client Secret"
+                              placeholder={t('settings.page.integrations.google.drive.clientSecretPlaceholder')}
                               className="text-xs"
                             />
                           </div>
@@ -705,22 +705,22 @@ const SettingsPage = () => {
                       </div>
                       <div className="flex items-center justify-between p-3 border rounded">
                         <div>
-                          <p className="font-medium text-sm">Gmail Integration</p>
-                          <p className="text-xs text-muted-foreground">Send automated emails and notifications</p>
+                          <p className="font-medium text-sm">{t('settings.page.integrations.google.gmail.name')}</p>
+                          <p className="text-xs text-muted-foreground">{t('settings.page.integrations.google.gmail.description')}</p>
                         </div>
                         <div className="space-y-2">
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">
-                              SMTP Settings
+                              {t('settings.page.integrations.google.gmail.smtpSettings')}
                             </label>
                             <Input
                               type="email"
-                              placeholder="smtp-username@gmail.com"
+                              placeholder={t('settings.page.integrations.google.gmail.usernamePlaceholder')}
                               className="text-xs mb-1"
                             />
                             <Input
                               type="password"
-                              placeholder="App Password"
+                              placeholder={t('settings.page.integrations.google.gmail.passwordPlaceholder')}
                               className="text-xs"
                             />
                           </div>
@@ -732,42 +732,42 @@ const SettingsPage = () => {
                 {/* Other Integrations */}
                 <Card>
                   <div className="p-4">
-                    <h4 className="font-medium mb-3">Other Integrations</h4>
+                    <h4 className="font-medium mb-3">{t('settings.page.integrations.other.title')}</h4>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-3 border rounded">
                         <div>
-                          <p className="font-medium text-sm">Pennylane</p>
-                          <p className="text-xs text-muted-foreground">Financial management integration</p>
+                          <p className="font-medium text-sm">{t('settings.page.integrations.other.pennylane.name')}</p>
+                          <p className="text-xs text-muted-foreground">{t('settings.page.integrations.other.pennylane.description')}</p>
                         </div>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => window.open('/integrations/pennylane', '_blank')}
                         >
-                          Configure
+                          {t('settings.integrations.configure')}
                         </Button>
                       </div>
                       <div className="flex items-center justify-between p-3 border rounded">
                         <div>
-                          <p className="font-medium text-sm">SMS Service</p>
-                          <p className="text-xs text-muted-foreground">Send SMS notifications</p>
+                          <p className="font-medium text-sm">{t('settings.page.integrations.other.sms.name')}</p>
+                          <p className="text-xs text-muted-foreground">{t('settings.page.integrations.other.sms.description')}</p>
                         </div>
                         <div className="space-y-2">
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">
-                              Provider
+                              {t('settings.page.integrations.other.sms.provider')}
                             </label>
                             <select className="w-full text-xs border rounded px-2 py-1">
-                              <option>Select SMS Provider</option>
-                              <option>Twilio</option>
-                              <option>MessageBird</option>
-                              <option>Orange SMS</option>
+                              <option>{t('settings.page.integrations.other.sms.selectProvider')}</option>
+                              <option>{t('settings.page.integrations.other.sms.providers.twilio')}</option>
+                              <option>{t('settings.page.integrations.other.sms.providers.messageBird')}</option>
+                              <option>{t('settings.page.integrations.other.sms.providers.orangeSms')}</option>
                             </select>
                           </div>
                           <div>
                             <Input
                               type="text"
-                              placeholder="API Key"
+                              placeholder={t('settings.page.integrations.other.sms.apiKeyPlaceholder')}
                               className="text-xs"
                             />
                           </div>
@@ -775,15 +775,15 @@ const SettingsPage = () => {
                       </div>
                       <div className="flex items-center justify-between p-3 border rounded">
                         <div>
-                          <p className="font-medium text-sm">Webhook URLs</p>
-                          <p className="text-xs text-muted-foreground">Configure external service notifications</p>
+                          <p className="font-medium text-sm">{t('settings.page.integrations.other.webhooks.name')}</p>
+                          <p className="text-xs text-muted-foreground">{t('settings.page.integrations.other.webhooks.description')}</p>
                         </div>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => window.open('/integrations/webhooks', '_blank')}
                         >
-                          Manage
+                          {t('settings.page.integrations.other.webhooks.manage')}
                         </Button>
                       </div>
                     </div>
@@ -792,23 +792,23 @@ const SettingsPage = () => {
                 {/* Integration Status */}
                 <Card>
                   <div className="p-4">
-                    <h4 className="font-medium mb-3">Integration Health</h4>
+                    <h4 className="font-medium mb-3">{t('settings.page.integrations.health.title')}</h4>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span>Wedof API</span>
-                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Connected</span>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">{t('settings.page.integrations.health.connected')}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span>Google Calendar</span>
-                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">Partial</span>
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">{t('settings.page.integrations.health.partial')}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span>AI Services</span>
-                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Active</span>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">{t('settings.page.integrations.health.active')}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span>SMS Service</span>
-                        <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">Not Configured</span>
+                        <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">{t('settings.page.integrations.health.notConfigured')}</span>
                       </div>
                     </div>
                   </div>
@@ -818,11 +818,11 @@ const SettingsPage = () => {
                 <Button onClick={() => {
                   addToast({
                     type: 'success',
-                    title: 'Settings saved',
-                    message: 'Integration settings have been saved.',
+                    title: t('settings.page.messages.settingsSaved'),
+                    message: t('settings.page.messages.integrationsSaved'),
                   });
                 }}>
-                  Save Integration Settings
+                  {t('settings.page.integrations.saveButton')}
                 </Button>
               </div>
             </CardContent>
@@ -833,12 +833,12 @@ const SettingsPage = () => {
                 <div className="flex items-center justify-center min-h-[300px]">
                   <div className="text-center">
                     <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Access Restricted</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('settings.page.accessRestricted.title')}</h3>
                     <p className="text-gray-600 mb-4">
-                      Integration settings are only available to administrators.
+                      {t('settings.page.accessRestricted.integrationsMessage')}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Current role: <Badge variant="secondary">{user?.role}</Badge>
+                      {t('settings.page.accessRestricted.currentRole')} <Badge variant="secondary">{user?.role}</Badge>
                     </p>
                   </div>
                 </div>

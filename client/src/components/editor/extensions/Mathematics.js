@@ -1,6 +1,7 @@
+// TODO: i18n - processed
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
-import MathematicsView from './MathematicsView';
+import MathematicsView from './MathematicsView';import { useTranslation } from "react-i18next";
 export const Mathematics = Node.create({
   name: 'mathematics',
   group: 'inline',
@@ -9,80 +10,80 @@ export const Mathematics = Node.create({
   addAttributes() {
     return {
       latex: {
-        default: '',
+        default: ''
       },
       display: {
-        default: false,
-      },
+        default: false
+      }
     };
   },
   parseHTML() {
     return [
-      {
-        tag: 'span[data-math]',
-        getAttrs: (dom) => ({
-          latex: dom.getAttribute('data-latex') || '',
-          display: dom.getAttribute('data-display') === 'true',
-        }),
-      },
-      {
-        tag: 'span.math-inline',
-        getAttrs: (dom) => ({
-          latex: dom.getAttribute('data-latex') || '',
-          display: false,
-        }),
-      },
-      {
-        tag: 'div.math-block',
-        getAttrs: (dom) => ({
-          latex: dom.getAttribute('data-latex') || '',
-          display: true,
-        }),
-      },
-    ];
+    {
+      tag: 'span[data-math]',
+      getAttrs: (dom) => ({
+        latex: dom.getAttribute('data-latex') || '',
+        display: dom.getAttribute('data-display') === 'true'
+      })
+    },
+    {
+      tag: 'span.math-inline',
+      getAttrs: (dom) => ({
+        latex: dom.getAttribute('data-latex') || '',
+        display: false
+      })
+    },
+    {
+      tag: 'div.math-block',
+      getAttrs: (dom) => ({
+        latex: dom.getAttribute('data-latex') || '',
+        display: true
+      })
+    }];
+
   },
   renderHTML({ node, HTMLAttributes }) {
     const { latex, display } = node.attrs;
     return [
-      display ? 'div' : 'span',
-      mergeAttributes(
-        this.options.HTMLAttributes,
-        HTMLAttributes,
-        {
-          'data-math': true,
-          'data-latex': latex,
-          'data-display': display,
-          class: display ? 'math-block' : 'math-inline',
-        }
-      ),
-    ];
+    display ? 'div' : 'span',
+    mergeAttributes(
+      this.options.HTMLAttributes,
+      HTMLAttributes,
+      {
+        'data-math': true,
+        'data-latex': latex,
+        'data-display': display,
+        class: display ? 'math-block' : 'math-inline'
+      }
+    )];
+
   },
   addCommands() {
     return {
       insertMath:
-        (options = {}) =>
-        ({ commands }) => {
-          return commands.insertContent({
-            type: this.name,
-            attrs: {
-              latex: options.latex || '',
-              display: options.display || false,
-            },
-          });
-        },
+      (options = {}) =>
+      ({ commands }) => {
+        return commands.insertContent({
+          type: this.name,
+          attrs: {
+            latex: options.latex || '',
+            display: options.display || false
+          }
+        });
+      },
       updateMath:
-        (options) =>
-        ({ commands }) => {
-          return commands.updateAttributes(this.name, options);
-        },
+      (options) =>
+      ({ commands }) => {
+        return commands.updateAttributes(this.name, options);
+      }
     };
   },
   addKeyboardShortcuts() {
     return {
-      'Mod-Shift-m': () => this.editor.commands.insertMath(),
+      'Mod-Shift-m': () => this.editor.commands.insertMath()
     };
   },
   addNodeView() {
     return ReactNodeViewRenderer(MathematicsView);
-  },
+  }
 });

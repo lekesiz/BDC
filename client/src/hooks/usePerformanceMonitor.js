@@ -1,4 +1,5 @@
-import { useEffect, useRef, useCallback } from 'react';
+// TODO: i18n - processed
+import { useEffect, useRef, useCallback } from 'react';import { useTranslation } from "react-i18next";
 const usePerformanceMonitor = (componentName, options = {}) => {
   const {
     enableLogging = process.env.NODE_ENV === 'development',
@@ -79,7 +80,7 @@ const usePerformanceMonitor = (componentName, options = {}) => {
       mountTime: mountTime.current,
       averageRenderTime: performanceData.current.averageRenderTime,
       slowRenders: performanceData.current.slowRenders,
-      slowRenderPercentage: (performanceData.current.slowRenders / renderCount.current) * 100
+      slowRenderPercentage: performanceData.current.slowRenders / renderCount.current * 100
     };
   }, [componentName]);
   return {

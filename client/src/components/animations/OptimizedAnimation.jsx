@@ -1,35 +1,36 @@
+// TODO: i18n - processed
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useMemo } from 'react';
 /**
  * Performance-optimized animation wrapper that only animates when in viewport
  * and uses GPU-accelerated transforms
- */
-export const OptimizedAnimation = ({ 
-  children, 
-  variants, 
+ */import { useTranslation } from "react-i18next";
+export const OptimizedAnimation = ({
+  children,
+  variants,
   threshold = 0.1,
   once = true,
   className,
   delay = 0,
   duration = 0.5,
-  ...props 
-}) => {
+  ...props
+}) => {const { t } = useTranslation();
   const { ref, inView } = useInView({
     threshold,
-    triggerOnce: once,
+    triggerOnce: once
   });
   // Memoize animation variants for performance
   const animationVariants = useMemo(() => ({
-    hidden: { 
-      opacity: 0, 
+    hidden: {
+      opacity: 0,
       y: 20,
       transition: { duration: 0 }
     },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { 
+      transition: {
         duration,
         delay,
         ease: 'easeOut'
@@ -44,31 +45,31 @@ export const OptimizedAnimation = ({
       variants={variants || animationVariants}
       className={className}
       style={{ transform: 'translateZ(0)' }} // Force GPU acceleration
-      {...props}
-    >
+      {...props}>
+
       {children}
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 /**
  * Optimized scroll-triggered animation
  */
-export const ScrollAnimation = ({ children, className, offset = 100 }) => {
+export const ScrollAnimation = ({ children, className, offset = 100 }) => {const { t } = useTranslation();
   const y = useMotionValue(0);
   const opacity = useTransform(y, [-offset, 0, offset], [0, 1, 0]);
   return (
     <motion.div
       className={className}
-      style={{ opacity, y }}
-    >
+      style={{ opacity, y }}>
+
       {children}
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 /**
  * Batch animation for multiple elements to reduce re-renders
  */
-export const BatchAnimation = ({ children, staggerDelay = 0.1 }) => {
+export const BatchAnimation = ({ children, staggerDelay = 0.1 }) => {const { t } = useTranslation();
   return (
     <motion.div
       initial="hidden"
@@ -76,12 +77,12 @@ export const BatchAnimation = ({ children, staggerDelay = 0.1 }) => {
       variants={{
         visible: {
           transition: {
-            staggerChildren: staggerDelay,
-          },
-        },
-      }}
-    >
+            staggerChildren: staggerDelay
+          }
+        }
+      }}>
+
       {children}
-    </motion.div>
-  );
+    </motion.div>);
+
 };

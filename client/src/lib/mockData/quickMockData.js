@@ -1,4 +1,5 @@
-/**
+// TODO: i18n - processed
+import { useTranslation } from "react-i18next"; /**
  * Quick Mock Data for All Remaining Components
  * Comprehensive demo data for testing all pages
  */
@@ -6,10 +7,10 @@
 export const mockDocuments = Array.from({ length: 30 }, (_, i) => ({
   id: i + 1,
   name: [
-    'Kimlik Belgesi', 'Diploma', 'CV', 'Sertifika', 'Transkript',
-    'İş Deneyimi Belgesi', 'Dil Belgesi', 'Proje Raporu', 'Sunum',
-    'Değerlendirme Formu', 'Katılım Belgesi', 'Başvuru Formu'
-  ][Math.floor(Math.random() * 12)],
+  'Kimlik Belgesi', 'Diploma', 'CV', 'Sertifika', 'Transkript',
+  'İş Deneyimi Belgesi', 'Dil Belgesi', 'Proje Raporu', 'Sunum',
+  'Değerlendirme Formu', 'Katılım Belgesi', 'Başvuru Formu'][
+  Math.floor(Math.random() * 12)],
   type: ['pdf', 'doc', 'docx', 'jpg', 'png', 'xlsx'][Math.floor(Math.random() * 6)],
   size: Math.floor(Math.random() * 5000) + 100, // KB
   uploadDate: new Date(Date.now() - Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000).toISOString(),
@@ -29,12 +30,12 @@ export const mockDocuments = Array.from({ length: 30 }, (_, i) => ({
 export const mockPrograms = Array.from({ length: 15 }, (_, i) => ({
   id: i + 1,
   title: [
-    'Dijital Beceriler Geliştirme', 'Mesleki İngilizce', 'Girişimcilik Eğitimi',
-    'Proje Yönetimi', 'Grafik Tasarım', 'Web Geliştirme', 'Veri Analizi',
-    'Pazarlama ve Satış', 'İnsan Kaynakları', 'Muhasebe ve Finans',
-    'Liderlik Becerileri', 'İletişim Teknikleri', 'Yaratıcı Düşünce',
-    'Problem Çözme', 'Takım Çalışması'
-  ][i],
+  'Dijital Beceriler Geliştirme', 'Mesleki İngilizce', 'Girişimcilik Eğitimi',
+  'Proje Yönetimi', 'Grafik Tasarım', 'Web Geliştirme', 'Veri Analizi',
+  'Pazarlama ve Satış', 'İnsan Kaynakları', 'Muhasebe ve Finans',
+  'Liderlik Becerileri', 'İletişim Teknikleri', 'Yaratıcı Düşünce',
+  'Problem Çözme', 'Takım Çalışması'][
+  i],
   description: 'Bu program katılımcıların mesleki becerilerini geliştirmeyi amaçlamaktadır.',
   duration: Math.floor(Math.random() * 12) + 3, // 3-15 months
   level: ['Başlangıç', 'Orta', 'İleri'][Math.floor(Math.random() * 3)],
@@ -45,9 +46,9 @@ export const mockPrograms = Array.from({ length: 15 }, (_, i) => ({
   maxCapacity: Math.floor(Math.random() * 30) + 50,
   status: ['active', 'upcoming', 'completed'][Math.floor(Math.random() * 3)],
   instructors: [
-    { id: 1, name: 'Ahmet Yılmaz', email: 'trainer1@bdc.com' },
-    { id: 2, name: 'Ayşe Demir', email: 'trainer2@bdc.com' }
-  ].slice(0, Math.floor(Math.random() * 2) + 1),
+  { id: 1, name: 'Ahmet Yılmaz', email: 'trainer1@bdc.com' },
+  { id: 2, name: 'Ayşe Demir', email: 'trainer2@bdc.com' }].
+  slice(0, Math.floor(Math.random() * 2) + 1),
   modules: Array.from({ length: Math.floor(Math.random() * 6) + 4 }, (_, j) => ({
     id: j + 1,
     title: `Modül ${j + 1}`,
@@ -60,10 +61,10 @@ export const mockPrograms = Array.from({ length: 15 }, (_, i) => ({
 export const mockEvents = Array.from({ length: 20 }, (_, i) => ({
   id: i + 1,
   title: [
-    'Matematik Dersi', 'İngilizce Sınavı', 'Proje Sunumu', 'Bireysel Görüşme',
-    'Grup Çalışması', 'Vaka Analizi', 'Workshop', 'Seminer', 'Eğitim',
-    'Değerlendirme Toplantısı'
-  ][Math.floor(Math.random() * 10)],
+  'Matematik Dersi', 'İngilizce Sınavı', 'Proje Sunumu', 'Bireysel Görüşme',
+  'Grup Çalışması', 'Vaka Analizi', 'Workshop', 'Seminer', 'Eğitim',
+  'Değerlendirme Toplantısı'][
+  Math.floor(Math.random() * 10)],
   start: new Date(Date.now() + (Math.floor(Math.random() * 30) - 15) * 24 * 60 * 60 * 1000).toISOString(),
   end: new Date(Date.now() + (Math.floor(Math.random() * 30) - 15) * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000).toISOString(),
   type: ['class', 'exam', 'meeting', 'workshop'][Math.floor(Math.random() * 4)],
@@ -86,9 +87,9 @@ export const mockMessages = Array.from({ length: 25 }, (_, i) => ({
     name: 'Mevcut Kullanıcı'
   },
   subject: [
-    'Ders programı hakkında', 'Sınav tarihi', 'Proje teslimi', 'Devamsızlık durumu',
-    'Başarı durumu', 'Yardım talebi', 'Toplantı daveti', 'Duyuru'
-  ][Math.floor(Math.random() * 8)],
+  'Ders programı hakkında', 'Sınav tarihi', 'Proje teslimi', 'Devamsızlık durumu',
+  'Başarı durumu', 'Yardım talebi', 'Toplantı daveti', 'Duyuru'][
+  Math.floor(Math.random() * 8)],
   content: 'Merhaba, bu mesaj demo amaçlı oluşturulmuştur. Gerçek bir mesaj içeriği burada yer alacaktır.',
   timestamp: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString(),
   isRead: Math.random() > 0.3,
@@ -100,10 +101,10 @@ export const mockMessages = Array.from({ length: 25 }, (_, i) => ({
 export const mockNotifications = Array.from({ length: 15 }, (_, i) => ({
   id: i + 1,
   title: [
-    'Yeni sınav atandı', 'Ders iptali', 'Not güncellendi', 'Mesaj alındı',
-    'Toplantı hatırlatması', 'Başvuru onaylandı', 'Belge yüklendi',
-    'Sistem güncellemesi'
-  ][Math.floor(Math.random() * 8)],
+  'Yeni sınav atandı', 'Ders iptali', 'Not güncellendi', 'Mesaj alındı',
+  'Toplantı hatırlatması', 'Başvuru onaylandı', 'Belge yüklendi',
+  'Sistem güncellemesi'][
+  Math.floor(Math.random() * 8)],
   message: 'Bu bir demo bildirimidir. Gerçek bildirim içeriği burada yer alacaktır.',
   type: ['info', 'success', 'warning', 'error'][Math.floor(Math.random() * 4)],
   timestamp: new Date(Date.now() - Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000).toISOString(),
@@ -129,7 +130,7 @@ export const mockAnalytics = {
       range: ['0-20', '21-40', '41-60', '61-80', '81-100'][i],
       count: Math.floor(Math.random() * 30) + 10
     })),
-    programPopularity: mockPrograms.slice(0, 5).map(p => ({
+    programPopularity: mockPrograms.slice(0, 5).map((p) => ({
       name: p.title,
       enrollments: p.enrollmentCount
     }))
@@ -139,9 +140,9 @@ export const mockAnalytics = {
 export const mockReports = Array.from({ length: 10 }, (_, i) => ({
   id: i + 1,
   title: [
-    'Aylık Başarı Raporu', 'Program Değerlendirme Raporu', 'Öğrenci İlerleme Raporu',
-    'Katılım Analizi', 'Performans Özeti', 'Trend Analizi'
-  ][Math.floor(Math.random() * 6)],
+  'Aylık Başarı Raporu', 'Program Değerlendirme Raporu', 'Öğrenci İlerleme Raporu',
+  'Katılım Analizi', 'Performans Özeti', 'Trend Analizi'][
+  Math.floor(Math.random() * 6)],
   type: ['monthly', 'quarterly', 'annual', 'custom'][Math.floor(Math.random() * 4)],
   status: ['generating', 'completed', 'failed'][Math.floor(Math.random() * 3)],
   createdAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString(),
@@ -192,58 +193,58 @@ export const setupQuickMockAPIs = (api, originalGet, originalPost, originalPut, 
   const del = originalDelete || api.delete;
   // Documents API
   const originalGetMethod = api.get;
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     if (url.includes('/api/documents')) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve({ data: { documents: mockDocuments, total: mockDocuments.length } });
         }, 300);
       });
     }
     if (url.includes('/api/programs')) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve({ data: { programs: mockPrograms, total: mockPrograms.length } });
         }, 300);
       });
     }
     if (url.includes('/api/calendar') || url.includes('/api/events')) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve({ data: { events: mockEvents, total: mockEvents.length } });
         }, 300);
       });
     }
     if (url.includes('/api/messages')) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve({ data: { messages: mockMessages, total: mockMessages.length } });
         }, 300);
       });
     }
     if (url.includes('/api/notifications')) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve({ data: { notifications: mockNotifications, total: mockNotifications.length } });
         }, 300);
       });
     }
     if (url.includes('/api/analytics')) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve({ data: mockAnalytics });
         }, 300);
       });
     }
     if (url.includes('/api/reports')) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve({ data: { reports: mockReports, total: mockReports.length } });
         }, 300);
       });
     }
     if (url.includes('/api/settings')) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve({ data: mockSettings });
         }, 300);

@@ -1,7 +1,8 @@
+// TODO: i18n - processed
 /**
  * Beneficiaries Mock API Setup
  */
-import { mockBeneficiaries, beneficiaryStats, generateBeneficiary } from './beneficiariesMockData.js';
+import { mockBeneficiaries, beneficiaryStats, generateBeneficiary } from './beneficiariesMockData.js';import { useTranslation } from "react-i18next";
 export const setupBeneficiariesMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   // Store original methods if not provided
   const get = originalGet || api.get;
@@ -9,7 +10,7 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
   const put = originalPut || api.put;
   const del = originalDelete || api.delete;
   // GET /api/beneficiaries - List beneficiaries with filtering, pagination, search
-  api.get = function(url, config) {
+  api.get = function (url, config) {
     if (url.includes('/api/beneficiaries') && !url.includes('/api/beneficiaries/')) {
       return new Promise((resolve) => {
         // Parse query parameters
@@ -26,29 +27,29 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
         let filteredBeneficiaries = [...mockBeneficiaries];
         // Apply search filter
         if (search) {
-          filteredBeneficiaries = filteredBeneficiaries.filter(b => 
-            b.personalInfo.firstName.toLowerCase().includes(search.toLowerCase()) ||
-            b.personalInfo.lastName.toLowerCase().includes(search.toLowerCase()) ||
-            b.personalInfo.email.toLowerCase().includes(search.toLowerCase()) ||
-            b.personalInfo.phone.includes(search)
+          filteredBeneficiaries = filteredBeneficiaries.filter((b) =>
+          b.personalInfo.firstName.toLowerCase().includes(search.toLowerCase()) ||
+          b.personalInfo.lastName.toLowerCase().includes(search.toLowerCase()) ||
+          b.personalInfo.email.toLowerCase().includes(search.toLowerCase()) ||
+          b.personalInfo.phone.includes(search)
           );
         }
         // Apply status filter
         if (status) {
-          filteredBeneficiaries = filteredBeneficiaries.filter(b => 
-            b.programInfo.status === status
+          filteredBeneficiaries = filteredBeneficiaries.filter((b) =>
+          b.programInfo.status === status
           );
         }
         // Apply program filter  
         if (program) {
-          filteredBeneficiaries = filteredBeneficiaries.filter(b => 
-            b.programInfo.currentProgram === program
+          filteredBeneficiaries = filteredBeneficiaries.filter((b) =>
+          b.programInfo.currentProgram === program
           );
         }
         // Apply city filter
         if (city) {
-          filteredBeneficiaries = filteredBeneficiaries.filter(b => 
-            b.contactInfo.city === city
+          filteredBeneficiaries = filteredBeneficiaries.filter((b) =>
+          b.contactInfo.city === city
           );
         }
         // Apply sorting
@@ -99,7 +100,7 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
       const id = parseInt(url.split('/').pop());
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          const beneficiary = mockBeneficiaries.find(b => b.id === id);
+          const beneficiary = mockBeneficiaries.find((b) => b.id === id);
           if (beneficiary) {
             resolve({
               data: {
@@ -107,44 +108,44 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
                   ...beneficiary,
                   // Add additional detailed info for single beneficiary view
                   recentActivities: [
-                    {
-                      id: 1,
-                      date: new Date().toISOString().split('T')[0],
-                      type: 'assessment',
-                      description: 'Genel Yetenek değerlendirmesi tamamlandı',
-                      score: 85
-                    },
-                    {
-                      id: 2,
-                      date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                      type: 'attendance',
-                      description: 'Derse katılım sağlandı',
-                      score: null
-                    },
-                    {
-                      id: 3,
-                      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                      type: 'document',
-                      description: 'CV güncellendi',
-                      score: null
-                    }
-                  ],
+                  {
+                    id: 1,
+                    date: new Date().toISOString().split('T')[0],
+                    type: 'assessment',
+                    description: 'Genel Yetenek değerlendirmesi tamamlandı',
+                    score: 85
+                  },
+                  {
+                    id: 2,
+                    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    type: 'attendance',
+                    description: 'Derse katılım sağlandı',
+                    score: null
+                  },
+                  {
+                    id: 3,
+                    date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    type: 'document',
+                    description: 'CV güncellendi',
+                    score: null
+                  }],
+
                   upcomingEvents: [
-                    {
-                      id: 1,
-                      date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-                      type: 'assessment',
-                      title: 'Mesleki Bilgi Değerlendirmesi',
-                      description: 'Final sınavı'
-                    },
-                    {
-                      id: 2,
-                      date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-                      type: 'meeting',
-                      title: 'Bireysel Görüşme',
-                      description: 'Trainer ile ilerleme değerlendirmesi'
-                    }
-                  ]
+                  {
+                    id: 1,
+                    date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+                    type: 'assessment',
+                    title: 'Mesleki Bilgi Değerlendirmesi',
+                    description: 'Final sınavı'
+                  },
+                  {
+                    id: 2,
+                    date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                    type: 'meeting',
+                    title: 'Bireysel Görüşme',
+                    description: 'Trainer ile ilerleme değerlendirmesi'
+                  }]
+
                 }
               }
             });
@@ -168,17 +169,17 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
               ...beneficiaryStats,
               charts: {
                 ageDistribution: [
-                  { range: '18-25', count: mockBeneficiaries.filter(b => b.personalInfo.age >= 18 && b.personalInfo.age <= 25).length },
-                  { range: '26-35', count: mockBeneficiaries.filter(b => b.personalInfo.age >= 26 && b.personalInfo.age <= 35).length },
-                  { range: '36-45', count: mockBeneficiaries.filter(b => b.personalInfo.age >= 36 && b.personalInfo.age <= 45).length },
-                  { range: '46+', count: mockBeneficiaries.filter(b => b.personalInfo.age >= 46).length }
-                ],
+                { range: '18-25', count: mockBeneficiaries.filter((b) => b.personalInfo.age >= 18 && b.personalInfo.age <= 25).length },
+                { range: '26-35', count: mockBeneficiaries.filter((b) => b.personalInfo.age >= 26 && b.personalInfo.age <= 35).length },
+                { range: '36-45', count: mockBeneficiaries.filter((b) => b.personalInfo.age >= 36 && b.personalInfo.age <= 45).length },
+                { range: '46+', count: mockBeneficiaries.filter((b) => b.personalInfo.age >= 46).length }],
+
                 progressDistribution: [
-                  { range: '0-25%', count: mockBeneficiaries.filter(b => b.programInfo.progress >= 0 && b.programInfo.progress <= 25).length },
-                  { range: '26-50%', count: mockBeneficiaries.filter(b => b.programInfo.progress >= 26 && b.programInfo.progress <= 50).length },
-                  { range: '51-75%', count: mockBeneficiaries.filter(b => b.programInfo.progress >= 51 && b.programInfo.progress <= 75).length },
-                  { range: '76-100%', count: mockBeneficiaries.filter(b => b.programInfo.progress >= 76).length }
-                ]
+                { range: '0-25%', count: mockBeneficiaries.filter((b) => b.programInfo.progress >= 0 && b.programInfo.progress <= 25).length },
+                { range: '26-50%', count: mockBeneficiaries.filter((b) => b.programInfo.progress >= 26 && b.programInfo.progress <= 50).length },
+                { range: '51-75%', count: mockBeneficiaries.filter((b) => b.programInfo.progress >= 51 && b.programInfo.progress <= 75).length },
+                { range: '76-100%', count: mockBeneficiaries.filter((b) => b.programInfo.progress >= 76).length }]
+
               }
             }
           });
@@ -189,12 +190,12 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
     return get.call(this, url, config);
   };
   // POST /api/beneficiaries - Create new beneficiary
-  api.post = function(url, data, config) {
+  api.post = function (url, data, config) {
     if (url === '/api/beneficiaries') {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           try {
-            const newId = Math.max(...mockBeneficiaries.map(b => b.id)) + 1;
+            const newId = Math.max(...mockBeneficiaries.map((b) => b.id)) + 1;
             const newBeneficiary = {
               id: newId,
               ...data,
@@ -229,12 +230,12 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
     return post.call(this, url, data, config);
   };
   // PUT /api/beneficiaries/:id - Update beneficiary
-  api.put = function(url, data, config) {
+  api.put = function (url, data, config) {
     if (url.match(/\/api\/beneficiaries\/\d+$/)) {
       const id = parseInt(url.split('/').pop());
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          const index = mockBeneficiaries.findIndex(b => b.id === id);
+          const index = mockBeneficiaries.findIndex((b) => b.id === id);
           if (index !== -1) {
             mockBeneficiaries[index] = {
               ...mockBeneficiaries[index],
@@ -265,12 +266,12 @@ export const setupBeneficiariesMockApi = (api, originalGet, originalPost, origin
     return put.call(this, url, data, config);
   };
   // DELETE /api/beneficiaries/:id - Delete beneficiary
-  api.delete = function(url, config) {
+  api.delete = function (url, config) {
     if (url.match(/\/api\/beneficiaries\/\d+$/)) {
       const id = parseInt(url.split('/').pop());
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          const index = mockBeneficiaries.findIndex(b => b.id === id);
+          const index = mockBeneficiaries.findIndex((b) => b.id === id);
           if (index !== -1) {
             const deletedBeneficiary = mockBeneficiaries.splice(index, 1)[0];
             resolve({

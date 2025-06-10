@@ -1,18 +1,19 @@
+// TODO: i18n - processed
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { cardHover, fadeInUp } from '@/lib/animations';
-import { useTheme } from '@/contexts/ThemeContext';
-export const AnimatedCard = ({ 
-  children, 
-  className, 
+import { useTheme } from '@/contexts/ThemeContext';import { useTranslation } from "react-i18next";
+export const AnimatedCard = ({
+  children,
+  className,
   variants = fadeInUp,
   hoverEffect = true,
-  ...props 
-}) => {
+  ...props
+}) => {const { t } = useTranslation();
   const { isDark } = useTheme();
-  const combinedVariants = hoverEffect 
-    ? { ...variants, ...cardHover }
-    : variants;
+  const combinedVariants = hoverEffect ?
+  { ...variants, ...cardHover } :
+  variants;
   // Dark mode hover effects
   const darkHoverVariants = {
     ...combinedVariants,
@@ -28,11 +29,11 @@ export const AnimatedCard = ({
       animate="animate"
       exit="exit"
       whileHover={hoverEffect ? darkHoverVariants.whileHover : undefined}
-      transition={combinedVariants.transition}
-    >
+      transition={combinedVariants.transition}>
+
       <Card className={`${isDark ? 'dark:bg-gray-800 dark:border-gray-700' : ''} ${className || ''}`} {...props}>
         {children}
       </Card>
-    </motion.div>
-  );
+    </motion.div>);
+
 };

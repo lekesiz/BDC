@@ -1,7 +1,8 @@
+// TODO: i18n - processed
 import React, { createContext, useState, useCallback } from 'react';
 // Create context
-export const AuthContext = createContext();
-export const AuthProvider = ({ children }) => {
+import { useTranslation } from "react-i18next";export const AuthContext = createContext();
+export const AuthProvider = ({ children }) => {const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +84,6 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={value}>
       {children}
-    </AuthContext.Provider>
-  );
+    </AuthContext.Provider>);
+
 };

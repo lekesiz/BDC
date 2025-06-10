@@ -1,10 +1,11 @@
+// TODO: i18n - processed
 import React, { useEffect } from 'react';
 import { X, AlertTriangle, CheckCircle, Info, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 /**
  * Global error handler that listens for unhandled errors and displays them
- */
-const GlobalErrorHandler = () => {
+ */import { useTranslation } from "react-i18next";
+const GlobalErrorHandler = () => {const { t } = useTranslation();
   const { addToast } = useToast();
   useEffect(() => {
     // Handle unhandled promise rejections
@@ -196,13 +197,13 @@ export const setupNetworkErrorInterceptor = (api, toast) => {
 /**
  * Enhanced error message component for better UX
  */
-export const ErrorMessage = ({ 
-  error, 
-  title = 'Error', 
+export const ErrorMessage = ({
+  error,
+  title = 'Error',
   showDetails = false,
   onRetry,
   className = ''
-}) => {
+}) => {const { t } = useTranslation();
   if (!error) return null;
   let message = 'An unexpected error occurred';
   let details = null;
@@ -226,30 +227,30 @@ export const ErrorMessage = ({
           <div className="mt-2 text-sm text-red-700">
             <p>{message}</p>
           </div>
-          {showDetails && details && (
-            <details className="mt-3">
-              <summary className="text-sm text-red-600 cursor-pointer hover:text-red-800">
-                Show details
-              </summary>
+          {showDetails && details &&
+          <details className="mt-3">
+              <summary className="text-sm text-red-600 cursor-pointer hover:text-red-800">{t("components.show_details")}
+
+            </summary>
               <pre className="mt-2 text-xs text-red-600 overflow-auto p-2 bg-red-100 rounded">
                 {details}
               </pre>
             </details>
-          )}
-          {onRetry && (
-            <div className="mt-4">
+          }
+          {onRetry &&
+          <div className="mt-4">
               <button
-                type="button"
-                onClick={onRetry}
-                className="text-sm font-medium text-red-600 hover:text-red-500"
-              >
-                Try again
-              </button>
+              type="button"
+              onClick={onRetry}
+              className="text-sm font-medium text-red-600 hover:text-red-500">{t("components.try_again")}
+
+
+            </button>
             </div>
-          )}
+          }
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 export default GlobalErrorHandler;

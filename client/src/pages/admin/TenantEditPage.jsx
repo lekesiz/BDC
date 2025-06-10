@@ -1,11 +1,12 @@
+// TODO: i18n - processed
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Building, 
+import {
+  Building,
   ArrowLeft,
   Save,
-  Loader2
-} from 'lucide-react';
+  Loader2 } from
+'lucide-react';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,8 +14,8 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
 /**
  * Tenant Edit Page
- */
-const TenantEditPage = () => {
+ */import { useTranslation } from "react-i18next";
+const TenantEditPage = () => {const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -53,7 +54,7 @@ const TenantEditPage = () => {
         addToast({
           title: 'Error',
           message: 'Failed to load tenant details',
-          type: 'error',
+          type: 'error'
         });
       } finally {
         setIsLoading(false);
@@ -70,7 +71,7 @@ const TenantEditPage = () => {
       addToast({
         title: 'Success',
         message: 'Tenant updated successfully',
-        type: 'success',
+        type: 'success'
       });
       navigate(`/admin/tenants/${id}`);
     } catch (error) {
@@ -78,7 +79,7 @@ const TenantEditPage = () => {
       addToast({
         title: 'Error',
         message: 'Failed to update tenant',
-        type: 'error',
+        type: 'error'
       });
     } finally {
       setIsSaving(false);
@@ -87,7 +88,7 @@ const TenantEditPage = () => {
   // Handle input change
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
@@ -98,24 +99,24 @@ const TenantEditPage = () => {
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
   if (!tenant) {
     return (
       <div className="flex-1 space-y-4 p-8 pt-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Tenant not found</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t("pages.tenant_not_found")}</h2>
           <Button
             onClick={() => navigate('/admin/tenants')}
-            className="mt-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Tenants
+            className="mt-4">
+
+            <ArrowLeft className="w-4 h-4 mr-2" />{t("pages.back_to_tenants")}
+
           </Button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
@@ -124,14 +125,14 @@ const TenantEditPage = () => {
         <div className="flex items-center space-x-4">
           <Button
             variant="ghost"
-            onClick={() => navigate(`/admin/tenants/${id}`)}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            onClick={() => navigate(`/admin/tenants/${id}`)}>
+
+            <ArrowLeft className="w-4 h-4 mr-2" />{t("components.back")}
+
           </Button>
           <h2 className="text-3xl font-bold tracking-tight flex items-center">
-            <Building className="w-8 h-8 mr-3 text-primary" />
-            Edit {tenant.name}
+            <Building className="w-8 h-8 mr-3 text-primary" />{t("components.edit")}
+            {tenant.name}
           </h2>
         </div>
       </div>
@@ -141,11 +142,11 @@ const TenantEditPage = () => {
           {/* Basic Information */}
           <Card>
             <div className="p-6">
-              <h3 className="text-lg font-medium mb-4">Basic Information</h3>
+              <h3 className="text-lg font-medium mb-4">{t("pages.basic_information")}</h3>
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Tenant Name *
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">{t("pages.tenant_name_")}
+
                   </label>
                   <Input
                     id="name"
@@ -154,12 +155,12 @@ const TenantEditPage = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full"
-                  />
+                    className="w-full" />
+
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">{t("components.email")}
+
                   </label>
                   <Input
                     id="email"
@@ -167,12 +168,12 @@ const TenantEditPage = () => {
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full"
-                  />
+                    className="w-full" />
+
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">{t("components.phone")}
+
                   </label>
                   <Input
                     id="phone"
@@ -180,12 +181,12 @@ const TenantEditPage = () => {
                     type="tel"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full"
-                  />
+                    className="w-full" />
+
                 </div>
                 <div>
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                    Address
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">{t("pages.address")}
+
                   </label>
                   <Input
                     id="address"
@@ -193,8 +194,8 @@ const TenantEditPage = () => {
                     type="text"
                     value={formData.address}
                     onChange={handleInputChange}
-                    className="w-full"
-                  />
+                    className="w-full" />
+
                 </div>
               </div>
             </div>
@@ -202,43 +203,43 @@ const TenantEditPage = () => {
           {/* Subscription Settings */}
           <Card>
             <div className="p-6">
-              <h3 className="text-lg font-medium mb-4">Subscription Settings</h3>
+              <h3 className="text-lg font-medium mb-4">{t("pages.subscription_settings")}</h3>
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label htmlFor="plan" className="block text-sm font-medium text-gray-700 mb-1">
-                    Plan
+                  <label htmlFor="plan" className="block text-sm font-medium text-gray-700 mb-1">{t("pages.plan")}
+
                   </label>
                   <select
                     id="plan"
                     name="plan"
                     value={formData.plan}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                  >
-                    <option value="basic">Basic</option>
-                    <option value="standard">Standard</option>
-                    <option value="premium">Premium</option>
-                    <option value="enterprise">Enterprise</option>
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+
+                    <option value="basic">{t("components.basic")}</option>
+                    <option value="standard">{t("components.standard")}</option>
+                    <option value="premium">{t("pages.premium")}</option>
+                    <option value="enterprise">{t("components.enterprise")}</option>
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="is_active" className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
+                  <label htmlFor="is_active" className="block text-sm font-medium text-gray-700 mb-1">{t("components.status")}
+
                   </label>
                   <select
                     id="is_active"
                     name="is_active"
                     value={formData.is_active}
-                    onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.value === 'true' }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                  >
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
+                    onChange={(e) => setFormData((prev) => ({ ...prev, is_active: e.target.value === 'true' }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary">
+
+                    <option value="true">{t("components.active")}</option>
+                    <option value="false">{t("components.inactive")}</option>
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="max_users" className="block text-sm font-medium text-gray-700 mb-1">
-                    Max Users
+                  <label htmlFor="max_users" className="block text-sm font-medium text-gray-700 mb-1">{t("pages.max_users")}
+
                   </label>
                   <Input
                     id="max_users"
@@ -247,12 +248,12 @@ const TenantEditPage = () => {
                     value={formData.max_users}
                     onChange={handleInputChange}
                     min="1"
-                    className="w-full"
-                  />
+                    className="w-full" />
+
                 </div>
                 <div>
-                  <label htmlFor="max_beneficiaries" className="block text-sm font-medium text-gray-700 mb-1">
-                    Max Beneficiaries
+                  <label htmlFor="max_beneficiaries" className="block text-sm font-medium text-gray-700 mb-1">{t("pages.max_beneficiaries")}
+
                   </label>
                   <Input
                     id="max_beneficiaries"
@@ -261,8 +262,8 @@ const TenantEditPage = () => {
                     value={formData.max_beneficiaries}
                     onChange={handleInputChange}
                     min="1"
-                    className="w-full"
-                  />
+                    className="w-full" />
+
                 </div>
               </div>
             </div>
@@ -272,30 +273,30 @@ const TenantEditPage = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate(`/admin/tenants/${id}`)}
-            >
-              Cancel
+              onClick={() => navigate(`/admin/tenants/${id}`)}>{t("components.cancel")}
+
+
             </Button>
             <Button
               type="submit"
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <>
+              disabled={isSaving}>
+
+              {isSaving ?
+              <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Changes
-                </>
-              )}
+                </> :
+
+              <>
+                  <Save className="w-4 h-4 mr-2" />{t("components.save_changes")}
+
+              </>
+              }
             </Button>
           </div>
         </div>
       </form>
-    </div>
-  );
+    </div>);
+
 };
 export default TenantEditPage;

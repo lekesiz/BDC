@@ -1,3 +1,4 @@
+// TODO: i18n - processed
 import React from 'react';
 import { cn } from '@/lib/utils';
 /**
@@ -8,12 +9,12 @@ import { cn } from '@/lib/utils';
  * @param {function} props.onCheckedChange - Callback when checked state changes
  * @param {string} props.className - Additional CSS classes
  * @returns {JSX.Element} Checkbox component
- */
-export const Checkbox = React.forwardRef(({ 
+ */import { useTranslation } from "react-i18next";
+export const Checkbox = React.forwardRef(({
   checked = false,
   onCheckedChange,
   className,
-  ...props 
+  ...props
 }, ref) => {
   return (
     <button
@@ -29,24 +30,24 @@ export const Checkbox = React.forwardRef(({
         checked && "bg-primary text-primary-foreground",
         className
       )}
-      {...props}
-    >
-      {checked && (
-        <svg
-          className="h-3 w-3"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={3}
-        >
+      {...props}>
+
+      {checked &&
+      <svg
+        className="h-3 w-3"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={3}>
+
           <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M5 13l4 4L19 7"
-          />
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5 13l4 4L19 7" />
+
         </svg>
-      )}
-    </button>
-  );
+      }
+    </button>);
+
 });
 Checkbox.displayName = "Checkbox";

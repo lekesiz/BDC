@@ -1,8 +1,9 @@
-import { 
-  generateSettingsData, 
+// TODO: i18n - processed
+import {
+  generateSettingsData,
   generateSettingsOptions,
-  generateDataExportOptions 
-} from './mockSettingsData';
+  generateDataExportOptions } from
+'./mockSettingsData';import { useTranslation } from "react-i18next";
 export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut, originalDelete) => {
   const originalFunctions = {
     get: originalGet || api.get.bind(api),
@@ -11,7 +12,7 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     delete: originalDelete || api.delete.bind(api)
   };
   // Settings endpoints
-  api.get = function(url, ...args) {
+  api.get = function (url, ...args) {
     // General settings endpoint
     if (url === '/api/settings' || url === '/api/settings/general') {
       const userRole = localStorage.getItem('userRole') || 'student';
@@ -170,7 +171,7 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     return originalFunctions.get.call(api, url, ...args);
   };
   // Update settings endpoints
-  api.put = function(url, data, ...args) {
+  api.put = function (url, data, ...args) {
     // Update general settings
     if (url === '/api/settings' || url === '/api/settings/general') {
       return Promise.resolve({
@@ -184,10 +185,10 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     }
     // Update specific setting sections
     const settingsSections = [
-      'profile', 'notifications', 'privacy', 'security', 
-      'appearance', 'integrations', 'organization', 'billing',
-      'teaching', 'learning', 'theme'
-    ];
+    'profile', 'notifications', 'privacy', 'security',
+    'appearance', 'integrations', 'organization', 'billing',
+    'teaching', 'learning', 'theme'];
+
     for (const section of settingsSections) {
       if (url === `/api/settings/${section}`) {
         return Promise.resolve({
@@ -225,17 +226,17 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
           enabled: data.enabled,
           qrCode: data.enabled ? 'data:image/png;base64,iVBORw0KGgoAAAANS...' : null,
           backupCodes: data.enabled ? [
-            'ABCD-EFGH-IJKL',
-            'MNOP-QRST-UVWX',
-            'YZAB-CDEF-GHIJ'
-          ] : null
+          'ABCD-EFGH-IJKL',
+          'MNOP-QRST-UVWX',
+          'YZAB-CDEF-GHIJ'] :
+          null
         }
       });
     }
     return originalFunctions.put.call(api, url, data, ...args);
   };
   // Settings POST endpoints
-  api.post = function(url, data, ...args) {
+  api.post = function (url, data, ...args) {
     // Export data endpoint
     if (url === '/api/settings/export-data') {
       return Promise.resolve({
@@ -304,7 +305,7 @@ export const setupSettingsMockApi = (api, originalGet, originalPost, originalPut
     return originalFunctions.post.call(api, url, data, ...args);
   };
   // Settings DELETE endpoints
-  api.delete = function(url, ...args) {
+  api.delete = function (url, ...args) {
     // Delete account endpoint
     if (url === '/api/settings/account') {
       return Promise.resolve({

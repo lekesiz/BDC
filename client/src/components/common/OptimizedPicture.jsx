@@ -1,5 +1,6 @@
+// TODO: i18n - processed
 import React from 'react';
-import LazyImage from './LazyImage';
+import LazyImage from './LazyImage';import { useTranslation } from "react-i18next";
 const OptimizedPicture = ({
   src,
   alt,
@@ -14,21 +15,21 @@ const OptimizedPicture = ({
   onLoad,
   onError,
   ...props
-}) => {
+}) => {const { t } = useTranslation();
   // If priority is true, use native loading instead of LazyImage
   if (priority) {
     return (
       <picture>
-        {formats.map(format => (
-          <source
-            key={format}
-            type={`image/${format}`}
-            srcSet={widths.map(w => 
-              `${src}?w=${w}&fm=${format}&q=${quality} ${w}w`
-            ).join(', ')}
-            sizes={sizes}
-          />
-        ))}
+        {formats.map((format) =>
+        <source
+          key={format}
+          type={`image/${format}`}
+          srcSet={widths.map((w) =>
+          `${src}?w=${w}&fm=${format}&q=${quality} ${w}w`
+          ).join(', ')}
+          sizes={sizes} />
+
+        )}
         <img
           src={`${src}?w=${widths[widths.length - 1]}&q=${quality}`}
           alt={alt}
@@ -37,24 +38,24 @@ const OptimizedPicture = ({
           decoding="async"
           onLoad={onLoad}
           onError={onError}
-          {...props}
-        />
-      </picture>
-    );
+          {...props} />
+
+      </picture>);
+
   }
   // For non-priority images, use LazyImage
   return (
     <picture>
-      {formats.map(format => (
-        <source
-          key={format}
-          type={`image/${format}`}
-          srcSet={widths.map(w => 
-            `${src}?w=${w}&fm=${format}&q=${quality} ${w}w`
-          ).join(', ')}
-          sizes={sizes}
-        />
-      ))}
+      {formats.map((format) =>
+      <source
+        key={format}
+        type={`image/${format}`}
+        srcSet={widths.map((w) =>
+        `${src}?w=${w}&fm=${format}&q=${quality} ${w}w`
+        ).join(', ')}
+        sizes={sizes} />
+
+      )}
       <LazyImage
         src={`${src}?w=${widths[widths.length - 1]}&q=${quality}`}
         alt={alt}
@@ -62,9 +63,9 @@ const OptimizedPicture = ({
         placeholder={placeholder}
         onLoad={onLoad}
         onError={onError}
-        {...props}
-      />
-    </picture>
-  );
+        {...props} />
+
+    </picture>);
+
 };
 export default React.memo(OptimizedPicture);
