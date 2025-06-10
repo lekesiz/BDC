@@ -73,11 +73,11 @@ class IPWhitelistMiddleware:
     def _is_ip_allowed(self, ip):
         """Check if IP is allowed based on whitelist."""
         # Empty whitelist means allow all
-        if not self.whitelist:
+        if not self.ip_whitelist:
             return True
             
         # Check if IP is in any of the allowed networks/IPs
-        for entry in self.whitelist:
+        for entry in self.ip_whitelist:
             if isinstance(entry, ipaddress.IPv4Network) or isinstance(entry, ipaddress.IPv6Network):
                 if ip in entry:
                     return True

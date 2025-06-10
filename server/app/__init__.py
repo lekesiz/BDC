@@ -26,6 +26,7 @@ from app.api.performance_monitoring import performance_bp
 from app.api.ai_question_generation import ai_question_generation_bp
 from app.api.i18n import i18n_bp
 from app.api.gamification import gamification_bp
+from app.api.security import security_bp
 
 # Import i18n middleware
 from app.middleware.i18n_middleware import (
@@ -85,6 +86,24 @@ def create_app(config_name='default'):
     except Exception as e:
         logger.error(f"❌ I18n middleware initialization failed: {e}")
     
+    # Initialize security middleware
+    try:
+        logger.info("🔒 Initializing enhanced security features...")
+        
+        # 1. Initialize threat detection middleware
+        from app.middleware.threat_detection_middleware import threat_detection_middleware
+        threat_detection_middleware.init_app(app)
+        
+        # 2. Apply IP whitelist middleware if enabled
+        if app.config.get('ENABLE_IP_WHITELIST', False):
+            from app.middleware.ip_whitelist import IPWhitelistMiddleware
+            app.wsgi_app = IPWhitelistMiddleware(app.wsgi_app)
+            logger.info("✅ IP whitelist middleware enabled")
+        
+        logger.info("✅ Enhanced security features initialized successfully!")
+    except Exception as e:
+        logger.error(f"❌ Security middleware initialization failed: {e}")
+    
     # CRITICAL: Initialize Performance Optimization
     try:
         logger.info("🚀 Initializing comprehensive performance optimization...")
@@ -115,7 +134,8 @@ def create_app(config_name='default'):
         (performance_bp, '/api/performance'),  # Performance monitoring API
         (ai_question_generation_bp, None),  # AI Question Generation API (has its own prefix)
         (i18n_bp, None),  # I18n API (has its own prefix)
-        (gamification_bp, None)  # Gamification API (has its own prefix)
+        (gamification_bp, None),  # Gamification API (has its own prefix)
+        (security_bp, None)  # Security API (has its own prefix)
     ]
     
     for blueprint, url_prefix in api_blueprints:

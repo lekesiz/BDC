@@ -1,9 +1,15 @@
 import os
 from datetime import timedelta
+import sys
+
+# Add parent directory to path to import from app
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app.config.security import SecurityConfig
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-class Config:
+class Config(SecurityConfig):
     """Base configuration."""
     # Flask
     SECRET_KEY = os.getenv('SECRET_KEY')
